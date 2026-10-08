@@ -35,10 +35,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "Paste Ring")
+        statusItem.button?.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "PasteRing")
 
         let menu = NSMenu()
-        let title = NSMenuItem(title: "Paste Ring: ⌘⇧V to cycle", action: nil, keyEquivalent: "")
+        let title = NSMenuItem(title: "PasteRing: ⌘⇧V to cycle", action: nil, keyEquivalent: "")
         title.isEnabled = false
         menu.addItem(title)
         menu.addItem(.separator())
@@ -46,7 +46,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(makeItem("Clear History", #selector(clearHistory)))
         menu.addItem(makeItem("Grant Accessibility Access…", #selector(requestAccessibility)))
         menu.addItem(.separator())
-        menu.addItem(makeItem("Quit Paste Ring", #selector(quit), key: "q"))
+        menu.addItem(makeItem("Quit PasteRing", #selector(quit), key: "q"))
         statusItem.menu = menu
     }
 
