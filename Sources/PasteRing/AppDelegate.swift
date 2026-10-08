@@ -1,16 +1,24 @@
 import AppKit
 import Carbon.HIToolbox
+import Combine
+import SwiftUI
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let history = ClipboardHistory()
+    private let settings = AppSettings()
+    private var maxItemsObserver: AnyCancellable?
+    private var preferencesWindow: NSWindow?
     private var monitor: ClipboardMonitor!
     private var overlay: OverlayController!
     private var statusItem: NSStatusItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        maxItemsObserver = settings.$maxItems.sink { [weak self] in
+            self?.history.limit = $0
+        }
         monitor = ClipboardMonitor(history: history)
-        overlay = OverlayController(history: history, monitor: monitor)
+        overlay = OverlayController(history: history, monitor: monitor, settings: settings)
         monitor.start()
         setUpStatusItem()
 
@@ -33,6 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         title.isEnabled = false
         menu.addItem(title)
         menu.addItem(.separator())
+        menu.addItem(makeItem("Settings…", #selector(openPreferences), key: ","))
         menu.addItem(makeItem("Clear History", #selector(clearHistory)))
         menu.addItem(makeItem("Grant Accessibility Access…", #selector(requestAccessibility)))
         menu.addItem(.separator())
@@ -44,6 +53,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
         item.target = self
         return item
+    }
+
+    @objc private func openPreferences() {
+        if preferencesWindow == nil {
+            let window = NSWindow(contentViewController: NSHostingController(rootView: PreferencesView(settings: settings)))
+            window.title = "Paste Ring Settings"
+            window.styleMask = [.titled, .closable]
+            window.isReleasedWhenClosed = false
+            window.center()
+            preferencesWindow = window
+        }
+        // Accessory apps are not activated automatically, so the window would open behind others.
+        NSApp.activate(ignoringOtherApps: true)
+        preferencesWindow?.makeKeyAndOrderFront(nil)
     }
 
     @objc private func clearHistory() {

@@ -9,14 +9,14 @@ struct ClipItem: Identifiable, Equatable {
 @MainActor
 final class ClipboardHistory {
     private(set) var items: [ClipItem] = []
-    let limit = 50
+    var limit = 50 {
+        didSet { trim() }
+    }
 
     func add(_ text: String) {
         items.removeAll { $0.text == text }
         items.insert(ClipItem(text: text), at: 0)
-        if items.count > limit {
-            items.removeLast(items.count - limit)
-        }
+        trim()
     }
 
     func promote(_ item: ClipItem) {
@@ -26,5 +26,11 @@ final class ClipboardHistory {
 
     func clear() {
         items.removeAll()
+    }
+
+    private func trim() {
+        if items.count > limit {
+            items.removeLast(items.count - limit)
+        }
     }
 }

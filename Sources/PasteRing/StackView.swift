@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct RingView: View {
-    static let size = CGSize(width: 640, height: 480)
+/// Vertical stack: the selected entry in the middle, neighbours above and below.
+struct StackView: View {
     private static let visibleRange = 3
 
     private static let spacing: CGFloat = 8
@@ -29,25 +29,10 @@ struct RingView: View {
                     }
                 }
             }
-
-            VStack {
-                Spacer()
-                Text(footer)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(.regularMaterial, in: Capsule())
-            }
         }
-        .frame(width: Self.size.width, height: Self.size.height)
+        .frame(width: 640, height: 480)
         .onPreferenceChange(CardHeights.self) { heights = $0 }
         .animation(.spring(response: 0.25, dampingFraction: 0.85), value: state.selected)
-    }
-
-    private var footer: String {
-        let position = state.items.isEmpty ? "" : "\(state.selected + 1) of \(state.items.count) · "
-        return position + "⌘⇧V, arrows or scroll to move · release to paste · ⌘⇧⎋ cancel"
     }
 
     private func scale(_ distance: Int) -> CGFloat {
@@ -110,6 +95,15 @@ struct ClipCard: View {
     /// Unselected cards show one line, so collapse newlines to keep the preview meaningful.
     private var displayText: String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        return isSelected ? trimmed : trimmed.split(whereSeparator: \.isNewline).joined(separator: " ⏎ ")
+        return isSelected ? trimmed : text.singleLine
+    }
+}
+
+extension String {
+    /// Trimmed, with line breaks shown as ⏎ so one-line previews stay meaningful.
+    var singleLine: String {
+        trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(whereSeparator: \.isNewline)
+            .joined(separator: " ⏎ ")
     }
 }

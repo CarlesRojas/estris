@@ -5,34 +5,41 @@ import SwiftUI
 @MainActor
 final class OverlayState: ObservableObject {
     @Published var items: [ClipItem] = []
-    @Published var selected = 0
+    /// Steps taken since opening. Unbounded so the ring keeps turning the same way when it wraps.
+    @Published var position = 0
+
+    var selected: Int {
+        items.isEmpty ? 0 : (position % items.count + items.count) % items.count
+    }
 }
 
-/// Shows the ring while ⌘⇧ is held. ⌘⇧V, ⌘⇧ arrows and the scroll wheel move the
+/// Shows the overlay while ⌘⇧ is held. ⌘⇧V, ⌘⇧ arrows and the scroll wheel move the
 /// selection, releasing pastes, ⌘⇧Esc cancels.
 @MainActor
 final class OverlayController: NSObject {
     private let history: ClipboardHistory
     private let monitor: ClipboardMonitor
+    private let settings: AppSettings
     private let state = OverlayState()
     private let panel: OverlayPanel
     private var modifierTimer: Timer?
-    /// Hotkeys that only exist while the ring is visible.
+    /// Hotkeys that only exist while the overlay is visible.
     private var sessionHotKeys: [UInt32] = []
     private var scrollAccumulator: CGFloat = 0
 
-    init(history: ClipboardHistory, monitor: ClipboardMonitor) {
+    init(history: ClipboardHistory, monitor: ClipboardMonitor, settings: AppSettings) {
         self.history = history
         self.monitor = monitor
+        self.settings = settings
         panel = OverlayPanel(
-            contentRect: NSRect(origin: .zero, size: RingView.size),
+            contentRect: NSRect(x: 0, y: 0, width: 640, height: 600),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
         super.init()
         panel.configure()
-        let hostingView = NSHostingView(rootView: RingView(state: state).frame(maxWidth: .infinity, maxHeight: .infinity))
+        let hostingView = NSHostingView(rootView: OverlayRootView(state: state, settings: settings))
         hostingView.sizingOptions = []
         panel.contentView = hostingView
         panel.onScroll = { [weak self] event in
@@ -51,12 +58,12 @@ final class OverlayController: NSObject {
     private func move(by step: Int) {
         let count = state.items.count
         guard count > 0 else { return }
-        state.selected = ((state.selected + step) % count + count) % count
+        state.position += step
     }
 
     private func show() {
         state.items = history.items
-        state.selected = 0
+        state.position = 0
         scrollAccumulator = 0
         panel.present(on: screenWithMouse())
 
