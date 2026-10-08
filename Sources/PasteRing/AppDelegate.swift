@@ -76,6 +76,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func tab<Content: View>(_ label: String, symbol: String, _ view: Content) -> NSTabViewItem {
         let controller = NSHostingController(rootView: view)
+        // The tab controller shows the selected tab's title as the window title.
+        controller.title = label
         controller.sizingOptions = .preferredContentSize
         let item = NSTabViewItem(viewController: controller)
         item.label = label

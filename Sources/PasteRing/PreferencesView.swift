@@ -145,7 +145,7 @@ struct HistoryPreferences: View {
                         .padding(.vertical, 2)
                     }
                 }
-                .listStyle(.inset(alternatesRowBackgrounds: true))
+                .listStyle(.inset)
             }
         }
         .frame(width: 460, height: 440)
