@@ -10,7 +10,7 @@ struct OverlayRootView: View {
             case .stack: StackView(state: state)
             case .ring: RingMenuView(state: state)
             case .carousel: CarouselView(state: state)
-            case .deck: DeckView(state: state)
+            case .simple: SimpleView(state: state)
             case .grid: GridView(state: state)
             }
 
@@ -18,11 +18,12 @@ struct OverlayRootView: View {
                 Text("\(state.selected + 1) of \(state.items.count)")
                     .font(.system(size: 13, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 5)
-                    .background(.regularMaterial, in: Capsule())
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .surface(Capsule())
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .environment(\.glassStyle, settings.glass)
     }
 }

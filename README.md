@@ -18,8 +18,9 @@ Open **Settings…** from the menu bar icon to choose:
   - *Stack*: vertical list, selected entry in the middle.
   - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
   - *Carousel*: Cover Flow style, neighbours tilted away on either side.
-  - *Deck*: upcoming entries peek out behind the selected card; moving on deals the top card away.
+  - *Simple*: one rectangle with the entry that will be pasted; cycling only swaps the text.
   - *Grid*: pages of 12 tiles, the page follows the selection.
+- **Glass**: *Frosted* or *Clear*. Uses Liquid Glass on macOS 26 and blur materials on earlier versions.
 - **History size**: how many entries to keep (5 to 500, default 50).
 - **Open at login**: on by default, so Paste Ring is running after a restart.
 

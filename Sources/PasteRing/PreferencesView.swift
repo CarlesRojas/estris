@@ -1,21 +1,6 @@
 import SwiftUI
 
-struct PreferencesView: View {
-    @ObservedObject var settings: AppSettings
-    @ObservedObject var history: ClipboardHistory
-
-    var body: some View {
-        TabView {
-            GeneralPreferences(settings: settings)
-                .tabItem { Label("General", systemImage: "gearshape") }
-            HistoryPreferences(history: history)
-                .tabItem { Label("History", systemImage: "clock") }
-        }
-        .frame(width: 480, height: 440)
-    }
-}
-
-private struct GeneralPreferences: View {
+struct GeneralPreferences: View {
     @ObservedObject var settings: AppSettings
     @State private var openAtLogin = LoginItem.isEnabled
 
@@ -27,6 +12,13 @@ private struct GeneralPreferences: View {
                 }
             }
             .pickerStyle(.radioGroup)
+
+            Picker("Glass", selection: $settings.glass) {
+                ForEach(GlassStyle.allCases) { glass in
+                    Text(glass.title).tag(glass)
+                }
+            }
+            .pickerStyle(.segmented)
 
             if settings.style == .ring {
                 LabeledContent("Ring shows") {
@@ -59,6 +51,7 @@ private struct GeneralPreferences: View {
             ))
         }
         .formStyle(.grouped)
+        .frame(width: 460, height: 400)
         .onAppear { openAtLogin = LoginItem.isEnabled }
     }
 
@@ -74,11 +67,11 @@ private struct GeneralPreferences: View {
     }
 }
 
-private struct HistoryPreferences: View {
+struct HistoryPreferences: View {
     @ObservedObject var history: ClipboardHistory
     @State private var confirmingClear = false
 
-    private let mutedRed = Color.red.opacity(0.7)
+    private let mutedRed = Color.red.opacity(0.88)
 
     var body: some View {
         VStack(spacing: 0) {
@@ -125,8 +118,10 @@ private struct HistoryPreferences: View {
                         .padding(.vertical, 2)
                     }
                 }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
             }
         }
+        .frame(width: 460, height: 440)
         .confirmationDialog("Delete all clipboard entries?", isPresented: $confirmingClear) {
             Button("Clear All", role: .destructive) { history.clear() }
         }

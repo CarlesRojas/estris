@@ -6,7 +6,6 @@ struct RingMenuView: View {
     private static let minRadius: CGFloat = 170
     /// Roughly a chip's width plus a gap, so neighbours at the top never overlap.
     private static let chipSpacing: CGFloat = 200
-    private static let trackWidth: CGFloat = 56
 
     @ObservedObject var state: OverlayState
 
@@ -16,10 +15,6 @@ struct RingMenuView: View {
         let radius = Self.radius(for: count)
 
         ZStack {
-            Circle()
-                .strokeBorder(.ultraThinMaterial, lineWidth: Self.trackWidth)
-                .frame(width: (radius + Self.trackWidth / 2) * 2, height: (radius + Self.trackWidth / 2) * 2)
-
             if count == 0 {
                 Text("Clipboard history is empty")
                     .font(.system(size: 15, weight: .medium))
@@ -72,19 +67,14 @@ private struct RingChip: View {
         HStack(spacing: 6) {
             AppIconView(bundleID: item.sourceBundleID, size: 18)
             Text(item.text.singleLine)
-                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                .font(.callout.weight(isSelected ? .semibold : .regular))
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(width: 150)
         .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(.regularMaterial, in: Capsule())
-        .overlay(
-            Capsule()
-                .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.1), lineWidth: isSelected ? 2 : 1)
-        )
-        .shadow(color: .black.opacity(isSelected ? 0.3 : 0.1), radius: isSelected ? 10 : 4, y: 2)
+        .padding(.vertical, 9)
+        .surface(Capsule(), isSelected: isSelected)
     }
 }

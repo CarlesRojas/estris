@@ -84,20 +84,15 @@ struct ClipCard: View {
                 AppIconView(bundleID: appBundleID, size: 30)
             }
             Text(displayText)
-                .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
+                .font(isSelected ? .title3.weight(.semibold) : .body)
                 .lineLimit(isSelected ? 4 : 1)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(width: 520, alignment: .leading)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 18)
         .padding(.vertical, 14)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.1), lineWidth: isSelected ? 2 : 1)
-        )
-        .shadow(color: .black.opacity(isSelected ? 0.3 : 0.1), radius: isSelected ? 16 : 6, y: 4)
+        .surface(RoundedRectangle(cornerRadius: 20, style: .continuous), isSelected: isSelected)
     }
 
     /// Unselected cards show one line, so collapse newlines to keep the preview meaningful.

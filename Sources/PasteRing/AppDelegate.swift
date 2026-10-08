@@ -58,8 +58,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openPreferences() {
         if preferencesWindow == nil {
-            let window = NSWindow(contentViewController: NSHostingController(rootView: PreferencesView(settings: settings, history: history)))
-            window.title = "Paste Ring Settings"
+            // Toolbar tabs, like the system's own Settings windows.
+            let tabs = NSTabViewController()
+            tabs.tabStyle = .toolbar
+            tabs.addTabViewItem(tab("General", symbol: "gearshape", GeneralPreferences(settings: settings)))
+            tabs.addTabViewItem(tab("History", symbol: "clock", HistoryPreferences(history: history)))
+            let window = NSWindow(contentViewController: tabs)
             window.styleMask = [.titled, .closable]
             window.isReleasedWhenClosed = false
             window.center()
@@ -68,6 +72,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Accessory apps are not activated automatically, so the window would open behind others.
         NSApp.activate(ignoringOtherApps: true)
         preferencesWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    private func tab<Content: View>(_ label: String, symbol: String, _ view: Content) -> NSTabViewItem {
+        let controller = NSHostingController(rootView: view)
+        controller.sizingOptions = .preferredContentSize
+        let item = NSTabViewItem(viewController: controller)
+        item.label = label
+        item.image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)
+        return item
     }
 
     @objc private func clearHistory() {

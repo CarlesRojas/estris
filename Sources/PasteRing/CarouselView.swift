@@ -44,7 +44,7 @@ struct CarouselView: View {
     }
 }
 
-/// Fixed-size card with the source app and the text, shared by Carousel, Deck and Grid.
+/// Fixed-size card with the source app and the text, shared by Carousel and Grid.
 struct ContentCard: View {
     let item: ClipItem?
     let isSelected: Bool
@@ -63,26 +63,18 @@ struct ContentCard: View {
                         .lineLimit(1)
                 }
                 Text(item.text.trimmingCharacters(in: .whitespacesAndNewlines))
-                    .font(.system(size: 15, weight: isSelected ? .medium : .regular))
+                    .font(.body.weight(isSelected ? .medium : .regular))
                     .lineLimit(lineLimit)
                     .truncationMode(.tail)
             } else {
                 Text("Clipboard history is empty")
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.body.weight(.medium))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             Spacer(minLength: 0)
         }
         .padding(16)
         .frame(width: width, height: height, alignment: .topLeading)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(nsColor: .windowBackgroundColor))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.12), lineWidth: isSelected ? 2 : 1)
-        )
-        .shadow(color: .black.opacity(isSelected ? 0.35 : 0.15), radius: isSelected ? 18 : 8, y: 6)
+        .surface(RoundedRectangle(cornerRadius: 22, style: .continuous), isSelected: isSelected)
     }
 }

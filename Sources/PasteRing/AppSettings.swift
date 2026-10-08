@@ -4,7 +4,7 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
     case stack
     case ring
     case carousel
-    case deck
+    case simple
     case grid
 
     var id: Self { self }
@@ -14,7 +14,7 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
         case .stack: "Stack"
         case .ring: "Ring menu"
         case .carousel: "Carousel"
-        case .deck: "Deck"
+        case .simple: "Simple"
         case .grid: "Grid"
         }
     }
@@ -37,21 +37,27 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(ringSize, forKey: Keys.ringSize) }
     }
 
+    @Published var glass: GlassStyle {
+        didSet { defaults.set(glass.rawValue, forKey: Keys.glass) }
+    }
+
     @Published var style: OverlayStyle {
         didSet { defaults.set(style.rawValue, forKey: Keys.style) }
     }
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [Keys.maxItems: 50, Keys.ringSize: 8, Keys.style: OverlayStyle.stack.rawValue])
+        defaults.register(defaults: [Keys.maxItems: 50, Keys.ringSize: 8, Keys.style: OverlayStyle.stack.rawValue, Keys.glass: GlassStyle.frosted.rawValue])
         maxItems = defaults.integer(forKey: Keys.maxItems)
         ringSize = defaults.integer(forKey: Keys.ringSize)
+        glass = GlassStyle(rawValue: defaults.string(forKey: Keys.glass) ?? "") ?? .frosted
         style = OverlayStyle(rawValue: defaults.string(forKey: Keys.style) ?? "") ?? .stack
     }
 
     private enum Keys {
         static let maxItems = "maxItems"
         static let ringSize = "ringSize"
+        static let glass = "glassStyle"
         static let style = "overlayStyle"
     }
 }
