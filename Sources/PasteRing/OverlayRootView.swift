@@ -14,18 +14,16 @@ struct OverlayRootView: View {
             case .grid: GridView(state: state)
             }
 
-            Text(footer)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(.regularMaterial, in: Capsule())
+            if !state.items.isEmpty {
+                Text("\(state.selected + 1) of \(state.items.count)")
+                    .font(.system(size: 13, weight: .medium).monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .background(.regularMaterial, in: Capsule())
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private var footer: String {
-        let position = state.items.isEmpty ? "" : "\(state.selected + 1) of \(state.items.count) · "
-        return position + "⌘⇧V, arrows or scroll to move · release to paste · ⌘⇧⎋ cancel"
-    }
 }
