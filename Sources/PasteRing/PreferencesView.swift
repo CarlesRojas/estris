@@ -28,6 +28,16 @@ private struct GeneralPreferences: View {
             }
             .pickerStyle(.radioGroup)
 
+            if settings.style == .ring {
+                LabeledContent("Ring shows") {
+                    HStack {
+                        Stepper("Ring shows", value: clamped(\.ringSize, to: AppSettings.ringSizeRange), in: AppSettings.ringSizeRange)
+                            .labelsHidden()
+                        Text("\(settings.ringSize) most recent entries")
+                    }
+                }
+            }
+
             LabeledContent("History size") {
                 HStack {
                     TextField("History size", value: maxItems, format: .number)
@@ -53,9 +63,13 @@ private struct GeneralPreferences: View {
     }
 
     private var maxItems: Binding<Int> {
+        clamped(\.maxItems, to: AppSettings.maxItemsRange)
+    }
+
+    private func clamped(_ keyPath: ReferenceWritableKeyPath<AppSettings, Int>, to range: ClosedRange<Int>) -> Binding<Int> {
         Binding(
-            get: { settings.maxItems },
-            set: { settings.maxItems = min(max($0, AppSettings.maxItemsRange.lowerBound), AppSettings.maxItemsRange.upperBound) }
+            get: { settings[keyPath: keyPath] },
+            set: { settings[keyPath: keyPath] = min(max($0, range.lowerBound), range.upperBound) }
         )
     }
 }

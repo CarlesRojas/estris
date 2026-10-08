@@ -16,7 +16,7 @@ Open **Settings…** from the menu bar icon to choose:
 
 - **Style**:
   - *Stack*: vertical list, selected entry in the middle.
-  - *Ring menu*: entries on a rotating circle, selected one at the top, full text in the centre.
+  - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
   - *Carousel*: Cover Flow style, neighbours tilted away on either side.
   - *Deck*: upcoming entries peek out behind the selected card; moving on deals the top card away.
   - *Grid*: pages of 12 tiles, the page follows the selection.

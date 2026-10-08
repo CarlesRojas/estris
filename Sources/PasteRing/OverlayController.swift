@@ -89,7 +89,8 @@ final class OverlayController: NSObject {
     }
 
     private func show() {
-        state.items = history.items
+        let visibleLimit = settings.style == .ring ? settings.ringSize : history.items.count
+        state.items = Array(history.items.prefix(visibleLimit))
         state.position = 0
         scrollAccumulator = 0
         panel.present(on: screenWithMouse())
