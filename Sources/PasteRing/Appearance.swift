@@ -145,12 +145,23 @@ private struct InPreviewKey: EnvironmentKey {
     static let defaultValue = false
 }
 
+private struct SolidKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
 extension EnvironmentValues {
     /// Inside the settings preview, vibrancy blends with the preview backdrop instead of
     /// whatever is behind the settings window.
     var surfaceInPreview: Bool {
         get { self[InPreviewKey.self] }
         set { self[InPreviewKey.self] = newValue }
+    }
+
+    /// Solid cards instead of a backdrop effect. Glass and blur sample what is behind them
+    /// and do not survive 3D transforms, so tilted views use this.
+    var surfaceIsSolid: Bool {
+        get { self[SolidKey.self] }
+        set { self[SolidKey.self] = newValue }
     }
 }
 
@@ -167,14 +178,23 @@ private struct Surface: ViewModifier {
     let isSelected: Bool
     @EnvironmentObject private var appearance: AppearanceSettings
     @Environment(\.surfaceInPreview) private var inPreview
+    @Environment(\.surfaceIsSolid) private var isSolid
 
+    @ViewBuilder
     func body(content: Content) -> some View {
-        backdrop(content)
-            .shadow(
-                color: .black.opacity(appearance.shadowRadius > 0 ? (isSelected ? 0.3 : 0.18) : 0),
-                radius: appearance.shadowRadius,
-                y: appearance.shadowRadius / 3
-            )
+        if isSolid {
+            content
+                .background(shape.fill(tint ?? .clear))
+                .background(shape.fill(Color(nsColor: .windowBackgroundColor)))
+                .shadow(color: .black.opacity(isSelected ? 0.35 : 0.15), radius: isSelected ? 18 : 8, y: 6)
+        } else {
+            backdrop(content)
+                .shadow(
+                    color: .black.opacity(appearance.shadowRadius > 0 ? (isSelected ? 0.3 : 0.18) : 0),
+                    radius: appearance.shadowRadius,
+                    y: appearance.shadowRadius / 3
+                )
+        }
     }
 
     private var shape: AnyShape {
