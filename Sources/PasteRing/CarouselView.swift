@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Cover Flow style: the selected card faces you, the others tilt away on either side.
+/// Cover Flow style: the selected card faces you, the others are turned away on either side.
 struct CarouselView: View {
     private static let visibleRange = 3
 
@@ -15,12 +15,9 @@ struct CarouselView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ContentCard(item: item, isSelected: distance == 0)
-                            .rotation3DEffect(
-                                .degrees(distance == 0 ? 0 : (distance < 0 ? 45 : -45)),
-                                axis: (x: 0, y: 1, z: 0),
-                                perspective: 0.6
-                            )
-                            .scaleEffect(distance == 0 ? 1 : 0.82)
+                            // Squashing horizontally reads as turned away. A real 3D rotation
+                            // with perspective made the near edge taller than the card.
+                            .scaleEffect(x: distance == 0 ? 1 : 0.82 * 0.62, y: distance == 0 ? 1 : 0.82)
                             .offset(x: offset(distance))
                             .opacity(opacity(distance))
                             .zIndex(Double(-abs(distance)))
