@@ -23,7 +23,6 @@ struct StackView: View {
                                 Color.clear.preference(key: CardHeights.self, value: [item.id: proxy.size.height])
                             })
                             .scaleEffect(scale(distance))
-                            .opacity(opacity(distance))
                             .offset(y: offset(for: index))
                             .zIndex(Double(-abs(distance)))
                     }
@@ -38,11 +37,6 @@ struct StackView: View {
     private func scale(_ distance: Int) -> CGFloat {
         let scales: [CGFloat] = [1.0, 0.8, 0.68, 0.58]
         return scales[min(abs(distance), 3)]
-    }
-
-    private func opacity(_ distance: Int) -> Double {
-        let opacities: [Double] = [1.0, 0.55, 0.3, 0.12]
-        return opacities[min(abs(distance), 3)]
     }
 
     /// Stacks cards edge to edge (after scaling) outward from the selected one.
