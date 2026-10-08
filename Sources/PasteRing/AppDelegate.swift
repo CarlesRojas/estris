@@ -29,6 +29,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.overlay.cycle()
         }
 
+        LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
     }
 
@@ -57,7 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openPreferences() {
         if preferencesWindow == nil {
-            let window = NSWindow(contentViewController: NSHostingController(rootView: PreferencesView(settings: settings)))
+            let window = NSWindow(contentViewController: NSHostingController(rootView: PreferencesView(settings: settings, history: history)))
             window.title = "Paste Ring Settings"
             window.styleMask = [.titled, .closable]
             window.isReleasedWhenClosed = false
