@@ -67,8 +67,13 @@ final class OverlayController: NSObject {
 
     private func show() {
         let visibleLimit = settings.style == .ring ? settings.ringSize : history.items.count
-        state.items = Array(history.items.prefix(visibleLimit))
-        state.position = 0
+        // Reset without animating, so the overlay opens already on the first entry.
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            state.items = Array(history.items.prefix(visibleLimit))
+            state.position = 0
+        }
         scrollAccumulator = 0
         panel.present(on: screenWithMouse())
 

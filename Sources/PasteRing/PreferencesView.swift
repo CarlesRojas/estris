@@ -1,8 +1,12 @@
+import AppKit
 import SwiftUI
 
 struct GeneralPreferences: View {
     @ObservedObject var settings: AppSettings
     @State private var openAtLogin = LoginItem.isEnabled
+    @State private var accessibilityGranted = Paster.isTrusted(prompt: false)
+
+    private static let accessibilitySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
 
     var body: some View {
         Form {
@@ -49,10 +53,33 @@ struct GeneralPreferences: View {
                     openAtLogin = LoginItem.isEnabled
                 }
             ))
+
+            Section {
+                LabeledContent("Accessibility") {
+                    HStack {
+                        Text(accessibilityGranted ? "Allowed" : "Not allowed")
+                            .foregroundStyle(.secondary)
+                        Link("Open Settings", destination: Self.accessibilitySettingsURL)
+                    }
+                }
+            } footer: {
+                Text("Needed to paste into the frontmost app. Without it, the chosen entry is only copied.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 460, height: 400)
-        .onAppear { openAtLogin = LoginItem.isEnabled }
+        .frame(width: 460, height: 480)
+        .onAppear(perform: refreshStatus)
+        // Picks up changes made in System Settings when returning to this window.
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            refreshStatus()
+        }
+    }
+
+    private func refreshStatus() {
+        openAtLogin = LoginItem.isEnabled
+        accessibilityGranted = Paster.isTrusted(prompt: false)
     }
 
     private var maxItems: Binding<Int> {

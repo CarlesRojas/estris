@@ -23,6 +23,7 @@ Open **Settings…** from the menu bar icon to choose:
 - **Glass**: *Frosted* or *Clear*. Uses Liquid Glass on macOS 26 and blur materials on earlier versions.
 - **History size**: how many entries to keep (5 to 500, default 50).
 - **Open at login**: on by default, so PasteRing is running after a restart.
+- **Accessibility**: shows whether the permission is granted, with a link to its page in System Settings.
 
 The **History** tab lists every saved entry. The trash button deletes one, **Clear All** deletes everything.
 
