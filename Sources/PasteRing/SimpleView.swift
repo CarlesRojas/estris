@@ -18,7 +18,7 @@ struct SimpleView: View {
         }
         .padding(20)
         .frame(width: 560, height: 200)
-        .surface(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .surface(cornerRadius: 22)
         .transaction { $0.animation = nil }
     }
 }

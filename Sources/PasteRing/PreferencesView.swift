@@ -10,30 +10,6 @@ struct GeneralPreferences: View {
 
     var body: some View {
         Form {
-            Picker("Style", selection: $settings.style) {
-                ForEach(OverlayStyle.allCases) { style in
-                    Text(style.title).tag(style)
-                }
-            }
-            .pickerStyle(.radioGroup)
-
-            Picker("Glass", selection: $settings.glass) {
-                ForEach(GlassStyle.allCases) { glass in
-                    Text(glass.title).tag(glass)
-                }
-            }
-            .pickerStyle(.segmented)
-
-            if settings.style == .ring {
-                LabeledContent("Ring shows") {
-                    HStack {
-                        Stepper("Ring shows", value: clamped(\.ringSize, to: AppSettings.ringSizeRange), in: AppSettings.ringSizeRange)
-                            .labelsHidden()
-                        Text("\(settings.ringSize) most recent entries")
-                    }
-                }
-            }
-
             LabeledContent("History size") {
                 HStack {
                     TextField("History size", value: maxItems, format: .number)
@@ -69,7 +45,7 @@ struct GeneralPreferences: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 460, height: 480)
+        .frame(width: 460, height: 360)
         .onAppear(perform: refreshStatus)
         // Picks up changes made in System Settings when returning to this window.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
@@ -83,14 +59,7 @@ struct GeneralPreferences: View {
     }
 
     private var maxItems: Binding<Int> {
-        clamped(\.maxItems, to: AppSettings.maxItemsRange)
-    }
-
-    private func clamped(_ keyPath: ReferenceWritableKeyPath<AppSettings, Int>, to range: ClosedRange<Int>) -> Binding<Int> {
-        Binding(
-            get: { settings[keyPath: keyPath] },
-            set: { settings[keyPath: keyPath] = min(max($0, range.lowerBound), range.upperBound) }
-        )
+        settings.clamped(\.maxItems, to: AppSettings.maxItemsRange)
     }
 }
 

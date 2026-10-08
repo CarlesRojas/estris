@@ -7,6 +7,7 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let history = ClipboardHistory()
     private let settings = AppSettings()
+    private let appearance = AppearanceSettings()
     private var maxItemsObserver: AnyCancellable?
     private var preferencesWindow: NSWindow?
     private var monitor: ClipboardMonitor!
@@ -18,7 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.history.limit = $0
         }
         monitor = ClipboardMonitor(history: history)
-        overlay = OverlayController(history: history, monitor: monitor, settings: settings)
+        overlay = OverlayController(history: history, monitor: monitor, settings: settings, appearance: appearance)
         monitor.start()
         setUpStatusItem()
 
@@ -62,8 +63,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let tabs = NSTabViewController()
             tabs.tabStyle = .toolbar
             tabs.addTabViewItem(tab("General", symbol: "gearshape", GeneralPreferences(settings: settings)))
+            tabs.addTabViewItem(tab("Appearance", symbol: "paintpalette", AppearancePreferences(settings: settings, appearance: appearance, history: history)))
             tabs.addTabViewItem(tab("History", symbol: "clock", HistoryPreferences(history: history)))
+            // Keep the app name as the window title instead of the selected tab's.
+            tabs.canPropagateSelectedChildViewControllerTitle = false
+            tabs.title = "PasteRing"
             let window = NSWindow(contentViewController: tabs)
+            window.title = "PasteRing"
             window.styleMask = [.titled, .closable]
             window.isReleasedWhenClosed = false
             window.center()
@@ -76,8 +82,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func tab<Content: View>(_ label: String, symbol: String, _ view: Content) -> NSTabViewItem {
         let controller = NSHostingController(rootView: view)
-        // The tab controller shows the selected tab's title as the window title.
-        controller.title = label
         controller.sizingOptions = .preferredContentSize
         let item = NSTabViewItem(viewController: controller)
         item.label = label

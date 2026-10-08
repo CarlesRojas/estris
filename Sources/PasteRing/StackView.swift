@@ -86,7 +86,7 @@ struct ClipCard: View {
         .frame(width: 520, alignment: .leading)
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
-        .surface(RoundedRectangle(cornerRadius: 20, style: .continuous), isSelected: isSelected)
+        .surface(cornerRadius: 20, isSelected: isSelected)
     }
 
     /// Unselected cards show one line, so collapse newlines to keep the preview meaningful.

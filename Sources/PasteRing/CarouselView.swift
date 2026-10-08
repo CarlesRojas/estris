@@ -72,6 +72,6 @@ struct ContentCard: View {
         }
         .padding(16)
         .frame(width: width, height: height, alignment: .topLeading)
-        .surface(RoundedRectangle(cornerRadius: 22, style: .continuous), isSelected: isSelected)
+        .surface(cornerRadius: 22, isSelected: isSelected)
     }
 }

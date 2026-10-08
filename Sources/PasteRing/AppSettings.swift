@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 enum OverlayStyle: String, CaseIterable, Identifiable {
     case stack
@@ -37,27 +38,29 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(ringSize, forKey: Keys.ringSize) }
     }
 
-    @Published var glass: GlassStyle {
-        didSet { defaults.set(glass.rawValue, forKey: Keys.glass) }
-    }
-
     @Published var style: OverlayStyle {
         didSet { defaults.set(style.rawValue, forKey: Keys.style) }
     }
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [Keys.maxItems: 50, Keys.ringSize: 8, Keys.style: OverlayStyle.stack.rawValue, Keys.glass: GlassStyle.frosted.rawValue])
+        defaults.register(defaults: [Keys.maxItems: 50, Keys.ringSize: 8, Keys.style: OverlayStyle.stack.rawValue])
         maxItems = defaults.integer(forKey: Keys.maxItems)
         ringSize = defaults.integer(forKey: Keys.ringSize)
-        glass = GlassStyle(rawValue: defaults.string(forKey: Keys.glass) ?? "") ?? .frosted
         style = OverlayStyle(rawValue: defaults.string(forKey: Keys.style) ?? "") ?? .stack
+    }
+
+    /// Binding that keeps typed or stepped values inside `range`.
+    func clamped(_ keyPath: ReferenceWritableKeyPath<AppSettings, Int>, to range: ClosedRange<Int>) -> Binding<Int> {
+        Binding(
+            get: { self[keyPath: keyPath] },
+            set: { self[keyPath: keyPath] = min(max($0, range.lowerBound), range.upperBound) }
+        )
     }
 
     private enum Keys {
         static let maxItems = "maxItems"
         static let ringSize = "ringSize"
-        static let glass = "glassStyle"
         static let style = "overlayStyle"
     }
 }

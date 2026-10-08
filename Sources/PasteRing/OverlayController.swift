@@ -24,6 +24,7 @@ final class OverlayController: NSObject {
     private let history: ClipboardHistory
     private let monitor: ClipboardMonitor
     private let settings: AppSettings
+    private let appearance: AppearanceSettings
     private let state = OverlayState()
     private let panel: OverlayPanel
     private var modifierTimer: Timer?
@@ -31,10 +32,11 @@ final class OverlayController: NSObject {
     private var sessionHotKeys: [UInt32] = []
     private var scrollAccumulator: CGFloat = 0
 
-    init(history: ClipboardHistory, monitor: ClipboardMonitor, settings: AppSettings) {
+    init(history: ClipboardHistory, monitor: ClipboardMonitor, settings: AppSettings, appearance: AppearanceSettings) {
         self.history = history
         self.monitor = monitor
         self.settings = settings
+        self.appearance = appearance
         panel = OverlayPanel(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 600),
             styleMask: [.borderless, .nonactivatingPanel],
@@ -43,7 +45,7 @@ final class OverlayController: NSObject {
         )
         super.init()
         panel.configure()
-        let hostingView = NSHostingView(rootView: OverlayRootView(state: state, settings: settings))
+        let hostingView = NSHostingView(rootView: OverlayRootView(state: state, settings: settings, appearance: appearance))
         hostingView.sizingOptions = []
         panel.contentView = hostingView
         panel.onScroll = { [weak self] event in

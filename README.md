@@ -12,22 +12,24 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 ## Settings
 
-Open **Settings…** from the menu bar icon to choose:
+Open **Settings…** from the menu bar icon.
 
-- **Style**:
-  - *Stack*: vertical list, selected entry in the middle.
-  - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
-  - *Carousel*: Cover Flow style, neighbours tilted away on either side.
-  - *Simple*: one rectangle with the entry that will be pasted; cycling only swaps the text.
-  - *Grid*: pages of 12 tiles, the page follows the selection.
-- **Glass**: *Frosted* or *Clear*. Uses Liquid Glass on macOS 26 and blur materials on earlier versions.
+**General**
 - **History size**: how many entries to keep (5 to 500, default 50).
 - **Open at login**: on by default, so PasteRing is running after a restart.
 - **Accessibility**: shows whether the permission is granted, with a link to its page in System Settings.
 
-The **History** tab lists every saved entry. The trash button deletes one, **Clear All** deletes everything.
+**Appearance** (with a live preview over your wallpaper)
+- **Style**:
+  - *Stack*: vertical list, selected entry in the middle.
+  - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
+  - *Carousel*: Cover Flow style, neighbours turned away on either side.
+  - *Simple*: one rectangle with the entry that will be pasted; cycling only swaps the text.
+  - *Grid*: pages of 12 tiles, the page follows the selection.
+- **Renderer**: which system API draws the surfaces: Liquid Glass via SwiftUI or AppKit (macOS 26), vibrancy (`NSVisualEffectView`, with a choice of material) or SwiftUI material.
+- **Tint**, **Tint strength**, **Selected highlight**, **Shadow**, **Dim screen**, and **Interactive** for SwiftUI glass.
 
-Entries marked as concealed or transient (password managers) are ignored. History is saved to `~/Library/Application Support/PasteRing/history.json` (readable by your user only), so it survives quitting and restarting the Mac.
+**History** lists every saved entry. The trash button deletes one, **Clear All** deletes everything.
 
 ## Build
 

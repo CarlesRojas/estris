@@ -59,7 +59,7 @@ struct RingMenuView: View {
     }
 }
 
-private struct RingChip: View {
+struct RingChip: View {
     let item: ClipItem
     let isSelected: Bool
 
@@ -75,6 +75,6 @@ private struct RingChip: View {
         .frame(width: 150)
         .padding(.horizontal, 12)
         .padding(.vertical, 9)
-        .surface(Capsule(), isSelected: isSelected)
+        .surface(cornerRadius: .infinity, isSelected: isSelected)
     }
 }
