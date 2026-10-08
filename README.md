@@ -6,7 +6,7 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 - Copy text as usual. Paste Ring records every new text entry (most recent first, up to 50).
 - Hold `⌘⇧` and press `V` to open the ring in the middle of the screen. The large card is what will be pasted.
-- Keep holding `⌘⇧` and press `V` again to move to the next entry.
+- Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
 - `⌘⇧Esc` closes the ring without pasting.
 

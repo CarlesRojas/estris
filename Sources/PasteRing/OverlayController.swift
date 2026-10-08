@@ -8,7 +8,8 @@ final class OverlayState: ObservableObject {
     @Published var selected = 0
 }
 
-/// Shows the ring while ⌘⇧ is held. Each ⌘⇧V advances, releasing pastes, ⌘⇧Esc cancels.
+/// Shows the ring while ⌘⇧ is held. ⌘⇧V, ⌘⇧ arrows and the scroll wheel move the
+/// selection, releasing pastes, ⌘⇧Esc cancels.
 @MainActor
 final class OverlayController: NSObject {
     private let history: ClipboardHistory
@@ -16,7 +17,9 @@ final class OverlayController: NSObject {
     private let state = OverlayState()
     private let panel: OverlayPanel
     private var modifierTimer: Timer?
-    private var cancelHotKey: UInt32?
+    /// Hotkeys that only exist while the ring is visible.
+    private var sessionHotKeys: [UInt32] = []
+    private var scrollAccumulator: CGFloat = 0
 
     init(history: ClipboardHistory, monitor: ClipboardMonitor) {
         self.history = history
@@ -29,43 +32,71 @@ final class OverlayController: NSObject {
         )
         super.init()
         panel.configure()
-        panel.contentView = NSHostingView(rootView: RingView(state: state))
+        let hostingView = NSHostingView(rootView: RingView(state: state).frame(maxWidth: .infinity, maxHeight: .infinity))
+        hostingView.sizingOptions = []
+        panel.contentView = hostingView
+        panel.onScroll = { [weak self] event in
+            self?.handleScroll(event)
+        }
     }
 
     func cycle() {
         if panel.isVisible {
-            guard !state.items.isEmpty else { return }
-            state.selected = (state.selected + 1) % state.items.count
+            move(by: 1)
         } else {
             show()
         }
     }
 
+    private func move(by step: Int) {
+        let count = state.items.count
+        guard count > 0 else { return }
+        state.selected = ((state.selected + step) % count + count) % count
+    }
+
     private func show() {
         state.items = history.items
         state.selected = 0
+        scrollAccumulator = 0
         panel.present(on: screenWithMouse())
 
         let timer = Timer(timeInterval: 1.0 / 60.0, target: self, selector: #selector(checkModifiers), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: .common)
         modifierTimer = timer
 
-        cancelHotKey = HotKeyCenter.shared.register(
-            keyCode: UInt32(kVK_Escape),
-            modifiers: UInt32(cmdKey | shiftKey)
-        ) { [weak self] in
-            self?.hide()
+        let bindings: [(Int, () -> Void)] = [
+            (kVK_Escape, { [weak self] in self?.hide() }),
+            (kVK_UpArrow, { [weak self] in self?.move(by: -1) }),
+            (kVK_LeftArrow, { [weak self] in self?.move(by: -1) }),
+            (kVK_DownArrow, { [weak self] in self?.move(by: 1) }),
+            (kVK_RightArrow, { [weak self] in self?.move(by: 1) }),
+        ]
+        sessionHotKeys = bindings.map { keyCode, handler in
+            HotKeyCenter.shared.register(keyCode: UInt32(keyCode), modifiers: UInt32(cmdKey | shiftKey), handler: handler)
         }
     }
 
     private func hide() {
         modifierTimer?.invalidate()
         modifierTimer = nil
-        if let cancelHotKey {
-            HotKeyCenter.shared.unregister(cancelHotKey)
-            self.cancelHotKey = nil
-        }
+        sessionHotKeys.forEach(HotKeyCenter.shared.unregister)
+        sessionHotKeys = []
         panel.orderOut(nil)
+    }
+
+    /// Trackpads send many small precise deltas, mouse wheels send whole lines.
+    /// Shift turns a mouse wheel into horizontal scrolling, so both axes count.
+    private func handleScroll(_ event: NSEvent) {
+        guard event.momentumPhase.isEmpty else { return }
+        let delta = abs(event.scrollingDeltaY) >= abs(event.scrollingDeltaX) ? event.scrollingDeltaY : event.scrollingDeltaX
+        let threshold: CGFloat = event.hasPreciseScrollingDeltas ? 30 : 1
+
+        scrollAccumulator += delta
+        while abs(scrollAccumulator) >= threshold {
+            // Content follows the gesture, so scrolling "up" brings the next entry up.
+            move(by: scrollAccumulator < 0 ? 1 : -1)
+            scrollAccumulator -= scrollAccumulator < 0 ? -threshold : threshold
+        }
     }
 
     @objc private func checkModifiers() {
@@ -94,7 +125,11 @@ final class OverlayController: NSObject {
     }
 }
 
+/// Transparent panel covering the whole screen so it receives scroll events wherever
+/// the pointer is, keeping them from scrolling the app underneath.
 final class OverlayPanel: NSPanel {
+    var onScroll: ((NSEvent) -> Void)?
+
     override var canBecomeKey: Bool { false }
     override var canBecomeMain: Bool { false }
 
@@ -105,15 +140,23 @@ final class OverlayPanel: NSPanel {
         isOpaque = false
         hasShadow = false
         hidesOnDeactivate = false
-        ignoresMouseEvents = true
+        ignoresMouseEvents = false
         isReleasedWhenClosed = false
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
     }
 
     func present(on screen: NSScreen?) {
-        if let visible = screen?.visibleFrame {
-            setFrameOrigin(NSPoint(x: visible.midX - frame.width / 2, y: visible.midY - frame.height / 2))
+        if let screen {
+            setFrame(screen.frame, display: true)
         }
         orderFrontRegardless()
+    }
+
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .scrollWheel {
+            onScroll?(event)
+        } else {
+            super.sendEvent(event)
+        }
     }
 }

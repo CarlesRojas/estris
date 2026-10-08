@@ -4,7 +4,11 @@ struct RingView: View {
     static let size = CGSize(width: 640, height: 480)
     private static let visibleRange = 3
 
+    private static let spacing: CGFloat = 8
+    private static let fallbackHeight: CGFloat = 50
+
     @ObservedObject var state: OverlayState
+    @State private var heights: [UUID: CGFloat] = [:]
 
     var body: some View {
         ZStack {
@@ -15,9 +19,12 @@ struct RingView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ClipCard(text: item.text, isSelected: distance == 0)
+                            .background(GeometryReader { proxy in
+                                Color.clear.preference(key: CardHeights.self, value: [item.id: proxy.size.height])
+                            })
                             .scaleEffect(scale(distance))
                             .opacity(opacity(distance))
-                            .offset(y: offset(distance))
+                            .offset(y: offset(for: index))
                             .zIndex(Double(-abs(distance)))
                     }
                 }
@@ -34,12 +41,13 @@ struct RingView: View {
             }
         }
         .frame(width: Self.size.width, height: Self.size.height)
+        .onPreferenceChange(CardHeights.self) { heights = $0 }
         .animation(.spring(response: 0.25, dampingFraction: 0.85), value: state.selected)
     }
 
     private var footer: String {
         let position = state.items.isEmpty ? "" : "\(state.selected + 1) of \(state.items.count) · "
-        return position + "⌘⇧V next · release to paste · ⌘⇧⎋ cancel"
+        return position + "⌘⇧V, arrows or scroll to move · release to paste · ⌘⇧⎋ cancel"
     }
 
     private func scale(_ distance: Int) -> CGFloat {
@@ -52,9 +60,30 @@ struct RingView: View {
         return opacities[min(abs(distance), 3)]
     }
 
-    private func offset(_ distance: Int) -> CGFloat {
-        let magnitude: CGFloat = [0, 95, 150, 195][min(abs(distance), 3)]
-        return distance < 0 ? -magnitude : magnitude
+    /// Stacks cards edge to edge (after scaling) outward from the selected one.
+    private func offset(for index: Int) -> CGFloat {
+        let step = index > state.selected ? 1 : -1
+        var y: CGFloat = 0
+        var current = state.selected
+        while current != index {
+            let next = current + step
+            y += halfHeight(current) + halfHeight(next) + Self.spacing
+            current = next
+        }
+        return CGFloat(step) * y
+    }
+
+    private func halfHeight(_ index: Int) -> CGFloat {
+        let height = heights[state.items[index].id] ?? Self.fallbackHeight
+        return height * scale(index - state.selected) / 2
+    }
+}
+
+private struct CardHeights: PreferenceKey {
+    static let defaultValue: [UUID: CGFloat] = [:]
+
+    static func reduce(value: inout [UUID: CGFloat], nextValue: () -> [UUID: CGFloat]) {
+        value.merge(nextValue()) { $1 }
     }
 }
 
