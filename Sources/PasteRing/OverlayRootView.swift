@@ -9,6 +9,9 @@ struct OverlayRootView: View {
             switch settings.style {
             case .stack: StackView(state: state)
             case .ring: RingMenuView(state: state)
+            case .carousel: CarouselView(state: state)
+            case .deck: DeckView(state: state)
+            case .grid: GridView(state: state)
             }
 
             Text(footer)

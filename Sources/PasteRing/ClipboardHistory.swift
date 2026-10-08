@@ -4,11 +4,14 @@ struct ClipItem: Identifiable, Equatable, Codable {
     let id: UUID
     let text: String
     let date: Date
+    /// App the text was copied from. Missing in entries saved by older versions.
+    let sourceBundleID: String?
 
-    init(text: String) {
+    init(text: String, sourceBundleID: String?) {
         id = UUID()
         self.text = text
         date = Date()
+        self.sourceBundleID = sourceBundleID
     }
 }
 
@@ -32,10 +35,10 @@ final class ClipboardHistory: ObservableObject {
         items = Self.load()
     }
 
-    func add(_ text: String) {
+    func add(_ text: String, sourceBundleID: String?) {
         var updated = items
         updated.removeAll { $0.text == text }
-        updated.insert(ClipItem(text: text), at: 0)
+        updated.insert(ClipItem(text: text, sourceBundleID: sourceBundleID), at: 0)
         items = updated
         trim()
     }

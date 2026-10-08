@@ -13,12 +13,12 @@ struct StackView: View {
     var body: some View {
         ZStack {
             if state.items.isEmpty {
-                ClipCard(text: "Clipboard history is empty", isSelected: true)
+                ClipCard(text: "Clipboard history is empty", isSelected: true, showsIcon: false)
             } else {
                 ForEach(Array(state.items.enumerated()), id: \.element.id) { index, item in
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
-                        ClipCard(text: item.text, isSelected: distance == 0)
+                        ClipCard(text: item.text, isSelected: distance == 0, appBundleID: item.sourceBundleID)
                             .background(GeometryReader { proxy in
                                 Color.clear.preference(key: CardHeights.self, value: [item.id: proxy.size.height])
                             })
@@ -75,21 +75,29 @@ private struct CardHeights: PreferenceKey {
 struct ClipCard: View {
     let text: String
     let isSelected: Bool
+    var appBundleID: String?
+    var showsIcon = true
 
     var body: some View {
-        Text(displayText)
-            .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
-            .lineLimit(isSelected ? 4 : 1)
-            .truncationMode(.tail)
-            .frame(width: 520, alignment: .leading)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.1), lineWidth: isSelected ? 2 : 1)
-            )
-            .shadow(color: .black.opacity(isSelected ? 0.3 : 0.1), radius: isSelected ? 16 : 6, y: 4)
+        HStack(spacing: 14) {
+            if showsIcon {
+                AppIconView(bundleID: appBundleID, size: 30)
+            }
+            Text(displayText)
+                .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
+                .lineLimit(isSelected ? 4 : 1)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(width: 520, alignment: .leading)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.1), lineWidth: isSelected ? 2 : 1)
+        )
+        .shadow(color: .black.opacity(isSelected ? 0.3 : 0.1), radius: isSelected ? 16 : 6, y: 4)
     }
 
     /// Unselected cards show one line, so collapse newlines to keep the preview meaningful.

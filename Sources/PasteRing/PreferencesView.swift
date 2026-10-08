@@ -89,6 +89,7 @@ private struct HistoryPreferences: View {
                 List {
                     ForEach(history.items) { item in
                         HStack(alignment: .top, spacing: 12) {
+                            AppIconView(bundleID: item.sourceBundleID, size: 28)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.text.singleLine)
                                     .lineLimit(2)

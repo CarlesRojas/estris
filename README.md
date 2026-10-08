@@ -4,7 +4,7 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 ## Usage
 
-- Copy text as usual. Paste Ring records every new text entry, most recent first.
+- Copy text as usual. Paste Ring records every new text entry, most recent first, along with the app it was copied from (shown as its icon).
 - Hold `⌘⇧` and press `V` to open the overlay in the middle of the screen. The highlighted entry is what will be pasted.
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
@@ -14,7 +14,12 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 Open **Settings…** from the menu bar icon to choose:
 
-- **Style**: *Stack* (vertical list, selected entry in the middle) or *Ring menu* (entries on a rotating circle, selected one at the top, full text in the centre).
+- **Style**:
+  - *Stack*: vertical list, selected entry in the middle.
+  - *Ring menu*: entries on a rotating circle, selected one at the top, full text in the centre.
+  - *Carousel*: Cover Flow style, neighbours tilted away on either side.
+  - *Deck*: upcoming entries peek out behind the selected card; moving on deals the top card away.
+  - *Grid*: pages of 12 tiles, the page follows the selection.
 - **History size**: how many entries to keep (5 to 500, default 50).
 - **Open at login**: on by default, so Paste Ring is running after a restart.
 

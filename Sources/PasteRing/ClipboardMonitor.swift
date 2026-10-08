@@ -41,6 +41,15 @@ final class ClipboardMonitor: NSObject {
         capture()
     }
 
+    /// Prefers the source the copying app declares (nspasteboard.org), else the frontmost app,
+    /// which is almost always the one that just copied.
+    private func sourceBundleID() -> String? {
+        if let declared = pasteboard.string(forType: .init("org.nspasteboard.source")), !declared.isEmpty {
+            return declared
+        }
+        return NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+    }
+
     private func capture() {
         if let types = pasteboard.types, types.contains(where: Self.ignoredTypes.contains) {
             return
@@ -48,6 +57,6 @@ final class ClipboardMonitor: NSObject {
         guard let text = pasteboard.string(forType: .string),
               !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         else { return }
-        history.add(text)
+        history.add(text, sourceBundleID: sourceBundleID())
     }
 }

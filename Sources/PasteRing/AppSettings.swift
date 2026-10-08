@@ -3,6 +3,9 @@ import Foundation
 enum OverlayStyle: String, CaseIterable, Identifiable {
     case stack
     case ring
+    case carousel
+    case deck
+    case grid
 
     var id: Self { self }
 
@@ -10,6 +13,9 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
         switch self {
         case .stack: "Stack"
         case .ring: "Ring menu"
+        case .carousel: "Carousel"
+        case .deck: "Deck"
+        case .grid: "Grid"
         }
     }
 }
