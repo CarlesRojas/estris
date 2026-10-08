@@ -25,5 +25,4 @@ struct OverlayRootView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-
 }
