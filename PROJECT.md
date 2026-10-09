@@ -112,7 +112,7 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
 - **Fill the space next to other windows** (on by default; shortcuts and dragging, preview included): a snap's sides that aren't on a screen edge move to the nearest edge of a tiled window, growing into a gap or shrinking away from a window.
   - Tiled windows: on the same screen, touching a screen edge (within 8 points), and at least half visible (sampled on a grid, against the windows in front). The moved window doesn't count.
   - Never overlaps them: where the free space isn't a rectangle, it leaves the gap.
-  - A free side with no window directly beside it lines up with the nearest side of another tiled window (not a screen edge), so a new bottom-left quarter meets the line two moved top quarters share.
+  - A free side with no window directly beside it lines up with the nearest side of another tiled window (not a screen edge, and within a quarter of the screen of where it would be), so a new bottom-left quarter meets the line two moved top quarters share.
   - Each direction stays within a range of the usual size, or keeps the usual size: halves and corners 0.1 to 1.95 times (nearly the whole screen), thirds and two thirds 0.5 to 1.6 times (a third next to a single third doesn't become two thirds).
   - Maximize, Center and Restore never fill.
   - If the app won't get as small as the space, the window gets the usual snap and the app's minimum is remembered, so later previews for it show the usual snap.

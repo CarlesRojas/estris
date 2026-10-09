@@ -21,6 +21,8 @@ enum SpaceFiller {
         default: 0.5...1.6
         }
     }
+    /// How far, as a share of the screen, a side may move to line up with another window's.
+    private static let alignmentReach: CGFloat = 0.25
     /// Share of a window that must be uncovered for it to count.
     private static let minimumVisibleShare = 0.5
 
@@ -96,14 +98,14 @@ enum SpaceFiller {
         if freeLeft {
             if let edge = beside.filter({ $0.maxX < usual.maxX - tolerance && $0.minX < usual.minX + tolerance }).map(\.maxX).max() {
                 minX = edge
-            } else if let line = nearest(to: usual.minX, among: lines.filter { $0 < rect.maxX - tolerance }) {
+            } else if let line = nearest(to: usual.minX, among: lines.filter { $0 < rect.maxX - tolerance }, within: area.width * Self.alignmentReach) {
                 minX = line
             }
         }
         if freeRight {
             if let edge = beside.filter({ $0.minX > usual.minX + tolerance && $0.maxX > usual.maxX - tolerance }).map(\.minX).min() {
                 maxX = edge
-            } else if let line = nearest(to: usual.maxX, among: lines.filter { $0 > minX + tolerance }) {
+            } else if let line = nearest(to: usual.maxX, among: lines.filter { $0 > minX + tolerance }, within: area.width * Self.alignmentReach) {
                 maxX = line
             }
         }
@@ -121,14 +123,14 @@ enum SpaceFiller {
         if freeBottom {
             if let edge = above.filter({ $0.maxY < usual.maxY - tolerance && $0.minY < usual.minY + tolerance }).map(\.maxY).max() {
                 minY = edge
-            } else if let line = nearest(to: usual.minY, among: lines.filter { $0 < rect.maxY - tolerance }) {
+            } else if let line = nearest(to: usual.minY, among: lines.filter { $0 < rect.maxY - tolerance }, within: area.height * Self.alignmentReach) {
                 minY = line
             }
         }
         if freeTop {
             if let edge = above.filter({ $0.minY > usual.minY + tolerance && $0.maxY > usual.maxY - tolerance }).map(\.minY).min() {
                 maxY = edge
-            } else if let line = nearest(to: usual.maxY, among: lines.filter { $0 > minY + tolerance }) {
+            } else if let line = nearest(to: usual.maxY, among: lines.filter { $0 > minY + tolerance }, within: area.height * Self.alignmentReach) {
                 maxY = line
             }
         }
@@ -136,8 +138,8 @@ enum SpaceFiller {
         return NSRect(x: rect.minX, y: minY, width: rect.width, height: maxY - minY)
     }
 
-    private static func nearest(to value: CGFloat, among lines: [CGFloat]) -> CGFloat? {
-        lines.min { abs($0 - value) < abs($1 - value) }
+    private static func nearest(to value: CGFloat, among lines: [CGFloat], within reach: CGFloat) -> CGFloat? {
+        lines.filter { abs($0 - value) <= reach }.min { abs($0 - value) < abs($1 - value) }
     }
 
     private static func nearlyEqual(_ a: NSRect, _ b: NSRect) -> Bool {
