@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The first row of every utility's settings pane: what it is, and a switch that turns the
@@ -36,8 +37,13 @@ struct UtilityHeader: View {
 
 /// The on/off state shown at the right of a sidebar row.
 struct StatusBadge: View {
-    /// Dark enough for white text to stay readable (about 5:1), in light and dark mode.
-    private static let onColor = Color(.sRGB, red: 0.10, green: 0.48, blue: 0.20)
+    /// The system green in light mode. In dark mode the system green is too bright for white
+    /// text, so a deeper green keeps it readable (about 5:1).
+    private static let onColor = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            ? NSColor(srgbRed: 0.10, green: 0.48, blue: 0.20, alpha: 1)
+            : .systemGreen
+    })
 
     let isOn: Bool
 
