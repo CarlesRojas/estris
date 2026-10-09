@@ -7,7 +7,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case general
     case clipboard
     case autoQuit
-    case mouse
+    case middleClick
     /// Hidden until unlocked from the version in General > About.
     case developer
 
@@ -18,7 +18,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .general: "General"
         case .clipboard: "Clipboard"
         case .autoQuit: "Auto Quit"
-        case .mouse: "Mouse"
+        case .middleClick: "Middle Click"
         case .developer: "Developer"
         }
     }
@@ -28,7 +28,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .general: "gearshape"
         case .clipboard: "list.clipboard"
         case .autoQuit: "xmark.app"
-        case .mouse: "computermouse"
+        case .middleClick: "hand.tap"
         case .developer: "hammer"
         }
     }
@@ -42,8 +42,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["logs", "debug", "developer", "diagnostics"]
         case .autoQuit:
             ["quit", "close", "window", "last window", "terminate", "excluded", "apps", "delay"]
-        case .mouse:
-            ["trackpad", "middle click", "tap", "fingers", "click"]
+        case .middleClick:
+            ["trackpad", "mouse", "middle", "tap", "fingers", "click"]
         case .clipboard:
             ["history", "paste", "search", "image", "file", "rich text", "excluded", "apps", "expiry", "shortcut", "hotkey", "keyboard", "password", "duplicate", "date", "delete", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
         }
@@ -100,6 +100,7 @@ struct SettingsSidebar: View {
     @ObservedObject var navigation: SettingsNavigation
     @ObservedObject var clipboardSettings: ClipboardSettings
     @ObservedObject var autoQuitSettings: AutoQuitSettings
+    @ObservedObject var middleClickSettings: MiddleClickSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -120,7 +121,7 @@ struct SettingsSidebar: View {
         case .general: nil
         case .clipboard: clipboardSettings.isEnabled
         case .autoQuit: autoQuitSettings.isEnabled
-        case .mouse: nil
+        case .middleClick: middleClickSettings.isEnabled
         case .developer: nil
         }
     }
@@ -133,7 +134,7 @@ struct SettingsDetail: View {
     @ObservedObject var general: GeneralSettings
     let clipboard: ClipboardManager
     let autoQuit: AutoQuit
-    let mouse: Mouse
+    let middleClick: MiddleClick
     let log: AppLog
 
     var body: some View {
@@ -146,8 +147,8 @@ struct SettingsDetail: View {
                     clipboard.settingsPane()
                 case .autoQuit:
                     autoQuit.settingsPane()
-                case .mouse:
-                    mouse.settingsPane()
+                case .middleClick:
+                    middleClick.settingsPane()
                 case .developer:
                     DeveloperPane(general: general, log: log)
                 }

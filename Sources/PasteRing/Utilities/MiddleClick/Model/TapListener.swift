@@ -6,7 +6,7 @@ import AppKit
 /// MultitouchSupport framework (loaded at run time, so PasteRing still runs if it ever goes
 /// away) and posts the click itself, which needs Accessibility access.
 @MainActor
-final class MiddleClick {
+final class TapListener {
     private let appLog: AppLog
     /// The devices being listened to; holding the list keeps them alive.
     private var devices: CFArray?
@@ -28,7 +28,7 @@ final class MiddleClick {
             guard let device = CFArrayGetValueAtIndex(list, index) else { continue }
             let pointer = UnsafeMutableRawPointer(mutating: device)
             api.register(pointer, multitouchCallback)
-            api.start(pointer, 0)
+            _ = api.start(pointer, 0)
         }
         log("listening for a \(fingers)-finger tap on \(CFArrayGetCount(list)) device(s)")
     }
@@ -39,7 +39,7 @@ final class MiddleClick {
             guard let device = CFArrayGetValueAtIndex(list, index) else { continue }
             let pointer = UnsafeMutableRawPointer(mutating: device)
             api.unregister(pointer, multitouchCallback)
-            api.stop(pointer)
+            _ = api.stop(pointer)
         }
         devices = nil
     }

@@ -89,11 +89,13 @@ Quits an app when you close its last window, the way apps on iPad and many Windo
 - Decisions are logged under **Developer > Logs** (and in Console, as "PasteRing Auto Quit") to see why an app was or wasn't quit.
 - Needs the Accessibility permission to see each app's windows.
 
-## Mouse
+## Middle Click
 
-Trackpad settings macOS doesn't offer, in **Settings… > Mouse**.
+Middle click from the trackpad, which macOS doesn't offer. Off by default; turn it on in **Settings… > Middle Click**.
 
-- **Middle click**: off (default), or a quick tap with three or four fingers clicks the middle button where the pointer is. It reads the trackpad's raw touches through the private MultitouchSupport framework and posts the click, so it needs the Accessibility permission. To use three fingers, turn off Look Up's three-finger tap in System Settings > Trackpad.
+- **Tap with**: three fingers (default) or four. A quick tap with the fingers held still clicks the middle button where the pointer is.
+- It reads the trackpad's raw touches through the private MultitouchSupport framework and posts the click, so it needs the Accessibility permission.
+- To use three fingers, turn off Look Up's three-finger tap in System Settings > Trackpad.
 
 ## Project structure
 
@@ -110,10 +112,10 @@ Sources/PasteRing/
       AutoQuit.swift           owns the utility
       Model/                   settings and the window watcher
       Settings/                the Auto Quit settings pane
-    Mouse/
-      Mouse.swift              owns the utility
-      Model/                   settings, middle click, device watcher
-      Settings/                the Mouse settings pane
+    MiddleClick/
+      MiddleClick.swift        owns the utility
+      Model/                   settings, tap listener, device watcher
+      Settings/                the Middle Click settings pane
     ClipboardManager/
       ClipboardManager.swift   owns the utility; created and started by the app delegate
       Model/                   history, clipboard monitor, settings
