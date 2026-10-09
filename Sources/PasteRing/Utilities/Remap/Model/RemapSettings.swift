@@ -39,6 +39,8 @@ struct Mapping: Codable, Identifiable, Hashable {
     var id = UUID()
     var input: RemapInput?
     var output: RemapOutput?
+    /// When it was added; the oldest wins when mappings on several devices compete.
+    var created: Date? = Date()
 }
 
 /// A device's mappings, with its name kept so it still shows while disconnected.
@@ -62,6 +64,12 @@ final class RemapSettings: ObservableObject {
         didSet { defaults.set(try? JSONEncoder().encode(devices), forKey: Keys.devices) }
     }
 
+    /// Keys and buttons seen reaching macOS without their device (some mice and utilities
+    /// send them that way). Only one device's mapping can apply to each.
+    @Published private(set) var deviceLessInputs: Set<RemapInput> {
+        didSet { defaults.set(try? JSONEncoder().encode(deviceLessInputs), forKey: Keys.deviceLessInputs) }
+    }
+
     /// Names given by the user, keyed by `InputDevice.id`.
     @Published var customNames: [String: String] {
         didSet { defaults.set(customNames, forKey: Keys.customNames) }
@@ -71,6 +79,7 @@ final class RemapSettings: ObservableObject {
         let defaults = UserDefaults.standard
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         customNames = defaults.dictionary(forKey: Keys.customNames) as? [String: String] ?? [:]
+        deviceLessInputs = defaults.data(forKey: Keys.deviceLessInputs).flatMap { try? JSONDecoder().decode(Set<RemapInput>.self, from: $0) } ?? []
         devices = defaults.data(forKey: Keys.devices).flatMap { try? JSONDecoder().decode([String: DeviceMappings].self, from: $0) } ?? [:]
     }
 
@@ -83,6 +92,31 @@ final class RemapSettings: ObservableObject {
     func rename(_ deviceID: String, to name: String) {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
         customNames[deviceID] = trimmed.isEmpty ? nil : trimmed
+    }
+
+    func noteDeviceLess(_ input: RemapInput) {
+        if !deviceLessInputs.contains(input) { deviceLessInputs.insert(input) }
+    }
+
+    /// For an input that arrives without its device: the device whose mapping applies, the
+    /// one with the oldest complete mapping for it.
+    func activeDevice(for input: RemapInput) -> (id: String, entry: DeviceMappings)? {
+        devices
+            .compactMap { id, entry -> (id: String, entry: DeviceMappings, created: Date)? in
+                guard let mapping = entry.mappings.first(where: { $0.input == input && $0.output != nil }) else { return nil }
+                return (id, entry, mapping.created ?? .distantPast)
+            }
+            .min { ($0.created, $0.id) < ($1.created, $1.id) }
+            .map { ($0.id, $0.entry) }
+    }
+
+    /// The other device whose mapping wins over this one, when its input arrives without a
+    /// device; nil when this one applies.
+    func conflict(for mapping: Mapping, on deviceID: String) -> String? {
+        guard let input = mapping.input, deviceLessInputs.contains(input),
+              let active = activeDevice(for: input), active.id != deviceID
+        else { return nil }
+        return customNames[active.id] ?? active.entry.name
     }
 
     func mappings(for deviceID: String) -> [Mapping] {
@@ -124,5 +158,6 @@ final class RemapSettings: ObservableObject {
         static let isEnabled = "remapEnabled"
         static let devices = "remapDevices"
         static let customNames = "remapDeviceNames"
+        static let deviceLessInputs = "remapDeviceLessInputs"
     }
 }

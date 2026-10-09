@@ -131,9 +131,14 @@ final class Remap {
         // A click on Create Mapping in the Event Viewer; logging it would add a row and move
         // the list under the pointer.
         let isLinkClick = isOverViewerLink && (type == .leftMouseDown || type == .leftMouseUp)
-        // Some presses reach macOS without their device; they take the mappings of the device
-        // that has one for them.
-        let target = device ?? parsed.input.flatMap(deviceMapping)
+        // Some presses reach macOS without their device; they take the mappings of the one
+        // device whose mapping applies to them.
+        if device == nil, let input = parsed.input, parsed.phase == .down, input != .mouseButton(0) {
+            settings.noteDeviceLess(input)
+        }
+        let target = device ?? parsed.input.flatMap { input in
+            settings.activeDevice(for: input).map { InputDevice(id: $0.id, name: $0.entry.name, kind: $0.entry.kind) }
+        }
         if isViewing, !parsed.isRepeat, !isLinkClick {
             let (original, result) = remapping(of: parsed.input, on: target)
             eventLog.record(InputEvent(
@@ -179,18 +184,6 @@ final class Remap {
         let pid = pid_t(event.getIntegerValueField(.eventSourceUnixProcessID))
         guard pid > 0 else { return "Other source" }
         return "Posted by \(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "process \(pid)")"
-    }
-
-    /// The device whose mappings a press without a device takes: one with a complete mapping
-    /// for it, preferring a mouse for buttons and a keyboard for keys.
-    private func deviceMapping(for input: RemapInput) -> InputDevice? {
-        let preferred: InputDevice.Kind
-        if case .mouseButton = input { preferred = .mouse } else { preferred = .keyboard }
-        let candidates = settings.devices
-            .filter { _, entry in entry.mappings.contains { $0.input == input && $0.output != nil } }
-            .map { id, entry in InputDevice(id: id, name: entry.name, kind: entry.kind) }
-            .sorted { ($0.kind == preferred ? 0 : 1, $0.id) < ($1.kind == preferred ? 0 : 1, $1.id) }
-        return candidates.first
     }
 
     /// For the Event Viewer: what an event was remapped to, and, for a key changed on the

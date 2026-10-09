@@ -136,7 +136,8 @@ private struct MappingsView: View {
     }
 
     private func row(_ mapping: Mapping, on device: InputDevice) -> some View {
-        HStack(spacing: 10) {
+        let conflict = settings.conflict(for: mapping, on: device.id)
+        return HStack(spacing: 10) {
             InputButton(remap: remap, device: device, input: mapping.input) { input in
                 var changed = mapping
                 changed.input = input
@@ -148,6 +149,13 @@ private struct MappingsView: View {
                 var changed = mapping
                 changed.output = output
                 settings.update(changed, on: device.id)
+            }
+            // This input reaches macOS without its device, so only one device can map it.
+            .disabled(conflict != nil)
+            if let conflict {
+                Label("Already mapped on \(conflict)", systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                    .help("This button reaches macOS without saying which device sent it, so only the mapping on \(conflict) applies.")
             }
             Spacer()
             let turned = swapped(mapping)
