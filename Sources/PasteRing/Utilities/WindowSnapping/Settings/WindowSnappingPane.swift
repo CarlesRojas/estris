@@ -18,6 +18,9 @@ struct WindowSnappingPane: View {
                 dragging
                 gestures
                 shortcuts
+                Section {
+                    Button("Reset to Defaults") { settings.reset() }
+                }
             }
             .formStyle(.grouped)
             .settingsPage()
@@ -31,7 +34,11 @@ struct WindowSnappingPane: View {
             Toggle("Snap by dragging a window to a screen edge", isOn: $settings.snapsByDragging)
             LabeledContent("Edge area") {
                 HStack {
-                    Slider(value: $settings.edgeArea, in: WindowSnappingSettings.edgeAreaRange, step: 1)
+                    // No step: it would draw a tick mark for every point.
+                    Slider(
+                        value: Binding(get: { settings.edgeArea }, set: { settings.edgeArea = $0.rounded() }),
+                        in: WindowSnappingSettings.edgeAreaRange
+                    )
                         .frame(width: 200)
                     Text("\(Int(settings.edgeArea)) pt")
                         .monospacedDigit()

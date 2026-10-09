@@ -99,7 +99,7 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
 
 Moves the front window to halves, corners, thirds or the whole screen. Off by default; turn it on in **Settings… > Window Snapping**.
 
-- The pane is one page: Dragging, Gestures and Shortcuts sections.
+- The pane is one page: Dragging, Gestures and Shortcuts sections, and **Reset to Defaults** (dragging, edge area, resizing together and gestures; not the on/off switch).
 - **Shortcuts** (all ⌃⌥, fixed, listed in the Shortcuts section): ← → ↑ ↓ halves; U, I, J, K top left, top right, bottom left, bottom right; ↩ maximize; D, F, G left, center, right third; E, R, T left, center and right two thirds; C center; ⌫ restore (the frame before the window was first snapped, or before it was last moved by hand and snapped again).
 - **Dragging** (on by default): drag a window by its title bar to an edge of the screen the pointer is on, see an outline of where it will go, and release:
   - Corners: quarters. Top edge: maximize.

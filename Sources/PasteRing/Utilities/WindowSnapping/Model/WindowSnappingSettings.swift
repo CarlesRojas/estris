@@ -61,6 +61,7 @@ final class WindowSnappingSettings: ObservableObject {
     }
 
     static let edgeAreaRange: ClosedRange<Double> = 8...150
+    static let defaultEdgeArea = 32.0
 
     /// The drag areas that snap.
     @Published var gestures: Set<SnapGesture> {
@@ -74,7 +75,7 @@ final class WindowSnappingSettings: ObservableObject {
             Keys.isEnabled: false,
             Keys.snapsByDragging: true,
             Keys.resizesTogether: true,
-            Keys.edgeArea: 32.0,
+            Keys.edgeArea: Self.defaultEdgeArea,
             Keys.gestures: SnapGesture.defaults.map(\.rawValue),
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
@@ -82,6 +83,14 @@ final class WindowSnappingSettings: ObservableObject {
         resizesTogether = defaults.bool(forKey: Keys.resizesTogether)
         edgeArea = defaults.double(forKey: Keys.edgeArea)
         gestures = Set((defaults.stringArray(forKey: Keys.gestures) ?? []).compactMap(SnapGesture.init(rawValue:)))
+    }
+
+    /// Back to how dragging, resizing and gestures start out; the on/off switch stays.
+    func reset() {
+        snapsByDragging = true
+        resizesTogether = true
+        edgeArea = Self.defaultEdgeArea
+        gestures = SnapGesture.defaults
     }
 
     private enum Keys {

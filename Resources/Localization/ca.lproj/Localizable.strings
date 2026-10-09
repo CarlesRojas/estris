@@ -210,6 +210,7 @@
 "Rename Device" = "Canvia el nom del dispositiu";
 "Rename this device" = "Canvia el nom d’aquest dispositiu";
 "Reset Appearance to Defaults" = "Restableix l’aparença per defecte";
+"Reset to Defaults" = "Restableix els valors per defecte";
 "Resize side-by-side windows together" = "Redimensiona juntes les finestres del costat";
 "Restore" = "Restaura";
 "Return" = "Retorn";
