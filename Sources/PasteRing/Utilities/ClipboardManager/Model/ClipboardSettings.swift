@@ -57,7 +57,7 @@ enum HistoryExpiry: String, CaseIterable, Identifiable {
 /// User preferences, persisted in UserDefaults.
 @MainActor
 final class ClipboardSettings: ObservableObject {
-    static let maxItemsRange = 5...500
+    static let maxItemsRange = 5...100
     static let ringSizeRange = 3...24
     static let gridColumns = GridLayout.columns
     static let gridSizeRange = 8...24
