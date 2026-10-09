@@ -55,21 +55,25 @@ Requires macOS 13+ and the Swift toolchain (Xcode or Command Line Tools).
 open build/PasteRing.app
 ```
 
-Reinstall (quit the running app, reset its Accessibility permission, rebuild, open):
+Once, create a local signing certificate so macOS keeps the Accessibility permission across rebuilds (it asks for your password to trust it):
 
 ```sh
-pkill -x PasteRing; tccutil reset Accessibility com.carlesrojas.PasteRing; rm -rf build/PasteRing.app && ./scripts/build-app.sh && open build/PasteRing.app
+./scripts/create-dev-certificate.sh
 ```
 
-Resetting the permission avoids a stale entry: after an ad-hoc rebuild, System Settings can show PasteRing as allowed while macOS ignores it. You will be asked to grant it again on launch.
+Then rebuild and relaunch with one command (quits the running app, builds, opens):
+
+```sh
+./scripts/run.sh
+```
+
+Grant Accessibility once after the first signed build; later builds keep it. Without the certificate the build is signed ad hoc, which changes every build, so macOS forgets the permission each time. To sign with your own identity instead:
+
+```sh
+SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/run.sh
+```
 
 On first launch macOS asks for **Accessibility** access (System Settings > Privacy & Security > Accessibility). It is needed to send `⌘V` to the frontmost app. Without it the selected entry is still placed on the clipboard.
-
-The build is ad-hoc signed by default, so macOS may forget the permission after a rebuild. Remove and re-add the app in the Accessibility list, or sign with a stable identity:
-
-```sh
-SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/build-app.sh
-```
 
 ## Developer settings
 

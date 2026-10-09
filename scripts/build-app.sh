@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Builds PasteRing.app into ./build.
-# Set SIGN_IDENTITY to a Developer ID / Apple Development identity to keep the
-# Accessibility permission across rebuilds (ad-hoc signatures change every build).
+# Signs with SIGN_IDENTITY, else the "PasteRing Development" certificate made by
+# create-dev-certificate.sh, else ad hoc. Ad-hoc signatures change every build, so macOS
+# forgets the Accessibility permission each time; a fixed certificate keeps it.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -15,6 +16,16 @@ mkdir -p "$APP/Contents/MacOS"
 cp "$BIN_DIR/PasteRing" "$APP/Contents/MacOS/PasteRing"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 
-codesign --force --sign "${SIGN_IDENTITY:--}" "$APP"
+IDENTITY="${SIGN_IDENTITY:-}"
+if [[ -z "$IDENTITY" ]]; then
+    if security find-certificate -c "PasteRing Development" >/dev/null 2>&1; then
+        IDENTITY="PasteRing Development"
+    else
+        IDENTITY="-"
+        echo "Signing ad hoc: Accessibility must be granted again after each build."
+        echo "Run ./scripts/create-dev-certificate.sh once to keep it."
+    fi
+fi
+codesign --force --sign "$IDENTITY" "$APP"
 
 echo "Built $APP"
