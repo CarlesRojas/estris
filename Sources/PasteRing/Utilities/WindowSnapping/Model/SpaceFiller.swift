@@ -12,8 +12,15 @@ import AppKit
 enum SpaceFiller {
     /// How close edges must be to count as touching.
     private static let tolerance: CGFloat = 8
-    /// How far, relative to the usual size, a direction may shrink or grow.
-    private static let sizeRange: ClosedRange<CGFloat> = 0.5...1.6
+    /// How far, relative to the usual size, a direction may shrink or grow. Halves and
+    /// corners may fill nearly the whole screen; thirds stay close to a third, so a lone third
+    /// doesn't become two thirds.
+    private static func sizeRange(for action: SnapAction) -> ClosedRange<CGFloat> {
+        switch action.group {
+        case .halves, .corners: 0.1...1.95
+        default: 0.5...1.6
+        }
+    }
     /// Share of a window that must be uncovered for it to count.
     private static let minimumVisibleShare = 0.5
 
@@ -57,11 +64,12 @@ enum SpaceFiller {
         let freeBottom = usual.minY > area.minY + 1
         let freeTop = usual.maxY < area.maxY - 1
 
+        let range = sizeRange(for: action)
         var rect = usual
         // Twice, as moving the sides of one direction changes which windows the other meets.
         for _ in 0..<2 {
-            rect = fitHorizontally(rect, usual: usual, freeLeft: freeLeft, freeRight: freeRight, among: tiled)
-            rect = fitVertically(rect, usual: usual, freeBottom: freeBottom, freeTop: freeTop, among: tiled)
+            rect = fitHorizontally(rect, usual: usual, freeLeft: freeLeft, freeRight: freeRight, among: tiled, range: range)
+            rect = fitVertically(rect, usual: usual, freeBottom: freeBottom, freeTop: freeTop, among: tiled, range: range)
         }
         if let minimum = minimumSizes[pid], rect.width < minimum.width || rect.height < minimum.height {
             return usual
@@ -79,7 +87,7 @@ enum SpaceFiller {
         return true
     }
 
-    private static func fitHorizontally(_ rect: NSRect, usual: NSRect, freeLeft: Bool, freeRight: Bool, among tiled: [NSRect]) -> NSRect {
+    private static func fitHorizontally(_ rect: NSRect, usual: NSRect, freeLeft: Bool, freeRight: Bool, among tiled: [NSRect], range: ClosedRange<CGFloat>) -> NSRect {
         let beside = tiled.filter { overlap($0.minY, $0.maxY, rect.minY, rect.maxY) > tolerance }
         var minX = rect.minX
         var maxX = rect.maxX
@@ -89,11 +97,11 @@ enum SpaceFiller {
         if freeRight, let edge = beside.filter({ $0.minX > usual.minX + tolerance && $0.maxX > usual.maxX - tolerance }).map(\.minX).min() {
             maxX = edge
         }
-        guard Self.sizeRange.contains((maxX - minX) / usual.width) else { return NSRect(x: usual.minX, y: rect.minY, width: usual.width, height: rect.height) }
+        guard range.contains((maxX - minX) / usual.width) else { return NSRect(x: usual.minX, y: rect.minY, width: usual.width, height: rect.height) }
         return NSRect(x: minX, y: rect.minY, width: maxX - minX, height: rect.height)
     }
 
-    private static func fitVertically(_ rect: NSRect, usual: NSRect, freeBottom: Bool, freeTop: Bool, among tiled: [NSRect]) -> NSRect {
+    private static func fitVertically(_ rect: NSRect, usual: NSRect, freeBottom: Bool, freeTop: Bool, among tiled: [NSRect], range: ClosedRange<CGFloat>) -> NSRect {
         let above = tiled.filter { overlap($0.minX, $0.maxX, rect.minX, rect.maxX) > tolerance }
         var minY = rect.minY
         var maxY = rect.maxY
@@ -103,7 +111,7 @@ enum SpaceFiller {
         if freeTop, let edge = above.filter({ $0.minY > usual.minY + tolerance && $0.maxY > usual.maxY - tolerance }).map(\.minY).min() {
             maxY = edge
         }
-        guard Self.sizeRange.contains((maxY - minY) / usual.height) else { return NSRect(x: rect.minX, y: usual.minY, width: rect.width, height: usual.height) }
+        guard range.contains((maxY - minY) / usual.height) else { return NSRect(x: rect.minX, y: usual.minY, width: rect.width, height: usual.height) }
         return NSRect(x: rect.minX, y: minY, width: rect.width, height: maxY - minY)
     }
 
