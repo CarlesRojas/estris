@@ -39,8 +39,10 @@ final class AppearanceSettings: ObservableObject {
         backdropDim = defaults.backdropDim
     }
 
-    func surfaceTint(isSelected: Bool) -> Color? {
-        let opacity = tintOpacity + (isSelected ? selectedTintOpacity : 0)
+    func surfaceTint(isSelected: Bool, isHovered: Bool = false) -> Color? {
+        // Hover adds a third of the selection highlight, so it never reads as selected.
+        let hover = isHovered && !isSelected ? selectedTintOpacity / 3 : 0
+        let opacity = tintOpacity + (isSelected ? selectedTintOpacity : 0) + hover
         return opacity > 0 ? tint.opacity(min(opacity, 1)) : nil
     }
 
@@ -80,10 +82,11 @@ private struct Surface: ViewModifier {
     let cornerRadius: CGFloat
     let isSelected: Bool
     @EnvironmentObject private var appearance: AppearanceSettings
+    @Environment(\.surfaceHovered) private var isHovered
 
     func body(content: Content) -> some View {
         content
-            .background(shape.fill(appearance.surfaceTint(isSelected: isSelected) ?? .clear))
+            .background(shape.fill(appearance.surfaceTint(isSelected: isSelected, isHovered: isHovered) ?? .clear))
             .background(.regularMaterial, in: shape)
             .background {
                 if appearance.shadowRadius > 0 {

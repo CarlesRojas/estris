@@ -22,38 +22,60 @@ extension EnvironmentValues {
 }
 
 extension View {
-    /// Clicking pastes `item`; a trash badge on the top-right corner deletes it.
-    func clipActions(_ item: ClipItem) -> some View {
-        modifier(ClipActions(item: item))
+    /// Clicking pastes `item`; a trash button in the top-right corner deletes it. Hovering
+/// tints the element a little.
+    /// `trashInset` lines the button up with the element's first row.
+    func clipActions(_ item: ClipItem, trashInset: CGFloat = 12) -> some View {
+        modifier(ClipActions(item: item, trashInset: trashInset))
     }
 }
 
 private struct ClipActions: ViewModifier {
     let item: ClipItem
+    let trashInset: CGFloat
     @Environment(\.overlayActions) private var actions
+    @State private var isHovered = false
+    @State private var isTrashHovered = false
 
     @ViewBuilder
     func body(content: Content) -> some View {
         if actions.isEnabled {
             content
+                .environment(\.surfaceHovered, isHovered)
                 .contentShape(Rectangle())
+                .onHover { isHovered = $0 }
                 .onTapGesture { actions.pick(item) }
                 .overlay(alignment: .topTrailing) {
                     Button {
                         actions.delete(item)
                     } label: {
                         Image(systemName: "trash")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(Color.red.opacity(0.88))
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(isTrashHovered ? .primary : .tertiary)
                             .frame(width: 24, height: 24)
-                            .background(.regularMaterial, in: Circle())
+                            .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .onHover { isTrashHovered = $0 }
                     .help("Delete from history")
-                    .offset(x: 8, y: -8)
+                    .padding(trashInset)
                 }
+                .animation(.easeOut(duration: 0.12), value: isHovered)
+                .animation(.easeOut(duration: 0.12), value: isTrashHovered)
         } else {
             content
         }
+    }
+}
+
+private struct SurfaceHoveredKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    /// The pointer is over this element; its surface gets a little more tint.
+    var surfaceHovered: Bool {
+        get { self[SurfaceHoveredKey.self] }
+        set { self[SurfaceHoveredKey.self] = newValue }
     }
 }

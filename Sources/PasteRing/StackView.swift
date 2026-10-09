@@ -23,7 +23,7 @@ struct StackView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ClipCard(text: item.text, isSelected: distance == 0, appBundleID: item.sourceBundleID)
-                            .clipActions(item)
+                            .clipActions(item, trashInset: 14)
                             .modifier(WheelPlacement(
                                 angle: Double(distance) * Self.step,
                                 step: Self.step,
@@ -83,6 +83,8 @@ struct ClipCard: View {
                 .lineLimit(4)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                // Room for the trash button in the corner.
+                .padding(.trailing, 20)
         }
         .frame(width: 520, alignment: .leading)
         .padding(.horizontal, 18)

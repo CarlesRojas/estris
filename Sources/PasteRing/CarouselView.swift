@@ -15,7 +15,7 @@ struct CarouselView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ContentCard(item: item, isSelected: distance == 0)
-                            .clipActions(item)
+                            .clipActions(item, trashInset: 16)
                             .rotation3DEffect(
                                 .degrees(distance == 0 ? 0 : (distance < 0 ? 45 : -45)),
                                 axis: (x: 0, y: 1, z: 0),
@@ -57,6 +57,7 @@ struct ContentCard: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
+                .padding(.trailing, 24)
                 // Same font whether selected or not: a heavier weight rewraps the text.
                 Text(item.text.trimmingCharacters(in: .whitespacesAndNewlines))
                     .font(.body)

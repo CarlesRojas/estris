@@ -9,7 +9,7 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
 - `⌘⇧Esc` closes the overlay without pasting. `⌘⇧Delete` removes the selected entry from the history.
-- Moving the mouse keeps the overlay open after you release `⌘⇧`. Click any entry to paste it, click its trash badge to delete it, or click outside to close. While it stays open, plain Return pastes, Esc closes, arrows move and Delete removes.
+- Moving the mouse keeps the overlay open after you release `⌘⇧`. Click any entry to paste it, click its trash icon to delete it, or click outside to close. While it stays open, plain Return pastes, Esc closes, arrows move and Delete removes.
 
 ## Settings
 

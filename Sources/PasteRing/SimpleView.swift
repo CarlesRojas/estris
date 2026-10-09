@@ -17,6 +17,7 @@ struct SimpleView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
+                .padding(.trailing, 24)
             }
             // No line limit: the text fills the card and truncates where the card ends.
             Text(item?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Clipboard history is empty")
@@ -38,7 +39,7 @@ private struct OptionalClipActions: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         if let item {
-            content.clipActions(item)
+            content.clipActions(item, trashInset: 22)
         } else {
             content
         }

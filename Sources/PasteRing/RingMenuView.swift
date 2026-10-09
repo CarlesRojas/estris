@@ -26,7 +26,7 @@ struct RingMenuView: View {
                 let angle = Double(index - state.position) * step
                 let distance = circularDistance(index, count: count)
                 RingChip(item: item, isSelected: distance == 0)
-                    .clipActions(item)
+                    .clipActions(item, trashInset: 6)
                     .modifier(RingPlacement(angle: angle, step: step, radius: radius))
                     .zIndex(distance == 0 ? 1 : 0)
             }
@@ -87,6 +87,8 @@ struct RingChip: View {
                 .lineLimit(2)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                // Room for the trash button in the corner.
+                .padding(.trailing, 16)
         }
         // Fixed size, two lines tall, so every chip on the ring matches.
         .frame(width: 200, height: 36)

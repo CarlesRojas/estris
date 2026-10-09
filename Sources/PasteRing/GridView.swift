@@ -17,7 +17,7 @@ struct GridView: View {
                     ForEach(state.items) { item in
                         let isSelected = item.id == state.selectedItem?.id
                         ContentCard(item: item, isSelected: isSelected, width: settings.gridCardWidth, height: 130, lineLimit: 3)
-                            .clipActions(item)
+                            .clipActions(item, trashInset: 16)
                             .scaleEffect(isSelected ? 1.06 : 1)
                             .zIndex(isSelected ? 1 : 0)
                     }
