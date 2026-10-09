@@ -19,14 +19,19 @@ struct RingMenuView: View {
         let chipWidth = CGFloat(settings.ringChipWidth)
         let chipHeight = CGFloat(settings.ringChipHeight)
         let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: chipHeight)
-        let size = CGSize(width: (radii.width + chipWidth * 0.6) * 2, height: (radii.height + chipHeight + 30) * 2)
+        // Room for the enlarged card at the top and the pill above it.
+        let topExtra = chipHeight * (RingPlacement.topScale - 1)
+        let size = CGSize(
+            width: max((radii.width + chipWidth * 0.6) * 2, chipWidth * RingPlacement.topScale),
+            height: (radii.height + chipHeight + 30) * 2 + topExtra * 2
+        )
         let scale = fitScale(for: size)
 
         ZStack {
-            // Above the selected card at the top of the ring (drawn 1.12 times larger there).
+            // Above the selected card at the top of the ring, which is drawn enlarged.
             if let position = state.positionText {
                 PositionPill(text: position)
-                    .offset(y: -radii.height - chipHeight * 1.12 / 2 - 26)
+                    .offset(y: -radii.height - chipHeight * RingPlacement.topScale / 2 - 26)
             }
 
             if count == 0 {
@@ -43,7 +48,8 @@ struct RingMenuView: View {
                 ContentCard(item: item, isSelected: distance == 0, width: chipWidth, height: chipHeight, lineLimit: nil)
                     .clipActions(item, trashInset: 16)
                     .modifier(RingPlacement(angle: angle, step: step, radii: radii))
-                    .zIndex(distance == 0 ? 1 : 0)
+                    // Nearer the top is nearer the viewer: drawn over the cards further round.
+                    .zIndex(Double(count - distance))
             }
         }
         .frame(width: size.width, height: size.height)
@@ -99,12 +105,16 @@ struct RingMenuView: View {
     }
 }
 
-/// Puts a chip on the circle with a plain offset, animating the angle so chips travel
-/// along the arc. Avoids rotation transforms, which material backgrounds do not survive.
-/// A chip grows as it nears the top, so the selection swells in while it arrives.
-private struct RingPlacement: ViewModifier, Animatable {
-    private static let topScale: CGFloat = 1.12
-    private static let restScale: CGFloat = 0.92
+/// Placed with a plain offset, animating the angle so cards travel along the arc. Avoids
+/// rotation transforms, which material backgrounds do not survive. A card grows as it nears
+/// the top, so the selection swells in while it arrives.
+/// The ring is seen at an angle: the top is nearest, so cards shrink as they go round
+/// towards the bottom, and the selected card at the top is enlarged to about the size of
+/// the Stack's front card.
+struct RingPlacement: ViewModifier, Animatable {
+    static let topScale: CGFloat = 1.6
+    /// Size at the bottom of the ring, the furthest point.
+    private static let farScale: CGFloat = 0.5
 
     var angle: Double
     let step: Double
@@ -121,8 +131,11 @@ private struct RingPlacement: ViewModifier, Animatable {
         // Angle from the top, in -180...180, since the raw angle keeps growing as the ring turns.
         let fromTop = abs(remainder(angle, 360))
         let nearness = step > 0 ? CGFloat(max(0, 1 - fromTop / step)) : 1
+        // 1 at the top, 0 at the bottom.
+        let depth = CGFloat((1 + cos(radians)) / 2)
+        let ringScale = Self.farScale + (1 - Self.farScale) * depth
         return content
-            .scaleEffect(Self.restScale + (Self.topScale - Self.restScale) * nearness)
+            .scaleEffect(ringScale + (Self.topScale - 1) * nearness)
             .offset(x: radii.width * sin(radians), y: -radii.height * cos(radians))
     }
 }
