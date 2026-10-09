@@ -24,10 +24,11 @@ Open **Settings…** from the menu bar icon.
   - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
   - *Stack*: entries ride a vertical wheel, coming forward along a curve as you cycle.
   - *Carousel*: Cover Flow style, neighbours tilted away on either side.
-  - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width is adjustable.
+  - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width is adjustable (default 256).
   - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
 - **Renderer**: which system API draws the surfaces: SwiftUI material (default), Liquid Glass via SwiftUI or AppKit (macOS 26), or vibrancy (`NSVisualEffectView`, with a choice of material).
-- **Tint** (default black), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (0%), and **Interactive** for SwiftUI glass.
+- **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (0%), and **Interactive** for SwiftUI glass.
+- **Reset to Defaults** resets everything in this tab, including the style and its options.
 
 **History** lists every saved entry. The trash button deletes one, **Clear All** deletes everything.
 
