@@ -21,7 +21,7 @@ struct AutoQuitPane: View {
             case .settings:
                 form
             case .excludedApps:
-                AppSwitchList(excluded: $settings.excludedApps, allOnText: "All apps quit", locked: AutoQuitSettings.alwaysKept)
+                AppSwitchList(excluded: $settings.excludedApps, locked: AutoQuitSettings.alwaysKept)
             }
         }
     }

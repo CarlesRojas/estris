@@ -34,7 +34,7 @@ struct ClipboardManagerPane: View {
         case .history:
             HistoryPreferences(history: history, settings: clipboard)
         case .excludedApps:
-            AppSwitchList(excluded: $clipboard.excludedApps, allOnText: "All apps recorded")
+            AppSwitchList(excluded: $clipboard.excludedApps)
         }
     }
 }

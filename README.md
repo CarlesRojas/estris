@@ -42,7 +42,7 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
     - Frosted material with **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16) and **Dim screen** (50%, fades in and out with the overlay). **Reset Appearance to Defaults** resets everything in this section.
   - *Shortcuts*: the shortcut that opens the overlay (default `⌘⇧V`) and any alternatives. Click one and press a new combination; it needs `⌘`, `⌥` or `⌃`.
 - **History**: every saved entry with where and when it was copied, with a search field. The trash button deletes one, **Clear All** deletes everything.
-- **Excluded Apps**: every installed app with a switch, all on. Switch an app off and nothing copied in it is recorded.
+- **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: nothing copied in it is recorded.
 
 Every entry in the overlay shows when it was copied next to its trash icon, in the date and time format chosen in General.
 
@@ -76,7 +76,7 @@ SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/build-app.sh
 Quits an app when you close its last window, the way apps on iPad and many Windows apps behave. Off by default; turn it on in **Settings… > Auto Quit**.
 
 - **Quit**: immediately, or after 1, 5 or 30 seconds (default 1 second) with no windows.
-- **Excluded Apps**: every installed app with a switch; switch one off and it is never quit. The Finder is always kept.
+- **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: it is never quit. The Finder is always excluded.
 - It reacts to windows closing (no polling): when an app's window is destroyed, the app is checked a few times over the next two seconds, and quit only if it still has no windows after the chosen delay.
 - Apps opened without a window, menu bar and background apps, and hidden apps are left alone: an app is only quit after it was seen with a window. If an app might still have a window macOS doesn't report to other apps (for example on another desktop), it is not quit.
 - Needs the Accessibility permission to see each app's windows.

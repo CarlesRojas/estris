@@ -1,14 +1,12 @@
 import AppKit
 import SwiftUI
 
-/// Every installed app with a switch, all on until switched off, under a pinned search
-/// field. Shared by utilities that let apps be left out.
+/// Every installed app with a switch that excludes it, all off by default, under a pinned
+/// search field. Shared by utilities that let apps be left out.
 struct AppSwitchList: View {
-    /// Bundle identifiers of the apps switched off.
+    /// Bundle identifiers of the apps switched on, that is, excluded.
     @Binding var excluded: Set<String>
-    /// Header text when nothing is switched off, such as "All apps recorded".
-    let allOnText: String
-    /// Apps that can't be switched on, with the reason shown under their name.
+    /// Apps that are always excluded, with the reason shown under their name.
     var locked: [String: String] = [:]
 
     @State private var apps: [InstalledApp] = []
@@ -40,7 +38,7 @@ struct AppSwitchList: View {
                         }
                     }
                 } header: {
-                    Text(excluded.isEmpty ? allOnText : "\(excluded.count) excluded")
+                    Text(excluded.isEmpty ? "No apps excluded" : (excluded.count == 1 ? "1 app excluded" : "\(excluded.count) apps excluded"))
                 }
             }
             .formStyle(.grouped)
@@ -54,7 +52,7 @@ struct AppSwitchList: View {
     }
 
     private func row(_ app: InstalledApp) -> some View {
-        Toggle(isOn: isOn(app)) {
+        Toggle(isOn: isExcluded(app)) {
             HStack(spacing: 10) {
                 AppIconView(bundleID: app.bundleID, size: 24, url: app.url)
                 VStack(alignment: .leading, spacing: 1) {
@@ -71,14 +69,14 @@ struct AppSwitchList: View {
         .disabled(locked[app.bundleID] != nil)
     }
 
-    private func isOn(_ app: InstalledApp) -> Binding<Bool> {
+    private func isExcluded(_ app: InstalledApp) -> Binding<Bool> {
         Binding(
-            get: { locked[app.bundleID] == nil && !excluded.contains(app.bundleID) },
-            set: { on in
-                if on {
-                    excluded.remove(app.bundleID)
-                } else {
+            get: { locked[app.bundleID] != nil || excluded.contains(app.bundleID) },
+            set: { isExcluded in
+                if isExcluded {
                     excluded.insert(app.bundleID)
+                } else {
+                    excluded.remove(app.bundleID)
                 }
             }
         )
