@@ -191,6 +191,7 @@
 "Play or Pause" = "Reproduzir ou pausar";
 "Posted by %@" = "Enviado por %@";
 "Press a key or button on %@" = "Pressione uma tecla ou um botão em %@";
+"Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Pressione o atalho de novo para o tamanho exato, ou mantenha ⌘ pressionada ao arrastar.";
 "Press keys…" = "Pressione as teclas…";
 "Press the new shortcut, or Esc to cancel" = "Pressione o novo atalho, ou Esc para cancelar";
 "Previous Desktop" = "Mesa anterior";

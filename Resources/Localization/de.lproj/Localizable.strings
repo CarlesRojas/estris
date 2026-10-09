@@ -191,6 +191,7 @@
 "Play or Pause" = "Wiedergabe oder Pause";
 "Posted by %@" = "Gesendet von %@";
 "Press a key or button on %@" = "Drücke eine Taste auf %@";
+"Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Drücke den Kurzbefehl erneut für die genaue Größe oder halte beim Ziehen ⌘ gedrückt.";
 "Press keys…" = "Tasten drücken …";
 "Press the new shortcut, or Esc to cancel" = "Neuen Kurzbefehl drücken oder Esc zum Abbrechen";
 "Previous Desktop" = "Vorheriger Schreibtisch";

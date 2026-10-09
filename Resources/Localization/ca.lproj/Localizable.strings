@@ -191,6 +191,7 @@
 "Play or Pause" = "Reprodueix o posa en pausa";
 "Posted by %@" = "Enviat per %@";
 "Press a key or button on %@" = "Prem una tecla o un botó a %@";
+"Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Prem la drecera un altre cop per a la mida exacta, o mantén ⌘ en arrossegar.";
 "Press keys…" = "Prem les tecles…";
 "Press the new shortcut, or Esc to cancel" = "Prem la nova drecera o Esc per cancel·lar";
 "Previous Desktop" = "Escriptori anterior";

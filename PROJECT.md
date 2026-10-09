@@ -115,6 +115,7 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
   - A free side with no window directly beside it lines up with the nearest side of another tiled window (not a screen edge, and within a quarter of the screen of where it would be), so a new bottom-left quarter meets the line two moved top quarters share.
   - Each direction stays within a range of the usual size, or keeps the usual size: halves and corners 0.1 to 1.95 times (nearly the whole screen), thirds and two thirds 0.5 to 1.6 times (a third next to a single third doesn't become two thirds).
   - Maximize, Center and Restore never fill.
+  - Exact area instead: pressing the same shortcut again on the same, unmoved window switches between the filled and the exact area (only when they differ); holding ⌘ while dragging previews and snaps the exact area, switching as ⌘ is pressed or released. The setting's subtitle says so.
   - If the app won't get as small as the space, the window gets the usual snap and the app's minimum is remembered, so later previews for it show the usual snap.
 - Works through the Accessibility permission (frames of other apps' windows) and a listen-only event tap, which also sees drags of PasteRing's own windows; those are moved directly. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
 

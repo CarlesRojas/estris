@@ -191,6 +191,7 @@
 "Play or Pause" = "Play or Pause";
 "Posted by %@" = "Posted by %@";
 "Press a key or button on %@" = "Press a key or button on %@";
+"Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Press a shortcut again for the exact size, or hold ⌘ while dragging.";
 "Press keys…" = "Press keys…";
 "Press the new shortcut, or Esc to cancel" = "Press the new shortcut, or Esc to cancel";
 "Previous Desktop" = "Previous Desktop";

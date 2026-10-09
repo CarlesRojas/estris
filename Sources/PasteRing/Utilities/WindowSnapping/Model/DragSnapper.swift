@@ -43,7 +43,9 @@ final class DragSnapper {
     }
 
     private let settings: WindowSnappingSettings
-    private let snapper: (AXWindow, SnapAction, NSScreen, NSRect) -> Void
+    /// Snaps a window: the action, its screen, where the window started, and whether to fill
+    /// the space next to other windows.
+    private let snapper: (AXWindow, SnapAction, NSScreen, NSRect, Bool) -> Void
     private let preview = SnapPreview()
     private var tap: CFMachPort?
 
@@ -57,7 +59,7 @@ final class DragSnapper {
     /// The tiled windows on each screen the drag has passed over, for filling space.
     private var tiled: [NSScreen: [NSRect]] = [:]
 
-    init(settings: WindowSnappingSettings, snapper: @escaping (AXWindow, SnapAction, NSScreen, NSRect) -> Void) {
+    init(settings: WindowSnappingSettings, snapper: @escaping (AXWindow, SnapAction, NSScreen, NSRect, Bool) -> Void) {
         self.settings = settings
         self.snapper = snapper
     }
@@ -69,7 +71,7 @@ final class DragSnapper {
             CGEvent.tapEnable(tap: tap, enable: true)
             return
         }
-        let types: [CGEventType] = [.leftMouseDown, .leftMouseDragged, .leftMouseUp]
+        let types: [CGEventType] = [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .flagsChanged]
         tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .tailAppendEventTap,
@@ -87,8 +89,20 @@ final class DragSnapper {
         reset()
     }
 
-    fileprivate func handle(_ type: CGEventType) {
+    /// Whether ⌘ is held, which snaps to the exact area without filling space.
+    private var isExact = false
+
+    /// Fills the space next to other windows unless off in Settings or ⌘ is held.
+    private var fills: Bool {
+        settings.fillsSpace && !isExact
+    }
+
+    fileprivate func handle(_ type: CGEventType, flags: CGEventFlags) {
+        isExact = flags.contains(.maskCommand)
         switch type {
+        case .flagsChanged:
+            // Pressing or letting go of ⌘ mid-drag switches the preview at once.
+            if mode == .moving, settings.snapsByDragging { updateTarget() }
         case .leftMouseDown: mouseDown()
         case .leftMouseDragged: mouseDragged()
         case .leftMouseUp: mouseUp()
@@ -136,7 +150,7 @@ final class DragSnapper {
         guard let window else { return }
         switch mode {
         case .moving:
-            if let target { snapper(window, target.action, target.screen, startFrame) }
+            if let target { snapper(window, target.action, target.screen, startFrame, fills) }
         case .resizing:
             // The last drag events may have been skipped; line the neighbours up once more.
             if settings.resizesTogether, let frame = window.frame { resizeNeighbours(to: frame) }
@@ -177,7 +191,7 @@ final class DragSnapper {
             return
         }
         var area = usual
-        if settings.fillsSpace {
+        if fills {
             if tiled[screen] == nil { tiled[screen] = SpaceFiller.tiledWindows(on: screen, excluding: window) }
             area = SpaceFiller.fit(usual, for: found.action, on: screen, among: tiled[screen] ?? [], pid: window.pid)
         }
@@ -314,7 +328,8 @@ private func dragSnapperCallback(
 ) -> Unmanaged<CGEvent>? {
     if let refcon {
         let snapper = Unmanaged<DragSnapper>.fromOpaque(refcon).takeUnretainedValue()
-        MainActor.assumeIsolated { snapper.handle(type) }
+        let flags = event.flags
+        MainActor.assumeIsolated { snapper.handle(type, flags: flags) }
     }
     return Unmanaged.passUnretained(event)
 }
