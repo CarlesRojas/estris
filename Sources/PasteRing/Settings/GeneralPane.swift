@@ -11,14 +11,9 @@ struct GeneralPane: View {
 
     var body: some View {
         Form {
-            if accessibilityGranted {
-                Section("Permissions") {
-                    LabeledContent("Accessibility") {
-                        Label("Allowed", systemImage: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                    }
-                }
-            } else {
+            // Missing permission: a warning at the very top. Once granted, it is a plain row
+            // further down.
+            if !accessibilityGranted {
                 Section {
                     HStack(alignment: .top, spacing: 14) {
                         Image(systemName: "exclamationmark.triangle.fill")
@@ -65,6 +60,15 @@ struct GeneralPane: View {
                     ForEach(TimeStyle.allCases) { style in
                         let sample = DateTimeFormat(language: general.language, timeStyle: style).timeString(from: .now)
                         Text("\(style.title) (\(sample))").tag(style)
+                    }
+                }
+            }
+
+            if accessibilityGranted {
+                Section("Permissions") {
+                    LabeledContent("Accessibility") {
+                        Label("Allowed", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
                     }
                 }
             }

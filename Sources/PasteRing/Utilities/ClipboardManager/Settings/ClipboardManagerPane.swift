@@ -4,10 +4,12 @@ import SwiftUI
 /// The Clipboard Manager's settings pane: the on/off switch, then Settings, History and
 /// Excluded Apps tabs.
 struct ClipboardManagerPane: View {
-    private enum Tab: Hashable {
-        case settings
-        case history
-        case excludedApps
+    private enum Tab: String, CaseIterable, Identifiable {
+        case settings = "Settings"
+        case history = "History"
+        case excludedApps = "Excluded Apps"
+
+        var id: Self { self }
     }
 
     @ObservedObject var clipboard: ClipboardSettings
@@ -25,22 +27,45 @@ struct ClipboardManagerPane: View {
                 isOn: $clipboard.isEnabled
             )
 
-            // The standard macOS tab view.
-            TabView(selection: $tab) {
-                ClipboardSettingsForm(settings: clipboard, appearance: appearance, history: history)
-                    .tabItem { Text("Settings") }
-                    .tag(Tab.settings)
-                HistoryPreferences(history: history, settings: clipboard)
-                    .tabItem { Text("History") }
-                    .tag(Tab.history)
-                ExcludedAppsList(settings: clipboard)
-                    .tabItem { Text("Excluded Apps") }
-                    .tag(Tab.excludedApps)
+            // Laid out like the standard tab view (tabs straddling the top edge of a box), but
+            // with the box's corners and bottom edge matched to the sidebar.
+            ZStack(alignment: .top) {
+                content
+                    .padding(.top, 14)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: PaneStyle.cornerRadius, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: PaneStyle.cornerRadius, style: .continuous)
+                            .strokeBorder(Color(nsColor: .separatorColor))
+                    )
+                    .padding(.top, 12)
+
+                Picker("View", selection: $tab) {
+                    ForEach(Tab.allCases) { tab in
+                        Text(tab.rawValue).tag(tab)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
             }
-            .padding([.horizontal, .bottom], 16)
+            .padding(.horizontal, 16)
+            .padding(.bottom, PaneStyle.bottomInset)
             // Shrink to the space left; the tabs' content scrolls.
             .frame(minHeight: 0, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch tab {
+        case .settings:
+            ClipboardSettingsForm(settings: clipboard, appearance: appearance, history: history)
+        case .history:
+            HistoryPreferences(history: history, settings: clipboard)
+        case .excludedApps:
+            ExcludedAppsList(settings: clipboard)
+        }
     }
 }

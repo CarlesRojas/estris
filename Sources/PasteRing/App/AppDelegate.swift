@@ -59,7 +59,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.titlebarAppearsTransparent = true
             window.toolbar = NSToolbar(identifier: "Settings")
             window.toolbarStyle = .unified
-            window.setContentSize(NSSize(width: 880, height: 700))
+            // 80% of the screen's height, within sensible limits.
+            let screenHeight = NSScreen.main?.visibleFrame.height ?? 800
+            window.setContentSize(NSSize(width: 880, height: min(max(screenHeight * 0.8, 640), 1100)))
             window.isReleasedWhenClosed = false
             window.center()
             settingsWindow = window
