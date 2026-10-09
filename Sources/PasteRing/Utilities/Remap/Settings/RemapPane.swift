@@ -57,8 +57,9 @@ private struct MappingsView: View {
             Section {
                 HStack {
                     Picker("Device", selection: $selection) {
-                        deviceGroup("Keyboards", devices: items.filter { $0.kind == .keyboard })
-                        deviceGroup("Mice and Trackpads", devices: items.filter { $0.kind == .mouse })
+                        ForEach(items) { device in
+                            deviceLabel(device)
+                        }
                     }
                     Button("Rename…") {
                         newName = device?.name ?? ""
@@ -113,20 +114,13 @@ private struct MappingsView: View {
         }
     }
 
-    @ViewBuilder
-    private func deviceGroup(_ title: String, devices: [InputDevice]) -> some View {
-        if !devices.isEmpty {
-            Section(title) {
-                ForEach(devices) { device in
-                    let count = settings.mappings(for: device.id).count
-                    Label(
-                        device.name + (device.isConnected ? "" : " (not connected)") + (count > 0 ? " (\(count))" : ""),
-                        systemImage: device.symbol
-                    )
-                    .tag(device.id)
-                }
-            }
-        }
+    private func deviceLabel(_ device: InputDevice) -> some View {
+        let count = settings.mappings(for: device.id).count
+        return Label(
+            device.name + (device.isConnected ? "" : " (not connected)") + (count > 0 ? " (\(count))" : ""),
+            systemImage: device.symbol
+        )
+        .tag(device.id)
     }
 
     private func row(_ mapping: Mapping, on device: InputDevice) -> some View {

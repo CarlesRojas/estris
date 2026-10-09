@@ -79,7 +79,7 @@ Middle click from the trackpad, which macOS doesn't offer. Off by default; turn 
 
 Changes what keys and mouse buttons do, per device. Off by default; turn it on in **Settings… > Remap**.
 
-- **Mappings**: a **Device** menu at the top lists connected keyboards and mice (and disconnected ones that still have mappings), grouped by kind; the chosen device's mappings are below it. **Add Mapping** picks a source and a result:
+- **Mappings**: a **Device** menu at the top lists connected keyboards, mice and trackpads (and disconnected ones that still have mappings) in one list, one entry per physical device; the chosen device's mappings are below it. Any key or button a device sends can be remapped on its entry; whether it looks like a keyboard or a mouse only picks its icon and which inputs the picker lists first. **Add Mapping** picks a source and a result:
   - Source: any key or mouse button except the left one. **Record** captures the next key or button pressed on that device; or pick from a searchable, sectioned list.
   - Result: another key, a mouse button, a system action (Mission Control, App Windows, Show Desktop, Launchpad, next or previous desktop, volume, mute, media, display and keyboard brightness, sleep display, lock screen, Spotlight, screenshots, emoji picker, Force Quit) or nothing.
   - One mapping per source; adding another for the same source replaces it.
@@ -88,7 +88,6 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Key to key: set on the keyboard itself through the system's per-device `UserKeyMapping` property, so modifiers and Caps Lock work like real keys. Set again when a device connects or the Mac wakes; cleared when Remap is turned off or the app quits.
   - Everything else: an event tap that reads the sending device from the HID event inside each event (private `CGEventCopyIOHIDEvent` and `IOHIDEventGetSenderID`), swallows the original and posts the result.
   - Devices are identified by vendor, product and name, so mappings survive reconnects; identical devices share mappings.
-  - A device with both a keyboard and a pointer interface (a laptop keyboard with its trackpad, a receiver for a keyboard and a mouse) is listed twice, once per kind, each with its own mappings. A mouse whose receiver adds a keyboard interface for extra buttons therefore also shows under Keyboards.
   - Devices can be renamed (**Rename…** next to the Device menu); an empty name goes back to the original.
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.
