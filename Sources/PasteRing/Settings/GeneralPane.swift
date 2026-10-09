@@ -7,6 +7,7 @@ struct GeneralPane: View {
 
     @ObservedObject var general: GeneralSettings
     @State private var openAtLogin = LoginItem.isEnabled
+    @State private var versionTaps: [Date] = []
     @State private var accessibilityGranted = Paster.isTrusted(prompt: false)
 
     var body: some View {
@@ -22,7 +23,7 @@ struct GeneralPane: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("PasteRing needs Accessibility access")
                                 .font(.headline)
-                            Text("macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in. Without it, entries are only copied to the clipboard.")
+                            Text("macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, and Auto Quit uses it to see each app's windows. Without it, entries are only copied to the clipboard and Auto Quit does nothing.")
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                             Button("Open Accessibility Settings") {
@@ -83,7 +84,8 @@ struct GeneralPane: View {
                             .font(.title3.weight(.semibold))
                         Text(Self.versionText)
                             .foregroundStyle(.secondary)
-                            .textSelection(.enabled)
+                            .contentShape(Rectangle())
+                            .onTapGesture(perform: versionTapped)
                     }
                 }
             }
@@ -94,6 +96,16 @@ struct GeneralPane: View {
         // Picks up changes made in System Settings when returning to this window.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             refreshStatus()
+        }
+    }
+
+    /// Six clicks on the version within a few seconds unlock the Developer pane.
+    private func versionTapped() {
+        let now = Date()
+        versionTaps = versionTaps.filter { now.timeIntervalSince($0) < 3 } + [now]
+        if versionTaps.count >= 6 {
+            versionTaps = []
+            general.showsDeveloperSettings = true
         }
     }
 

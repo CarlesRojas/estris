@@ -65,11 +65,17 @@ final class GeneralSettings: ObservableObject {
         didSet { defaults.set(timeStyle.rawValue, forKey: Keys.timeStyle) }
     }
 
+    /// Unlocked by clicking the version in General > About six times.
+    @Published var showsDeveloperSettings: Bool {
+        didSet { defaults.set(showsDeveloperSettings, forKey: Keys.showsDeveloperSettings) }
+    }
+
     init() {
         let defaults = UserDefaults.standard
         language = AppLanguage(rawValue: defaults.string(forKey: Keys.language) ?? "") ?? .english
         dateStyle = DateStyle(rawValue: defaults.string(forKey: Keys.dateStyle) ?? "") ?? .monthDay
         timeStyle = TimeStyle(rawValue: defaults.string(forKey: Keys.timeStyle) ?? "") ?? .system
+        showsDeveloperSettings = defaults.bool(forKey: Keys.showsDeveloperSettings)
     }
 
     var dateTimeFormat: DateTimeFormat {
@@ -80,5 +86,6 @@ final class GeneralSettings: ObservableObject {
         static let language = "language"
         static let dateStyle = "dateStyle"
         static let timeStyle = "timeStyle"
+        static let showsDeveloperSettings = "showsDeveloperSettings"
     }
 }

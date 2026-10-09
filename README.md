@@ -42,7 +42,7 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
     - Frosted material with **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16) and **Dim screen** (50%, fades in and out with the overlay). **Reset Appearance to Defaults** resets everything in this section.
   - *Shortcuts*: the shortcut that opens the overlay (default `⌘⇧V`) and any alternatives. Click one and press a new combination; it needs `⌘`, `⌥` or `⌃`.
 - **History**: every saved entry with where and when it was copied, with a search field. The trash button deletes one, **Clear All** deletes everything.
-- **Excluded Apps**: every installed app with a switch, all on. Switch an app off and nothing copied in it is recorded.
+- **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: nothing copied in it is recorded.
 
 Every entry in the overlay shows when it was copied next to its trash icon, in the date and time format chosen in General.
 
@@ -71,6 +71,24 @@ The build is ad-hoc signed by default, so macOS may forget the permission after 
 SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/build-app.sh
 ```
 
+## Developer settings
+
+Click the version in **Settings… > General > About** six times to add a **Developer** pane to the sidebar:
+
+- **Logs**: what the utilities noticed and decided (newest first, searchable), with **Copy All** for bug reports and **Clear**.
+- **Settings**: status details and settings regular users don't need, including **Hide Developer Settings**.
+
+## Auto Quit
+
+Quits an app when you close its last window, the way apps on iPad and many Windows apps behave. Off by default; turn it on in **Settings… > Auto Quit**.
+
+- **Quit**: immediately, or after 1, 5 or 30 seconds (default 1 second) with no windows.
+- **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: it is never quit. The Finder is always excluded.
+- It reacts to windows closing (no polling): when an app's window is destroyed, its other windows are checked right away, leaving out the one that closed, and the app quits after the chosen delay if none are left. Closing a full-screen window always waits about a second, since leaving full screen briefly leaves an app with no windows.
+- Apps opened without a window, menu bar and background apps, and hidden apps are left alone: an app is only quit after it was seen with a window. Windows on other desktops are only noticed with the Screen Recording permission (macOS hides other apps' window titles without it), so without it closing the last window on this desktop can quit an app that still has one elsewhere.
+- Decisions are logged under **Developer > Logs** (and in Console, as "PasteRing Auto Quit") to see why an app was or wasn't quit.
+- Needs the Accessibility permission to see each app's windows.
+
 ## Project structure
 
 PasteRing is meant to grow into a set of macOS utilities, so code is grouped by area:
@@ -82,6 +100,10 @@ Sources/PasteRing/
   Settings/               the Settings window: sidebar, search, General pane
   Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons)
   Utilities/
+    AutoQuit/
+      AutoQuit.swift           owns the utility
+      Model/                   settings and the window watcher
+      Settings/                the Auto Quit settings pane
     ClipboardManager/
       ClipboardManager.swift   owns the utility; created and started by the app delegate
       Model/                   history, clipboard monitor, settings

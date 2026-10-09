@@ -7,11 +7,14 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let general = GeneralSettings()
     private lazy var clipboard = ClipboardManager(general: general)
+    private let log = AppLog()
+    private lazy var autoQuit = AutoQuit(log: log)
     private var settingsWindow: SettingsWindowController?
     private var statusItem: NSStatusItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         clipboard.start()
+        autoQuit.start()
         setUpStatusItem()
         LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
@@ -42,7 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, log: log)
         }
         settingsWindow?.show()
     }
