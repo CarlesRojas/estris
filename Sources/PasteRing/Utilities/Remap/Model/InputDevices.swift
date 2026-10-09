@@ -13,6 +13,11 @@ struct InputDevice: Identifiable, Hashable {
     let kind: Kind
     var isConnected = true
 
+    var symbol: String {
+        if kind == .keyboard { return "keyboard" }
+        return name.localizedCaseInsensitiveContains("trackpad") ? "rectangle.and.hand.point.up.left" : "computermouse"
+    }
+
     static func id(vendorID: Int, productID: Int, name: String) -> String {
         "\(vendorID)-\(productID)-\(name)"
     }
@@ -27,22 +32,35 @@ final class InputDevices: ObservableObject {
 
     func refresh() {
         services = HIDServices.all()
-        var devices: [String: InputDevice] = [:]
+        let physical = Dictionary(grouping: services) {
+            InputDevice.id(vendorID: $0.vendorID, productID: $0.productID, name: $0.name)
+        }
+        var devices: [InputDevice] = []
         var bySender: [UInt64: InputDevice] = [:]
-        for service in services {
-            let id = InputDevice.id(vendorID: service.vendorID, productID: service.productID, name: service.name)
-            // A device with a keyboard interface is listed as a keyboard, even if it also points.
-            let kind: InputDevice.Kind = service.isKeyboard ? .keyboard : .mouse
-            if devices[id] == nil || kind == .keyboard {
-                devices[id] = InputDevice(id: id, name: service.name, kind: kind)
+        for (id, group) in physical {
+            let name = group[0].name
+            let hasKeyboard = group.contains(where: \.isKeyboard)
+            let hasPointer = group.contains(where: \.isPointer)
+            if hasKeyboard, hasPointer, name.localizedCaseInsensitiveContains("keyboard") {
+                // A keyboard with a built-in trackpad, like a laptop's: listed as both, each
+                // with the services of its kind.
+                let keyboard = InputDevice(id: id, name: Self.keyboardName(name), kind: .keyboard)
+                let pointer = InputDevice(id: id + "-pointer", name: Self.pointerName(name), kind: .mouse)
+                devices += [keyboard, pointer]
+                for service in group {
+                    bySender[service.registryID] = service.isPointer ? pointer : keyboard
+                }
+            } else {
+                // Mice often add a keyboard interface for their extra buttons; they are still mice.
+                let device = InputDevice(id: id, name: name, kind: hasPointer ? .mouse : .keyboard)
+                devices.append(device)
+                for service in group {
+                    bySender[service.registryID] = device
+                }
             }
         }
-        for service in services {
-            let id = InputDevice.id(vendorID: service.vendorID, productID: service.productID, name: service.name)
-            bySender[service.registryID] = devices[id]
-        }
         deviceBySender = bySender
-        connected = devices.values.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        connected = devices.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
     func device(sender: UInt64) -> InputDevice? {
@@ -50,6 +68,20 @@ final class InputDevices: ObservableObject {
     }
 
     func services(of deviceID: String) -> [HIDService] {
-        services.filter { InputDevice.id(vendorID: $0.vendorID, productID: $0.productID, name: $0.name) == deviceID }
+        services.filter { deviceBySender[$0.registryID]?.id == deviceID }
+    }
+
+    /// "Apple Internal Keyboard / Trackpad" becomes "Apple Internal Keyboard".
+    private static func keyboardName(_ name: String) -> String {
+        name.components(separatedBy: " / ").first ?? name
+    }
+
+    /// "Apple Internal Keyboard / Trackpad" becomes "Apple Internal Trackpad".
+    private static func pointerName(_ name: String) -> String {
+        let parts = name.components(separatedBy: " / ")
+        guard parts.count > 1 else { return name + " Pointer" }
+        var words = parts[0].components(separatedBy: " ")
+        words.removeLast()
+        return (words + [parts[1]]).joined(separator: " ")
     }
 }

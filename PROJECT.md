@@ -88,6 +88,7 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Key to key: set on the keyboard itself through the system's per-device `UserKeyMapping` property, so modifiers and Caps Lock work like real keys. Set again when a device connects or the Mac wakes; cleared when Remap is turned off or the app quits.
   - Everything else: an event tap that reads the sending device from the HID event inside each event (private `CGEventCopyIOHIDEvent` and `IOHIDEventGetSenderID`), swallows the original and posts the result.
   - Devices are identified by vendor, product and name, so mappings survive reconnects; identical devices share mappings.
+  - A device with a pointer is listed as a mouse, even if it also has a keyboard interface (receivers often do, for extra buttons). A keyboard with a built-in trackpad ("Apple Internal Keyboard / Trackpad") is split into a keyboard and a trackpad entry.
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.
 

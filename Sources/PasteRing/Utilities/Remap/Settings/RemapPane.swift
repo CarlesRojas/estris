@@ -98,7 +98,7 @@ private struct MappingsView: View {
                     let count = settings.mappings(for: device.id).count
                     Label(
                         device.name + (device.isConnected ? "" : " (not connected)") + (count > 0 ? " (\(count))" : ""),
-                        systemImage: device.kind == .keyboard ? "keyboard" : "computermouse"
+                        systemImage: device.symbol
                     )
                     .tag(device.id)
                 }
