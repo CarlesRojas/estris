@@ -73,9 +73,7 @@ struct EventViewer: View {
                 .frame(width: 40, alignment: .leading)
             HStack(spacing: 6) {
                 if let source = event.source, let input = event.input, input != .mouseButton(0) {
-                    Button(event.name) { map(source, input) }
-                        .buttonStyle(.link)
-                        .help("Remap it")
+                    RemapLink(title: event.name) { map(source, input) }
                 } else {
                     Text(event.name)
                 }
@@ -88,5 +86,22 @@ struct EventViewer: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
+    }
+}
+
+/// A key or button name that opens a mapping from it; underlined while hovered.
+private struct RemapLink: View {
+    let title: String
+    let action: () -> Void
+    @State private var isHovered = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .underline(isHovered)
+        }
+        .buttonStyle(.link)
+        .onHover { isHovered = $0 }
+        .help("Remap it")
     }
 }

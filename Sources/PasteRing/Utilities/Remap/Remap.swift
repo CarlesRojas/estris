@@ -122,7 +122,7 @@ final class Remap {
             }
         }
 
-        if isViewing, !parsed.isRepeat {
+        if isViewing, !parsed.isRepeat, !isOwnClick(type: type, event: event) {
             eventLog.record(InputEvent(device: device.map(settings.name(of:)) ?? "Other source", source: device, input: parsed.input, phase: parsed.phase, name: parsed.name, detail: parsed.detail))
         }
 
@@ -146,6 +146,14 @@ final class Remap {
         if case .key = input, case .key = output { return true }
         perform(output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
         return false
+    }
+
+    /// A left click on one of PasteRing's windows: kept out of the Event Viewer, so clicking a
+    /// name there doesn't add a row and move the list under the pointer.
+    private func isOwnClick(type: CGEventType, event: CGEvent) -> Bool {
+        guard type == .leftMouseDown || type == .leftMouseUp else { return false }
+        let window = Int(event.getIntegerValueField(.mouseEventWindowUnderMousePointer))
+        return NSApp.windows.contains { $0.windowNumber == window }
     }
 
     private func perform(_ output: RemapOutput, down: Bool, isRepeat: Bool) {
