@@ -1,95 +1,40 @@
 import SwiftUI
 
-/// Vertical wheel: entries ride a circle that curves away from you, so the next one comes
-/// forward and up into the front. Cards always face you; depth shows as size and overlap.
+/// A pile of cards: the selected one in front, the next few peeking out above it, each
+/// smaller and showing less the further back it is. Moving on drops the front card down
+/// behind the pile while the next one comes forward.
 struct StackView: View {
-    private static let visibleRange = 3
-    /// Angle between neighbouring entries on the wheel, in degrees.
-    /// A small, steeply curved wheel: cards stay close together but drop back fast,
-    /// which is what reads as depth.
-    private static let step: Double = 38
-    private static let radius: CGFloat = 130
-    /// Distance from the viewer to the front of the wheel. Smaller means stronger depth.
-    private static let perspective: CGFloat = 160
+    private static let cardWidth: CGFloat = 520
+    private static let cardHeight: CGFloat = 170
+    /// How far each card's top sits above the front card's top. Gaps shrink with depth.
+    private static let peeks: [CGFloat] = [0, 24, 42, 55, 63]
+    private static let scales: [CGFloat] = [1, 0.94, 0.89, 0.85, 0.82]
 
     @ObservedObject var state: OverlayState
 
     var body: some View {
         ZStack {
             if state.items.isEmpty {
-                ClipCard(text: "Clipboard history is empty", isSelected: true, showsIcon: false)
+                EntryCard(item: nil, width: Self.cardWidth, height: Self.cardHeight)
             } else {
-                ForEach(Array(state.items.enumerated()), id: \.element.id) { index, item in
-                    let distance = index - state.selected
-                    if abs(distance) <= Self.visibleRange {
-                        ClipCard(text: item.text, isSelected: distance == 0, appBundleID: item.sourceBundleID)
-                            .clipActions(item, trashInset: 14)
-                            .modifier(WheelPlacement(
-                                angle: Double(distance) * Self.step,
-                                step: Self.step,
-                                radius: Self.radius,
-                                perspective: Self.perspective
-                            ))
-                            .zIndex(Double(-abs(distance)))
-                    }
+                // Distance -1 is the card that just left the front; it stays rendered so it
+                // can slide down out of sight behind the new front card.
+                ForEach(state.circularSlots(within: -1...(Self.peeks.count - 1))) { slot in
+                    let distance = slot.distance
+                    EntryCard(item: slot.item, width: Self.cardWidth, height: Self.cardHeight, isSelected: distance == 0)
+                        .clipActions(slot.item, trashInset: 22)
+                        .allowsHitTesting(distance >= 0)
+                        .scaleEffect(distance < 0 ? 0.9 : Self.scales[distance], anchor: .top)
+                        .offset(y: distance < 0 ? Self.cardHeight * 0.9 : -Self.peeks[distance])
+                        .opacity(distance < 0 ? 0 : 1)
+                        // The leaving card drops straight to the back, so it passes behind the pile.
+                        .zIndex(distance < 0 ? -100 : Double(-distance))
+                        .transition(.opacity)
                 }
             }
         }
-        .frame(width: 640, height: 560)
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: state.selected)
-    }
-}
-
-/// Places a card on the wheel. Animating the angle (not the resulting offset and scale)
-/// makes cards travel along the curve instead of in a straight line.
-private struct WheelPlacement: ViewModifier, Animatable {
-    var angle: Double
-    let step: Double
-    let radius: CGFloat
-    let perspective: CGFloat
-    /// Extra shrink for every card but the current one, so the front one stands out.
-    private let backShrink: CGFloat = 0.1
-
-    var animatableData: Double {
-        get { angle }
-        set { angle = newValue }
-    }
-
-    func body(content: Content) -> some View {
-        let radians = angle * .pi / 180
-        let depth = radius * (1 - cos(radians))
-        // Eases in over the first step, so a card shrinks smoothly as it leaves the front.
-        let leaving = CGFloat(min(abs(angle) / step, 1))
-        return content
-            .scaleEffect(perspective / (perspective + depth) * (1 - backShrink * leaving))
-            .offset(y: radius * sin(radians))
-    }
-}
-
-struct ClipCard: View {
-    let text: String
-    let isSelected: Bool
-    var appBundleID: String?
-    var showsIcon = true
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 14) {
-            if showsIcon {
-                AppIconView(bundleID: appBundleID, size: 30)
-            }
-            // Same font and line limit front and back, so nothing reflows as a card moves.
-            Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
-                .font(.title3)
-                .lineLimit(4)
-                .truncationMode(.tail)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                // Room for the trash button in the corner.
-                .padding(.trailing, 20)
-        }
-        .frame(width: 520, alignment: .leading)
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
-        .surface(cornerRadius: 20, isSelected: isSelected)
+        .frame(width: 640, height: 420)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: state.position)
     }
 }
 

@@ -8,6 +8,21 @@ struct SimpleView: View {
 
     var body: some View {
         let item = state.selectedItem
+        EntryCard(item: item, width: settings.simpleWidth, height: settings.simpleHeight)
+            .modifier(OptionalClipActions(item: item))
+            .transaction { $0.animation = nil }
+    }
+}
+
+/// App icon and name on top, the copied text below, filling the card and truncating where
+/// it ends. Used by Default and Stack.
+struct EntryCard: View {
+    let item: ClipItem?
+    let width: CGFloat
+    let height: CGFloat
+    var isSelected = false
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let item {
                 HStack(spacing: 10) {
@@ -19,17 +34,14 @@ struct SimpleView: View {
                 }
                 .padding(.trailing, 24)
             }
-            // No line limit: the text fills the card and truncates where the card ends.
             Text(item?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Clipboard history is empty")
                 .font(.title3)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .padding(20)
-        .frame(width: settings.simpleWidth, height: settings.simpleHeight)
-        .surface(cornerRadius: 22)
-        .modifier(OptionalClipActions(item: item))
-        .transaction { $0.animation = nil }
+        .frame(width: width, height: height)
+        .surface(cornerRadius: 22, isSelected: isSelected)
     }
 }
 
