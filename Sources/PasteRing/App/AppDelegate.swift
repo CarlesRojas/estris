@@ -9,12 +9,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var clipboard = ClipboardManager(general: general)
     private let log = AppLog()
     private lazy var autoQuit = AutoQuit(log: log)
+    private lazy var middleClick = MiddleClick(log: log)
     private var settingsWindow: SettingsWindowController?
     private var statusItem: NSStatusItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         clipboard.start()
         autoQuit.start()
+        middleClick.start()
         setUpStatusItem()
         LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
@@ -45,7 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, log: log)
         }
         settingsWindow?.show()
     }

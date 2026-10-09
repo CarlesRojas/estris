@@ -15,11 +15,11 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     let window: NSWindow
     private let navigation: SettingsNavigation
 
-    init(general: GeneralSettings, clipboard: ClipboardManager, autoQuit: AutoQuit, log: AppLog) {
+    init(general: GeneralSettings, clipboard: ClipboardManager, autoQuit: AutoQuit, middleClick: MiddleClick, log: AppLog) {
         let navigation = SettingsNavigation(general: general)
         self.navigation = navigation
-        let sidebar = NSHostingController(rootView: SettingsSidebar(navigation: navigation, clipboardSettings: clipboard.settings, autoQuitSettings: autoQuit.settings))
-        let detail = NSHostingController(rootView: SettingsDetail(navigation: navigation, general: general, clipboard: clipboard, autoQuit: autoQuit, log: log))
+        let sidebar = NSHostingController(rootView: SettingsSidebar(navigation: navigation, clipboardSettings: clipboard.settings, autoQuitSettings: autoQuit.settings, middleClickSettings: middleClick.settings))
+        let detail = NSHostingController(rootView: SettingsDetail(navigation: navigation, general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, log: log))
         // The window sets its own size; SwiftUI content must not grow or shrink it.
         sidebar.sizingOptions = []
         detail.sizingOptions = []
