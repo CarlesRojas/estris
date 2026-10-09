@@ -17,6 +17,7 @@
 "1 app excluded" = "1 app excluida";
 "1 entry" = "1 entrada";
 "1 hour" = "1 hora";
+"10 seconds" = "10 segundos";
 "12-hour" = "12 horas";
 "15 minutes" = "15 minutos";
 "2 hours" = "2 horas";
@@ -127,7 +128,6 @@
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Insertar";
 "Keep Awake" = "Mantener despierto";
-"Keep awake for" = "Mantener despierto durante";
 "Keep up to" = "Conservar hasta";
 "Keeping awake" = "Manteniendo despierto";
 "Keeps copied images in the history alongside text and files." = "Guarda las imágenes copiadas en el historial junto al texto y los archivos.";
@@ -182,6 +182,7 @@
 "No clipboard entries yet" = "Aún no hay entradas en el portapapeles";
 "No entries match “%@”" = "Ninguna entrada coincide con «%@»";
 "No events yet" = "Aún no hay eventos";
+"No, idle" = "No, inactivo";
 "Not granted" = "No concedido";
 "Nothing" = "Nada";
 "Nothing logged yet." = "Aún no hay registros.";
@@ -265,6 +266,7 @@
 "Side edges near the bottom: bottom half" = "Bordes laterales cerca de abajo: mitad inferior";
 "Side edges near the top: top half" = "Bordes laterales cerca de arriba: mitad superior";
 "Skips text copied from password fields and password managers." = "Omite el texto copiado de campos de contraseña y gestores de contraseñas.";
+"Sleep after being idle for" = "Reposo tras estar inactivo";
 "Sleep Display" = "Reposo de la pantalla";
 "Snap by dragging a window to a screen edge" = "Ajustar al arrastrar una ventana a un borde de la pantalla";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Ajusta ventanas a mitades, esquinas y tercios con atajos o arrastrándolas a un borde de la pantalla.";
@@ -299,7 +301,6 @@
 "Top right corner" = "Esquina superior derecha";
 "Unknown app" = "App desconocida";
 "Unknown device %@" = "Dispositivo desconocido %@";
-"Until %@" = "Hasta las %@";
 "Up" = "Soltado";
 "Up Arrow" = "Flecha arriba";
 "usage %@" = "uso %@";
@@ -312,4 +313,5 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Si está desactivado, el historial mantiene el orden en que se copiaron las cosas y ⌘V sigue pegando el último texto copiado.";
 "Width" = "Anchura";
 "Window Snapping" = "Ajuste de ventanas";
+"Yes" = "Sí";
 "§ (Section)" = "§ (Sección)";

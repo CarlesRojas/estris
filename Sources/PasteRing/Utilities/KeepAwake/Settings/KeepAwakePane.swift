@@ -5,7 +5,6 @@ import SwiftUI
 struct KeepAwakePane: View {
     @ObservedObject var settings: KeepAwakeSettings
     @ObservedObject var status: KeepAwakeStatus
-    @Environment(\.dateTimeFormat) private var dateTimeFormat
 
     var body: some View {
         VStack(spacing: 0) {
@@ -17,7 +16,7 @@ struct KeepAwakePane: View {
             )
 
             Form {
-                Section("Keep awake for") {
+                Section("Sleep after being idle for") {
                     picker("On power adapter", selection: $settings.onPower)
                     picker("On battery", selection: $settings.onBattery)
                 }
@@ -51,7 +50,8 @@ struct KeepAwakePane: View {
         switch status.state {
         case .off, .paused: String(localized: "No")
         case .indefinitely: String(localized: "Indefinitely")
-        case .until(let end): String(localized: "Until \(dateTimeFormat.timeString(from: end))")
+        case .active: String(localized: "Yes")
+        case .idle: String(localized: "No, idle")
         }
     }
 }

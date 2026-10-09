@@ -17,6 +17,7 @@
 "1 app excluded" = "1 app excluded";
 "1 entry" = "1 entry";
 "1 hour" = "1 hour";
+"10 seconds" = "10 seconds";
 "12-hour" = "12-hour";
 "15 minutes" = "15 minutes";
 "2 hours" = "2 hours";
@@ -127,7 +128,6 @@
 "Indefinitely" = "Indefinitely";
 "Insert" = "Insert";
 "Keep Awake" = "Keep Awake";
-"Keep awake for" = "Keep awake for";
 "Keep up to" = "Keep up to";
 "Keeping awake" = "Keeping awake";
 "Keeps copied images in the history alongside text and files." = "Keeps copied images in the history alongside text and files.";
@@ -182,6 +182,7 @@
 "No clipboard entries yet" = "No clipboard entries yet";
 "No entries match “%@”" = "No entries match “%@”";
 "No events yet" = "No events yet";
+"No, idle" = "No, idle";
 "Not granted" = "Not granted";
 "Nothing" = "Nothing";
 "Nothing logged yet." = "Nothing logged yet.";
@@ -265,6 +266,7 @@
 "Side edges near the bottom: bottom half" = "Side edges near the bottom: bottom half";
 "Side edges near the top: top half" = "Side edges near the top: top half";
 "Skips text copied from password fields and password managers." = "Skips text copied from password fields and password managers.";
+"Sleep after being idle for" = "Sleep after being idle for";
 "Sleep Display" = "Sleep Display";
 "Snap by dragging a window to a screen edge" = "Snap by dragging a window to a screen edge";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge.";
@@ -299,7 +301,6 @@
 "Top right corner" = "Top right corner";
 "Unknown app" = "Unknown app";
 "Unknown device %@" = "Unknown device %@";
-"Until %@" = "Until %@";
 "Up" = "Up";
 "Up Arrow" = "Up Arrow";
 "usage %@" = "usage %@";
@@ -312,4 +313,5 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.";
 "Width" = "Width";
 "Window Snapping" = "Window Snapping";
+"Yes" = "Yes";
 "§ (Section)" = "§ (Section)";

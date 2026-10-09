@@ -1,23 +1,34 @@
 import AppKit
 import Combine
+import IOKit
 import IOKit.pwr_mgt
 import SwiftUI
 
-/// The Keep Awake utility: while on, stops the Mac and its display from sleeping when idle,
-/// for as long as chosen for the current power source (power adapter or battery), then turns
-/// itself off. The time counts from when it was turned on; plugging in or out switches to the
-/// other source's choice. Owns everything it needs, so the app only has to create it and call
-/// `start()`.
+/// The Keep Awake utility: while on, keeps the Mac and its display awake until it has been
+/// idle for as long as chosen for the current power source (power adapter or battery). Idle
+/// means no mouse, keyboard or trackpad input and nothing else keeping the display on (a
+/// playing video does); any of those starts the count again. Once idle for that long it lets
+/// go, so macOS's own sleep settings apply, and holds again when the Mac is used. Owns
+/// everything it needs, so the app only has to create it and call `start()`.
 @MainActor
 final class KeepAwake {
+    /// How often to look again while another app keeps the display on, as macOS doesn't
+    /// tell when that stops.
+    private static let otherHolderRecheck: TimeInterval = 60
+
     let settings = KeepAwakeSettings()
     let status = KeepAwakeStatus()
     private let appLog: AppLog
-    private lazy var power = PowerSource { [weak self] in self?.apply() }
+    private lazy var power = PowerSource { [weak self] in self?.evaluate() }
     private var observers: Set<AnyCancellable> = []
+    private var wakeTokens: [NSObjectProtocol] = []
     private var assertion: IOPMAssertionID?
-    private var startedAt: Date?
     private var timer: Timer?
+    /// Watches for input after letting go, to hold again when the Mac is used.
+    private var activityMonitor: Any?
+    /// When another app last stopped keeping the display on, which counts as activity.
+    private var otherHolderEndedAt = Date.distantPast
+    private var otherHolderWasActive = false
 
     init(log: AppLog) {
         appLog = log
@@ -25,12 +36,18 @@ final class KeepAwake {
 
     func start() {
         power.start()
+        let center = NSWorkspace.shared.notificationCenter
+        wakeTokens = [NSWorkspace.screensDidWakeNotification, NSWorkspace.didWakeNotification].map { name in
+            center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.evaluate() }
+            }
+        }
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
         settings.$isEnabled.map { _ in () }
             .merge(with: settings.$onPower.map { _ in () }, settings.$onBattery.map { _ in () })
             .receive(on: RunLoop.main)
-            .sink { [weak self] in self?.apply() }
+            .sink { [weak self] in self?.evaluate() }
             .store(in: &observers)
     }
 
@@ -39,39 +56,67 @@ final class KeepAwake {
         KeepAwakePane(settings: settings, status: status)
     }
 
-    private func apply() {
+    /// Decides whether to hold the Mac awake now, and when to look again.
+    private func evaluate() {
         timer?.invalidate()
         timer = nil
+        stopWatchingActivity()
         status.isOnBattery = PowerSource.isOnBattery
         guard settings.isEnabled else {
-            startedAt = nil
             release()
             status.state = .off
             return
         }
-        let started = startedAt ?? Date()
-        startedAt = started
         let duration = status.isOnBattery ? settings.onBattery : settings.onPower
-        switch duration.seconds {
-        case nil:
+        guard let limit = duration.seconds else {
             hold()
             status.state = .indefinitely
-        case 0?:
+            return
+        }
+        guard limit > 0 else {
             release()
             status.state = .paused
-        case let seconds?:
-            let end = started.addingTimeInterval(seconds)
-            guard end > Date() else {
-                // Time is up: turn the switch off, which releases it.
-                settings.isEnabled = false
-                return
-            }
-            hold()
-            status.state = .until(end)
-            timer = Timer.scheduledTimer(withTimeInterval: end.timeIntervalSinceNow, repeats: false) { [weak self] _ in
-                MainActor.assumeIsolated { self?.apply() }
-            }
+            return
         }
+
+        let otherHolderActive = Self.otherAppKeepsDisplayOn()
+        if otherHolderWasActive && !otherHolderActive { otherHolderEndedAt = Date() }
+        otherHolderWasActive = otherHolderActive
+        if otherHolderActive {
+            hold()
+            status.state = .active
+            lookAgain(in: Self.otherHolderRecheck)
+            return
+        }
+
+        let idle = min(Self.inputIdleTime, Date().timeIntervalSince(otherHolderEndedAt))
+        if idle < limit {
+            hold()
+            status.state = .active
+            lookAgain(in: limit - idle)
+        } else {
+            release()
+            status.state = .idle
+            watchForActivity()
+        }
+    }
+
+    private func lookAgain(in seconds: TimeInterval) {
+        timer = Timer.scheduledTimer(withTimeInterval: max(seconds, 1), repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.evaluate() }
+        }
+    }
+
+    private func watchForActivity() {
+        guard activityMonitor == nil else { return }
+        activityMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDown, .rightMouseDown, .scrollWheel, .keyDown]) { [weak self] _ in
+            MainActor.assumeIsolated { self?.evaluate() }
+        }
+    }
+
+    private func stopWatchingActivity() {
+        if let activityMonitor { NSEvent.removeMonitor(activityMonitor) }
+        activityMonitor = nil
     }
 
     private func hold() {
@@ -94,6 +139,33 @@ final class KeepAwake {
         guard let assertion else { return }
         IOPMAssertionRelease(assertion)
         self.assertion = nil
+    }
+
+    /// Seconds since the last mouse, keyboard or trackpad input.
+    private static var inputIdleTime: TimeInterval {
+        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOHIDSystem"))
+        guard service != 0 else { return 0 }
+        defer { IOObjectRelease(service) }
+        let value = IORegistryEntryCreateCFProperty(service, "HIDIdleTime" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue()
+        guard let nanoseconds = (value as? NSNumber)?.uint64Value else { return 0 }
+        return TimeInterval(nanoseconds) / 1_000_000_000
+    }
+
+    /// Whether another app keeps the display on, as video players do while playing.
+    private static func otherAppKeepsDisplayOn() -> Bool {
+        var byProcess: Unmanaged<CFDictionary>?
+        guard IOPMCopyAssertionsByProcess(&byProcess) == kIOReturnSuccess,
+              let assertions = byProcess?.takeRetainedValue() as? [NSNumber: [[String: Any]]]
+        else { return false }
+        let displayTypes: Set<String> = [
+            kIOPMAssertionTypePreventUserIdleDisplaySleep as String,
+            kIOPMAssertionTypeNoDisplaySleep as String,
+        ]
+        return assertions.contains { pid, list in
+            pid.int32Value != getpid() && list.contains { assertion in
+                (assertion[kIOPMAssertionTypeKey as String] as? String).map(displayTypes.contains) ?? false
+            }
+        }
     }
 
     private func log(_ message: String) {

@@ -1,8 +1,10 @@
 import Foundation
 
-/// How long to keep the Mac awake once Keep Awake is turned on.
+/// How long the Mac may be idle before Keep Awake lets it sleep.
 enum KeepAwakeDuration: String, CaseIterable, Identifiable {
     case off
+    /// For trying it out.
+    case tenSeconds
     case fifteenMinutes
     case thirtyMinutes
     case oneHour
@@ -16,6 +18,7 @@ enum KeepAwakeDuration: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .off: String(localized: "Don't keep awake")
+        case .tenSeconds: String(localized: "10 seconds")
         case .fifteenMinutes: String(localized: "15 minutes")
         case .thirtyMinutes: String(localized: "30 minutes")
         case .oneHour: String(localized: "1 hour")
@@ -30,6 +33,7 @@ enum KeepAwakeDuration: String, CaseIterable, Identifiable {
     var seconds: TimeInterval? {
         switch self {
         case .off: 0
+        case .tenSeconds: 10
         case .fifteenMinutes: 15 * 60
         case .thirtyMinutes: 30 * 60
         case .oneHour: 60 * 60
@@ -82,7 +86,10 @@ final class KeepAwakeStatus: ObservableObject {
         /// On, but the current power source is set to not keep awake.
         case paused
         case indefinitely
-        case until(Date)
+        /// Keeping awake, as the Mac was used within the chosen time.
+        case active
+        /// Idle for the chosen time: macOS's own sleep settings apply until it is used again.
+        case idle
     }
 
     @Published var state = State.off

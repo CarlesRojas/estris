@@ -17,6 +17,7 @@
 "1 app excluded" = "1 app excluído";
 "1 entry" = "1 item";
 "1 hour" = "1 hora";
+"10 seconds" = "10 segundos";
 "12-hour" = "12 horas";
 "15 minutes" = "15 minutos";
 "2 hours" = "2 horas";
@@ -127,7 +128,6 @@
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Inserir";
 "Keep Awake" = "Manter acordado";
-"Keep awake for" = "Manter acordado por";
 "Keep up to" = "Manter até";
 "Keeping awake" = "Mantendo acordado";
 "Keeps copied images in the history alongside text and files." = "Mantém as imagens copiadas no histórico junto com texto e arquivos.";
@@ -182,6 +182,7 @@
 "No clipboard entries yet" = "Ainda não há itens na Área de Transferência";
 "No entries match “%@”" = "Nenhum item corresponde a “%@”";
 "No events yet" = "Ainda não há eventos";
+"No, idle" = "Não, inativo";
 "Not granted" = "Não concedido";
 "Nothing" = "Nada";
 "Nothing logged yet." = "Nada registrado ainda.";
@@ -265,6 +266,7 @@
 "Side edges near the bottom: bottom half" = "Bordas laterais perto da base: metade inferior";
 "Side edges near the top: top half" = "Bordas laterais perto do topo: metade superior";
 "Skips text copied from password fields and password managers." = "Ignora o texto copiado de campos de senha e gerenciadores de senhas.";
+"Sleep after being idle for" = "Repousar após inatividade de";
 "Sleep Display" = "Repousar tela";
 "Snap by dragging a window to a screen edge" = "Encaixar ao arrastar uma janela até uma borda da tela";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Encaixe janelas em metades, cantos e terços com atalhos ou arrastando-as até uma borda da tela.";
@@ -299,7 +301,6 @@
 "Top right corner" = "Canto superior direito";
 "Unknown app" = "App desconhecido";
 "Unknown device %@" = "Dispositivo desconhecido %@";
-"Until %@" = "Até %@";
 "Up" = "Solto";
 "Up Arrow" = "Seta para cima";
 "usage %@" = "uso %@";
@@ -312,4 +313,5 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Quando desativado, o histórico mantém a ordem em que as coisas foram copiadas e ⌘V continua colando o último texto copiado.";
 "Width" = "Largura";
 "Window Snapping" = "Encaixe de janelas";
+"Yes" = "Sim";
 "§ (Section)" = "§ (Seção)";

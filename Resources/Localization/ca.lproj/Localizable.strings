@@ -17,6 +17,7 @@
 "1 app excluded" = "1 app exclosa";
 "1 entry" = "1 entrada";
 "1 hour" = "1 hora";
+"10 seconds" = "10 segons";
 "12-hour" = "12 hores";
 "15 minutes" = "15 minuts";
 "2 hours" = "2 hores";
@@ -127,7 +128,6 @@
 "Indefinitely" = "Indefinidament";
 "Insert" = "Insereix";
 "Keep Awake" = "Mantén despert";
-"Keep awake for" = "Mantén despert durant";
 "Keep up to" = "Conserva fins a";
 "Keeping awake" = "Mantenint despert";
 "Keeps copied images in the history alongside text and files." = "Desa les imatges copiades a l’historial juntament amb el text i els fitxers.";
@@ -182,6 +182,7 @@
 "No clipboard entries yet" = "Encara no hi ha cap entrada al porta-retalls";
 "No entries match “%@”" = "Cap entrada coincideix amb «%@»";
 "No events yet" = "Encara no hi ha cap esdeveniment";
+"No, idle" = "No, inactiu";
 "Not granted" = "No concedit";
 "Nothing" = "Res";
 "Nothing logged yet." = "Encara no hi ha cap registre.";
@@ -265,6 +266,7 @@
 "Side edges near the bottom: bottom half" = "Vores laterals a prop de baix: meitat inferior";
 "Side edges near the top: top half" = "Vores laterals a prop de dalt: meitat superior";
 "Skips text copied from password fields and password managers." = "Omet el text copiat de camps de contrasenya i gestors de contrasenyes.";
+"Sleep after being idle for" = "Repòs després d’inactivitat de";
 "Sleep Display" = "Repòs de la pantalla";
 "Snap by dragging a window to a screen edge" = "Ajusta en arrossegar una finestra a una vora de la pantalla";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Ajusta les finestres a meitats, cantonades i terços amb dreceres o arrossegant-les a una vora de la pantalla.";
@@ -299,7 +301,6 @@
 "Top right corner" = "Cantonada superior dreta";
 "Unknown app" = "App desconeguda";
 "Unknown device %@" = "Dispositiu desconegut %@";
-"Until %@" = "Fins a les %@";
 "Up" = "Deixat anar";
 "Up Arrow" = "Fletxa amunt";
 "usage %@" = "ús %@";
@@ -312,4 +313,5 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Si està desactivat, l’historial manté l’ordre en què es van copiar les coses i ⌘V continua enganxant l’últim text copiat.";
 "Width" = "Amplada";
 "Window Snapping" = "Ajust de finestres";
+"Yes" = "Sí";
 "§ (Section)" = "§ (Secció)";

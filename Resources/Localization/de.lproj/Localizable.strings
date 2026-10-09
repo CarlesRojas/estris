@@ -17,6 +17,7 @@
 "1 app excluded" = "1 App ausgeschlossen";
 "1 entry" = "1 Eintrag";
 "1 hour" = "1 Stunde";
+"10 seconds" = "10 Sekunden";
 "12-hour" = "12 Stunden";
 "15 minutes" = "15 Minuten";
 "2 hours" = "2 Stunden";
@@ -127,7 +128,6 @@
 "Indefinitely" = "Unbegrenzt";
 "Insert" = "Einfügen";
 "Keep Awake" = "Wach halten";
-"Keep awake for" = "Wach halten für";
 "Keep up to" = "Behalten bis";
 "Keeping awake" = "Wach gehalten";
 "Keeps copied images in the history alongside text and files." = "Behält kopierte Bilder neben Text und Dateien im Verlauf.";
@@ -182,6 +182,7 @@
 "No clipboard entries yet" = "Noch keine Einträge in der Zwischenablage";
 "No entries match “%@”" = "Keine Einträge passen zu „%@“";
 "No events yet" = "Noch keine Ereignisse";
+"No, idle" = "Nein, inaktiv";
 "Not granted" = "Nicht erteilt";
 "Nothing" = "Nichts";
 "Nothing logged yet." = "Noch nichts protokolliert.";
@@ -265,6 +266,7 @@
 "Side edges near the bottom: bottom half" = "Seitenränder unten: untere Hälfte";
 "Side edges near the top: top half" = "Seitenränder oben: obere Hälfte";
 "Skips text copied from password fields and password managers." = "Überspringt Text aus Passwortfeldern und Passwortmanagern.";
+"Sleep after being idle for" = "Ruhezustand nach Inaktivität von";
 "Sleep Display" = "Display ausschalten";
 "Snap by dragging a window to a screen edge" = "Einrasten durch Ziehen eines Fensters an einen Bildschirmrand";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Lass Fenster per Kurzbefehl oder durch Ziehen an einen Bildschirmrand in Hälften, Ecken und Drittel einrasten.";
@@ -299,7 +301,6 @@
 "Top right corner" = "Ecke oben rechts";
 "Unknown app" = "Unbekannte App";
 "Unknown device %@" = "Unbekanntes Gerät %@";
-"Until %@" = "Bis %@";
 "Up" = "Losgelassen";
 "Up Arrow" = "Pfeil nach oben";
 "usage %@" = "Usage %@";
@@ -312,4 +313,5 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Wenn aus, behält der Verlauf die Reihenfolge des Kopierens, und ⌘V setzt weiter den zuletzt kopierten Text ein.";
 "Width" = "Breite";
 "Window Snapping" = "Fenster einrasten";
+"Yes" = "Ja";
 "§ (Section)" = "§ (Paragraf)";

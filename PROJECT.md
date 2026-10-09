@@ -121,12 +121,14 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
 
 ## Keep Awake
 
-Stops the Mac and its display from sleeping when idle. Turn it on with the switch in **Settings… > Keep Awake**; it turns itself off when its time is up.
+Keeps the Mac and its display awake until it has been idle for a chosen time. Turn it on with the switch in **Settings… > Keep Awake**; it stays on until turned off.
 
-- **Keep awake for**, separately **On power adapter** (default Indefinitely) and **On battery** (default 1 hour): Don't keep awake, 15 or 30 minutes, 1, 2, 4 or 8 hours, or Indefinitely.
-- The time counts from when it was turned on. Plugging in or out switches to the other choice at once (counted from the same start); "Don't keep awake" pauses it until the source changes again.
-- **Now** (while on): the current power source, and whether it keeps awake, indefinitely or until when.
-- Works with a power assertion (`PreventUserIdleDisplaySleep`), released when it turns off or the app quits; power source changes come from IOKit's power source notifications.
+- **Sleep after being idle for**, separately **On power adapter** (default Indefinitely) and **On battery** (default 1 hour): Don't keep awake, 10 seconds (for trying it out), 15 or 30 minutes, 1, 2, 4 or 8 hours, or Indefinitely.
+- Idle means no mouse, keyboard or trackpad input (the system's HID idle time) and no other app keeping the display on (as video players do while playing). Any of those starts the count again.
+- While not idle for that long it holds a `PreventUserIdleDisplaySleep` power assertion; once idle for that long it releases it, so macOS's own sleep settings apply (the display sleeps soon after, as macOS has been counting the same idle time), and a global input monitor or the screen or Mac waking holds it again.
+- It looks again exactly when the idle time would run out; while another app keeps the display on it looks once a minute, as macOS doesn't tell when that stops.
+- Plugging in or out (IOKit power source notifications) applies the other choice at once. "Don't keep awake" pauses it; "Indefinitely" always holds.
+- **Now** (while on): the current power source, and whether it keeps awake (Yes, Indefinitely, No, or No, idle).
 
 ## Languages
 
