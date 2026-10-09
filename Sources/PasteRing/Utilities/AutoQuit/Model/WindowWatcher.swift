@@ -36,8 +36,11 @@ final class WindowWatcher {
     private var lastCheckRound: [pid_t: Date] = [:]
     private var workspaceTokens: [NSObjectProtocol] = []
 
-    init(settings: AutoQuitSettings) {
+    private let activity: AutoQuitActivity
+
+    init(settings: AutoQuitSettings, activity: AutoQuitActivity) {
         self.settings = settings
+        self.activity = activity
     }
 
     func start() {
@@ -180,7 +183,7 @@ final class WindowWatcher {
     }
 
     private func log(_ message: String) {
-        NSLog("PasteRing Auto Quit: %@", message)
+        activity.record(message)
     }
 
     /// Document and app windows (not panels, sheets or palettes) on the current desktop,

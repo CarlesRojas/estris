@@ -8,6 +8,8 @@ struct AutoQuitPane: View {
     }
 
     @ObservedObject var settings: AutoQuitSettings
+    @ObservedObject var activity: AutoQuitActivity
+    @Environment(\.dateTimeFormat) private var dateTimeFormat
     @State private var tab = Tab.settings
 
     var body: some View {
@@ -40,6 +42,30 @@ struct AutoQuitPane: View {
                 Text("Apps opened without a window, and apps that live in the menu bar, are left alone. The Finder is never quit. Needs Accessibility access to see each app's windows.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+
+            Section {
+                if activity.entries.isEmpty {
+                    Text(settings.isEnabled ? "Nothing yet. Close an app's last window to see what happens." : "Turn Auto Quit on to start.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(activity.entries) { entry in
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(entry.message)
+                            Spacer()
+                            Text(dateTimeFormat.timeString(from: entry.date))
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            } header: {
+                HStack {
+                    Text("Recent Activity")
+                    Spacer()
+                    Button("Clear") { activity.clear() }
+                        .disabled(activity.entries.isEmpty)
+                }
             }
         }
         .formStyle(.grouped)
