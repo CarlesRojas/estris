@@ -57,7 +57,7 @@ struct ChoiceList<Value>: View {
 enum Choices {
     static func inputs(for device: InputDevice) -> [ChoiceSection<RemapInput>] {
         let keys = keySections { RemapInput.key($0.usage) }
-        let buttons = ChoiceSection(title: "Mouse Buttons", choices: MouseButtons.remappable.map {
+        let buttons = ChoiceSection(title: String(localized: "Mouse Buttons"), choices: MouseButtons.remappable.map {
             Choice(id: "button-\($0)", title: MouseButtons.name($0), value: RemapInput.mouseButton($0))
         })
         return device.kind == .mouse ? [buttons] + keys : keys + [buttons]
@@ -65,18 +65,18 @@ enum Choices {
 
     static func outputs(for input: RemapInput?) -> [ChoiceSection<RemapOutput>] {
         let actions = SystemAction.Section.allCases.map { section in
-            ChoiceSection(title: section.rawValue, choices: SystemAction.allCases.filter { $0.section == section }.map {
+            ChoiceSection(title: section.title, choices: SystemAction.allCases.filter { $0.section == section }.map {
                 Choice(id: "action-\($0.rawValue)", title: $0.title, value: RemapOutput.action($0))
             })
         }
-        let buttons = ChoiceSection(title: "Mouse Buttons", choices: (0...4).map {
+        let buttons = ChoiceSection(title: String(localized: "Mouse Buttons"), choices: (0...4).map {
             Choice(id: "button-\($0)", title: MouseButtons.name($0), value: RemapOutput.mouseButton($0))
         })
         // Keys without a macOS key code can only stand in for another key, on the keyboard itself.
         var onlyTypeable = true
         if case .key = input { onlyTypeable = false }
         let keys = keySections(onlyTypeable: onlyTypeable) { RemapOutput.key($0.usage) }
-        let nothing = ChoiceSection(title: "Off", choices: [Choice(id: "nothing", title: "Nothing", value: RemapOutput.nothing)])
+        let nothing = ChoiceSection(title: String(localized: "Off"), choices: [Choice(id: "nothing", title: RemapOutput.nothing.title, value: RemapOutput.nothing)])
         return actions + [buttons] + keys + [nothing]
     }
 
@@ -84,7 +84,7 @@ enum Choices {
         KeyInfo.Section.allCases.compactMap { section in
             let keys = KeyCatalog.all.filter { $0.section == section && (!onlyTypeable || $0.keyCode != nil) }
             guard !keys.isEmpty else { return nil }
-            return ChoiceSection(title: section.rawValue, choices: keys.map {
+            return ChoiceSection(title: section.title, choices: keys.map {
                 Choice(id: "key-\($0.usage)", title: $0.name, value: value($0))
             })
         }

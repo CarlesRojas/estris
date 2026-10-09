@@ -21,7 +21,7 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 
 **General** (applies to every utility)
 - **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.
-- **Language** (English for now), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
+- **Language** (see Languages below), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
 - **Open at login**: on by default, so PasteRing is running after a restart.
 - **About**: app icon, name and version.
 
@@ -95,6 +95,13 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.
 
+## Languages
+
+English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching (a **Relaunch** button appears). Dates follow the chosen language.
+
+- Translations: `Resources/Localization/<language>.lproj/Localizable.strings`, keyed by the English text; `build-app.sh` copies them into the app and `Info.plist` lists the languages.
+- `scripts/check-localization.py` finds the text the app shows and reports anything missing in a language.
+
 ## Project structure
 
 PasteRing is meant to grow into a set of macOS utilities, so code is grouped by area:
@@ -104,7 +111,7 @@ Sources/PasteRing/
   App/                    entry point, app delegate (menu bar item, Settings window)
   General/                settings shared by every utility (language, date and time format)
   Settings/               the Settings window: sidebar, search, General pane
-  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher)
+  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher, localization, relaunch)
   Utilities/
     AutoQuit/
       AutoQuit.swift           owns the utility

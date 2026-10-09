@@ -179,11 +179,12 @@ final class Remap {
     /// mouse or keyboard utility resending it), or the unknown device's ID.
     private func unknownSource(sender: UInt64?, event: CGEvent) -> String {
         if let sender {
-            return String(format: "Unknown device 0x%llX", sender)
+            return String(localized: "Unknown device \(String(format: "0x%llX", sender))")
         }
         let pid = pid_t(event.getIntegerValueField(.eventSourceUnixProcessID))
-        guard pid > 0 else { return "Other source" }
-        return "Posted by \(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "process \(pid)")"
+        guard pid > 0 else { return String(localized: "Other source") }
+        let poster = NSRunningApplication(processIdentifier: pid)?.localizedName ?? String(localized: "process \(pid)")
+        return String(localized: "Posted by \(poster)")
     }
 
     /// For the Event Viewer: what an event was remapped to, and, for a key changed on the
@@ -250,26 +251,26 @@ final class Remap {
             } else {
                 phase = type == .keyDown ? .down : .up
             }
-            var detail = String(format: "key code 0x%02X", keyCode)
+            var detail = String(localized: "key code \(String(format: "0x%02X", keyCode))")
             if let usage {
-                detail += String(format: ", usage 0x%llX:0x%llX", usage >> 32, usage & 0xFFFF_FFFF)
+                detail += ", " + String(localized: "usage \(String(format: "0x%llX:0x%llX", usage >> 32, usage & 0xFFFF_FFFF))")
             }
             return ParsedEvent(
                 input: usage.map(RemapInput.key),
                 phase: phase,
                 isRepeat: event.getIntegerValueField(.keyboardEventAutorepeat) != 0,
-                name: usage.map(KeyCatalog.name(usage:)) ?? String(format: "Key code 0x%02X", keyCode),
+                name: usage.map(KeyCatalog.name(usage:)) ?? String(localized: "Key code \(String(format: "0x%02X", keyCode))"),
                 detail: detail
             )
         case .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp:
             let number = Int(event.getIntegerValueField(.mouseEventButtonNumber))
             let isDown = type == .leftMouseDown || type == .rightMouseDown || type == .otherMouseDown
-            return ParsedEvent(input: .mouseButton(number), phase: isDown ? .down : .up, isRepeat: false, name: MouseButtons.name(number), detail: "button \(number)")
+            return ParsedEvent(input: .mouseButton(number), phase: isDown ? .down : .up, isRepeat: false, name: MouseButtons.name(number), detail: String(localized: "button \(number)"))
         default:
             guard type.rawValue == Self.systemDefined, let event = NSEvent(cgEvent: event), event.subtype.rawValue == 8 else { return nil }
             let key = (event.data1 & 0xFFFF_0000) >> 16
             let state = (event.data1 & 0xFF00) >> 8
-            return ParsedEvent(input: nil, phase: state == 0xA ? .down : .up, isRepeat: event.data1 & 0x1 != 0, name: SystemAction.mediaKeyName(key), detail: "special key \(key)")
+            return ParsedEvent(input: nil, phase: state == 0xA ? .down : .up, isRepeat: event.data1 & 0x1 != 0, name: SystemAction.mediaKeyName(key), detail: String(localized: "special key \(key)"))
         }
     }
 

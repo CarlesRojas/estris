@@ -28,7 +28,7 @@ enum RemapOutput: Codable, Hashable {
         case .key(let usage): KeyCatalog.name(usage: usage)
         case .mouseButton(let number): MouseButtons.name(number)
         case .action(let action): action.title
-        case .nothing: "Nothing"
+        case .nothing: String(localized: "Nothing")
         }
     }
 }
@@ -56,15 +56,15 @@ enum MappingConflict {
 
     var message: String {
         switch self {
-        case .above: "Already mapped above"
-        case .otherDevice(let name): "Already mapped on \(name)"
+        case .above: String(localized: "Already mapped above")
+        case .otherDevice(let name): String(localized: "Already mapped on \(name)")
         }
     }
 
     var explanation: String {
         switch self {
-        case .above: "Only the first mapping for a key or button applies."
-        case .otherDevice(let name): "This button reaches macOS without saying which device sent it, so only the mapping on \(name) applies."
+        case .above: String(localized: "Only the first mapping for a key or button applies.")
+        case .otherDevice(let name): String(localized: "This button reaches macOS without saying which device sent it, so only the mapping on \(name) applies.")
         }
     }
 }

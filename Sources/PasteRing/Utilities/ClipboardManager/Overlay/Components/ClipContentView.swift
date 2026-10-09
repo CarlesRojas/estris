@@ -4,8 +4,8 @@ extension ClipItem {
     /// Where the entry came from: the app, or another device for Universal Clipboard.
     @MainActor
     var sourceName: String {
-        if isFromOtherDevice == true { return "Another device" }
-        return AppIcons.name(for: sourceBundleID) ?? "Unknown app"
+        if isFromOtherDevice == true { return String(localized: "Another device") }
+        return AppIcons.name(for: sourceBundleID) ?? String(localized: "Unknown app")
     }
 }
 

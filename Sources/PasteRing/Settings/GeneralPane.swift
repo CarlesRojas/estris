@@ -39,7 +39,12 @@ struct GeneralPane: View {
             Section("Language & Region") {
                 Picker("Language", selection: $general.language) {
                     ForEach(AppLanguage.allCases) { language in
-                        Text(language.title).tag(language)
+                        Text(verbatim: language.title).tag(language)
+                    }
+                }
+                if general.language != general.launchLanguage {
+                    LabeledContent("PasteRing switches language when it relaunches") {
+                        Button("Relaunch") { Relaunch.now() }
                     }
                 }
                 Picker("Date format", selection: $general.dateStyle) {
@@ -50,7 +55,7 @@ struct GeneralPane: View {
                 Picker("Time format", selection: $general.timeStyle) {
                     ForEach(TimeStyle.allCases) { style in
                         let sample = DateTimeFormat(language: general.language, timeStyle: style).timeString(from: .now)
-                        Text("\(style.title) (\(sample))").tag(style)
+                        Text(verbatim: "\(style.title) (\(sample))").tag(style)
                     }
                 }
             }
@@ -80,7 +85,7 @@ struct GeneralPane: View {
                         .resizable()
                         .frame(width: 56, height: 56)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("PasteRing")
+                        Text(verbatim: "PasteRing")
                             .font(.title3.weight(.semibold))
                         Text(Self.versionText)
                             .foregroundStyle(.secondary)
@@ -111,9 +116,9 @@ struct GeneralPane: View {
 
     private static var versionText: String {
         let info = Bundle.main.infoDictionary
-        let version = info?["CFBundleShortVersionString"] as? String ?? "development build"
+        let version = info?["CFBundleShortVersionString"] as? String ?? String(localized: "development build")
         let build = info?["CFBundleVersion"] as? String
-        return build.map { "Version \(version) (\($0))" } ?? "Version \(version)"
+        return build.map { String(localized: "Version \(version) (\($0))") } ?? String(localized: "Version \(version)")
     }
 
     private func refreshStatus() {

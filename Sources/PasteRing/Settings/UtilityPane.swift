@@ -5,7 +5,7 @@ import SwiftUI
 struct UtilityPane<Tab, Content: View>: View
 where Tab: CaseIterable & Hashable & RawRepresentable, Tab.RawValue == String, Tab.AllCases: RandomAccessCollection {
     let pane: SettingsPane
-    let summary: String
+    let summary: LocalizedStringKey
     /// The utility's on/off switch; nil for panes without one.
     var isOn: Binding<Bool>?
     @Binding var tab: Tab
@@ -17,7 +17,7 @@ where Tab: CaseIterable & Hashable & RawRepresentable, Tab.RawValue == String, T
 
             Picker("View", selection: $tab) {
                 ForEach(Array(Tab.allCases), id: \.self) { tab in
-                    Text(tab.rawValue).tag(tab)
+                    Text(LocalizedStringKey(tab.rawValue)).tag(tab)
                 }
             }
             .pickerStyle(.segmented)

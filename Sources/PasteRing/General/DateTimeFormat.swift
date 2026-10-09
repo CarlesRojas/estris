@@ -3,13 +3,13 @@ import SwiftUI
 
 /// Formats a moment as short date and time, such as "Oct 9 14:05", per General settings.
 struct DateTimeFormat: Equatable {
-    var language = AppLanguage.english
+    var language = AppLanguage.system
     var dateStyle = DateStyle.monthDay
     var timeStyle = TimeStyle.system
 
     func string(from date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: language.rawValue)
+        formatter.locale = language.locale
         formatter.dateFormat = "\(dateStyle.pattern) \(timePattern)"
         return formatter.string(from: date)
     }
@@ -17,14 +17,14 @@ struct DateTimeFormat: Equatable {
     /// The date part alone, for showing the choices in Settings.
     func dateString(from date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: language.rawValue)
+        formatter.locale = language.locale
         formatter.dateFormat = dateStyle.pattern
         return formatter.string(from: date)
     }
 
     func timeString(from date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: language.rawValue)
+        formatter.locale = language.locale
         formatter.dateFormat = timePattern
         return formatter.string(from: date)
     }

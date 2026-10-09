@@ -115,7 +115,7 @@ struct ClipboardSettingsForm: View {
 
             Section {
                 ForEach(settings.shortcuts) { shortcut in
-                    LabeledContent(shortcut == settings.shortcuts.first ? "Open overlay" : "Alternative") {
+                    LabeledContent(shortcut == settings.shortcuts.first ? String(localized: "Open overlay") : String(localized: "Alternative")) {
                         HStack {
                             ShortcutRecorder(shortcut: settings.shortcutBinding(shortcut))
                             if settings.shortcuts.count > 1 {
@@ -156,7 +156,7 @@ struct ClipboardSettingsForm: View {
         return Array((history.items + samples).prefix(4))
     }
 
-    private func slider(_ title: String, value: Binding<Double>, in range: ClosedRange<Double>, percent: Bool = true) -> some View {
+    private func slider(_ title: LocalizedStringKey, value: Binding<Double>, in range: ClosedRange<Double>, percent: Bool = true) -> some View {
         LabeledContent(title) {
             HStack {
                 Slider(value: value, in: range)

@@ -71,7 +71,7 @@ final class ClipboardManager: NSObject {
 
     /// Entries for the menu bar menu.
     func menuItems() -> [NSMenuItem] {
-        let clear = NSMenuItem(title: "Clear Clipboard History", action: #selector(clearHistory), keyEquivalent: "")
+        let clear = NSMenuItem(title: String(localized: "Clear Clipboard History"), action: #selector(clearHistory), keyEquivalent: "")
         clear.target = self
         return [clear]
     }

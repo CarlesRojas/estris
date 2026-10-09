@@ -9,8 +9,8 @@ enum TapFingers: Int, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .three: "Three fingers"
-        case .four: "Four fingers"
+        case .three: String(localized: "Three fingers")
+        case .four: String(localized: "Four fingers")
         }
     }
 }
