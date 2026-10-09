@@ -21,35 +21,37 @@ struct HistoryPreferences: View {
     }
 
     var body: some View {
-        // Grouped like every other settings page: the search row in one box, entries in the next.
-        Form {
-            Section {
-                HStack(spacing: 12) {
-                    SearchField(text: $search)
-                    Text(countText)
-                        .foregroundStyle(.secondary)
-                        .fixedSize()
-                    Button("Clear All", role: .destructive) {
-                        confirmingClear = true
-                    }
-                    .disabled(history.items.isEmpty)
-                }
-            }
+        // The search stays pinned at the top; the entries scroll below, grouped like every
+        // other settings page.
+        VStack(spacing: 0) {
+            SearchField(text: $search)
+                .pinnedAboveList()
 
-            Section {
-                if history.items.isEmpty {
-                    placeholder("No clipboard entries yet")
-                } else if results.isEmpty {
-                    placeholder("No entries match \u{201C}\(search)\u{201D}")
-                } else {
-                    ForEach(results, id: \.item.id) { result in
-                        row(result.item, position: result.position)
+            Form {
+                Section {
+                    if history.items.isEmpty {
+                        placeholder("No clipboard entries yet")
+                    } else if results.isEmpty {
+                        placeholder("No entries match \u{201C}\(search)\u{201D}")
+                    } else {
+                        ForEach(results, id: \.item.id) { result in
+                            row(result.item, position: result.position)
+                        }
+                    }
+                } header: {
+                    HStack {
+                        Text(countText)
+                        Spacer()
+                        Button("Clear All", role: .destructive) {
+                            confirmingClear = true
+                        }
+                        .disabled(history.items.isEmpty)
                     }
                 }
             }
+            .formStyle(.grouped)
+            .settingsPage()
         }
-        .formStyle(.grouped)
-        .settingsPage()
         .confirmationDialog("Delete all clipboard entries?", isPresented: $confirmingClear) {
             Button("Clear All", role: .destructive) { history.clear() }
         }

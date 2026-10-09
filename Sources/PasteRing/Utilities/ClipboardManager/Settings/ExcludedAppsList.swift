@@ -16,37 +16,36 @@ struct ExcludedAppsList: View {
     }
 
     var body: some View {
-        // Grouped like every other settings page: the search row in one box, apps in the next.
-        Form {
-            Section {
-                HStack(spacing: 12) {
-                    SearchField(text: $search, prompt: "Search apps")
-                    Text(settings.excludedApps.isEmpty ? "All apps recorded" : "\(settings.excludedApps.count) excluded")
-                        .foregroundStyle(.secondary)
-                        .fixedSize()
-                }
-            }
+        // The search stays pinned at the top; the apps scroll below, grouped like every other
+        // settings page.
+        VStack(spacing: 0) {
+            SearchField(text: $search, prompt: "Search apps")
+                .pinnedAboveList()
 
-            Section {
-                if isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                } else {
-                    ForEach(results) { app in
-                        Toggle(isOn: isRecorded(app)) {
-                            HStack(spacing: 10) {
-                                AppIconView(bundleID: app.bundleID, size: 24, url: app.url)
-                                Text(app.name)
+            Form {
+                Section {
+                    if isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                    } else {
+                        ForEach(results) { app in
+                            Toggle(isOn: isRecorded(app)) {
+                                HStack(spacing: 10) {
+                                    AppIconView(bundleID: app.bundleID, size: 24, url: app.url)
+                                    Text(app.name)
+                                }
                             }
+                            .toggleStyle(.switch)
                         }
-                        .toggleStyle(.switch)
                     }
+                } header: {
+                    Text(settings.excludedApps.isEmpty ? "All apps recorded" : "\(settings.excludedApps.count) excluded")
                 }
             }
+            .formStyle(.grouped)
+            .settingsPage()
         }
-        .formStyle(.grouped)
-        .settingsPage()
         .task {
             guard apps.isEmpty else { return }
             apps = await Task.detached(priority: .userInitiated) { InstalledApps.scan() }.value
