@@ -29,6 +29,11 @@ struct AppearancePreferences: View {
                         slider("Height", value: $settings.carouselHeight, in: AppSettings.carouselSizeRange, percent: false)
                     }
 
+                    if settings.style == .stack {
+                        slider("Width", value: $settings.stackWidth, in: AppSettings.stackWidthRange, percent: false)
+                        slider("Height", value: $settings.stackHeight, in: AppSettings.stackHeightRange, percent: false)
+                    }
+
                     if settings.style == .grid {
                         LabeledContent("Grid shows") {
                             HStack {
