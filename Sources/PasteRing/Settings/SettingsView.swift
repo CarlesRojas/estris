@@ -17,7 +17,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .general: "gearshape.2"
+        case .general: "gearshape"
         case .clipboard: "list.clipboard"
         }
     }
@@ -84,8 +84,15 @@ struct SettingsView: View {
         NavigationSplitView {
             List(panes, selection: $selection) { pane in
                 HStack {
-                    // Outlined symbols in the accent colour, as in Finder's and Mail's sidebars.
-                    Label(pane.title, systemImage: pane.symbol)
+                    // Outlined symbols in the accent colour, as in Finder's and Mail's sidebars;
+                    // white on the selected row's highlight.
+                    Label {
+                        Text(pane.title)
+                    } icon: {
+                        Image(systemName: pane.symbol)
+                            .foregroundStyle(selection == pane ? Color.white : Color.accentColor)
+                            .animation(.easeInOut(duration: 0.2), value: selection)
+                    }
                     Spacer()
                     if let isOn = isOn(pane) {
                         StatusBadge(isOn: isOn)
