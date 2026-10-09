@@ -26,7 +26,7 @@ struct SimpleView: View {
         }
         .padding(20)
         .frame(width: settings.simpleWidth, height: settings.simpleHeight)
-        .surface(cornerRadius: 22, isSelected: true)
+        .surface(cornerRadius: 22)
         .transaction { $0.animation = nil }
     }
 }

@@ -5,8 +5,8 @@ import SwiftUI
 struct StackView: View {
     private static let visibleRange = 3
     /// Angle between neighbouring entries on the wheel, in degrees.
-    private static let step: Double = 26
-    private static let radius: CGFloat = 230
+    private static let step: Double = 20
+    private static let radius: CGFloat = 240
     /// Distance from the viewer to the front of the wheel. Smaller means stronger depth.
     private static let perspective: CGFloat = 320
 
@@ -23,6 +23,7 @@ struct StackView: View {
                         ClipCard(text: item.text, isSelected: distance == 0, appBundleID: item.sourceBundleID)
                             .modifier(WheelPlacement(
                                 angle: Double(distance) * Self.step,
+                                step: Self.step,
                                 radius: Self.radius,
                                 perspective: Self.perspective
                             ))
@@ -40,8 +41,11 @@ struct StackView: View {
 /// makes cards travel along the curve instead of in a straight line.
 private struct WheelPlacement: ViewModifier, Animatable {
     var angle: Double
+    let step: Double
     let radius: CGFloat
     let perspective: CGFloat
+    /// Extra shrink for every card but the current one, so the front one stands out.
+    private let backShrink: CGFloat = 0.18
 
     var animatableData: Double {
         get { angle }
@@ -51,8 +55,10 @@ private struct WheelPlacement: ViewModifier, Animatable {
     func body(content: Content) -> some View {
         let radians = angle * .pi / 180
         let depth = radius * (1 - cos(radians))
+        // Eases in over the first step, so a card shrinks smoothly as it leaves the front.
+        let leaving = CGFloat(min(abs(angle) / step, 1))
         return content
-            .scaleEffect(perspective / (perspective + depth))
+            .scaleEffect(perspective / (perspective + depth) * (1 - backShrink * leaving))
             .offset(y: radius * sin(radians))
     }
 }

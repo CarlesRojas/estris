@@ -5,7 +5,7 @@ import SwiftUI
 struct RingMenuView: View {
     private static let minRadius: CGFloat = 170
     /// Roughly a chip's width plus a gap, so neighbours at the top never overlap.
-    private static let chipSpacing: CGFloat = 200
+    private static let chipSpacing: CGFloat = 238
 
     @ObservedObject var state: OverlayState
 
@@ -31,7 +31,7 @@ struct RingMenuView: View {
                     .zIndex(distance == 0 ? 1 : 0)
             }
         }
-        .frame(width: (radius + 110) * 2, height: (radius + 40) * 2)
+        .frame(width: (radius + 130) * 2, height: (radius + 50) * 2)
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.position)
     }
 
@@ -70,17 +70,18 @@ struct RingChip: View {
     let isSelected: Bool
 
     var body: some View {
-        HStack(spacing: 6) {
-            AppIconView(bundleID: item.sourceBundleID, size: 18)
+        HStack(spacing: 10) {
+            AppIconView(bundleID: item.sourceBundleID, size: 24)
             Text(item.text.singleLine)
-                .font(.callout)
-                .lineLimit(1)
+                .font(.body)
+                .lineLimit(2)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(width: 150)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 9)
-        .surface(cornerRadius: .infinity, isSelected: isSelected)
+        // Fixed size, two lines tall, so every chip on the ring matches.
+        .frame(width: 200, height: 36)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .surface(cornerRadius: 18, isSelected: isSelected)
     }
 }

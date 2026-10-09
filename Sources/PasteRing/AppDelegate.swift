@@ -78,6 +78,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Accessory apps are not activated automatically, so the window would open behind others.
         NSApp.activate(ignoringOtherApps: true)
         preferencesWindow?.makeKeyAndOrderFront(nil)
+        // Don't start with a text field focused (and its contents selected).
+        preferencesWindow?.makeFirstResponder(nil)
     }
 
     private func tab<Content: View>(_ label: String, symbol: String, _ view: Content) -> NSTabViewItem {

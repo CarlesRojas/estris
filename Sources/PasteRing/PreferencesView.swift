@@ -4,6 +4,7 @@ import SwiftUI
 struct GeneralPreferences: View {
     @ObservedObject var settings: AppSettings
     @State private var openAtLogin = LoginItem.isEnabled
+    @FocusState private var historySizeFocused: Bool
     @State private var accessibilityGranted = Paster.isTrusted(prompt: false)
 
     private static let accessibilitySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
@@ -13,6 +14,7 @@ struct GeneralPreferences: View {
             LabeledContent("History size") {
                 HStack {
                     TextField("History size", value: maxItems, format: .number)
+                        .focused($historySizeFocused)
                         .labelsHidden()
                         .multilineTextAlignment(.trailing)
                         .frame(width: 60)
@@ -46,7 +48,12 @@ struct GeneralPreferences: View {
         }
         .formStyle(.grouped)
         .frame(width: 460, height: 360)
-        .onAppear(perform: refreshStatus)
+        .onAppear {
+            refreshStatus()
+            // The window focuses the first text field when the tab opens, which selects
+            // the whole number. Start with nothing focused instead.
+            DispatchQueue.main.async { historySizeFocused = false }
+        }
         // Picks up changes made in System Settings when returning to this window.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             refreshStatus()
