@@ -108,7 +108,8 @@ final class GeneralSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        language = AppLanguage(rawValue: defaults.string(forKey: Keys.language) ?? "") ?? .system
+        let language = AppLanguage(rawValue: defaults.string(forKey: Keys.language) ?? "") ?? .system
+        self.language = language
         launchLanguage = language
         dateStyle = DateStyle(rawValue: defaults.string(forKey: Keys.dateStyle) ?? "") ?? .monthDay
         timeStyle = TimeStyle(rawValue: defaults.string(forKey: Keys.timeStyle) ?? "") ?? .system
