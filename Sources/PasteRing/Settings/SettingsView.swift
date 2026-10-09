@@ -10,6 +10,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case middleClick
     case remap
     case windowSnapping
+    case keepAwake
     /// Hidden until unlocked from the version in General > About.
     case developer
 
@@ -23,6 +24,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .middleClick: String(localized: "Middle Click")
         case .remap: String(localized: "Remap")
         case .windowSnapping: String(localized: "Window Snapping")
+        case .keepAwake: String(localized: "Keep Awake")
         case .developer: String(localized: "Developer")
         }
     }
@@ -35,6 +37,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .middleClick: "hand.tap"
         case .remap: "keyboard"
         case .windowSnapping: "rectangle.split.2x1"
+        case .keepAwake: "cup.and.saucer"
         case .developer: "hammer"
         }
     }
@@ -48,6 +51,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["logs", "debug", "developer", "diagnostics"]
         case .autoQuit:
             ["quit", "close", "window", "last window", "terminate", "excluded", "apps", "delay"]
+        case .keepAwake:
+            ["awake", "sleep", "caffeinate", "display", "battery", "power", "timer"]
         case .windowSnapping:
             ["window", "snap", "tile", "half", "halves", "corner", "third", "maximize", "resize", "drag", "shortcut"]
         case .remap:
@@ -113,6 +118,7 @@ struct SettingsSidebar: View {
     @ObservedObject var middleClickSettings: MiddleClickSettings
     @ObservedObject var remapSettings: RemapSettings
     @ObservedObject var windowSnappingSettings: WindowSnappingSettings
+    @ObservedObject var keepAwakeSettings: KeepAwakeSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -138,6 +144,7 @@ struct SettingsSidebar: View {
         case .middleClick: middleClickSettings.isEnabled
         case .remap: remapSettings.isEnabled
         case .windowSnapping: windowSnappingSettings.isEnabled
+        case .keepAwake: keepAwakeSettings.isEnabled
         case .developer: nil
         }
     }
@@ -153,6 +160,7 @@ struct SettingsDetail: View {
     let middleClick: MiddleClick
     let remap: Remap
     let windowSnapping: WindowSnapping
+    let keepAwake: KeepAwake
     let log: AppLog
 
     var body: some View {
@@ -171,6 +179,8 @@ struct SettingsDetail: View {
                     remap.settingsPane()
                 case .windowSnapping:
                     windowSnapping.settingsPane()
+                case .keepAwake:
+                    keepAwake.settingsPane()
                 case .developer:
                     DeveloperPane(general: general, log: log)
                 }

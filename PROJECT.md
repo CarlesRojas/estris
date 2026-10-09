@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap and Window Snapping.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping and Keep Awake.
 
 ## Usage
 
@@ -18,6 +18,8 @@ History is saved in `~/Library/Application Support/PasteRing` (readable by your 
 ## Settings
 
 Open **Settings…** from the menu bar icon. The sidebar (with search) has one pane for the whole app and one per utility; each utility shows whether it is **On** or **Off** at the right of its row, and its pane starts with a switch to turn it on or off.
+
+Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
 **General** (applies to every utility)
 - **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.
@@ -119,6 +121,17 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
   - If the app won't get as small as the space, the window gets the usual snap and the app's minimum is remembered, so later previews for it show the usual snap.
 - Works through the Accessibility permission (frames of other apps' windows) and a listen-only event tap, which also sees drags of PasteRing's own windows; those are moved directly. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
 
+## Keep Awake
+
+Keeps the Mac and its display awake until it has been idle for a chosen time, then starts the screen saver or puts it to sleep. Turn it on with the switch in **Settings… > Keep Awake**; it stays on until turned off.
+
+- **Sleep after being idle for**, separately **On power adapter** (default Indefinitely) and **On battery** (default 1 hour): Don't keep awake, 15 or 30 minutes, 1, 2, 4 or 8 hours, or Indefinitely.
+- Idle means no mouse, keyboard or trackpad input (the system's HID idle time) and no other app keeping the display on (as video players do while playing). Any of those starts the count again.
+- While not idle for that long it holds a `PreventUserIdleDisplaySleep` power assertion; once idle for that long it releases it and starts the screen saver (**Start the screen saver instead of sleeping**, on by default) or puts the Mac to sleep (`pmset sleepnow`); a global input monitor or the screen or Mac waking holds it again. Waking counts as activity, so the count starts over instead of sleeping again straight away.
+- It looks again exactly when the idle time would run out, and whenever macOS posts that power assertions changed (an app starts or stops keeping the Mac awake); while another app keeps the display on it also looks every 5 seconds, in case that notice doesn't come. Which apps keep the display on is logged under Developer > Logs as it changes.
+- Plugging in or out (IOKit power source notifications) applies the other choice at once. "Don't keep awake" pauses it; "Indefinitely" always holds.
+- **Status** (while on): the power source; the state, refreshed every second while the pane is open (Active while the Mac is used, meaning input within the last second, or while another app keeps the display on; Inactive while counting down; Inactive, macOS sleep settings apply once the time is up; Always on; Not keeping awake); and, while counting, **Sleeps in** with a countdown of whole seconds left (full while the Mac is used, 0:00 during the last second) that ticks while the pane is open.
+
 ## Languages
 
 English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching (a **Relaunch** button appears). Dates follow the chosen language.
@@ -149,6 +162,10 @@ Sources/PasteRing/
       WindowSnapping.swift     owns the utility: shortcuts, snapping, restore frames
       Model/                   settings, snap actions, Accessibility windows, drag snapper, space filler, preview
       Settings/                the Window Snapping pane
+    KeepAwake/
+      KeepAwake.swift          owns the utility: power assertion and timer
+      Model/                   settings, status, power source
+      Settings/                the Keep Awake pane
     Remap/
       Remap.swift              owns the utility and its event tap
       Model/                   settings, devices, key catalog, system actions, key mapper, event log

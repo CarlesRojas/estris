@@ -253,6 +253,20 @@ final class ClipboardSettings: ObservableObject {
         Keys.showDeleteButton: true,
     ]
 
+    /// Back to the default settings, appearance and shortcut; the on/off switch, excluded
+    /// apps and history stay as they are.
+    func reset() {
+        maxItems = 50
+        ignorePasswords = true
+        recordImages = true
+        pasteAsPlainText = false
+        removeDuplicates = true
+        moveToTopOnPaste = true
+        expiry = .never
+        shortcuts = [Self.defaultShortcut]
+        resetAppearance()
+    }
+
     func resetAppearance() {
         for key in Self.appearanceDefaults.keys {
             defaults.removeObject(forKey: key)

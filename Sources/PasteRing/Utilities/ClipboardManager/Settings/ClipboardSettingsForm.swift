@@ -136,6 +136,9 @@ struct ClipboardSettingsForm: View {
             } header: {
                 Text("Shortcuts")
             }
+            Section {
+                Button("Reset to Defaults") { settings.reset(); appearance.reset() }
+            }
         }
         .formStyle(.grouped)
         .settingsPage()

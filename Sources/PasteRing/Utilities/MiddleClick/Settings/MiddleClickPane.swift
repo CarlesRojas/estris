@@ -37,6 +37,9 @@ struct MiddleClickPane: View {
             } header: {
                 Text("General")
             }
+            Section {
+                Button("Reset to Defaults") { settings.reset() }
+            }
         }
         .formStyle(.grouped)
         .settingsPage()
