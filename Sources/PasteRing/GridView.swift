@@ -23,7 +23,7 @@ struct GridLayout: Equatable {
     /// Narrows tiles that would overflow the screen width, and drops rows that would
     /// overflow its height.
     @MainActor
-    static func fitting(_ settings: AppSettings, in screen: CGSize) -> GridLayout {
+    static func fitting(_ settings: ClipboardSettings, in screen: CGSize) -> GridLayout {
         let columns = CGFloat(Self.columns)
         let available = CGSize(
             width: screen.width - reservedSize.width - padding * 2,
@@ -45,7 +45,7 @@ struct GridLayout: Equatable {
 /// Every visible entry as a tile, all on screen at once.
 struct GridView: View {
     @ObservedObject var state: OverlayState
-    @ObservedObject var settings: AppSettings
+    @ObservedObject var settings: ClipboardSettings
 
     private var layout: GridLayout {
         state.gridLayout ?? GridLayout.fitting(settings, in: CGSize(width: 10_000, height: 10_000))

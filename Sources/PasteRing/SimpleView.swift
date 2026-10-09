@@ -4,7 +4,7 @@ import SwiftUI
 /// content, nothing moves.
 struct SimpleView: View {
     @ObservedObject var state: OverlayState
-    @ObservedObject var settings: AppSettings
+    @ObservedObject var settings: ClipboardSettings
 
     var body: some View {
         let item = state.selectedItem
@@ -21,6 +21,7 @@ struct EntryCard: View {
     let width: CGFloat
     let height: CGFloat
     var isSelected = false
+    @Environment(\.overlayActions) private var actions
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -32,7 +33,8 @@ struct EntryCard: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                .padding(.trailing, 24)
+                // Room for the date and trash button in the corner.
+                .padding(.trailing, actions.isEnabled ? ContentCard.cornerReserve : 0)
             }
             Text(item?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Clipboard history is empty")
                 .font(.title3)

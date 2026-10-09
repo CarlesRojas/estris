@@ -53,8 +53,9 @@ final class OverlayController: NSObject {
 
     private let history: ClipboardHistory
     private let monitor: ClipboardMonitor
-    private let settings: AppSettings
+    private let settings: ClipboardSettings
     private let appearance: AppearanceSettings
+    private let general: GeneralSettings
     private let state = OverlayState()
     private let panel: OverlayPanel
     private var modifierTimer: Timer?
@@ -68,11 +69,12 @@ final class OverlayController: NSObject {
     /// Bumped on every show and hide, so a finished fade-out does not hide a newer show.
     private var presentation = 0
 
-    init(history: ClipboardHistory, monitor: ClipboardMonitor, settings: AppSettings, appearance: AppearanceSettings) {
+    init(history: ClipboardHistory, monitor: ClipboardMonitor, settings: ClipboardSettings, appearance: AppearanceSettings, general: GeneralSettings) {
         self.history = history
         self.monitor = monitor
         self.settings = settings
         self.appearance = appearance
+        self.general = general
         panel = OverlayPanel(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 600),
             styleMask: [.borderless, .nonactivatingPanel],
@@ -87,7 +89,7 @@ final class OverlayController: NSObject {
             dismiss: { [weak self] in self?.hide() },
             isEnabled: true
         )
-        let hostingView = OverlayHostingView(rootView: OverlayRootView(state: state, settings: settings, appearance: appearance))
+        let hostingView = OverlayHostingView(rootView: OverlayRootView(state: state, settings: settings, appearance: appearance, general: general))
         hostingView.sizingOptions = []
         panel.contentView = hostingView
         panel.onScroll = { [weak self] event in

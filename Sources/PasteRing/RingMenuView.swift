@@ -11,7 +11,7 @@ struct RingMenuView: View {
     private static var radiiCache: [String: CGSize] = [:]
 
     @ObservedObject var state: OverlayState
-    @ObservedObject var settings: AppSettings
+    @ObservedObject var settings: ClipboardSettings
 
     var body: some View {
         let count = state.items.count
@@ -112,8 +112,9 @@ private struct RingPlacement: ViewModifier, Animatable {
 struct RingChip: View {
     let item: ClipItem
     let isSelected: Bool
-    var width: CGFloat = 228
+    var width: CGFloat = 280
     var height: CGFloat = 56
+    @Environment(\.overlayActions) private var actions
 
     var body: some View {
         HStack(spacing: 10) {
@@ -123,8 +124,8 @@ struct RingChip: View {
                 .font(.body)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                // Room for the trash button in the corner.
-                .padding(.trailing, 16)
+                // Room for the date and trash button in the corner.
+                .padding(.trailing, actions.isEnabled ? ContentCard.cornerReserve - 14 : 0)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

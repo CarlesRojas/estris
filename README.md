@@ -13,25 +13,27 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 ## Settings
 
-Open **Settings…** from the menu bar icon.
+Open **Settings…** from the menu bar icon. The sidebar (with search) has one pane for the whole app and one per utility.
 
-**General**
-- **History size**: how many entries to keep (5 to 500, default 50).
+**General** (applies to every utility)
+- **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.
 - **Open at login**: on by default, so PasteRing is running after a restart.
-- **Accessibility**: shows whether the permission is granted, with a link to its page in System Settings.
+- **Language** (English for now), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
+- **About**: version and a short description.
 
-**Appearance** (with a live preview over your wallpaper)
-- **Style**:
-  - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
-  - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width and height are adjustable (default 256 by 130). On a smaller screen it shows fewer rows, and narrower tiles, so everything fits.
-  - *Carousel*: Cover Flow style, neighbours tilted away on either side. Card width and height are adjustable (default 260 by 260).
-  - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling slides the front card down and fades it out while the next one comes forward; going back plays the same motion in reverse. Card width and height are adjustable (default 520 by 170).
-  - *Ring menu*: the most recent entries (3 to 12, default 12) spread around a ring (an ellipse as tight as the chips allow) that turns to bring the selected one to the top. Chip width and height are adjustable (default 228 by 56); the ring grows to fit.
-- Surfaces use the system's frosted material.
-- **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (50%, fades in and out with the overlay).
-- **Reset to Defaults** resets everything in this tab, including the style and its options.
+**Clipboard Manager** has two tabs:
+- **Settings**:
+  - *History*: how many entries to keep (5 to 500, default 50).
+  - *Style*, with a live preview over your wallpaper:
+    - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
+    - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width and height are adjustable (default 256 by 130). On a smaller screen it shows fewer rows, and narrower tiles, so everything fits.
+    - *Carousel*: Cover Flow style, neighbours tilted away on either side. Card width and height are adjustable (default 260 by 260).
+    - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling slides the front card down and fades it out while the next one comes forward; going back plays the same motion in reverse. Card width and height are adjustable (default 520 by 170).
+    - *Ring menu*: the most recent entries (3 to 12, default 12) spread around a ring (an ellipse as tight as the chips allow) that turns to bring the selected one to the top. Chip width and height are adjustable (default 280 by 56); the ring grows to fit.
+  - *Surface*: frosted material with **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16) and **Dim screen** (50%, fades in and out with the overlay). **Reset Style and Surface to Defaults** resets this section and the style.
+- **History**: every saved entry with when it was copied. The trash button deletes one, **Clear All** deletes everything.
 
-**History** lists every saved entry. The trash button deletes one, **Clear All** deletes everything.
+Every entry in the overlay shows when it was copied next to its trash icon, in the date and time format chosen in General.
 
 ## Build
 

@@ -2,8 +2,9 @@ import SwiftUI
 
 struct OverlayRootView: View {
     @ObservedObject var state: OverlayState
-    @ObservedObject var settings: AppSettings
+    @ObservedObject var settings: ClipboardSettings
     @ObservedObject var appearance: AppearanceSettings
+    @ObservedObject var general: GeneralSettings
 
     var body: some View {
         ZStack {
@@ -16,6 +17,7 @@ struct OverlayRootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .environmentObject(appearance)
         .environment(\.overlayActions, state.actions)
+        .environment(\.dateTimeFormat, general.dateTimeFormat)
     }
 
     private var content: some View {

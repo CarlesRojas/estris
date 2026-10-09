@@ -10,7 +10,7 @@ struct StackView: View {
     private static let scales: [CGFloat] = [1, 0.94, 0.89, 0.85, 0.82]
 
     @ObservedObject var state: OverlayState
-    @ObservedObject var settings: AppSettings
+    @ObservedObject var settings: ClipboardSettings
 
     private var width: CGFloat { settings.stackWidth }
     private var height: CGFloat { settings.stackHeight }

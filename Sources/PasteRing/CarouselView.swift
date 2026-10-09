@@ -5,7 +5,7 @@ struct CarouselView: View {
     private static let visibleRange = 3
 
     @ObservedObject var state: OverlayState
-    @ObservedObject var settings: AppSettings
+    @ObservedObject var settings: ClipboardSettings
 
     private var width: CGFloat { settings.carouselWidth }
     private var height: CGFloat { settings.carouselHeight }
@@ -47,8 +47,12 @@ struct CarouselView: View {
 
 /// Fixed-size card with the source app and the text, shared by Carousel and Grid.
 struct ContentCard: View {
+    /// Width kept free in the header for the date and trash button.
+    static let cornerReserve: CGFloat = 120
+
     let item: ClipItem?
     let isSelected: Bool
+    @Environment(\.overlayActions) private var actions
     var width: CGFloat = 260
     var height: CGFloat = 260
     var lineLimit: Int? = 9
@@ -63,7 +67,8 @@ struct ContentCard: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                .padding(.trailing, 24)
+                // Room for the date and trash button in the corner.
+                .padding(.trailing, actions.isEnabled ? Self.cornerReserve : 0)
                 // Same font whether selected or not: a heavier weight rewraps the text.
                 Text(item.text.trimmingCharacters(in: .whitespacesAndNewlines))
                     .font(.body)

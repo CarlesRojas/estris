@@ -6,7 +6,8 @@ import SwiftUI
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let history = ClipboardHistory()
-    private let settings = AppSettings()
+    private let general = GeneralSettings()
+    private let settings = ClipboardSettings()
     private let appearance = AppearanceSettings()
     private var maxItemsObserver: AnyCancellable?
     private var preferencesWindow: NSWindow?
@@ -19,7 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.history.limit = $0
         }
         monitor = ClipboardMonitor(history: history)
-        overlay = OverlayController(history: history, monitor: monitor, settings: settings, appearance: appearance)
+        overlay = OverlayController(history: history, monitor: monitor, settings: settings, appearance: appearance, general: general)
         monitor.start()
         setUpStatusItem()
 
@@ -59,18 +60,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openPreferences() {
         if preferencesWindow == nil {
-            // Toolbar tabs, like the system's own Settings windows.
-            let tabs = NSTabViewController()
-            tabs.tabStyle = .toolbar
-            tabs.addTabViewItem(tab("General", symbol: "gearshape", GeneralPreferences(settings: settings)))
-            tabs.addTabViewItem(tab("Appearance", symbol: "paintpalette", AppearancePreferences(settings: settings, appearance: appearance, history: history)))
-            tabs.addTabViewItem(tab("History", symbol: "clock", HistoryPreferences(history: history)))
-            // Keep the app name as the window title instead of the selected tab's.
-            tabs.canPropagateSelectedChildViewControllerTitle = false
-            tabs.title = "PasteRing"
-            let window = NSWindow(contentViewController: tabs)
+            let settingsView = SettingsView(general: general, clipboard: settings, appearance: appearance, history: history)
+            let window = NSWindow(contentViewController: NSHostingController(rootView: settingsView))
             window.title = "PasteRing"
-            window.styleMask = [.titled, .closable]
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
+            window.setContentSize(NSSize(width: 880, height: 700))
             window.isReleasedWhenClosed = false
             window.center()
             preferencesWindow = window
@@ -80,15 +74,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         preferencesWindow?.makeKeyAndOrderFront(nil)
         // Don't start with a text field focused (and its contents selected).
         preferencesWindow?.makeFirstResponder(nil)
-    }
-
-    private func tab<Content: View>(_ label: String, symbol: String, _ view: Content) -> NSTabViewItem {
-        let controller = NSHostingController(rootView: view)
-        controller.sizingOptions = .preferredContentSize
-        let item = NSTabViewItem(viewController: controller)
-        item.label = label
-        item.image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)
-        return item
     }
 
     @objc private func clearHistory() {

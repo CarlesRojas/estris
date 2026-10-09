@@ -24,7 +24,7 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
 
 /// User preferences, persisted in UserDefaults.
 @MainActor
-final class AppSettings: ObservableObject {
+final class ClipboardSettings: ObservableObject {
     static let maxItemsRange = 5...500
     static let ringSizeRange = 3...12
     static let gridColumns = GridLayout.columns
@@ -36,7 +36,7 @@ final class AppSettings: ObservableObject {
     static let carouselSizeRange: ClosedRange<Double> = 180...420
     static let stackWidthRange: ClosedRange<Double> = 360...800
     static let stackHeightRange: ClosedRange<Double> = 120...360
-    static let ringChipWidthRange: ClosedRange<Double> = 140...360
+    static let ringChipWidthRange: ClosedRange<Double> = 200...420
     static let ringChipHeightRange: ClosedRange<Double> = 40...140
 
     private let defaults = UserDefaults.standard
@@ -142,7 +142,7 @@ final class AppSettings: ObservableObject {
         Keys.carouselHeight: 260.0,
         Keys.stackWidth: 520.0,
         Keys.stackHeight: 170.0,
-        Keys.ringChipWidth: 228.0,
+        Keys.ringChipWidth: 280.0,
         Keys.ringChipHeight: 56.0,
     ]
 
@@ -166,7 +166,7 @@ final class AppSettings: ObservableObject {
     }
 
     /// Binding that keeps typed or stepped values inside `range`.
-    func clamped(_ keyPath: ReferenceWritableKeyPath<AppSettings, Int>, to range: ClosedRange<Int>) -> Binding<Int> {
+    func clamped(_ keyPath: ReferenceWritableKeyPath<ClipboardSettings, Int>, to range: ClosedRange<Int>) -> Binding<Int> {
         Binding(
             get: { self[keyPath: keyPath] },
             set: { self[keyPath: keyPath] = min(max($0, range.lowerBound), range.upperBound) }
