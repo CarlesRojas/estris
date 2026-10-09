@@ -28,10 +28,13 @@ struct SourceIcon: View {
     }
 }
 
-/// An entry's content: its text, an image thumbnail, or the copied file names.
+/// An entry's content: its text (styled, for rich text), the copied image, or the copied
+/// file names.
 struct ClipContentView: View {
     let item: ClipItem
     var font: Font = .body
+    /// Point size of `font`, which rich text is scaled to.
+    var baseSize: CGFloat = 13
     /// One line with line breaks shown as ⏎, for small rows and chips.
     var singleLine = false
 
@@ -39,21 +42,45 @@ struct ClipContentView: View {
         switch item.kind {
         case .image:
             if let image = ClipThumbnails.image(for: item) {
-                Image(nsImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                if singleLine {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                } else {
+                    // The full width of the card at the image's own aspect ratio; anything
+                    // taller than the card is cut off at the bottom.
+                    GeometryReader { proxy in
+                        Image(nsImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: proxy.size.width)
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    }
+                    .clipped()
+                }
             } else {
                 label(item.text, symbol: "photo")
             }
         case .files:
             label(singleLine ? item.text.singleLine : item.text, symbol: item.text.contains("\n") ? "doc.on.doc" : "doc")
-        case .text, .richText:
-            Text(singleLine ? item.text.singleLine : item.text.trimmingCharacters(in: .whitespacesAndNewlines))
-                .font(font)
-                .truncationMode(.tail)
+        case .richText:
+            if let attributed = RichTextRenderer.attributed(for: item, baseSize: baseSize, singleLine: singleLine) {
+                Text(attributed)
+                    .truncationMode(.tail)
+            } else {
+                plainText
+            }
+        case .text:
+            plainText
         }
+    }
+
+    private var plainText: some View {
+        Text(singleLine ? item.text.singleLine : item.text.trimmingCharacters(in: .whitespacesAndNewlines))
+            .font(font)
+            .truncationMode(.tail)
     }
 
     private func label(_ text: String, symbol: String) -> some View {

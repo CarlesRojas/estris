@@ -168,8 +168,8 @@ final class ClipboardMonitor: NSObject {
         }
     }
 
-    /// A small PNG of the copied image, and its size in pixels.
-    private func imageThumbnail(maxSide: CGFloat = 480) -> (data: Data, pixelSize: String)? {
+    /// A PNG of the copied image, large enough to fill a card, and its size in pixels.
+    private func imageThumbnail(maxSide: CGFloat = 1200) -> (data: Data, pixelSize: String)? {
         guard let image = NSImage(pasteboard: pasteboard), image.size.width > 0, image.size.height > 0 else { return nil }
         let pixels = image.representations.first.map { NSSize(width: $0.pixelsWide, height: $0.pixelsHigh) } ?? image.size
         let scale = min(1, maxSide / max(image.size.width, image.size.height))

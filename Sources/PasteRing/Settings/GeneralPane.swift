@@ -35,16 +35,6 @@ struct GeneralPane: View {
                 }
             }
 
-            Section("Startup") {
-                Toggle("Open at login", isOn: Binding(
-                    get: { openAtLogin },
-                    set: {
-                        LoginItem.setEnabled($0)
-                        openAtLogin = LoginItem.isEnabled
-                    }
-                ))
-            }
-
             Section("Language & Region") {
                 Picker("Language", selection: $general.language) {
                     ForEach(AppLanguage.allCases) { language in
@@ -62,6 +52,16 @@ struct GeneralPane: View {
                         Text("\(style.title) (\(sample))").tag(style)
                     }
                 }
+            }
+
+            Section("Startup") {
+                Toggle("Open at login", isOn: Binding(
+                    get: { openAtLogin },
+                    set: {
+                        LoginItem.setEnabled($0)
+                        openAtLogin = LoginItem.isEnabled
+                    }
+                ))
             }
 
             if accessibilityGranted {
@@ -86,9 +86,6 @@ struct GeneralPane: View {
                             .textSelection(.enabled)
                     }
                 }
-                Text("A set of small utilities for macOS. It starts with a clipboard manager: hold ⌘⇧ and press V to pick from everything you have copied.")
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .formStyle(.grouped)

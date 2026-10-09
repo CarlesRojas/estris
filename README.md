@@ -4,7 +4,7 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 ## Usage
 
-- Copy as usual. PasteRing records text, rich text, images and files, most recent first, along with the app they were copied from (shown as its icon). Pasting an entry gives back exactly what was copied. Copies that arrive from your other Apple devices through Universal Clipboard are recorded too, marked as coming from another device.
+- Copy as usual. PasteRing records text, rich text, images and files, most recent first, along with the app they were copied from (shown as its icon). Pasting an entry gives back exactly what was copied. The overlay shows images at the card's full width and rich text with its styling (fonts, bold and italic, colours, underline). Copies that arrive from your other Apple devices through Universal Clipboard are recorded too, marked as coming from another device.
 - Hold `⌘⇧` and press `V` to open the overlay in the middle of the screen. The highlighted entry is what will be pasted.
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
@@ -20,9 +20,9 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 
 **General** (applies to every utility)
 - **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.
-- **Open at login**: on by default, so PasteRing is running after a restart.
 - **Language** (English for now), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
-- **About**: version and a short description.
+- **Open at login**: on by default, so PasteRing is running after a restart.
+- **About**: app icon, name and version.
 
 **Clipboard** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
 - **Settings**:

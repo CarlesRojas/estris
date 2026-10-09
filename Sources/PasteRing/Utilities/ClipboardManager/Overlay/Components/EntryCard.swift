@@ -24,7 +24,7 @@ struct EntryCard: View {
             }
             Group {
                 if let item {
-                    ClipContentView(item: item, font: .title3)
+                    ClipContentView(item: item, font: .title3, baseSize: 15)
                 } else {
                     Text("Clipboard history is empty")
                         .font(.title3)
