@@ -58,6 +58,21 @@ enum HIDServices {
         }
     }
 
+    /// One line per input service, unnamed ones included, for the Developer logs.
+    static func describeAll() -> [String] {
+        guard let client, let copyServices, let list = copyServices(client)?.takeRetainedValue() as? [AnyObject] else {
+            return ["can't list input services"]
+        }
+        return list.map { service in
+            let name = property(service, "Product") as? String ?? "(no name)"
+            let number = { (key: String) in (property(service, key) as? NSNumber)?.intValue ?? 0 }
+            let registryID = (getRegistryID?(service)?.takeUnretainedValue() as? NSNumber)?.uint64Value ?? 0
+            return String(format: "%@: vendor 0x%X, product 0x%X, usage 0x%X:0x%X, transport %@, id 0x%llX",
+                          name, number("VendorID"), number("ProductID"), number("PrimaryUsagePage"), number("PrimaryUsage"),
+                          property(service, "Transport") as? String ?? "?", registryID)
+        }
+    }
+
     @discardableResult
     static func set(_ key: String, to value: AnyObject, on service: HIDService) -> Bool {
         setProperty?(service.client, key as CFString, value) ?? 0 != 0

@@ -36,6 +36,7 @@ final class Remap {
 
     func start() {
         devices.refresh()
+        logDevices()
         watcher.start()
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
@@ -75,6 +76,7 @@ final class Remap {
 
     private func devicesChanged() {
         devices.refresh()
+        logDevices()
         lastRefresh = Date()
         apply()
     }
@@ -260,6 +262,12 @@ final class Remap {
             let state = (event.data1 & 0xFF00) >> 8
             return ParsedEvent(input: nil, phase: state == 0xA ? .down : .up, isRepeat: event.data1 & 0x1 != 0, name: SystemAction.mediaKeyName(key), detail: "special key \(key)")
         }
+    }
+
+    /// Every input service macOS reports, so a missing or unexpected device can be traced.
+    private func logDevices() {
+        let lines = HIDServices.describeAll()
+        log("input services (\(lines.count)):\n" + lines.joined(separator: "\n"))
     }
 
     private func log(_ message: String) {
