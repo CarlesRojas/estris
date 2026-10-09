@@ -61,7 +61,7 @@ final class WindowSnappingSettings: ObservableObject {
     }
 
     static let edgeAreaRange: ClosedRange<Double> = 8...150
-    static let defaultEdgeArea = 32.0
+    static let defaultEdgeArea = 64.0
 
     /// The drag areas that snap.
     @Published var gestures: Set<SnapGesture> {
