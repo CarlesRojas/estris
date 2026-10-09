@@ -80,7 +80,10 @@
 "Click to change" = "Fes clic per canviar";
 "Clipboard" = "Porta-retalls";
 "Clipboard history is empty" = "L’historial del porta-retalls és buit";
+"Color Picker" = "Selector de color";
+"Copied" = "Copiat";
 "Copy All" = "Copia-ho tot";
+"Copy as" = "Copia com a";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar una cosa que ja és a l’historial la mou a dalt en lloc d’afegir-la de nou.";
 "Corners" = "Cantonades";
 "Create Mapping" = "Crea una assignació";
@@ -108,10 +111,12 @@
 "entries" = "entrades";
 "Escape" = "Esc";
 "Event Viewer" = "Visor d’esdeveniments";
+"Example" = "Exemple";
 "Excluded Apps" = "Apps excloses";
 "Fast Forward" = "Avançament ràpid";
 "Fill the space next to other windows" = "Omple l’espai al costat d’altres finestres";
 "Force Quit Applications" = "Força la sortida d’aplicacions";
+"Format" = "Format";
 "Forward Delete" = "Suprimeix cap endavant";
 "Four fingers" = "Quatre dits";
 "Function Keys" = "Tecles de funció";
@@ -129,6 +134,7 @@
 "Immediately" = "Immediatament";
 "Inactive" = "Inactiu";
 "Inactive, macOS sleep settings apply" = "Inactiu, s’apliquen els ajustos de repòs del macOS";
+"Include # prefix" = "Inclou el prefix #";
 "Indefinitely" = "Indefinidament";
 "Insert" = "Insereix";
 "Keep Awake" = "Mantén despert";
@@ -206,6 +212,8 @@
 "PasteRing switches language when it relaunches" = "El PasteRing canvia d’idioma quan es torna a obrir";
 "Pause" = "Pausa";
 "Permissions" = "Permisos";
+"Pick a color" = "Tria un color";
+"Pick a color anywhere on screen with a shortcut and copy it." = "Tria un color de qualsevol lloc de la pantalla amb una drecera i copia’l.";
 "Play or Pause" = "Reprodueix o posa en pausa";
 "Posted by %@" = "Enviat per %@";
 "Power adapter" = "Adaptador de corrent";
@@ -260,6 +268,7 @@
 "Settings" = "Configuració";
 "Settings…" = "Configuració…";
 "Shadow" = "Ombra";
+"Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";

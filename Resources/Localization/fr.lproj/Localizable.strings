@@ -80,7 +80,10 @@
 "Click to change" = "Cliquez pour modifier";
 "Clipboard" = "Presse-papiers";
 "Clipboard history is empty" = "L’historique du presse-papiers est vide";
+"Color Picker" = "Pipette";
+"Copied" = "Copié";
 "Copy All" = "Tout copier";
+"Copy as" = "Copier en tant que";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copier un élément déjà présent dans l’historique le place en haut au lieu de l’ajouter à nouveau.";
 "Corners" = "Coins";
 "Create Mapping" = "Créer une affectation";
@@ -108,10 +111,12 @@
 "entries" = "entrées";
 "Escape" = "Échappement";
 "Event Viewer" = "Visualiseur d’évènements";
+"Example" = "Exemple";
 "Excluded Apps" = "Apps exclues";
 "Fast Forward" = "Avance rapide";
 "Fill the space next to other windows" = "Remplir l’espace à côté des autres fenêtres";
 "Force Quit Applications" = "Forcer à quitter des applications";
+"Format" = "Format";
 "Forward Delete" = "Supprimer vers l’avant";
 "Four fingers" = "Quatre doigts";
 "Function Keys" = "Touches de fonction";
@@ -129,6 +134,7 @@
 "Immediately" = "Immédiatement";
 "Inactive" = "Inactif";
 "Inactive, macOS sleep settings apply" = "Inactif, les réglages de veille de macOS s’appliquent";
+"Include # prefix" = "Inclure le préfixe #";
 "Indefinitely" = "Indéfiniment";
 "Insert" = "Insertion";
 "Keep Awake" = "Garder éveillé";
@@ -206,6 +212,8 @@
 "PasteRing switches language when it relaunches" = "PasteRing change de langue lorsqu’il redémarre";
 "Pause" = "Pause";
 "Permissions" = "Autorisations";
+"Pick a color" = "Prélever une couleur";
+"Pick a color anywhere on screen with a shortcut and copy it." = "Prélevez une couleur n’importe où à l’écran avec un raccourci et copiez-la.";
 "Play or Pause" = "Lecture ou pause";
 "Posted by %@" = "Envoyé par %@";
 "Power adapter" = "Adaptateur secteur";
@@ -260,6 +268,7 @@
 "Settings" = "Réglages";
 "Settings…" = "Réglages…";
 "Shadow" = "Ombre";
+"Shortcut" = "Raccourci";
 "Shortcuts" = "Raccourcis";
 "Show delete button" = "Afficher le bouton de suppression";
 "Show Desktop" = "Afficher le bureau";

@@ -80,7 +80,10 @@
 "Click to change" = "Click to change";
 "Clipboard" = "Clipboard";
 "Clipboard history is empty" = "Clipboard history is empty";
+"Color Picker" = "Color Picker";
+"Copied" = "Copied";
 "Copy All" = "Copy All";
+"Copy as" = "Copy as";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copying something already in the history moves it to the top instead of adding it again.";
 "Corners" = "Corners";
 "Create Mapping" = "Create Mapping";
@@ -108,10 +111,12 @@
 "entries" = "entries";
 "Escape" = "Escape";
 "Event Viewer" = "Event Viewer";
+"Example" = "Example";
 "Excluded Apps" = "Excluded Apps";
 "Fast Forward" = "Fast Forward";
 "Fill the space next to other windows" = "Fill the space next to other windows";
 "Force Quit Applications" = "Force Quit Applications";
+"Format" = "Format";
 "Forward Delete" = "Forward Delete";
 "Four fingers" = "Four fingers";
 "Function Keys" = "Function Keys";
@@ -129,6 +134,7 @@
 "Immediately" = "Immediately";
 "Inactive" = "Inactive";
 "Inactive, macOS sleep settings apply" = "Inactive, macOS sleep settings apply";
+"Include # prefix" = "Include # prefix";
 "Indefinitely" = "Indefinitely";
 "Insert" = "Insert";
 "Keep Awake" = "Keep Awake";
@@ -206,6 +212,8 @@
 "PasteRing switches language when it relaunches" = "PasteRing switches language when it relaunches";
 "Pause" = "Pause";
 "Permissions" = "Permissions";
+"Pick a color" = "Pick a color";
+"Pick a color anywhere on screen with a shortcut and copy it." = "Pick a color anywhere on screen with a shortcut and copy it.";
 "Play or Pause" = "Play or Pause";
 "Posted by %@" = "Posted by %@";
 "Power adapter" = "Power adapter";
@@ -260,6 +268,7 @@
 "Settings" = "Settings";
 "Settings…" = "Settings…";
 "Shadow" = "Shadow";
+"Shortcut" = "Shortcut";
 "Shortcuts" = "Shortcuts";
 "Show delete button" = "Show delete button";
 "Show Desktop" = "Show Desktop";

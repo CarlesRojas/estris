@@ -20,9 +20,11 @@ final class AppearanceSettings: ObservableObject {
         var backdropDim = 0.5
     }
 
-    init() {
-        let stored = UserDefaults.standard.data(forKey: Self.key)
-            .flatMap { try? JSONDecoder().decode(Stored.self, from: $0) } ?? Stored()
+    /// The look as configured; `usesDefaults` gives the default look instead, without reading
+    /// or saving anything, for other utilities' overlays.
+    init(usesDefaults: Bool = false) {
+        let saved = usesDefaults ? nil : UserDefaults.standard.data(forKey: Self.key)
+        let stored = saved.flatMap { try? JSONDecoder().decode(Stored.self, from: $0) } ?? Stored()
         tint = Self.color(from: stored.tint)
         tintOpacity = stored.tintOpacity
         selectedTintOpacity = stored.selectedTintOpacity
