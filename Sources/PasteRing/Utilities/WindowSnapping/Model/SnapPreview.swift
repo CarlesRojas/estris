@@ -23,7 +23,7 @@ final class SnapPreview {
         view.layer?.cornerRadius = Self.cornerRadius
         view.layer?.cornerCurve = .continuous
         view.layer?.borderWidth = 2
-        view.layer?.borderColor = NSColor.white.withAlphaComponent(0.75).cgColor
+        view.layer?.borderColor = NSColor.white.withAlphaComponent(0.3).cgColor
         view.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.3).cgColor
         panel.contentView = view
         return panel

@@ -8,6 +8,7 @@
 "%lld most recent entries" = "os %lld itens mais recentes";
 "%lld of %@" = "%lld de %@";
 "%lld of %lld" = "%lld de %lld";
+"%lld pt" = "%lld pt";
 "' (Quote)" = "' (Aspas)";
 ", (Comma)" = ", (Vírgula)";
 "- (Minus)" = "- (Menos)";
@@ -42,9 +43,13 @@
 "App Windows" = "Janelas do app";
 "Appearance" = "Aparência";
 "Auto Quit" = "Encerramento automático";
+"Bottom edge: thirds" = "Borda inferior: terços";
+"Bottom edge: two thirds when sliding to the middle" = "Borda inferior: dois terços ao deslizar para o meio";
 "Bottom Half" = "Metade inferior";
 "Bottom Left" = "Inferior esquerdo";
+"Bottom left corner" = "Canto inferior esquerdo";
 "Bottom Right" = "Inferior direito";
+"Bottom right corner" = "Canto inferior direito";
 "Brightness Down" = "Diminuir brilho";
 "Brightness Up" = "Aumentar brilho";
 "button %lld" = "botão %lld";
@@ -83,6 +88,7 @@
 "Down Arrow" = "Seta para baixo";
 "Dragging" = "Arrastar";
 "Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Remove fontes, cores e outras formatações para que o texto colado combine com o destino.";
+"Edge area" = "Área da borda";
 "Editing" = "Edição";
 "Eject" = "Ejetar";
 "Emoji and Symbols" = "Emoji e Símbolos";
@@ -97,6 +103,7 @@
 "Four fingers" = "Quatro dedos";
 "Function Keys" = "Teclas de função";
 "General" = "Geral";
+"Gestures" = "Gestos";
 "Granted" = "Concedido";
 "Grid" = "Grade";
 "Grid shows" = "A grade mostra";
@@ -128,6 +135,7 @@
 "Left Button" = "Botão esquerdo";
 "Left Command" = "Command esquerdo";
 "Left Control" = "Control esquerdo";
+"Left edge: left half" = "Borda esquerda: metade esquerda";
 "Left Half" = "Metade esquerda";
 "Left Option" = "Option esquerdo";
 "Left Shift" = "Shift esquerdo";
@@ -210,6 +218,7 @@
 "Right Button" = "Botão direito";
 "Right Command" = "Command direito";
 "Right Control" = "Control direito";
+"Right edge: right half" = "Borda direita: metade direita";
 "Right Half" = "Metade direita";
 "Right Option" = "Option direito";
 "Right Shift" = "Shift direito";
@@ -232,6 +241,8 @@
 "Show delete button" = "Mostrar botão de apagar";
 "Show Desktop" = "Mostrar mesa";
 "Show when entries were copied" = "Mostrar quando os itens foram copiados";
+"Side edges near the bottom: bottom half" = "Bordas laterais perto da base: metade inferior";
+"Side edges near the top: top half" = "Bordas laterais perto do topo: metade superior";
 "Skips text copied from password fields and password managers." = "Ignora o texto copiado de campos de senha e gerenciadores de senhas.";
 "Sleep Display" = "Repousar tela";
 "Snap by dragging a window to a screen edge" = "Encaixar ao arrastar uma janela até uma borda da tela";
@@ -258,9 +269,12 @@
 "Time format" = "Formato de hora";
 "Tint" = "Tonalidade";
 "Tint strength" = "Intensidade da tonalidade";
+"Top edge: maximize" = "Borda superior: maximizar";
 "Top Half" = "Metade superior";
 "Top Left" = "Superior esquerdo";
+"Top left corner" = "Canto superior esquerdo";
 "Top Right" = "Superior direito";
+"Top right corner" = "Canto superior direito";
 "Unknown app" = "App desconhecido";
 "Unknown device %@" = "Dispositivo desconhecido %@";
 "Up" = "Solto";

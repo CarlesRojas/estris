@@ -8,6 +8,7 @@
 "%lld most recent entries" = "les %lld entrades més recents";
 "%lld of %@" = "%lld de %@";
 "%lld of %lld" = "%lld de %lld";
+"%lld pt" = "%lld pt";
 "' (Quote)" = "' (Cometa)";
 ", (Comma)" = ", (Coma)";
 "- (Minus)" = "- (Menys)";
@@ -42,9 +43,13 @@
 "App Windows" = "Finestres de l’app";
 "Appearance" = "Aparença";
 "Auto Quit" = "Tancament automàtic";
+"Bottom edge: thirds" = "Vora inferior: terços";
+"Bottom edge: two thirds when sliding to the middle" = "Vora inferior: dos terços en lliscar cap al centre";
 "Bottom Half" = "Meitat inferior";
 "Bottom Left" = "A baix a l’esquerra";
+"Bottom left corner" = "Cantonada inferior esquerra";
 "Bottom Right" = "A baix a la dreta";
+"Bottom right corner" = "Cantonada inferior dreta";
 "Brightness Down" = "Abaixa la brillantor";
 "Brightness Up" = "Apuja la brillantor";
 "button %lld" = "botó %lld";
@@ -83,6 +88,7 @@
 "Down Arrow" = "Fletxa avall";
 "Dragging" = "Arrossegar";
 "Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Elimina tipus de lletra, colors i altres formats perquè el text enganxat s’adapti a on va.";
+"Edge area" = "Zona de la vora";
 "Editing" = "Edició";
 "Eject" = "Expulsa";
 "Emoji and Symbols" = "Emojis i símbols";
@@ -97,6 +103,7 @@
 "Four fingers" = "Quatre dits";
 "Function Keys" = "Tecles de funció";
 "General" = "General";
+"Gestures" = "Gestos";
 "Granted" = "Concedit";
 "Grid" = "Graella";
 "Grid shows" = "La graella mostra";
@@ -128,6 +135,7 @@
 "Left Button" = "Botó esquerre";
 "Left Command" = "Ordre esquerra";
 "Left Control" = "Control esquerra";
+"Left edge: left half" = "Vora esquerra: meitat esquerra";
 "Left Half" = "Meitat esquerra";
 "Left Option" = "Opció esquerra";
 "Left Shift" = "Majúscules esquerra";
@@ -210,6 +218,7 @@
 "Right Button" = "Botó dret";
 "Right Command" = "Ordre dreta";
 "Right Control" = "Control dreta";
+"Right edge: right half" = "Vora dreta: meitat dreta";
 "Right Half" = "Meitat dreta";
 "Right Option" = "Opció dreta";
 "Right Shift" = "Majúscules dreta";
@@ -232,6 +241,8 @@
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";
 "Show when entries were copied" = "Mostra quan es van copiar les entrades";
+"Side edges near the bottom: bottom half" = "Vores laterals a prop de baix: meitat inferior";
+"Side edges near the top: top half" = "Vores laterals a prop de dalt: meitat superior";
 "Skips text copied from password fields and password managers." = "Omet el text copiat de camps de contrasenya i gestors de contrasenyes.";
 "Sleep Display" = "Repòs de la pantalla";
 "Snap by dragging a window to a screen edge" = "Ajusta en arrossegar una finestra a una vora de la pantalla";
@@ -258,9 +269,12 @@
 "Time format" = "Format d’hora";
 "Tint" = "To";
 "Tint strength" = "Intensitat del to";
+"Top edge: maximize" = "Vora superior: maximitza";
 "Top Half" = "Meitat superior";
 "Top Left" = "A dalt a l’esquerra";
+"Top left corner" = "Cantonada superior esquerra";
 "Top Right" = "A dalt a la dreta";
+"Top right corner" = "Cantonada superior dreta";
 "Unknown app" = "App desconeguda";
 "Unknown device %@" = "Dispositiu desconegut %@";
 "Up" = "Deixat anar";

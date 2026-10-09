@@ -9,11 +9,8 @@ import AppKit
 /// follow it.
 @MainActor
 final class DragSnapper {
-    /// How far into the screen an edge reaches. Wider than the screen's very edge, so a
-    /// drag can stop on an edge shared with another display.
-    private static let edgeBand: CGFloat = 32
-    /// How far along an edge from a corner the corner reaches.
-    private static let cornerLength: CGFloat = 64
+    /// How far along an edge from a corner the corner reaches, at least.
+    private static let minimumCornerLength: CGFloat = 64
     /// How far along a side edge from its ends the top and bottom halves reach.
     private static let shortEdgeLength: CGFloat = 145
     /// How close edges must be to count as shared.
@@ -174,9 +171,13 @@ final class DragSnapper {
     /// The snap area under the pointer: corners for quarters, the top for the whole screen,
     /// the sides for halves (top and bottom halves near their ends), and the bottom for
     /// thirds, which become two thirds when the drag slides from a side third to the middle.
+    /// Gestures switched off in Settings leave their place to the next area that applies.
+    /// The edges reach as far into the screen as Settings says, wider than the screen's very
+    /// edge, so a drag can stop on an edge shared with another display.
     private func snapArea(at point: NSPoint, on frame: NSRect) -> (action: SnapAction, edge: SnapEdge)? {
-        let band = Self.edgeBand
-        let corner = Self.cornerLength
+        let on = settings.gestures
+        let band = CGFloat(settings.edgeArea)
+        let corner = max(Self.minimumCornerLength, band)
         let left = point.x <= frame.minX + band
         let right = point.x >= frame.maxX - band
         let top = point.y >= frame.maxY - band
@@ -186,21 +187,23 @@ final class DragSnapper {
         let nearTop = point.y >= frame.maxY - corner
         let nearBottom = point.y <= frame.minY + corner
 
-        if (left && nearTop) || (top && nearLeft) { return (.topLeft, .topLeft) }
-        if (right && nearTop) || (top && nearRight) { return (.topRight, .topRight) }
-        if (left && nearBottom) || (bottom && nearLeft) { return (.bottomLeft, .bottomLeft) }
-        if (right && nearBottom) || (bottom && nearRight) { return (.bottomRight, .bottomRight) }
-        if top { return (.maximize, .top) }
+        if on.contains(.topLeft), (left && nearTop) || (top && nearLeft) { return (.topLeft, .topLeft) }
+        if on.contains(.topRight), (right && nearTop) || (top && nearRight) { return (.topRight, .topRight) }
+        if on.contains(.bottomLeft), (left && nearBottom) || (bottom && nearLeft) { return (.bottomLeft, .bottomLeft) }
+        if on.contains(.bottomRight), (right && nearBottom) || (bottom && nearRight) { return (.bottomRight, .bottomRight) }
+        if top, on.contains(.maximize) { return (.maximize, .top) }
         if left || right {
             let edge: SnapEdge = left ? .left : .right
-            if point.y >= frame.maxY - Self.shortEdgeLength { return (.topHalf, edge) }
-            if point.y <= frame.minY + Self.shortEdgeLength { return (.bottomHalf, edge) }
-            return (left ? .leftHalf : .rightHalf, edge)
+            if on.contains(.topHalf), point.y >= frame.maxY - Self.shortEdgeLength { return (.topHalf, edge) }
+            if on.contains(.bottomHalf), point.y <= frame.minY + Self.shortEdgeLength { return (.bottomHalf, edge) }
+            if left, on.contains(.leftHalf) { return (.leftHalf, edge) }
+            if right, on.contains(.rightHalf) { return (.rightHalf, edge) }
         }
-        if bottom {
+        if bottom, on.contains(.thirds) {
             let third = frame.width / 3
             if point.x < frame.minX + third { return (.firstThird, .bottom) }
             if point.x > frame.maxX - third { return (.lastThird, .bottom) }
+            guard on.contains(.twoThirds) else { return (.centerThird, .bottom) }
             switch target?.action {
             case .firstThird, .firstTwoThirds: return (.firstTwoThirds, .bottom)
             case .lastThird, .lastTwoThirds: return (.lastTwoThirds, .bottom)

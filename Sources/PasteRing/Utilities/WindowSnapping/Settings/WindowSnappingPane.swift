@@ -30,8 +30,31 @@ struct WindowSnappingPane: View {
         Form {
             Section("Dragging") {
                 Toggle("Snap by dragging a window to a screen edge", isOn: $settings.snapsByDragging)
+                LabeledContent("Edge area") {
+                    HStack {
+                        Slider(value: $settings.edgeArea, in: WindowSnappingSettings.edgeAreaRange, step: 1)
+                            .frame(width: 200)
+                        Text("\(Int(settings.edgeArea)) pt")
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                            .frame(width: 50, alignment: .trailing)
+                    }
+                }
+                .disabled(!settings.snapsByDragging)
                 Toggle("Resize side-by-side windows together", isOn: $settings.resizesTogether)
             }
+
+            Section("Gestures") {
+                ForEach(SnapGesture.allCases) { gesture in
+                    Toggle(gesture.title, isOn: Binding(
+                        get: { settings.gestures.contains(gesture) },
+                        set: { isOn in
+                            if isOn { settings.gestures.insert(gesture) } else { settings.gestures.remove(gesture) }
+                        }
+                    ))
+                }
+            }
+            .disabled(!settings.snapsByDragging)
         }
         .formStyle(.grouped)
         .settingsPage()
