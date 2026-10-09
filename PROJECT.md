@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping and Keep Awake.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Keep Awake and Color Picker.
 
 ## Usage
 
@@ -132,6 +132,14 @@ Keeps the Mac and its display awake until it has been idle for a chosen time, th
 - Plugging in or out (IOKit power source notifications) applies the other choice at once. "Don't keep awake" pauses it; "Indefinitely" always holds.
 - **Status** (while on): the power source; the state, refreshed every second while the pane is open (Active while the Mac is used, meaning input within the last second, or while another app keeps the display on; Inactive while counting down; Inactive, macOS sleep settings apply once the time is up; Always on; Not keeping awake); and, while counting, **Sleeps in** with a countdown of whole seconds left (full while the Mac is used, 0:00 during the last second) that ticks while the pane is open.
 
+## Color Picker
+
+Picks a color anywhere on screen with a shortcut and copies it. Off by default; turn it on in **Settings… > Color Picker**.
+
+- **Shortcut** (default ⇧⌘C, which browsers also use for Inspect Element) shows macOS's color sampler (`NSColorSampler`): a loupe by the pointer with the color and pixels under it. Click picks, Esc cancels. No Screen Recording permission needed.
+- **Copy as**: Hex (`#FF8000`, with **Include # prefix**, on by default), RGB (`rgb(255, 128, 0)`), HSL (`hsl(30, 100%, 50%)`) or SwiftUI (`Color(red: 1.000, green: 0.502, blue: 0.000)`), in sRGB. An example shows the chosen format.
+- After picking, a badge by the pointer shows the color and the copied text for a moment.
+
 ## Languages
 
 English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching (a **Relaunch** button appears). Dates follow the chosen language.
@@ -162,6 +170,10 @@ Sources/PasteRing/
       WindowSnapping.swift     owns the utility: shortcuts, snapping, restore frames
       Model/                   settings, snap actions, Accessibility windows, drag snapper, space filler, preview
       Settings/                the Window Snapping pane
+    ColorPicker/
+      ScreenColorPicker.swift  owns the utility (named so it doesn't hide SwiftUI's ColorPicker)
+      Model/                   settings and formats, the picked-color badge
+      Settings/                the Color Picker pane
     KeepAwake/
       KeepAwake.swift          owns the utility: power assertion and timer
       Model/                   settings, status, power source

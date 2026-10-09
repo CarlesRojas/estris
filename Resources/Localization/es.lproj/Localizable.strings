@@ -80,7 +80,10 @@
 "Click to change" = "Haz clic para cambiar";
 "Clipboard" = "Portapapeles";
 "Clipboard history is empty" = "El historial del portapapeles está vacío";
+"Color Picker" = "Selector de color";
+"Copied" = "Copiado";
 "Copy All" = "Copiar todo";
+"Copy as" = "Copiar como";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar algo que ya está en el historial lo sube arriba en lugar de añadirlo de nuevo.";
 "Corners" = "Esquinas";
 "Create Mapping" = "Crear asignación";
@@ -108,10 +111,12 @@
 "entries" = "entradas";
 "Escape" = "Escape";
 "Event Viewer" = "Visor de eventos";
+"Example" = "Ejemplo";
 "Excluded Apps" = "Apps excluidas";
 "Fast Forward" = "Avance rápido";
 "Fill the space next to other windows" = "Llenar el espacio junto a otras ventanas";
 "Force Quit Applications" = "Forzar salida de aplicaciones";
+"Format" = "Formato";
 "Forward Delete" = "Suprimir hacia delante";
 "Four fingers" = "Cuatro dedos";
 "Function Keys" = "Teclas de función";
@@ -129,6 +134,7 @@
 "Immediately" = "Inmediatamente";
 "Inactive" = "Inactivo";
 "Inactive, macOS sleep settings apply" = "Inactivo, se aplican los ajustes de reposo de macOS";
+"Include # prefix" = "Incluir el prefijo #";
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Insertar";
 "Keep Awake" = "Mantener despierto";
@@ -206,6 +212,8 @@
 "PasteRing switches language when it relaunches" = "PasteRing cambia de idioma al volver a abrirse";
 "Pause" = "Pausa";
 "Permissions" = "Permisos";
+"Pick a color" = "Elegir un color";
+"Pick a color anywhere on screen with a shortcut and copy it." = "Elige un color de cualquier parte de la pantalla con un atajo y cópialo.";
 "Play or Pause" = "Reproducir o pausar";
 "Posted by %@" = "Enviado por %@";
 "Power adapter" = "Adaptador de corriente";
@@ -260,6 +268,7 @@
 "Settings" = "Ajustes";
 "Settings…" = "Ajustes…";
 "Shadow" = "Sombra";
+"Shortcut" = "Atajo";
 "Shortcuts" = "Atajos";
 "Show delete button" = "Mostrar botón de eliminar";
 "Show Desktop" = "Mostrar escritorio";

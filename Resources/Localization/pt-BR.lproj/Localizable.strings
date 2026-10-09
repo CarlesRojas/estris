@@ -80,7 +80,10 @@
 "Click to change" = "Clique para alterar";
 "Clipboard" = "Área de Transferência";
 "Clipboard history is empty" = "O histórico da Área de Transferência está vazio";
+"Color Picker" = "Seletor de cores";
+"Copied" = "Copiado";
 "Copy All" = "Copiar tudo";
+"Copy as" = "Copiar como";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar algo que já está no histórico o move para o topo em vez de adicioná-lo novamente.";
 "Corners" = "Cantos";
 "Create Mapping" = "Criar mapeamento";
@@ -108,10 +111,12 @@
 "entries" = "itens";
 "Escape" = "Esc";
 "Event Viewer" = "Visualizador de eventos";
+"Example" = "Exemplo";
 "Excluded Apps" = "Apps excluídos";
 "Fast Forward" = "Avançar";
 "Fill the space next to other windows" = "Preencher o espaço ao lado de outras janelas";
 "Force Quit Applications" = "Forçar Encerrar Aplicativos";
+"Format" = "Formato";
 "Forward Delete" = "Apagar à frente";
 "Four fingers" = "Quatro dedos";
 "Function Keys" = "Teclas de função";
@@ -129,6 +134,7 @@
 "Immediately" = "Imediatamente";
 "Inactive" = "Inativo";
 "Inactive, macOS sleep settings apply" = "Inativo, valem os ajustes de repouso do macOS";
+"Include # prefix" = "Incluir o prefixo #";
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Inserir";
 "Keep Awake" = "Manter acordado";
@@ -206,6 +212,8 @@
 "PasteRing switches language when it relaunches" = "O PasteRing muda de idioma ao reabrir";
 "Pause" = "Pause";
 "Permissions" = "Permissões";
+"Pick a color" = "Escolher uma cor";
+"Pick a color anywhere on screen with a shortcut and copy it." = "Escolha uma cor em qualquer lugar da tela com um atalho e copie-a.";
 "Play or Pause" = "Reproduzir ou pausar";
 "Posted by %@" = "Enviado por %@";
 "Power adapter" = "Adaptador de energia";
@@ -260,6 +268,7 @@
 "Settings" = "Ajustes";
 "Settings…" = "Ajustes…";
 "Shadow" = "Sombra";
+"Shortcut" = "Atalho";
 "Shortcuts" = "Atalhos";
 "Show delete button" = "Mostrar botão de apagar";
 "Show Desktop" = "Mostrar mesa";
