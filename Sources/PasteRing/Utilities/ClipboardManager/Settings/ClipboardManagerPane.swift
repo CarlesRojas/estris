@@ -24,26 +24,19 @@ struct ClipboardManagerPane: View {
                 isOn: $clipboard.isEnabled
             )
 
-            Divider()
-
-            Picker("View", selection: $tab) {
-                Text("Settings").tag(Tab.settings)
-                Text("History").tag(Tab.history)
-                Text("Excluded Apps").tag(Tab.excludedApps)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .fixedSize()
-            .padding(.vertical, 12)
-
-            switch tab {
-            case .settings:
+            // The standard macOS tab view.
+            TabView(selection: $tab) {
                 ClipboardSettingsForm(settings: clipboard, appearance: appearance, history: history)
-            case .history:
+                    .tabItem { Text("Settings") }
+                    .tag(Tab.settings)
                 HistoryPreferences(history: history, settings: clipboard)
-            case .excludedApps:
+                    .tabItem { Text("History") }
+                    .tag(Tab.history)
                 ExcludedAppsList(settings: clipboard)
+                    .tabItem { Text("Excluded Apps") }
+                    .tag(Tab.excludedApps)
             }
+            .padding([.horizontal, .bottom], 16)
         }
     }
 }

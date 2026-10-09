@@ -89,7 +89,7 @@ struct SettingsView: View {
             }
         }
         .environment(\.dateTimeFormat, general.dateTimeFormat)
-        .frame(minWidth: 820, minHeight: 640)
+        .frame(minWidth: 820, maxWidth: .infinity, minHeight: 640, maxHeight: .infinity)
         // Jump to the first match when the search hides the open pane.
         .onChange(of: search) { _ in
             if let selection, !panes.contains(selection), let first = panes.first {

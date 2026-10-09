@@ -61,12 +61,13 @@ private struct ClipActions: ViewModifier {
                 .onHover { isHovered = $0 }
                 .onTapGesture { actions.pick(item) }
                 .overlay(alignment: .topTrailing) {
-                    HStack(spacing: 2) {
+                    // Aligned on the text baseline, so the date and key sit level with the
+                    // trash symbol instead of riding above it.
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
                         if let key = actions.quickPickKey(item) {
                             Text(key)
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.tertiary)
-                                .frame(minHeight: 24)
                                 .padding(.trailing, 6)
                         }
                         if actions.showsDate {
@@ -74,13 +75,13 @@ private struct ClipActions: ViewModifier {
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.tertiary)
                                 .lineLimit(1)
-                                // Keeps the date clear of the corner when there is no trash button.
-                                .frame(minHeight: 24)
                         }
                         if actions.showsDelete {
                             deleteButton
                         }
                     }
+                    // Same height as the trash button even without it, so the row lines up.
+                    .frame(minHeight: 24)
                     .padding(trashInset)
                 }
                 .animation(.easeOut(duration: 0.12), value: isHovered)

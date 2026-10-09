@@ -26,19 +26,20 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 
 **Clipboard Manager** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
 - **Settings**:
-  - *Shortcuts*: the shortcut that opens the overlay (default `⌘⇧V`) and any alternatives. Click one and press a new combination; it needs `⌘`, `⌥` or `⌃`.
-  - *History*: how many entries to keep (5 to 500, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and three switches, all on by default:
+  - *General*: how many entries to keep (5 to 500, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and three switches, all on by default:
     - **Ignore passwords**: skips text copied from password fields and password managers.
     - **Remove duplicates**: copying something already in the history moves it to the top instead of adding it again.
     - **Move pasted entry to the top**: when off, the history keeps copy order and `⌘V` keeps pasting the last copied text after you paste an older entry.
-  - *Style*, with a live preview over your wallpaper:
-    - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
-    - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width and height are adjustable (default 256 by 130). On a smaller screen it shows fewer rows, and narrower tiles, so everything fits.
-    - *Carousel*: Cover Flow style, neighbours tilted away on either side. Card width and height are adjustable (default 260 by 260).
-    - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling slides the front card down and fades it out while the next one comes forward; going back plays the same motion in reverse. Card width and height are adjustable (default 520 by 170).
-    - *Ring menu*: the most recent entries (3 to 12, default 12) spread around a ring (an ellipse as tight as the chips allow) that turns to bring the selected one to the top. Chip width and height are adjustable (default 280 by 56); the ring grows to fit.
-  - **Show when entries were copied**, **Show delete button** and **Show quick-pick keys** turn those off in the overlay (the History tab always has them).
-  - *Surface*: frosted material with **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16) and **Dim screen** (50%, fades in and out with the overlay). **Reset Style and Surface to Defaults** resets this section and the style.
+  - *Appearance*, with a live preview over your wallpaper:
+    - **Style**:
+      - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
+      - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width and height are adjustable (default 256 by 130). On a smaller screen it shows fewer rows, and narrower tiles, so everything fits.
+      - *Carousel*: Cover Flow style, neighbours tilted away on either side. Card width and height are adjustable (default 260 by 260).
+      - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling slides the front card down and fades it out while the next one comes forward; going back plays the same motion in reverse. Card width and height are adjustable (default 520 by 170).
+      - *Ring menu*: the most recent entries (3 to 12, default 12) spread around a ring (an ellipse as tight as the chips allow) that turns to bring the selected one to the top. Chip width and height are adjustable (default 280 by 56); the ring grows to fit.
+    - **Show when entries were copied**, **Show delete button** and **Show quick-pick keys** (the History tab always has them).
+    - Frosted material with **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16) and **Dim screen** (50%, fades in and out with the overlay). **Reset Appearance to Defaults** resets everything in this section.
+  - *Shortcuts*: the shortcut that opens the overlay (default `⌘⇧V`) and any alternatives. Click one and press a new combination; it needs `⌘`, `⌥` or `⌃`.
 - **History**: every saved entry with where and when it was copied and its quick-pick key, with a search field. The trash button deletes one, **Clear All** deletes everything.
 - **Excluded Apps**: every installed app with a switch, all on. Switch an app off and nothing copied in it is recorded.
 

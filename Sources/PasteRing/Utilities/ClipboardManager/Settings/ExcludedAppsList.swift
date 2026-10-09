@@ -34,7 +34,7 @@ struct ExcludedAppsList: View {
                 List(results) { app in
                     Toggle(isOn: isRecorded(app)) {
                         HStack(spacing: 10) {
-                            AppIconView(bundleID: app.bundleID, size: 24)
+                            AppIconView(bundleID: app.bundleID, size: 24, url: app.url)
                             Text(app.name)
                         }
                     }

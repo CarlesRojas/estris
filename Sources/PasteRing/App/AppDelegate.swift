@@ -49,7 +49,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             hostingController.sizingOptions = [.minSize]
             let window = NSWindow(contentViewController: hostingController)
             window.title = "PasteRing"
-            window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
+            // Content starts below the title bar, so the sidebar never runs under it.
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
             window.setContentSize(NSSize(width: 880, height: 700))
             window.isReleasedWhenClosed = false
             window.center()

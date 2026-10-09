@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// The Clipboard Manager's Settings tab: shortcuts, history, style and surface, each in a section.
+/// The Clipboard Manager's Settings tab: General, Appearance and Shortcuts sections.
 struct ClipboardSettingsForm: View {
     @ObservedObject var settings: ClipboardSettings
     @ObservedObject var appearance: AppearanceSettings
@@ -10,35 +10,7 @@ struct ClipboardSettingsForm: View {
 
     var body: some View {
         Form {
-            Section {
-                ForEach(settings.shortcuts) { shortcut in
-                    LabeledContent(shortcut == settings.shortcuts.first ? "Open overlay" : "Alternative") {
-                        HStack {
-                            ShortcutRecorder(shortcut: settings.shortcutBinding(shortcut))
-                            if settings.shortcuts.count > 1 {
-                                Button {
-                                    settings.shortcuts.removeAll { $0.id == shortcut.id }
-                                } label: {
-                                    Image(systemName: "minus.circle")
-                                }
-                                .buttonStyle(.borderless)
-                                .help("Remove this shortcut")
-                            }
-                        }
-                    }
-                }
-                Button("Add Alternative Shortcut") {
-                    settings.addAlternativeShortcut()
-                }
-            } header: {
-                Text("Shortcuts")
-            } footer: {
-                Text("Keep the modifiers held and press the key again to move through entries; release them to paste. With the modifiers held, 1 to 9 paste the first nine entries. Click a shortcut to change it.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("History") {
+            Section("General") {
                 LabeledContent("Keep up to") {
                     HStack {
                         TextField("Keep up to", value: settings.clamped(\.maxItems, to: ClipboardSettings.maxItemsRange), format: .number)
@@ -70,7 +42,7 @@ struct ClipboardSettingsForm: View {
                 }
             }
 
-            Section("Style") {
+            Section("Appearance") {
                 AppearancePreview(appearance: appearance, items: previewItems)
                     .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
 
@@ -125,21 +97,44 @@ struct ClipboardSettingsForm: View {
                 Toggle("Show when entries were copied", isOn: $settings.showCopyDate)
                 Toggle("Show delete button", isOn: $settings.showDeleteButton)
                 Toggle("Show quick-pick keys", isOn: $settings.showQuickPickKeys)
-            }
 
-            Section("Surface") {
                 ColorPicker("Tint", selection: $appearance.tint, supportsOpacity: false)
                 slider("Tint strength", value: $appearance.tintOpacity, in: 0...0.6)
                 slider("Selected highlight", value: $appearance.selectedTintOpacity, in: 0...0.6)
                 slider("Shadow", value: $appearance.shadowRadius, in: 0...30, percent: false)
                 slider("Dim screen", value: $appearance.backdropDim, in: 0...0.7)
-            }
-
-            Section {
-                Button("Reset Style and Surface to Defaults") {
+                Button("Reset Appearance to Defaults") {
                     settings.resetAppearance()
                     appearance.reset()
                 }
+            }
+
+            Section {
+                ForEach(settings.shortcuts) { shortcut in
+                    LabeledContent(shortcut == settings.shortcuts.first ? "Open overlay" : "Alternative") {
+                        HStack {
+                            ShortcutRecorder(shortcut: settings.shortcutBinding(shortcut))
+                            if settings.shortcuts.count > 1 {
+                                Button {
+                                    settings.shortcuts.removeAll { $0.id == shortcut.id }
+                                } label: {
+                                    Image(systemName: "minus.circle")
+                                }
+                                .buttonStyle(.borderless)
+                                .help("Remove this shortcut")
+                            }
+                        }
+                    }
+                }
+                Button("Add Alternative Shortcut") {
+                    settings.addAlternativeShortcut()
+                }
+            } header: {
+                Text("Shortcuts")
+            } footer: {
+                Text("Keep the modifiers held and press the key again to move through entries; release them to paste. With the modifiers held, 1 to 9 paste the first nine entries. Click a shortcut to change it.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
