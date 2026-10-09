@@ -47,8 +47,8 @@ struct StatusBadge: View {
 
     let isOn: Bool
     /// On the selected row's coloured highlight, the badge turns white like the row's text
-    /// and icon, instead of putting green on blue: solid white with the highlight showing
-    /// through as text when on, a faint white outline when off.
+    /// and icon, instead of putting green on blue: solid white with black text when on, a
+    /// faint white outline when off.
     var onSelectedRow = false
 
     var body: some View {
@@ -68,7 +68,7 @@ struct StatusBadge: View {
 
     private var foreground: Color {
         switch (onSelectedRow, isOn) {
-        case (true, true): .accentColor
+        case (true, true): .black
         case (true, false): .white.opacity(0.85)
         case (false, true): .white
         case (false, false): .secondary
