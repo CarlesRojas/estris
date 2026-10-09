@@ -74,7 +74,7 @@ struct EventViewer: View {
                 .frame(width: 90, alignment: .leading)
             Text(event.phase.rawValue)
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(event.phase == .down ? Color.accentColor : .secondary)
                 .frame(width: 40, alignment: .leading)
             HStack(spacing: 6) {
                 Text(event.name)
