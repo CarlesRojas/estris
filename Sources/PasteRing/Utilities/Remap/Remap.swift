@@ -122,7 +122,7 @@ final class Remap {
         }
 
         if isViewing, !parsed.isRepeat {
-            eventLog.record(InputEvent(device: device?.name ?? "Other source", phase: parsed.phase, name: parsed.name, detail: parsed.detail))
+            eventLog.record(InputEvent(device: device.map(settings.name(of:)) ?? "Other source", phase: parsed.phase, name: parsed.name, detail: parsed.detail))
         }
 
         if let recording, let input = parsed.input, parsed.phase == .down,

@@ -60,10 +60,27 @@ final class RemapSettings: ObservableObject {
         didSet { defaults.set(try? JSONEncoder().encode(devices), forKey: Keys.devices) }
     }
 
+    /// Names given by the user, keyed by `InputDevice.id`.
+    @Published var customNames: [String: String] {
+        didSet { defaults.set(customNames, forKey: Keys.customNames) }
+    }
+
     init() {
         let defaults = UserDefaults.standard
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
+        customNames = defaults.dictionary(forKey: Keys.customNames) as? [String: String] ?? [:]
         devices = defaults.data(forKey: Keys.devices).flatMap { try? JSONDecoder().decode([String: DeviceMappings].self, from: $0) } ?? [:]
+    }
+
+    /// The device's name, as renamed by the user if it was.
+    func name(of device: InputDevice) -> String {
+        customNames[device.id] ?? device.name
+    }
+
+    /// Renames a device; an empty name goes back to the one it reports.
+    func rename(_ deviceID: String, to name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        customNames[deviceID] = trimmed.isEmpty ? nil : trimmed
     }
 
     func mappings(for deviceID: String) -> [Mapping] {
@@ -94,5 +111,6 @@ final class RemapSettings: ObservableObject {
     private enum Keys {
         static let isEnabled = "remapEnabled"
         static let devices = "remapDevices"
+        static let customNames = "remapDeviceNames"
     }
 }

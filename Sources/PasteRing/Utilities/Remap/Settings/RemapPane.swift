@@ -35,15 +35,19 @@ private struct MappingsView: View {
     @ObservedObject var devices: InputDevices
     @State private var selection = ""
     @State private var isAdding = false
+    @State private var isRenaming = false
+    @State private var newName = ""
 
-    /// Connected devices, then disconnected ones that still have mappings.
+    /// Connected devices, then disconnected ones that still have mappings, with the names
+    /// the user gave them.
     private var listed: [InputDevice] {
         let connected = devices.connected
         let saved = settings.devices
             .filter { id, entry in !entry.mappings.isEmpty && !connected.contains { $0.id == id } }
             .map { id, entry in InputDevice(id: id, name: entry.name, kind: entry.kind, isConnected: false) }
+        return (connected + saved)
+            .map { InputDevice(id: $0.id, name: settings.name(of: $0), kind: $0.kind, isConnected: $0.isConnected) }
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-        return connected + saved
     }
 
     var body: some View {
@@ -51,9 +55,16 @@ private struct MappingsView: View {
         let device = items.first { $0.id == selection }
         Form {
             Section {
-                Picker("Device", selection: $selection) {
-                    deviceGroup("Keyboards", devices: items.filter { $0.kind == .keyboard })
-                    deviceGroup("Mice and Trackpads", devices: items.filter { $0.kind == .mouse })
+                HStack {
+                    Picker("Device", selection: $selection) {
+                        deviceGroup("Keyboards", devices: items.filter { $0.kind == .keyboard })
+                        deviceGroup("Mice and Trackpads", devices: items.filter { $0.kind == .mouse })
+                    }
+                    Button("Rename…") {
+                        newName = device?.name ?? ""
+                        isRenaming = true
+                    }
+                    .disabled(device == nil)
                 }
             }
 
@@ -83,6 +94,18 @@ private struct MappingsView: View {
                     settings.add(mapping, to: device)
                 }
             }
+        }
+        .alert("Rename Device", isPresented: $isRenaming) {
+            TextField("Name", text: $newName)
+            Button("Rename") {
+                if let device { settings.rename(device.id, to: newName) }
+            }
+            if let device, settings.customNames[device.id] != nil {
+                Button("Use Original Name") {
+                    settings.rename(device.id, to: "")
+                }
+            }
+            Button("Cancel", role: .cancel) {}
         }
         .onAppear {
             devices.refresh()

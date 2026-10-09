@@ -41,9 +41,9 @@ final class InputDevices: ObservableObject {
             let name = group[0].name
             let hasKeyboard = group.contains(where: \.isKeyboard)
             let hasPointer = group.contains(where: \.isPointer)
-            if hasKeyboard, hasPointer, name.localizedCaseInsensitiveContains("keyboard") {
-                // A keyboard with a built-in trackpad, like a laptop's: listed as both, each
-                // with the services of its kind.
+            if hasKeyboard, hasPointer {
+                // A keyboard with a built-in trackpad, or one receiver for a keyboard and a
+                // mouse: listed as both, each with the services of its kind.
                 let keyboard = InputDevice(id: id, name: Self.keyboardName(name), kind: .keyboard)
                 let pointer = InputDevice(id: id + "-pointer", name: Self.pointerName(name), kind: .mouse)
                 devices += [keyboard, pointer]
@@ -51,7 +51,6 @@ final class InputDevices: ObservableObject {
                     bySender[service.registryID] = service.isPointer ? pointer : keyboard
                 }
             } else {
-                // Mice often add a keyboard interface for their extra buttons; they are still mice.
                 let device = InputDevice(id: id, name: name, kind: hasPointer ? .mouse : .keyboard)
                 devices.append(device)
                 for service in group {
@@ -71,15 +70,18 @@ final class InputDevices: ObservableObject {
         services.filter { deviceBySender[$0.registryID]?.id == deviceID }
     }
 
-    /// "Apple Internal Keyboard / Trackpad" becomes "Apple Internal Keyboard".
+    /// "Apple Internal Keyboard / Trackpad" becomes "Apple Internal Keyboard", and
+    /// "USB Receiver" becomes "USB Receiver (Keyboard)".
     private static func keyboardName(_ name: String) -> String {
-        name.components(separatedBy: " / ").first ?? name
+        let parts = name.components(separatedBy: " / ")
+        return parts.count > 1 ? parts[0] : name + " (Keyboard)"
     }
 
-    /// "Apple Internal Keyboard / Trackpad" becomes "Apple Internal Trackpad".
+    /// "Apple Internal Keyboard / Trackpad" becomes "Apple Internal Trackpad", and
+    /// "USB Receiver" becomes "USB Receiver (Mouse)".
     private static func pointerName(_ name: String) -> String {
         let parts = name.components(separatedBy: " / ")
-        guard parts.count > 1 else { return name + " Pointer" }
+        guard parts.count > 1 else { return name + " (Mouse)" }
         var words = parts[0].components(separatedBy: " ")
         words.removeLast()
         return (words + [parts[1]]).joined(separator: " ")
