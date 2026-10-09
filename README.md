@@ -91,10 +91,9 @@ Quits an app when you close its last window, the way apps on iPad and many Windo
 
 ## Mouse
 
-Trackpad and pointer settings macOS doesn't offer, in **Settings… > Mouse**.
+Trackpad settings macOS doesn't offer, in **Settings… > Mouse**.
 
-- **Middle Click**: off (default), or a quick tap with three or four fingers clicks the middle button where the pointer is. It reads the trackpad's raw touches through the private MultitouchSupport framework and posts the click, so it needs the Accessibility permission. To use three fingers, turn off Look Up's three-finger tap in System Settings > Trackpad.
-- **Pointer Speed**: set the mouse and the trackpad speed separately, from 0 up to 5 (System Settings stops at 3). It takes effect at once and is set again whenever a device connects or the Mac wakes, since macOS resets it then. Turning a speed off goes back to the one in System Settings.
+- **Middle click**: off (default), or a quick tap with three or four fingers clicks the middle button where the pointer is. It reads the trackpad's raw touches through the private MultitouchSupport framework and posts the click, so it needs the Accessibility permission. To use three fingers, turn off Look Up's three-finger tap in System Settings > Trackpad.
 
 ## Project structure
 
@@ -113,7 +112,7 @@ Sources/PasteRing/
       Settings/                the Auto Quit settings pane
     Mouse/
       Mouse.swift              owns the utility
-      Model/                   settings, middle click, pointer speed, device watcher
+      Model/                   settings, middle click, device watcher
       Settings/                the Mouse settings pane
     ClipboardManager/
       ClipboardManager.swift   owns the utility; created and started by the app delegate

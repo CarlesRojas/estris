@@ -2,8 +2,8 @@ import AppKit
 import IOKit
 import IOKit.hid
 
-/// Calls back when an input device or trackpad connects, or the Mac wakes: the moments macOS
-/// resets the pointer speed and trackpads stop reporting touches.
+/// Calls back when an input device or trackpad connects, or the Mac wakes: new trackpads
+/// aren't being listened to yet, and trackpads stop reporting touches after sleep.
 @MainActor
 final class DeviceWatcher {
     /// New devices take a moment to be ready after they appear, and several appear at once.

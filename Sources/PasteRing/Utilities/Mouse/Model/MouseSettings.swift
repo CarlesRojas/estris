@@ -29,52 +29,17 @@ enum MiddleClickGesture: String, CaseIterable, Identifiable {
 /// Mouse preferences, persisted in UserDefaults.
 @MainActor
 final class MouseSettings: ObservableObject {
-    /// Slowest and fastest pointer speed offered. System Settings stops at 3.
-    static let speedRange: ClosedRange<Double> = 0...5
-
     private let defaults = UserDefaults.standard
 
     @Published var middleClick: MiddleClickGesture {
         didSet { defaults.set(middleClick.rawValue, forKey: Keys.middleClick) }
     }
 
-    /// Whether PasteRing sets the speed; when off, the System Settings speed is used.
-    @Published var setsMouseSpeed: Bool {
-        didSet { defaults.set(setsMouseSpeed, forKey: Keys.setsMouseSpeed) }
-    }
-
-    @Published var mouseSpeed: Double {
-        didSet { defaults.set(mouseSpeed, forKey: Keys.mouseSpeed) }
-    }
-
-    @Published var setsTrackpadSpeed: Bool {
-        didSet { defaults.set(setsTrackpadSpeed, forKey: Keys.setsTrackpadSpeed) }
-    }
-
-    @Published var trackpadSpeed: Double {
-        didSet { defaults.set(trackpadSpeed, forKey: Keys.trackpadSpeed) }
-    }
-
     init() {
-        let defaults = UserDefaults.standard
-        // Speeds start from what System Settings has, so turning one on changes nothing yet.
-        defaults.register(defaults: [
-            Keys.middleClick: MiddleClickGesture.off.rawValue,
-            Keys.mouseSpeed: PointerSpeed.systemSpeed(of: .mouse),
-            Keys.trackpadSpeed: PointerSpeed.systemSpeed(of: .trackpad),
-        ])
-        middleClick = MiddleClickGesture(rawValue: defaults.string(forKey: Keys.middleClick) ?? "") ?? .off
-        setsMouseSpeed = defaults.bool(forKey: Keys.setsMouseSpeed)
-        mouseSpeed = defaults.double(forKey: Keys.mouseSpeed)
-        setsTrackpadSpeed = defaults.bool(forKey: Keys.setsTrackpadSpeed)
-        trackpadSpeed = defaults.double(forKey: Keys.trackpadSpeed)
+        middleClick = MiddleClickGesture(rawValue: UserDefaults.standard.string(forKey: Keys.middleClick) ?? "") ?? .off
     }
 
     private enum Keys {
         static let middleClick = "mouseMiddleClick"
-        static let setsMouseSpeed = "mouseSetsMouseSpeed"
-        static let mouseSpeed = "mouseMouseSpeed"
-        static let setsTrackpadSpeed = "mouseSetsTrackpadSpeed"
-        static let trackpadSpeed = "mouseTrackpadSpeed"
     }
 }
