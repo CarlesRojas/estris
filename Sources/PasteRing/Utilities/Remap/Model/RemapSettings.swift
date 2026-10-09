@@ -99,8 +99,8 @@ final class RemapSettings: ObservableObject {
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         customNames = defaults.dictionary(forKey: Keys.customNames) as? [String: String] ?? [:]
         deviceLessInputs = defaults.data(forKey: Keys.deviceLessInputs).flatMap { try? JSONDecoder().decode(Set<RemapInput>.self, from: $0) } ?? []
-        removeEmptyMappings()
         devices = defaults.data(forKey: Keys.devices).flatMap { try? JSONDecoder().decode([String: DeviceMappings].self, from: $0) } ?? [:]
+        removeEmptyMappings()
     }
 
     /// The device's name, as renamed by the user if it was.
