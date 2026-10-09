@@ -18,7 +18,7 @@ struct InputEvent: Identifiable {
     let detail: String
 }
 
-/// The latest events, newest first, while the Event Viewer is open.
+/// The latest events, oldest first, while the Event Viewer is open.
 @MainActor
 final class EventLog: ObservableObject {
     private static let limit = 300
@@ -26,9 +26,9 @@ final class EventLog: ObservableObject {
     @Published private(set) var events: [InputEvent] = []
 
     func record(_ event: InputEvent) {
-        events.insert(event, at: 0)
+        events.append(event)
         if events.count > Self.limit {
-            events.removeLast(events.count - Self.limit)
+            events.removeFirst(events.count - Self.limit)
         }
     }
 
