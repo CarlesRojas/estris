@@ -107,12 +107,23 @@ struct SettingsView: View {
             .modifier(HidesSidebarToggle())
             .navigationSplitViewColumnWidth(min: 180, ideal: 210)
         } detail: {
-            switch selection ?? .general {
-            case .general:
-                GeneralPane(general: general)
-            case .clipboard:
-                clipboard.settingsPane()
+            Group {
+                switch selection ?? .general {
+                case .general:
+                    GeneralPane(general: general)
+                case .clipboard:
+                    clipboard.settingsPane()
+                }
             }
+            // The split view sizes the window from the detail column's preferred size. A long
+            // form prefers its full height (taller than the screen), which pushed everything
+            // off the top and bottom when switching panes. Fixed small minimum and ideal sizes
+            // keep the window as it is; the forms scroll instead.
+            .frame(
+                minWidth: 520, idealWidth: 640, maxWidth: .infinity,
+                minHeight: 0, idealHeight: 500, maxHeight: .infinity,
+                alignment: .top
+            )
         }
         .environment(\.dateTimeFormat, general.dateTimeFormat)
         // Jump to the first match when the search hides the open pane.
