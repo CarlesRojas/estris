@@ -18,10 +18,6 @@ final class Remap {
     private var observers: Set<AnyCancellable> = []
     private var tap: CFMachPort?
     private var lastRefresh = Date.distantPast
-    /// The pointing device that last moved or clicked, for button presses that arrive without
-    /// their device (mouse utilities often resend side buttons that way).
-    private var lastPointer: InputDevice?
-    private var lastPointerCheck = Date.distantPast
 
     /// Whether the Event Viewer is on screen, so events are logged.
     var isViewing = false {
@@ -88,7 +84,7 @@ final class Remap {
     private func updateTap() {
         let needed = settings.isEnabled || isViewing || recording != nil
         if needed, tap == nil {
-            let types: [CGEventType] = [.keyDown, .keyUp, .flagsChanged, .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp, .mouseMoved]
+            let types: [CGEventType] = [.keyDown, .keyUp, .flagsChanged, .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp]
             var mask = types.reduce(CGEventMask(0)) { $0 | 1 << $1.rawValue }
             mask |= 1 << Self.systemDefined
             tap = CGEvent.tapCreate(
@@ -116,33 +112,17 @@ final class Remap {
             if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
             return true
         }
-        if type == .mouseMoved {
-            // Only to keep track of the mouse in use; checked now and then, as moves are many.
-            if Date().timeIntervalSince(lastPointerCheck) > 0.5 {
-                lastPointerCheck = Date()
-                if let sender = EventSource.sender(of: event), let device = devices.device(sender: sender) {
-                    lastPointer = device
-                }
-            }
-            return true
-        }
         guard let parsed = parse(type: type, event: event) else { return true }
 
         var device: InputDevice?
-        if let sender = EventSource.sender(of: event) {
+        let sender = EventSource.sender(of: event)
+        if let sender {
             device = devices.device(sender: sender)
             // A device that just connected, before the watcher noticed.
             if device == nil, Date().timeIntervalSince(lastRefresh) > 2 {
                 lastRefresh = Date()
                 devices.refresh()
                 device = devices.device(sender: sender)
-            }
-        }
-        if case .mouseButton? = parsed.input {
-            if let device {
-                lastPointer = device
-            } else {
-                device = lastPointer
             }
         }
 
@@ -152,7 +132,7 @@ final class Remap {
         if isViewing, !parsed.isRepeat, !isLinkClick {
             let (original, result) = remapping(of: parsed.input, on: device)
             eventLog.record(InputEvent(
-                device: device.map(settings.name(of:)) ?? "Other source",
+                device: device.map(settings.name(of:)) ?? unknownSource(sender: sender, event: event),
                 source: device,
                 input: original ?? parsed.input,
                 phase: parsed.phase,
@@ -182,6 +162,17 @@ final class Remap {
         if case .key = input, case .key = output { return true }
         perform(output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
         return false
+    }
+
+    /// For the Event Viewer, when the device isn't known: the app that posted the event (a
+    /// mouse or keyboard utility resending it), or the unknown device's ID.
+    private func unknownSource(sender: UInt64?, event: CGEvent) -> String {
+        if let sender {
+            return String(format: "Unknown device 0x%llX", sender)
+        }
+        let pid = pid_t(event.getIntegerValueField(.eventSourceUnixProcessID))
+        guard pid > 0 else { return "Other source" }
+        return "Posted by \(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "process \(pid)")"
     }
 
     /// For the Event Viewer: what an event was remapped to, and, for a key changed on the

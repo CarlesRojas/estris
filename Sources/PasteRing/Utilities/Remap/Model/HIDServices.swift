@@ -38,14 +38,15 @@ enum HIDServices {
     private static let setProperty = function("IOHIDServiceClientSetProperty", as: SetProperty.self)
     private static let getRegistryID = function("IOHIDServiceClientGetRegistryID", as: GetRegistryID.self)
 
-    /// Every keyboard and pointing service with a product name.
+    /// Every input service with a product name: keyboards and pointers, and the other
+    /// interfaces devices have (media keys, vendor extras), which can send buttons too.
     static func all() -> [HIDService] {
         guard let client, let copyServices, let list = copyServices(client)?.takeRetainedValue() as? [AnyObject] else { return [] }
         return list.compactMap { service in
             guard let name = property(service, "Product") as? String, !name.isEmpty,
                   let registryID = (getRegistryID?(service)?.takeUnretainedValue() as? NSNumber)?.uint64Value
             else { return nil }
-            let info = HIDService(
+            return HIDService(
                 registryID: registryID,
                 vendorID: (property(service, "VendorID") as? NSNumber)?.intValue ?? 0,
                 productID: (property(service, "ProductID") as? NSNumber)?.intValue ?? 0,
@@ -54,7 +55,6 @@ enum HIDServices {
                 usage: (property(service, "PrimaryUsage") as? NSNumber)?.intValue ?? 0,
                 client: service
             )
-            return info.isKeyboard || info.isPointer ? info : nil
         }
     }
 

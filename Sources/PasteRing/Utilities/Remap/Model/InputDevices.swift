@@ -43,6 +43,9 @@ final class InputDevices: ObservableObject {
             let name = group[0].name
             let hasKeyboard = group.contains(where: \.isKeyboard)
             let hasPointer = group.contains(where: \.isPointer)
+            // Only keyboards and pointing devices are listed, but every interface of one maps
+            // to it: a mouse can send its side buttons through another one.
+            guard hasKeyboard || hasPointer else { continue }
             let isKeyboard = hasKeyboard && (!hasPointer || name.localizedCaseInsensitiveContains("keyboard"))
             let device = InputDevice(id: id, name: name, kind: isKeyboard ? .keyboard : .mouse)
             devices.append(device)
