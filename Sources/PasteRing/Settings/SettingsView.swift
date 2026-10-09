@@ -84,7 +84,7 @@ struct SettingsSidebar: View {
                     }
                     Spacer()
                     if let isOn = isOn(pane) {
-                        StatusBadge(isOn: isOn)
+                        StatusBadge(isOn: isOn, onSelectedRow: navigation.selection == pane)
                     }
                 }
             }
