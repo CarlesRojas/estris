@@ -63,8 +63,8 @@ final class ClipboardSettings: ObservableObject {
     static let gridSizeRange = 8...24
     static let simpleWidthRange: ClosedRange<Double> = 360...900
     static let simpleHeightRange: ClosedRange<Double> = 120...420
-    static let gridCardWidthRange: ClosedRange<Double> = 160...420
-    static let gridCardHeightRange: ClosedRange<Double> = 90...300
+    static let gridCardWidthRange: ClosedRange<Double> = 200...480
+    static let gridCardHeightRange: ClosedRange<Double> = 160...560
     static let carouselSizeRange: ClosedRange<Double> = 180...420
     static let stackWidthRange: ClosedRange<Double> = 360...800
     static let stackHeightRange: ClosedRange<Double> = 120...360
@@ -245,8 +245,8 @@ final class ClipboardSettings: ObservableObject {
         Keys.style: OverlayStyle.simple.rawValue,
         Keys.ringSize: 12,
         Keys.gridSize: 12,
-        Keys.gridCardWidth: 256.0,
-        Keys.gridCardHeight: 130.0,
+        Keys.gridCardWidth: 280.0,
+        Keys.gridCardHeight: 320.0,
         Keys.simpleWidth: 560.0,
         Keys.simpleHeight: 256.0,
         Keys.carouselWidth: 260.0,

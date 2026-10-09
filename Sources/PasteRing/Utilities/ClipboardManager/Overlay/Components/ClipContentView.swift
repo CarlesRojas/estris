@@ -37,17 +37,20 @@ struct ClipContentView: View {
     var baseSize: CGFloat = 13
     /// One line with line breaks shown as ⏎, for small rows and chips.
     var singleLine = false
+    /// Show an image whole inside the space it gets, instead of at full width (for cards
+    /// that keep a fixed height).
+    var fitsImageInside = false
 
     var body: some View {
         switch item.kind {
         case .image:
             if let image = ClipThumbnails.image(for: item) {
-                if singleLine {
+                if singleLine || fitsImageInside {
                     Image(nsImage: image)
                         .resizable()
                         .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        .clipShape(RoundedRectangle(cornerRadius: singleLine ? 4 : 8, style: .continuous))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: singleLine ? .leading : .topLeading)
                 } else {
                     // The full width of the card at the image's own aspect ratio; anything
                     // taller than the card is cut off at the bottom.

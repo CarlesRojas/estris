@@ -12,17 +12,6 @@ struct StackView: View {
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
 
-    private var frontGrowth: CGFloat {
-        EntryCard.fittedHeight(for: state.selectedItem, width: width, height: height) - height
-    }
-
-    /// How much of a card, from its top and before scaling, is drawn. Cards behind show the
-    /// strip above the front card plus a little under its rounded corners.
-    private func visibleHeight(_ distance: Int) -> CGFloat {
-        guard distance > 0 else { return 100_000 }
-        return Self.peeks[distance] / Self.scales[distance] + 24
-    }
-
     private var width: CGFloat { settings.stackWidth }
     private var height: CGFloat { settings.stackHeight }
 
@@ -37,14 +26,6 @@ struct StackView: View {
                     let distance = slot.distance
                     EntryCard(item: slot.item, width: width, height: height, isSelected: distance == 0)
                         .clipActions(slot.item, trashInset: 22)
-                        // Same layout height for every card, top pinned: a card holding an image
-                        // grows downward only.
-                        .frame(height: height, alignment: .top)
-                        // Cards behind only show their top strip: the rest would show through
-                        // the translucent front card, or below it when they are taller.
-                        .mask(alignment: .top) {
-                            Rectangle().frame(height: visibleHeight(distance))
-                        }
                         .allowsHitTesting(distance >= 0)
                         .scaleEffect(distance < 0 ? 0.97 : Self.scales[distance], anchor: .top)
                         .offset(y: distance < 0 ? height * 0.45 : -Self.peeks[distance])
@@ -56,11 +37,11 @@ struct StackView: View {
             }
         }
         .frame(width: width + 120, height: height + 250)
-        // Just below the front card, moving down when it grows for an image.
+        // Just below the front card.
         .overlay {
             if let position = state.positionText {
                 PositionPill(text: position)
-                    .offset(y: height / 2 + max(0, frontGrowth) + 30)
+                    .offset(y: height / 2 + 30)
             }
         }
         // No bounce, so the fade and slide read as one smooth motion.

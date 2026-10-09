@@ -12,18 +12,26 @@ struct RingMenuView: View {
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
+    @Environment(\.overlayActions) private var actions
 
     var body: some View {
         let count = state.items.count
         let step = count > 0 ? 360 / Double(count) : 0
         let chipWidth = settings.ringChipWidth
         let chipHeight = settings.ringChipHeight
-        let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: chipHeight)
+        // Chips holding an image are taller; the ring is spaced for the tallest one.
+        let heights = state.items.map {
+            RingChip.fittedHeight(for: $0, width: chipWidth, height: chipHeight, cornerReserve: actions.cornerReserve)
+        }
+        let layoutHeight = heights.max() ?? chipHeight
+        let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: layoutHeight)
+        let selectedHeight = heights.indices.contains(state.selected) ? heights[state.selected] : chipHeight
 
         ZStack {
-            // The middle of the ring is empty: the natural place for the pill.
+            // Above the selected chip at the top of the ring (drawn 1.12 times larger there).
             if let position = state.positionText {
                 PositionPill(text: position)
+                    .offset(y: -radii.height - selectedHeight * 1.12 / 2 - 26)
             }
 
             if count == 0 {
@@ -42,7 +50,7 @@ struct RingMenuView: View {
                     .zIndex(distance == 0 ? 1 : 0)
             }
         }
-        .frame(width: (radii.width + chipWidth * 0.6) * 2, height: (radii.height + chipHeight) * 2)
+        .frame(width: (radii.width + chipWidth * 0.6) * 2, height: (radii.height + layoutHeight + 30) * 2)
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.position)
     }
 

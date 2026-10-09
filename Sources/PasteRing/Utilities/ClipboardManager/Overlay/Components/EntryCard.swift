@@ -7,6 +7,9 @@ struct EntryCard: View {
     let width: CGFloat
     let height: CGFloat
     var isSelected = false
+    /// Grow taller so an image shows whole at the card's width (Default); otherwise the image
+    /// fits inside the card as it is (Stack).
+    var growsToFitImage = false
     @Environment(\.overlayActions) private var actions
 
     private static let padding: CGFloat = 20
@@ -33,7 +36,7 @@ struct EntryCard: View {
             }
             Group {
                 if let item {
-                    ClipContentView(item: item, font: .title3, baseSize: 15)
+                    ClipContentView(item: item, font: .title3, baseSize: 15, fitsImageInside: !growsToFitImage)
                 } else {
                     Text("Clipboard history is empty")
                         .font(.title3)
@@ -42,7 +45,7 @@ struct EntryCard: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .padding(Self.padding)
-        .frame(width: width, height: Self.fittedHeight(for: item, width: width, height: height))
+        .frame(width: width, height: growsToFitImage ? Self.fittedHeight(for: item, width: width, height: height) : height)
         .surface(cornerRadius: 22, isSelected: isSelected)
     }
 }

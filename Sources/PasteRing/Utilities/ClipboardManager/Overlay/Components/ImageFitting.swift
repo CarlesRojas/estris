@@ -9,11 +9,17 @@ enum ImageFitting {
     /// The card height that shows `item`'s image at `contentWidth`, given the space the rest
     /// of the card takes (`chrome`). Never below `baseHeight`, never above the limit.
     @MainActor
-    static func cardHeight(for item: ClipItem?, baseHeight: CGFloat, contentWidth: CGFloat, chrome: CGFloat) -> CGFloat {
+    static func cardHeight(
+        for item: ClipItem?,
+        baseHeight: CGFloat,
+        contentWidth: CGFloat,
+        chrome: CGFloat,
+        maxHeight: CGFloat = maxCardHeight
+    ) -> CGFloat {
         guard let item, item.kind == .image,
               let size = ClipThumbnails.image(for: item)?.size, size.width > 0
         else { return baseHeight }
         let needed = chrome + contentWidth * size.height / size.width
-        return min(max(baseHeight, needed), max(baseHeight, maxCardHeight))
+        return min(max(baseHeight, needed), max(baseHeight, maxHeight))
     }
 }

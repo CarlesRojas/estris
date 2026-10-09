@@ -32,7 +32,7 @@ struct ContentCard: View {
                 // Room for the date and trash button in the corner.
                 .padding(.trailing, actions.cornerReserve)
                 // Same font whether selected or not: a heavier weight rewraps the text.
-                ClipContentView(item: item)
+                ClipContentView(item: item, fitsImageInside: !growsToFitImage)
                     .lineLimit(lineLimit)
             } else {
                 Text("Clipboard history is empty")

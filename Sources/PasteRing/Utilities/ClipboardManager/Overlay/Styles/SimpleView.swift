@@ -14,7 +14,7 @@ struct SimpleView: View {
             if let position = state.positionText {
                 PositionPill(text: position)
             }
-            EntryCard(item: item, width: settings.simpleWidth, height: height)
+            EntryCard(item: item, width: settings.simpleWidth, height: height, growsToFitImage: true)
                 .modifier(OptionalClipActions(item: item))
                 // Laid out at the usual height with the top pinned: a taller card for an image
                 // grows downward only.

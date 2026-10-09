@@ -10,12 +10,12 @@ struct GridView: View {
     }
 
     var body: some View {
-        VStack(spacing: 12) {
-            // Above the grid, clear of its rows.
+        VStack(spacing: 4) {
+            grid
+            // Below the grid, clear of its rows.
             if let position = state.positionText {
                 PositionPill(text: position)
             }
-            grid
         }
     }
 
