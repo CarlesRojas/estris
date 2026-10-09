@@ -36,7 +36,7 @@ struct KeepAwakePane: View {
                                 if let remaining = status.remaining {
                                     Divider().padding(.vertical, 8)
                                     LabeledContent("Sleeps in") {
-                                        Text(Self.countdown(remaining))
+                                        Text(countdownText(remaining))
                                             .monospacedDigit()
                                     }
                                 }
@@ -76,9 +76,16 @@ struct KeepAwakePane: View {
     /// How recent input must be to count as being used right now.
     private static let activeWindow: TimeInterval = 1
 
+    /// Whole seconds left, so it reads 0:00 during the last second; the full time while the
+    /// Mac is being used.
+    private func countdownText(_ remaining: TimeInterval) -> String {
+        guard let limit = status.limit else { return "" }
+        return Self.countdown(status.idleTime < Self.activeWindow ? limit : remaining.rounded(.down))
+    }
+
     /// "4:05" or "1:04:05".
     private static func countdown(_ seconds: TimeInterval) -> String {
-        let total = Int(seconds.rounded(.up))
+        let total = Int(seconds)
         let hours = total / 3600
         let minutes = total / 60 % 60
         let rest = total % 60

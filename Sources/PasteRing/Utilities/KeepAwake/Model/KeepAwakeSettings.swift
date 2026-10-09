@@ -4,8 +4,6 @@ import IOKit
 /// How long the Mac may be idle before Keep Awake lets it sleep.
 enum KeepAwakeDuration: String, CaseIterable, Identifiable {
     case off
-    /// For trying it out.
-    case tenSeconds
     case fifteenMinutes
     case thirtyMinutes
     case oneHour
@@ -19,7 +17,6 @@ enum KeepAwakeDuration: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .off: String(localized: "Don't keep awake")
-        case .tenSeconds: String(localized: "10 seconds")
         case .fifteenMinutes: String(localized: "15 minutes")
         case .thirtyMinutes: String(localized: "30 minutes")
         case .oneHour: String(localized: "1 hour")
@@ -34,7 +31,6 @@ enum KeepAwakeDuration: String, CaseIterable, Identifiable {
     var seconds: TimeInterval? {
         switch self {
         case .off: 0
-        case .tenSeconds: 10
         case .fifteenMinutes: 15 * 60
         case .thirtyMinutes: 30 * 60
         case .oneHour: 60 * 60

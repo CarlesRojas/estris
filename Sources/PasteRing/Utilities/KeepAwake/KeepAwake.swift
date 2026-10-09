@@ -14,8 +14,6 @@ final class KeepAwake {
     /// How often to look again while another app keeps the display on, in case the change
     /// notice below doesn't arrive.
     private static let otherHolderRecheck: TimeInterval = 5
-    /// How long the countdown shows 0:00 before the time is up.
-    private static let zeroShownFor: TimeInterval = 1
     /// What macOS posts when any app starts or stops keeping the Mac or display awake.
     private static let assertionNotices = [
         "com.apple.system.powermanagement.assertions",
@@ -121,10 +119,6 @@ final class KeepAwake {
             hold()
             status.state = .active
             lookAgain(in: limit - idle)
-        } else if status.state == .active, idle < limit + Self.zeroShownFor {
-            // The countdown shows 0:00 for a moment before acting; using the Mac meanwhile
-            // still starts it over.
-            lookAgain(in: limit + Self.zeroShownFor - idle)
         } else {
             release()
             let wasCounting = status.state == .active
