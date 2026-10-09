@@ -79,7 +79,7 @@ Middle click from the trackpad, which macOS doesn't offer. Off by default; turn 
 
 Changes what keys and mouse buttons do, per device. Off by default; turn it on in **Settings… > Remap**.
 
-- **Mappings**: a **Device** menu at the top lists connected keyboards, mice and trackpads (and disconnected ones that still have mappings) in one list, one entry per physical device; the chosen device's mappings are below it. Any key or button a device sends can be remapped on its entry; whether it looks like a keyboard or a mouse only picks its icon and which inputs the picker lists first. **Add Mapping** adds an empty row to the list; each row's source and result are buttons that open a picker, so adding and editing work the same. A row missing either side does nothing.
+- **Mappings**: every device (connected keyboards, mice and trackpads, and disconnected ones that still have mappings) is its own group, "<name> Mappings", all on one page; the pencil next to the title renames it. One group per physical device. Any key or button a device sends can be remapped on its entry; whether it looks like a keyboard or a mouse only picks its icon and which inputs the picker lists first. **Add Mapping** adds an empty row to the list; each row's source and result are buttons that open a picker, so adding and editing work the same. A row missing either side does nothing.
   - Source: any key or mouse button except the left one. **Record** captures the next key or button pressed on that device; or pick from a searchable, sectioned list.
   - Result: another key, a mouse button, a system action (Mission Control, App Windows, Show Desktop, Launchpad, next or previous desktop, volume, mute, media, display and keyboard brightness, sleep display, lock screen, Spotlight, screenshots, emoji picker, Force Quit) or nothing.
   - Only the first mapping for a source applies: a later row for the same key or button on the same device shows "Already mapped above", with its result disabled. Nothing is deleted.
@@ -90,7 +90,7 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Everything else: an event tap that reads the sending device from the HID event inside each event (private `CGEventCopyIOHIDEvent` and `IOHIDEventGetSenderID`), swallows the original and posts the result.
   - Every interface of a device (keyboard, pointer, media keys, vendor extras) maps to it, since a mouse can send side buttons through any of them; only devices with a keyboard or pointer interface are listed.
   - Devices are identified by vendor, product and name, so mappings survive reconnects; identical devices share mappings.
-  - Devices can be renamed (**Rename…** next to the Device menu); an empty name goes back to the original.
+  - Devices can be renamed (pencil next to the group title); an empty name goes back to the original.
   - A press that reaches macOS without its device (seen while recording or pressing) is remembered as device-less. It takes the oldest complete mapping for it on any device; newer mappings of it on other devices show "Already mapped on" that device, with their result disabled.
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.

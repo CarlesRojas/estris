@@ -34,13 +34,14 @@ struct RemapPane: View {
     }
 }
 
-/// A device menu at the top, then the chosen device's mappings.
+/// Every device as its own group of mappings, all on one page.
 private struct MappingsView: View {
     let remap: Remap
     @ObservedObject var settings: RemapSettings
     @ObservedObject var devices: InputDevices
+    /// A device to scroll to, set when the Event Viewer opens a mapping on it.
     @Binding var selection: String
-    @State private var isRenaming = false
+    @State private var renaming: InputDevice?
     @State private var newName = ""
 
     /// Connected devices, then disconnected ones that still have mappings, with the names
@@ -56,65 +57,60 @@ private struct MappingsView: View {
     }
 
     var body: some View {
-        let items = listed
-        let device = items.first { $0.id == selection }
-        Form {
-            Section {
-                HStack {
-                    Picker("Device", selection: $selection) {
-                        ForEach(items) { device in
-                            deviceLabel(device)
+        ScrollViewReader { proxy in
+            Form {
+                ForEach(listed) { device in
+                    let mappings = settings.mappings(for: device.id)
+                    Section {
+                        ForEach(mappings) { mapping in
+                            row(mapping, on: device)
                         }
+                        Button("Add Mapping") {
+                            settings.addMapping(to: device)
+                        }
+                    } header: {
+                        header(device)
                     }
-                    Button("Rename…") {
-                        newName = device?.name ?? ""
-                        isRenaming = true
-                    }
-                    .disabled(device == nil)
+                    .id(device.id)
                 }
             }
-
-            if let device {
-                let mappings = settings.mappings(for: device.id)
-                Section {
-                    if mappings.isEmpty {
-                        Text("No mappings")
-                            .foregroundStyle(.secondary)
-                    }
-                    ForEach(mappings) { mapping in
-                        row(mapping, on: device)
-                    }
-                    Button("Add Mapping") {
-                        settings.addMapping(to: device)
-                    }
-                } header: {
-                    Text("Mappings")
-                }
+            .formStyle(.grouped)
+            .settingsPage()
+            .onAppear {
+                devices.refresh()
+                guard !selection.isEmpty else { return }
+                let target = selection
+                selection = ""
+                DispatchQueue.main.async { proxy.scrollTo(target, anchor: .top) }
             }
         }
-        .formStyle(.grouped)
-        .settingsPage()
-        .alert("Rename Device", isPresented: $isRenaming) {
+        .alert("Rename Device", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
             Button("Rename") {
-                if let device { settings.rename(device.id, to: newName) }
+                if let renaming { settings.rename(renaming.id, to: newName) }
             }
-            if let device, settings.customNames[device.id] != nil {
+            if let renaming, settings.customNames[renaming.id] != nil {
                 Button("Use Original Name") {
-                    settings.rename(device.id, to: "")
+                    settings.rename(renaming.id, to: "")
                 }
             }
             Button("Cancel", role: .cancel) {}
         }
-        .onAppear {
-            devices.refresh()
-            if device == nil { selection = listed.first?.id ?? "" }
-        }
     }
 
-    private func deviceLabel(_ device: InputDevice) -> some View {
-        Label(device.name + (device.isConnected ? "" : " (not connected)"), systemImage: device.symbol)
-            .tag(device.id)
+    /// "<name> Mappings", with a pencil to rename the device.
+    private func header(_ device: InputDevice) -> some View {
+        HStack(spacing: 6) {
+            Label("\(device.name) Mappings" + (device.isConnected ? "" : " (not connected)"), systemImage: device.symbol)
+            Button {
+                newName = device.name
+                renaming = device
+            } label: {
+                Image(systemName: "pencil")
+            }
+            .buttonStyle(.borderless)
+            .help("Rename this device")
+        }
     }
 
     /// The mapping turned around, or nil when its result can't be a source (a system action,
@@ -137,42 +133,46 @@ private struct MappingsView: View {
 
     private func row(_ mapping: Mapping, on device: InputDevice) -> some View {
         let conflict = settings.conflict(for: mapping, on: device.id)
-        return HStack(spacing: 10) {
-            InputButton(remap: remap, device: device, input: mapping.input) { input in
-                var changed = mapping
-                changed.input = input
-                settings.update(changed, on: device.id)
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
+                InputButton(remap: remap, device: device, input: mapping.input) { input in
+                    var changed = mapping
+                    changed.input = input
+                    settings.update(changed, on: device.id)
+                }
+                Image(systemName: "arrow.right")
+                    .foregroundStyle(.secondary)
+                OutputButton(input: mapping.input, output: mapping.output) { output in
+                    var changed = mapping
+                    changed.output = output
+                    settings.update(changed, on: device.id)
+                }
+                .disabled(conflict != nil)
+                Spacer()
+                let turned = swapped(mapping)
+                Button {
+                    if let turned { settings.update(turned, on: device.id) }
+                } label: {
+                    Image(systemName: "arrow.left.arrow.right")
+                }
+                .buttonStyle(.borderless)
+                .disabled(turned == nil)
+                .help("Swap From and To")
+                Button {
+                    settings.remove(mapping, from: device.id)
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.borderless)
+                .help("Remove this mapping")
             }
-            Image(systemName: "arrow.right")
-                .foregroundStyle(.secondary)
-            OutputButton(input: mapping.input, output: mapping.output) { output in
-                var changed = mapping
-                changed.output = output
-                settings.update(changed, on: device.id)
-            }
-            .disabled(conflict != nil)
+            // On a line of its own under the mapping.
             if let conflict {
                 Label(conflict.message, systemImage: "exclamationmark.triangle.fill")
+                    .font(.callout)
                     .foregroundStyle(.orange)
                     .help(conflict.explanation)
             }
-            Spacer()
-            let turned = swapped(mapping)
-            Button {
-                if let turned { settings.update(turned, on: device.id) }
-            } label: {
-                Image(systemName: "arrow.left.arrow.right")
-            }
-            .buttonStyle(.borderless)
-            .disabled(turned == nil)
-            .help("Swap From and To")
-            Button {
-                settings.remove(mapping, from: device.id)
-            } label: {
-                Image(systemName: "trash")
-            }
-            .buttonStyle(.borderless)
-            .help("Remove this mapping")
         }
     }
 }
