@@ -1,7 +1,8 @@
 import AppKit
 import ApplicationServices
 
-/// A window of another app, moved and resized through the Accessibility API.
+/// A window to snap: another app's, moved and resized through the Accessibility API, or one
+/// of PasteRing's own, moved directly.
 ///
 /// Accessibility frames are in global coordinates with the origin at the top left of the
 /// main screen and y growing down; AppKit's are from the bottom left with y growing up.
@@ -10,19 +11,38 @@ struct AXWindow {
     /// Longest any single request may block, so a busy app can't freeze dragging.
     private static let messagingTimeout: Float = 0.25
 
-    let element: AXUIElement
+    let element: AXUIElement?
+    /// One of PasteRing's own windows.
+    let own: NSWindow?
     let pid: pid_t
 
     init(element: AXUIElement) {
         self.element = element
+        own = nil
         AXUIElementSetMessagingTimeout(element, Self.messagingTimeout)
         var pid: pid_t = 0
         AXUIElementGetPid(element, &pid)
         self.pid = pid
     }
 
+    init(own window: NSWindow) {
+        element = nil
+        own = window
+        pid = getpid()
+    }
+
+    /// PasteRing's own window under a point, leaving out panels such as the snap preview.
+    private static func ownWindow(at point: NSPoint) -> NSWindow? {
+        NSApp.windows.first { window in
+            window.isVisible && !(window is NSPanel) && window.styleMask.contains(.titled) && window.frame.contains(point)
+        }
+    }
+
     /// The front app's focused window.
     static func focused() -> AXWindow? {
+        if NSApp.isActive, let window = NSApp.keyWindow, !(window is NSPanel) {
+            return AXWindow(own: window)
+        }
         guard let app = NSWorkspace.shared.frontmostApplication else { return nil }
         let application = AXUIElementCreateApplication(app.processIdentifier)
         AXUIElementSetMessagingTimeout(application, messagingTimeout)
@@ -35,6 +55,10 @@ struct AXWindow {
 
     /// The window under a point given in AppKit coordinates.
     static func at(_ point: NSPoint) -> AXWindow? {
+        // Ours are frontmost only if the pointer is over one and it is above other apps'.
+        if let window = ownWindow(at: point), window.windowNumber == NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0) {
+            return AXWindow(own: window)
+        }
         let systemWide = AXUIElementCreateSystemWide()
         AXUIElementSetMessagingTimeout(systemWide, messagingTimeout)
         let ax = axPoint(point)
@@ -50,6 +74,9 @@ struct AXWindow {
 
     /// An app's window whose frame matches, for windows found through the window server.
     static func of(pid: pid_t, matching frame: NSRect) -> AXWindow? {
+        if pid == getpid() {
+            return NSApp.windows.first { $0.isVisible && $0.frame.equalTo(frame) }.map(AXWindow.init(own:))
+        }
         let application = AXUIElementCreateApplication(pid)
         AXUIElementSetMessagingTimeout(application, messagingTimeout)
         var value: CFTypeRef?
@@ -64,6 +91,8 @@ struct AXWindow {
     }
 
     var frame: NSRect? {
+        if let own { return own.frame }
+        guard let element else { return nil }
         var positionValue: CFTypeRef?
         var sizeValue: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, kAXPositionAttribute as CFString, &positionValue) == .success,
@@ -78,6 +107,11 @@ struct AXWindow {
     }
 
     func setFrame(_ frame: NSRect) {
+        if let own {
+            own.setFrame(frame, display: true)
+            return
+        }
+        guard let element else { return }
         let rect = Self.axRect(frame)
         var position = rect.origin
         var size = rect.size
@@ -90,7 +124,9 @@ struct AXWindow {
     }
 
     func isSame(as other: AXWindow) -> Bool {
-        CFEqual(element, other.element)
+        if let own, let otherOwn = other.own { return own === otherOwn }
+        guard let element, let otherElement = other.element else { return false }
+        return CFEqual(element, otherElement)
     }
 
     /// The screen showing most of the window.

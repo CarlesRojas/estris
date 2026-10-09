@@ -107,7 +107,7 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
   - Edges reach 32 points into the screen, so a drag can stop on an edge shared with another display. Corners reach 64 points along each edge; the top and bottom halves 145 points from the ends of a side edge.
   - The outline is rounded, dark and see-through; it grows out of the edge or corner and glides between areas.
 - **Resize side-by-side windows together** (on by default): while resizing a window, windows that shared the edge being dragged (within 4 points, overlapping along it) are resized to keep sharing it, live and once more on release. They don't shrink below 120 points.
-- Works through the Accessibility permission (frames) and a global mouse monitor. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
+- Works through the Accessibility permission (frames of other apps' windows) and a listen-only event tap, which also sees drags of PasteRing's own windows; those are moved directly. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
 
 ## Languages
 

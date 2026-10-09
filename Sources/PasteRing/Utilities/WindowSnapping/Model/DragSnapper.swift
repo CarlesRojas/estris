@@ -20,6 +20,8 @@ final class DragSnapper {
     private static let sharedEdgeTolerance: CGFloat = 4
     /// Smallest size a neighbour is resized down to.
     private static let minimumNeighbourSize: CGFloat = 120
+    /// How tall the title bar and toolbar of PasteRing's windows are, where they are dragged.
+    private static let ownTitleBarHeight: CGFloat = 52
     /// Gap between window reads while dragging.
     private static let readInterval: TimeInterval = 1.0 / 30
 
@@ -37,10 +39,11 @@ final class DragSnapper {
     private let settings: WindowSnappingSettings
     private let snapper: (AXWindow, SnapAction, NSScreen, NSRect) -> Void
     private let preview = SnapPreview()
-    private var monitors: [Any] = []
+    private var tap: CFMachPort?
 
     private var window: AXWindow?
     private var startFrame: NSRect = .zero
+    private var startPoint: NSPoint = .zero
     private var mode = Mode.undecided
     private var lastRead = Date.distantPast
     private var target: (action: SnapAction, screen: NSScreen)?
@@ -51,40 +54,62 @@ final class DragSnapper {
         self.snapper = snapper
     }
 
+    /// A listen-only event tap: unlike a global event monitor, it also sees drags of
+    /// PasteRing's own windows.
     func start() {
-        guard monitors.isEmpty else { return }
-        let handlers: [(NSEvent.EventTypeMask, (NSEvent) -> Void)] = [
-            (.leftMouseDown, { [weak self] _ in self?.mouseDown() }),
-            (.leftMouseDragged, { [weak self] _ in self?.mouseDragged() }),
-            (.leftMouseUp, { [weak self] _ in self?.mouseUp() }),
-        ]
-        // Global monitors run on the main thread.
-        monitors = handlers.compactMap { mask, handler in
-            NSEvent.addGlobalMonitorForEvents(matching: mask) { event in
-                MainActor.assumeIsolated { handler(event) }
-            }
+        if let tap {
+            CGEvent.tapEnable(tap: tap, enable: true)
+            return
         }
+        let types: [CGEventType] = [.leftMouseDown, .leftMouseDragged, .leftMouseUp]
+        tap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap,
+            place: .tailAppendEventTap,
+            options: .listenOnly,
+            eventsOfInterest: types.reduce(CGEventMask(0)) { $0 | 1 << $1.rawValue },
+            callback: dragSnapperCallback,
+            userInfo: Unmanaged.passUnretained(self).toOpaque()
+        )
+        guard let tap else { return }
+        CFRunLoopAddSource(CFRunLoopGetMain(), CFMachPortCreateRunLoopSource(nil, tap, 0), .commonModes)
     }
 
     func stop() {
-        monitors.forEach(NSEvent.removeMonitor)
-        monitors = []
+        if let tap { CGEvent.tapEnable(tap: tap, enable: false) }
         reset()
+    }
+
+    fileprivate func handle(_ type: CGEventType) {
+        switch type {
+        case .leftMouseDown: mouseDown()
+        case .leftMouseDragged: mouseDragged()
+        case .leftMouseUp: mouseUp()
+        case .tapDisabledByTimeout, .tapDisabledByUserInput:
+            if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
+        default: break
+        }
     }
 
     private func mouseDown() {
         reset()
-        guard let window = AXWindow.at(NSEvent.mouseLocation), window.pid != getpid(), let frame = window.frame else { return }
+        guard let window = AXWindow.at(NSEvent.mouseLocation), let frame = window.frame else { return }
         self.window = window
         startFrame = frame
+        startPoint = NSEvent.mouseLocation
     }
 
     private func mouseDragged() {
         guard let window, Date().timeIntervalSince(lastRead) >= Self.readInterval else { return }
         lastRead = Date()
         if mode == .undecided {
-            guard let frame = window.frame, frame != startFrame else { return }
-            mode = frame.size == startFrame.size ? .moving : .resizing
+            guard let frame = window.frame else { return }
+            if frame != startFrame {
+                mode = frame.size == startFrame.size ? .moving : .resizing
+            } else if isDraggingOwnTitleBar {
+                mode = .moving
+            } else {
+                return
+            }
         }
         switch mode {
         case .moving:
@@ -110,6 +135,15 @@ final class DragSnapper {
         case .undecided:
             break
         }
+    }
+
+    /// PasteRing's own windows may only report their new place once the drag ends, so a drag
+    /// that started in the title bar area and has gone a few points counts as moving.
+    private var isDraggingOwnTitleBar: Bool {
+        guard window?.own != nil else { return false }
+        let point = NSEvent.mouseLocation
+        return startFrame.maxY - startPoint.y <= Self.ownTitleBarHeight
+            && hypot(point.x - startPoint.x, point.y - startPoint.y) > 3
     }
 
     private func reset() {
@@ -234,4 +268,19 @@ final class DragSnapper {
         }
         return found
     }
+}
+
+/// Plain C function for the event tap; the snapper comes back through the refcon. Runs on
+/// the main run loop, where the tap is scheduled.
+private func dragSnapperCallback(
+    _ proxy: CGEventTapProxy,
+    _ type: CGEventType,
+    _ event: CGEvent,
+    _ refcon: UnsafeMutableRawPointer?
+) -> Unmanaged<CGEvent>? {
+    if let refcon {
+        let snapper = Unmanaged<DragSnapper>.fromOpaque(refcon).takeUnretainedValue()
+        MainActor.assumeIsolated { snapper.handle(type) }
+    }
+    return Unmanaged.passUnretained(event)
 }
