@@ -16,6 +16,8 @@ struct InputEvent: Identifiable {
     let phase: Phase
     let name: String
     let detail: String
+    /// What it was remapped to, if it was.
+    var result: String?
 }
 
 /// The latest events, oldest first, while the Event Viewer is open.

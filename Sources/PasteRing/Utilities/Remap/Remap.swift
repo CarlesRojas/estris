@@ -129,7 +129,16 @@ final class Remap {
         // the list under the pointer.
         let isLinkClick = isOverViewerLink && (type == .leftMouseDown || type == .leftMouseUp)
         if isViewing, !parsed.isRepeat, !isLinkClick {
-            eventLog.record(InputEvent(device: device.map(settings.name(of:)) ?? "Other source", source: device, input: parsed.input, phase: parsed.phase, name: parsed.name, detail: parsed.detail))
+            let (original, result) = remapping(of: parsed.input, on: device)
+            eventLog.record(InputEvent(
+                device: device.map(settings.name(of:)) ?? "Other source",
+                source: device,
+                input: original ?? parsed.input,
+                phase: parsed.phase,
+                name: original?.title ?? parsed.name,
+                detail: parsed.detail,
+                result: result?.title
+            ))
         }
 
         if let recording, let input = parsed.input, parsed.phase == .down, input != .mouseButton(0) {
@@ -152,6 +161,24 @@ final class Remap {
         if case .key = input, case .key = output { return true }
         perform(output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
         return false
+    }
+
+    /// For the Event Viewer: what an event was remapped to, and, for a key changed on the
+    /// keyboard itself (which macOS already reports as the new key), the key pressed.
+    private func remapping(of input: RemapInput?, on device: InputDevice?) -> (original: RemapInput?, result: RemapOutput?) {
+        guard settings.isEnabled, let device, let input else { return (nil, nil) }
+        let mappings = settings.mappings(for: device.id)
+        if let output = mappings.first(where: { $0.input == input })?.output {
+            return (nil, output)
+        }
+        if case .key(let usage) = input,
+           let mapping = mappings.first(where: { mapping in
+               guard case .key? = mapping.input, case .key(usage)? = mapping.output else { return false }
+               return true
+           }) {
+            return (mapping.input, mapping.output)
+        }
+        return (nil, nil)
     }
 
     private func perform(_ output: RemapOutput, down: Bool, isRepeat: Bool) {

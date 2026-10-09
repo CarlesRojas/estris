@@ -74,12 +74,19 @@ struct EventViewer: View {
                 .frame(width: 90, alignment: .leading)
             Text(event.phase.rawValue)
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(event.phase == .down ? Color.accentColor : .secondary)
+                .foregroundStyle(.secondary)
                 .frame(width: 40, alignment: .leading)
             HStack(spacing: 6) {
                 Text(event.name)
                 Text("(\(event.detail))")
                     .foregroundStyle(.secondary)
+                if let result = event.result {
+                    Image(systemName: "arrow.right")
+                        .foregroundStyle(Color.accentColor)
+                    Text(result)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.accentColor)
+                }
                 if hoveredRow == event.id, let source = event.source, let input = event.input, input != .mouseButton(0) {
                     Button("Create Mapping") {
                         remap.isOverViewerLink = false
