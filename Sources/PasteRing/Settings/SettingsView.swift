@@ -78,7 +78,11 @@ struct SettingsSidebar: View {
                         Text(pane.title)
                     } icon: {
                         Image(systemName: pane.symbol)
+                            .font(.system(size: 15))
                             .foregroundStyle(navigation.selection == pane ? Color.white : Color.primary)
+                            // Centred in a fixed box: symbols sit on the text baseline by
+                            // default, which pushes taller ones like the clipboard down.
+                            .frame(width: 22, height: 22, alignment: .center)
                             // Switches with the selection highlight, without fading.
                             .transaction { $0.animation = nil }
                     }
