@@ -87,6 +87,16 @@ final class ClipboardSettings: ObservableObject {
         didSet { defaults.set(ignorePasswords, forKey: Keys.ignorePasswords) }
     }
 
+    /// Record copied images. Text, rich text and files are always recorded.
+    @Published var recordImages: Bool {
+        didSet { defaults.set(recordImages, forKey: Keys.recordImages) }
+    }
+
+    /// Paste rich text without its formatting, so it takes the style of where it is pasted.
+    @Published var pasteAsPlainText: Bool {
+        didSet { defaults.set(pasteAsPlainText, forKey: Keys.pasteAsPlainText) }
+    }
+
     /// Copying something already in the history moves it to the top instead of adding it again.
     @Published var removeDuplicates: Bool {
         didSet { defaults.set(removeDuplicates, forKey: Keys.removeDuplicates) }
@@ -185,6 +195,8 @@ final class ClipboardSettings: ObservableObject {
             Keys.isEnabled: true,
             Keys.maxItems: 50,
             Keys.ignorePasswords: true,
+            Keys.recordImages: true,
+            Keys.pasteAsPlainText: false,
             Keys.removeDuplicates: true,
             Keys.moveToTopOnPaste: true,
         ])
@@ -192,6 +204,8 @@ final class ClipboardSettings: ObservableObject {
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         maxItems = defaults.integer(forKey: Keys.maxItems)
         ignorePasswords = defaults.bool(forKey: Keys.ignorePasswords)
+        recordImages = defaults.bool(forKey: Keys.recordImages)
+        pasteAsPlainText = defaults.bool(forKey: Keys.pasteAsPlainText)
         removeDuplicates = defaults.bool(forKey: Keys.removeDuplicates)
         moveToTopOnPaste = defaults.bool(forKey: Keys.moveToTopOnPaste)
         let savedShortcuts = defaults.data(forKey: Keys.shortcuts).flatMap { try? JSONDecoder().decode([Shortcut].self, from: $0) }
@@ -308,6 +322,8 @@ final class ClipboardSettings: ObservableObject {
         static let isEnabled = "clipboardManagerEnabled"
         static let maxItems = "maxItems"
         static let ignorePasswords = "ignorePasswords"
+        static let recordImages = "recordImages"
+        static let pasteAsPlainText = "pasteAsPlainText"
         static let removeDuplicates = "removeDuplicates"
         static let moveToTopOnPaste = "moveToTopOnPaste"
         static let shortcuts = "shortcuts"

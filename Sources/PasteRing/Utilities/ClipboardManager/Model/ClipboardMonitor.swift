@@ -52,10 +52,11 @@ final class ClipboardMonitor: NSObject {
     }
 
     /// Puts an entry back on the pasteboard, exactly as it was copied, without recording it
-    /// as a new entry.
-    func write(_ item: ClipItem) {
+    /// as a new entry. With `plainText`, rich text goes back as its text only.
+    func write(_ item: ClipItem, plainText: Bool = false) {
         pasteboard.clearContents()
-        if item.hasPayload == true, let payload = ClipPayloadStore.load(item.id) {
+        let keepsFormatting = !(plainText && item.kind == .richText)
+        if keepsFormatting, item.hasPayload == true, let payload = ClipPayloadStore.load(item.id) {
             let objects = payload.map { types in
                 let pasteboardItem = NSPasteboardItem()
                 for (type, data) in types {
@@ -117,6 +118,7 @@ final class ClipboardMonitor: NSObject {
         } else if let string {
             kind = hasRichText ? .richText : .text
         } else if hasImage {
+            guard settings.recordImages else { return nil }
             kind = .image
         } else {
             return nil

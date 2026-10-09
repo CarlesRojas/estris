@@ -32,6 +32,14 @@ struct ClipboardSettingsForm: View {
                     Text("Ignore passwords")
                     Text("Skips text copied from password fields and password managers.")
                 }
+                Toggle(isOn: $settings.recordImages) {
+                    Text("Record images")
+                    Text("Keeps copied images in the history alongside text and files.")
+                }
+                Toggle(isOn: $settings.pasteAsPlainText) {
+                    Text("Paste as plain text")
+                    Text("Drops fonts, colours and other formatting, so pasted text matches where it goes.")
+                }
                 Toggle(isOn: $settings.removeDuplicates) {
                     Text("Remove duplicates")
                     Text("Copying something already in the history moves it to the top instead of adding it again.")

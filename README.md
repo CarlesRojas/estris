@@ -28,6 +28,8 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 - **Settings**:
   - *General*: how many entries to keep (5 to 500, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and three switches, all on by default:
     - **Ignore passwords**: skips text copied from password fields and password managers.
+    - **Record images** (on): keeps copied images in the history.
+    - **Paste as plain text** (off): pastes rich text without its formatting.
     - **Remove duplicates**: copying something already in the history moves it to the top instead of adding it again.
     - **Move pasted entry to the top**: when off, the history keeps copy order and `⌘V` keeps pasting the last copied text after you paste an older entry.
   - *Appearance*, with a live preview over your wallpaper:

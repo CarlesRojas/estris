@@ -219,7 +219,7 @@ final class OverlayController: NSObject {
         if settings.moveToTopOnPaste {
             history.promote(item)
         }
-        monitor.write(item)
+        monitor.write(item, plainText: settings.pasteAsPlainText)
 
         guard Paster.isTrusted(prompt: true) else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
