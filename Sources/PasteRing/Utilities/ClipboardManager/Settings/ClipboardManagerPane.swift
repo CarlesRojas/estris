@@ -26,32 +26,21 @@ struct ClipboardManagerPane: View {
                 isOn: $clipboard.isEnabled
             )
 
-            // Laid out like the standard tab view (tabs straddling the top edge of a box), but
-            // with the box's corners and bottom edge matched to the sidebar.
-            ZStack(alignment: .top) {
-                content
-                    .padding(.top, 14)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: PaneStyle.cornerRadius, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: PaneStyle.cornerRadius, style: .continuous)
-                            .strokeBorder(Color(nsColor: .separatorColor))
-                    )
-                    .padding(.top, 12)
-
-                Picker("View", selection: $tab) {
-                    ForEach(Tab.allCases) { tab in
-                        Text(tab.rawValue).tag(tab)
-                    }
+            // The tabs stay pinned at the top; below them the selected tab fills the pane
+            // and scrolls like any other settings page, with no box around it.
+            Picker("View", selection: $tab) {
+                ForEach(Tab.allCases) { tab in
+                    Text(tab.rawValue).tag(tab)
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .fixedSize()
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, PaneStyle.bottomInset)
-            // Shrink to the space left; the tabs' content scrolls.
-            .frame(minHeight: 0, maxHeight: .infinity)
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .padding(.bottom, 4)
+
+            content
+                // Shrink to the space left; the tab's content scrolls.
+                .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
