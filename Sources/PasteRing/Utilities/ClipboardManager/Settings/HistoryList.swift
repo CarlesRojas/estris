@@ -68,28 +68,41 @@ struct HistoryPreferences: View {
             .padding(.vertical, 12)
     }
 
+    /// Laid out like the Default overlay card: app and date on top, the content below.
     private func row(_ item: ClipItem) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            SourceIcon(item: item, size: 28)
-            VStack(alignment: .leading, spacing: 4) {
-                ClipContentView(item: item, singleLine: true)
-                    .lineLimit(2)
-                    .frame(maxHeight: item.kind == .image ? 56 : nil, alignment: .leading)
-                Text("\(item.sourceName) · \(dateTimeFormat.string(from: item.date))")
-                    .font(.caption)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                SourceIcon(item: item, size: 22)
+                Text(item.sourceName)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                Spacer()
+                Text(dateTimeFormat.string(from: item.date))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                Button {
+                    history.remove(item)
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(mutedRed)
+                .help("Delete this entry")
             }
-            Spacer()
-            Button {
-                history.remove(item)
-            } label: {
-                Image(systemName: "trash")
+
+            Group {
+                if item.kind == .image {
+                    ClipContentView(item: item, fitsImageInside: true)
+                        .frame(height: 140)
+                } else {
+                    ClipContentView(item: item)
+                        .lineLimit(2)
+                }
             }
-            .buttonStyle(.borderless)
-            .foregroundStyle(mutedRed)
-            .help("Delete this entry")
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
     }
 
 }
