@@ -26,7 +26,7 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 
 **Clipboard** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
 - **Settings**:
-  - *General*: how many entries to keep (5 to 500, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and three switches, all on by default:
+  - *General*: how many entries to keep (5 to 500, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and these switches:
     - **Ignore passwords**: skips text copied from password fields and password managers.
     - **Record images** (on): keeps copied images in the history.
     - **Paste as plain text** (off): pastes rich text without its formatting.
