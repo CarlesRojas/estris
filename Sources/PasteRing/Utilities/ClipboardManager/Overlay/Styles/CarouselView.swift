@@ -7,6 +7,10 @@ struct CarouselView: View {
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
 
+    private var frontGrowth: CGFloat {
+        ContentCard.fittedHeight(for: state.selectedItem, width: width, height: height) - height
+    }
+
     private var width: CGFloat { settings.carouselWidth }
     private var height: CGFloat { settings.carouselHeight }
 
@@ -19,8 +23,11 @@ struct CarouselView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         // No line limit: the text fills whatever height the card has.
-                        ContentCard(item: item, isSelected: distance == 0, width: width, height: height, lineLimit: nil)
+                        ContentCard(item: item, isSelected: distance == 0, width: width, height: height, lineLimit: nil, growsToFitImage: true)
                             .clipActions(item, trashInset: 16)
+                            // Same layout height for every card, top pinned: a card holding an
+                            // image grows downward only.
+                            .frame(height: height, alignment: .top)
                             .rotation3DEffect(
                                 .degrees(distance == 0 ? 0 : (distance < 0 ? 45 : -45)),
                                 axis: (x: 0, y: 1, z: 0),
@@ -34,6 +41,8 @@ struct CarouselView: View {
             }
         }
         .frame(width: width * 3.5, height: height + 80)
+        // The frame leaves 40pt below the cards; the pill only has to move for more.
+        .preference(key: OverlayGrowthKey.self, value: frontGrowth - 40)
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.selected)
     }
 

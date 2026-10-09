@@ -9,6 +9,15 @@ struct EntryCard: View {
     var isSelected = false
     @Environment(\.overlayActions) private var actions
 
+    private static let padding: CGFloat = 20
+    /// Padding plus the app row and the gap below it.
+    private static let chrome: CGFloat = padding * 2 + 28 + 12
+
+    /// `height`, or taller for an image so it shows whole at the card's width.
+    static func fittedHeight(for item: ClipItem?, width: CGFloat, height: CGFloat) -> CGFloat {
+        ImageFitting.cardHeight(for: item, baseHeight: height, contentWidth: width - padding * 2, chrome: chrome)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let item {
@@ -32,8 +41,8 @@ struct EntryCard: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
-        .padding(20)
-        .frame(width: width, height: height)
+        .padding(Self.padding)
+        .frame(width: width, height: Self.fittedHeight(for: item, width: width, height: height))
         .surface(cornerRadius: 22, isSelected: isSelected)
     }
 }

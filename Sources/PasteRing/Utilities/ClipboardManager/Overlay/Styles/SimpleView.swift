@@ -8,8 +8,14 @@ struct SimpleView: View {
 
     var body: some View {
         let item = state.selectedItem
-        EntryCard(item: item, width: settings.simpleWidth, height: settings.simpleHeight)
+        let height = settings.simpleHeight
+        let fitted = EntryCard.fittedHeight(for: item, width: settings.simpleWidth, height: height)
+        EntryCard(item: item, width: settings.simpleWidth, height: height)
             .modifier(OptionalClipActions(item: item))
+            // Laid out at the usual height with the top pinned: a taller card for an image
+            // grows downward only, and the position pill moves down with it.
+            .frame(height: height, alignment: .top)
+            .preference(key: OverlayGrowthKey.self, value: fitted - height)
             .transaction { $0.animation = nil }
     }
 }

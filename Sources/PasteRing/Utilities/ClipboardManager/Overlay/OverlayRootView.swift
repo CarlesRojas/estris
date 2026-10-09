@@ -5,6 +5,7 @@ struct OverlayRootView: View {
     @ObservedObject var settings: ClipboardSettings
     @ObservedObject var appearance: AppearanceSettings
     @ObservedObject var general: GeneralSettings
+    @State private var growth: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -37,18 +38,26 @@ struct OverlayRootView: View {
     }
 
     private var content: some View {
-        VStack(spacing: 16) {
-            switch settings.style {
-            case .stack: StackView(state: state, settings: settings)
-            case .ring: RingMenuView(state: state, settings: settings)
-            case .carousel: CarouselView(state: state, settings: settings)
-            case .simple: SimpleView(state: state, settings: settings)
-            case .grid: GridView(state: state, settings: settings)
+        style
+            .onPreferenceChange(OverlayGrowthKey.self) { growth = max(0, $0) }
+            // The pill hangs below the style without taking part in its layout, so the style
+            // stays put on screen; it moves down when a card grows for an image.
+            .overlay(alignment: .bottom) {
+                if !state.items.isEmpty {
+                    PositionPill(text: "\(state.selected + 1) of \(state.items.count)")
+                        .alignmentGuide(.bottom) { pill in pill[.top] - 16 - growth }
+                }
             }
+    }
 
-            if !state.items.isEmpty {
-                PositionPill(text: "\(state.selected + 1) of \(state.items.count)")
-            }
+    @ViewBuilder
+    private var style: some View {
+        switch settings.style {
+        case .stack: StackView(state: state, settings: settings)
+        case .ring: RingMenuView(state: state, settings: settings)
+        case .carousel: CarouselView(state: state, settings: settings)
+        case .simple: SimpleView(state: state, settings: settings)
+        case .grid: GridView(state: state, settings: settings)
         }
     }
 }

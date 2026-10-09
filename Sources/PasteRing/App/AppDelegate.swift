@@ -40,6 +40,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return item
     }
 
+    private static let settingsMinimumSize = NSSize(width: 820, height: 600)
+
     @objc private func openSettings() {
         if settingsWindow == nil {
             let settingsView = SettingsView(general: general, clipboard: clipboard)
@@ -53,7 +55,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 hostingController.sceneBridgingOptions = [.toolbars]
             }
             let window = NSWindow(contentViewController: hostingController)
-            window.contentMinSize = NSSize(width: 820, height: 600)
             // Laid out like System Settings: no visible title, and the sidebar runs to the top
             // of the window with the close, minimize and zoom buttons inside it. No title at all,
             // so none can show.
@@ -63,6 +64,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.titlebarAppearsTransparent = true
             window.toolbar = NSToolbar(identifier: "Settings")
             window.toolbarStyle = .unified
+            // Set after the style mask and toolbar, which can reset it. Covers both the content
+            // and the whole frame so the window can't be dragged smaller.
+            window.contentMinSize = Self.settingsMinimumSize
+            window.minSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: Self.settingsMinimumSize)).size
             // 80% of the screen's height, within sensible limits.
             let screenHeight = NSScreen.main?.visibleFrame.height ?? 800
             window.setContentSize(NSSize(width: 880, height: min(max(screenHeight * 0.8, 640), 1100)))

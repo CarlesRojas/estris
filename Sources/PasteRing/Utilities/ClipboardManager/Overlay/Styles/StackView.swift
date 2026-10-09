@@ -12,6 +12,10 @@ struct StackView: View {
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
 
+    private var frontGrowth: CGFloat {
+        EntryCard.fittedHeight(for: state.selectedItem, width: width, height: height) - height
+    }
+
     private var width: CGFloat { settings.stackWidth }
     private var height: CGFloat { settings.stackHeight }
 
@@ -26,6 +30,9 @@ struct StackView: View {
                     let distance = slot.distance
                     EntryCard(item: slot.item, width: width, height: height, isSelected: distance == 0)
                         .clipActions(slot.item, trashInset: 22)
+                        // Same layout height for every card, top pinned: a card holding an image
+                        // grows downward only.
+                        .frame(height: height, alignment: .top)
                         .allowsHitTesting(distance >= 0)
                         .scaleEffect(distance < 0 ? 0.97 : Self.scales[distance], anchor: .top)
                         .offset(y: distance < 0 ? height * 0.45 : -Self.peeks[distance])
@@ -37,6 +44,8 @@ struct StackView: View {
             }
         }
         .frame(width: width + 120, height: height + 250)
+        // The frame leaves 125pt below the front card; the pill only has to move for more.
+        .preference(key: OverlayGrowthKey.self, value: frontGrowth - 125)
         // No bounce, so the fade and slide read as one smooth motion.
         .animation(.spring(response: 0.45, dampingFraction: 1), value: state.position)
     }
