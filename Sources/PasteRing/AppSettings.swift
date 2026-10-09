@@ -35,6 +35,8 @@ final class AppSettings: ObservableObject {
     static let carouselSizeRange: ClosedRange<Double> = 180...420
     static let stackWidthRange: ClosedRange<Double> = 360...800
     static let stackHeightRange: ClosedRange<Double> = 120...360
+    static let ringChipWidthRange: ClosedRange<Double> = 140...360
+    static let ringChipHeightRange: ClosedRange<Double> = 40...140
 
     private let defaults = UserDefaults.standard
 
@@ -72,6 +74,14 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(stackHeight, forKey: Keys.stackHeight) }
     }
 
+    @Published var ringChipWidth: Double {
+        didSet { defaults.set(ringChipWidth, forKey: Keys.ringChipWidth) }
+    }
+
+    @Published var ringChipHeight: Double {
+        didSet { defaults.set(ringChipHeight, forKey: Keys.ringChipHeight) }
+    }
+
     @Published var simpleWidth: Double {
         didSet { defaults.set(simpleWidth, forKey: Keys.simpleWidth) }
     }
@@ -98,6 +108,8 @@ final class AppSettings: ObservableObject {
         carouselHeight = defaults.double(forKey: Keys.carouselHeight)
         stackWidth = defaults.double(forKey: Keys.stackWidth)
         stackHeight = defaults.double(forKey: Keys.stackHeight)
+        ringChipWidth = defaults.double(forKey: Keys.ringChipWidth)
+        ringChipHeight = defaults.double(forKey: Keys.ringChipHeight)
         style = OverlayStyle(rawValue: defaults.string(forKey: Keys.style) ?? "") ?? .simple
     }
 
@@ -123,6 +135,8 @@ final class AppSettings: ObservableObject {
         Keys.carouselHeight: 260.0,
         Keys.stackWidth: 520.0,
         Keys.stackHeight: 170.0,
+        Keys.ringChipWidth: 228.0,
+        Keys.ringChipHeight: 56.0,
     ]
 
     func resetAppearance() {
@@ -139,6 +153,8 @@ final class AppSettings: ObservableObject {
         carouselHeight = defaults.double(forKey: Keys.carouselHeight)
         stackWidth = defaults.double(forKey: Keys.stackWidth)
         stackHeight = defaults.double(forKey: Keys.stackHeight)
+        ringChipWidth = defaults.double(forKey: Keys.ringChipWidth)
+        ringChipHeight = defaults.double(forKey: Keys.ringChipHeight)
     }
 
     /// Binding that keeps typed or stepped values inside `range`.
@@ -160,6 +176,8 @@ final class AppSettings: ObservableObject {
         static let carouselHeight = "carouselHeight"
         static let stackWidth = "stackWidth"
         static let stackHeight = "stackHeight"
+        static let ringChipWidth = "ringChipWidth"
+        static let ringChipHeight = "ringChipHeight"
         static let style = "overlayStyle"
     }
 }

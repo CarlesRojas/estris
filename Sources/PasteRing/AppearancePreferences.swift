@@ -53,6 +53,8 @@ struct AppearancePreferences: View {
                                 Text("\(settings.ringSize) most recent entries")
                             }
                         }
+                        slider("Width", value: $settings.ringChipWidth, in: AppSettings.ringChipWidthRange, percent: false)
+                        slider("Height", value: $settings.ringChipHeight, in: AppSettings.ringChipHeightRange, percent: false)
                     }
                 }
 

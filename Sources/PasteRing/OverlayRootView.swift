@@ -22,7 +22,7 @@ struct OverlayRootView: View {
         VStack(spacing: 16) {
             switch settings.style {
             case .stack: StackView(state: state, settings: settings)
-            case .ring: RingMenuView(state: state)
+            case .ring: RingMenuView(state: state, settings: settings)
             case .carousel: CarouselView(state: state, settings: settings)
             case .simple: SimpleView(state: state, settings: settings)
             case .grid: GridView(state: state, settings: settings)

@@ -4,15 +4,17 @@ import SwiftUI
 /// selected entry is at the top.
 struct RingMenuView: View {
     private static let minRadius: CGFloat = 170
-    /// Roughly a chip's width plus a gap, so neighbours at the top never overlap.
-    private static let chipSpacing: CGFloat = 238
+    private static let chipGap: CGFloat = 10
 
     @ObservedObject var state: OverlayState
+    @ObservedObject var settings: AppSettings
 
     var body: some View {
         let count = state.items.count
         let step = count > 0 ? 360 / Double(count) : 0
-        let radius = Self.radius(for: count)
+        let chipWidth = settings.ringChipWidth
+        let chipHeight = settings.ringChipHeight
+        let radius = Self.radius(for: count, chipSize: max(chipWidth, chipHeight))
 
         ZStack {
             if count == 0 {
@@ -25,20 +27,20 @@ struct RingMenuView: View {
                 // Position is unbounded, so the angle keeps turning the same way past the last entry.
                 let angle = Double(index - state.position) * step
                 let distance = circularDistance(index, count: count)
-                RingChip(item: item, isSelected: distance == 0)
+                RingChip(item: item, isSelected: distance == 0, width: chipWidth, height: chipHeight)
                     .clipActions(item, trashInset: 6)
                     .modifier(RingPlacement(angle: angle, step: step, radius: radius))
                     .zIndex(distance == 0 ? 1 : 0)
             }
         }
-        .frame(width: (radius + 130) * 2, height: (radius + 50) * 2)
+        .frame(width: (radius + chipWidth * 0.6) * 2, height: (radius + chipHeight) * 2)
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.position)
     }
 
-    /// Large enough that the chord between neighbouring chips fits a chip.
-    private static func radius(for count: Int) -> CGFloat {
+    /// Large enough that the chord between neighbouring chips fits a chip plus a gap.
+    private static func radius(for count: Int, chipSize: CGFloat) -> CGFloat {
         guard count > 2 else { return minRadius }
-        return max(minRadius, chipSpacing / (2 * sin(.pi / CGFloat(count))))
+        return max(minRadius, (chipSize + chipGap) / (2 * sin(.pi / CGFloat(count))))
     }
 
     private func circularDistance(_ index: Int, count: Int) -> Int {
@@ -78,22 +80,24 @@ private struct RingPlacement: ViewModifier, Animatable {
 struct RingChip: View {
     let item: ClipItem
     let isSelected: Bool
+    var width: CGFloat = 228
+    var height: CGFloat = 56
 
     var body: some View {
         HStack(spacing: 10) {
             AppIconView(bundleID: item.sourceBundleID, size: 24)
+            // No line limit: the text fills the chip and truncates where it ends.
             Text(item.text.singleLine)
                 .font(.body)
-                .lineLimit(2)
                 .truncationMode(.tail)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 // Room for the trash button in the corner.
                 .padding(.trailing, 16)
         }
-        // Fixed size, two lines tall, so every chip on the ring matches.
-        .frame(width: 200, height: 36)
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
+        // Every chip on the ring has the same size.
+        .frame(width: width, height: height)
         .surface(cornerRadius: 18, isSelected: isSelected)
     }
 }
