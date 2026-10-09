@@ -1,10 +1,14 @@
 import SwiftUI
 
-/// Ring menu: every entry sits on one circle, evenly spaced. The ring turns so the
-/// selected entry is at the top.
+/// Ring menu: every entry sits on one ring, evenly spaced. The ring turns so the
+/// selected entry is at the top. It is an ellipse, as tight as the chips allow: wide chips
+/// need room side by side at the top and bottom, but stack closely at the sides.
 struct RingMenuView: View {
-    private static let minRadius: CGFloat = 170
-    private static let chipGap: CGFloat = 10
+    private static let minRadius: CGFloat = 120
+    private static let chipGap: CGFloat = 6
+    /// Widest the ring may get relative to its height, so it still reads as a ring.
+    private static let maxAspect: CGFloat = 1.6
+    private static var radiiCache: [String: CGSize] = [:]
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: AppSettings
@@ -14,7 +18,7 @@ struct RingMenuView: View {
         let step = count > 0 ? 360 / Double(count) : 0
         let chipWidth = settings.ringChipWidth
         let chipHeight = settings.ringChipHeight
-        let radius = Self.radius(for: count, chipSize: max(chipWidth, chipHeight))
+        let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: chipHeight)
 
         ZStack {
             if count == 0 {
@@ -29,18 +33,45 @@ struct RingMenuView: View {
                 let distance = circularDistance(index, count: count)
                 RingChip(item: item, isSelected: distance == 0, width: chipWidth, height: chipHeight)
                     .clipActions(item, trashInset: 6)
-                    .modifier(RingPlacement(angle: angle, step: step, radius: radius))
+                    .modifier(RingPlacement(angle: angle, step: step, radii: radii))
                     .zIndex(distance == 0 ? 1 : 0)
             }
         }
-        .frame(width: (radius + chipWidth * 0.6) * 2, height: (radius + chipHeight) * 2)
+        .frame(width: (radii.width + chipWidth * 0.6) * 2, height: (radii.height + chipHeight) * 2)
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.position)
     }
 
-    /// Large enough that the chord between neighbouring chips fits a chip plus a gap.
-    private static func radius(for count: Int, chipSize: CGFloat) -> CGFloat {
-        guard count > 2 else { return minRadius }
-        return max(minRadius, (chipSize + chipGap) / (2 * sin(.pi / CGFloat(count))))
+    /// Smallest ellipse (horizontal and vertical radius) on which no two chips overlap.
+    private static func radii(count: Int, chipWidth: CGFloat, chipHeight: CGFloat) -> CGSize {
+        let key = "\(count)-\(Int(chipWidth))-\(Int(chipHeight))"
+        if let cached = radiiCache[key] { return cached }
+
+        // The chip at the top is drawn a little larger, so allow for that.
+        let width = chipWidth * 1.04 + chipGap
+        let height = chipHeight * 1.04 + chipGap
+        let angles = (0..<count).map { 2 * Double.pi * Double($0) / Double(count) }
+
+        func fits(_ rx: CGFloat, _ ry: CGFloat) -> Bool {
+            let points = angles.map { CGPoint(x: rx * sin($0), y: -ry * cos($0)) }
+            for i in points.indices {
+                for j in points.indices where j > i {
+                    if abs(points[i].x - points[j].x) < width && abs(points[i].y - points[j].y) < height {
+                        return false
+                    }
+                }
+            }
+            return true
+        }
+
+        var result = CGSize(width: minRadius, height: minRadius)
+        search: for ry in stride(from: minRadius, through: 2000, by: 4) {
+            for rx in stride(from: ry, through: ry * maxAspect, by: 4) where fits(rx, ry) {
+                result = CGSize(width: rx, height: ry)
+                break search
+            }
+        }
+        radiiCache[key] = result
+        return result
     }
 
     private func circularDistance(_ index: Int, count: Int) -> Int {
@@ -59,7 +90,8 @@ private struct RingPlacement: ViewModifier, Animatable {
 
     var angle: Double
     let step: Double
-    let radius: CGFloat
+    /// Horizontal and vertical radius of the ellipse.
+    let radii: CGSize
 
     var animatableData: Double {
         get { angle }
@@ -73,7 +105,7 @@ private struct RingPlacement: ViewModifier, Animatable {
         let nearness = step > 0 ? CGFloat(max(0, 1 - fromTop / step)) : 1
         return content
             .scaleEffect(Self.restScale + (Self.topScale - Self.restScale) * nearness)
-            .offset(x: radius * sin(radians), y: -radius * cos(radians))
+            .offset(x: radii.width * sin(radians), y: -radii.height * cos(radians))
     }
 }
 

@@ -126,7 +126,7 @@ final class AppSettings: ObservableObject {
     /// Reset to Defaults covers them.
     private static let appearanceDefaults: [String: Any] = [
         Keys.style: OverlayStyle.simple.rawValue,
-        Keys.ringSize: 8,
+        Keys.ringSize: 12,
         Keys.gridSize: 12,
         Keys.gridCardWidth: 256.0,
         Keys.simpleWidth: 560.0,
