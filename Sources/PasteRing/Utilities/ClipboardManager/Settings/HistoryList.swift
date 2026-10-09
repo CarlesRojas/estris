@@ -21,34 +21,35 @@ struct HistoryPreferences: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                SearchField(text: $search)
-                Text(countText)
-                    .foregroundStyle(.secondary)
-                    .fixedSize()
-                Button("Clear All", role: .destructive) {
-                    confirmingClear = true
+        // Grouped like every other settings page: the search row in one box, entries in the next.
+        Form {
+            Section {
+                HStack(spacing: 12) {
+                    SearchField(text: $search)
+                    Text(countText)
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                    Button("Clear All", role: .destructive) {
+                        confirmingClear = true
+                    }
+                    .disabled(history.items.isEmpty)
                 }
-                .disabled(history.items.isEmpty)
             }
-            .padding(12)
 
-            Divider()
-
-            if history.items.isEmpty {
-                placeholder("No clipboard entries yet")
-            } else if results.isEmpty {
-                placeholder("No entries match \u{201C}\(search)\u{201D}")
-            } else {
-                List {
+            Section {
+                if history.items.isEmpty {
+                    placeholder("No clipboard entries yet")
+                } else if results.isEmpty {
+                    placeholder("No entries match \u{201C}\(search)\u{201D}")
+                } else {
                     ForEach(results, id: \.item.id) { result in
                         row(result.item, position: result.position)
                     }
                 }
-                .listStyle(.inset)
             }
         }
+        .formStyle(.grouped)
+        .settingsPage()
         .confirmationDialog("Delete all clipboard entries?", isPresented: $confirmingClear) {
             Button("Clear All", role: .destructive) { history.clear() }
         }
@@ -62,7 +63,8 @@ struct HistoryPreferences: View {
     private func placeholder(_ text: String) -> some View {
         Text(text)
             .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
     }
 
     private func row(_ item: ClipItem, position: Int) -> some View {

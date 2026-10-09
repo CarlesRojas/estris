@@ -16,33 +16,37 @@ struct ExcludedAppsList: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                SearchField(text: $search, prompt: "Search apps")
-                Text(settings.excludedApps.isEmpty ? "All apps recorded" : "\(settings.excludedApps.count) excluded")
-                    .foregroundStyle(.secondary)
-                    .fixedSize()
-            }
-            .padding(12)
-
-            Divider()
-
-            if isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List(results) { app in
-                    Toggle(isOn: isRecorded(app)) {
-                        HStack(spacing: 10) {
-                            AppIconView(bundleID: app.bundleID, size: 24, url: app.url)
-                            Text(app.name)
-                        }
-                    }
-                    .toggleStyle(.switch)
+        // Grouped like every other settings page: the search row in one box, apps in the next.
+        Form {
+            Section {
+                HStack(spacing: 12) {
+                    SearchField(text: $search, prompt: "Search apps")
+                    Text(settings.excludedApps.isEmpty ? "All apps recorded" : "\(settings.excludedApps.count) excluded")
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
                 }
-                .listStyle(.inset)
+            }
+
+            Section {
+                if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                } else {
+                    ForEach(results) { app in
+                        Toggle(isOn: isRecorded(app)) {
+                            HStack(spacing: 10) {
+                                AppIconView(bundleID: app.bundleID, size: 24, url: app.url)
+                                Text(app.name)
+                            }
+                        }
+                        .toggleStyle(.switch)
+                    }
+                }
             }
         }
+        .formStyle(.grouped)
+        .settingsPage()
         .task {
             guard apps.isEmpty else { return }
             apps = await Task.detached(priority: .userInitiated) { InstalledApps.scan() }.value

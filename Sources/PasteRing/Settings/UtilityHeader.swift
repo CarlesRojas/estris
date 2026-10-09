@@ -29,7 +29,8 @@ struct UtilityHeader: View {
                 .labelsHidden()
                 .controlSize(.large)
         }
-        .padding(.horizontal, 20)
+        // Lines up with the grouped boxes below.
+        .padding(.horizontal, SettingsLayout.contentInset)
         .padding(.vertical, 14)
     }
 }

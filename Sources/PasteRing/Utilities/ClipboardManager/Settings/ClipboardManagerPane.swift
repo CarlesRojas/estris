@@ -35,7 +35,10 @@ struct ClipboardManagerPane: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
-            .fixedSize()
+            // The large size is the current macOS look for a page's main switcher (rounder,
+            // roomier segments); equal widths keep it calm.
+            .controlSize(.large)
+            .frame(width: 420)
             .padding(.bottom, 4)
 
             content

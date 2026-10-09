@@ -138,6 +138,7 @@ struct ClipboardSettingsForm: View {
             }
         }
         .formStyle(.grouped)
+        .settingsPage()
         .onAppear {
             // Forms focus their first text field on appear, which selects the whole number.
             DispatchQueue.main.async { historySizeFocused = false }

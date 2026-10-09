@@ -92,6 +92,7 @@ struct GeneralPane: View {
             }
         }
         .formStyle(.grouped)
+        .settingsPage()
         .onAppear(perform: refreshStatus)
         // Picks up changes made in System Settings when returning to this window.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
