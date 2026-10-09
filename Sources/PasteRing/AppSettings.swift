@@ -32,6 +32,7 @@ final class AppSettings: ObservableObject {
     static let simpleWidthRange: ClosedRange<Double> = 360...900
     static let simpleHeightRange: ClosedRange<Double> = 120...420
     static let gridCardWidthRange: ClosedRange<Double> = 160...420
+    static let carouselSizeRange: ClosedRange<Double> = 180...420
 
     private let defaults = UserDefaults.standard
 
@@ -51,6 +52,14 @@ final class AppSettings: ObservableObject {
 
     @Published var gridCardWidth: Double {
         didSet { defaults.set(gridCardWidth, forKey: Keys.gridCardWidth) }
+    }
+
+    @Published var carouselWidth: Double {
+        didSet { defaults.set(carouselWidth, forKey: Keys.carouselWidth) }
+    }
+
+    @Published var carouselHeight: Double {
+        didSet { defaults.set(carouselHeight, forKey: Keys.carouselHeight) }
     }
 
     @Published var simpleWidth: Double {
@@ -75,6 +84,8 @@ final class AppSettings: ObservableObject {
         gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
         simpleWidth = defaults.double(forKey: Keys.simpleWidth)
         simpleHeight = defaults.double(forKey: Keys.simpleHeight)
+        carouselWidth = defaults.double(forKey: Keys.carouselWidth)
+        carouselHeight = defaults.double(forKey: Keys.carouselHeight)
         style = OverlayStyle(rawValue: defaults.string(forKey: Keys.style) ?? "") ?? .simple
     }
 
@@ -96,6 +107,8 @@ final class AppSettings: ObservableObject {
         Keys.gridCardWidth: 256.0,
         Keys.simpleWidth: 560.0,
         Keys.simpleHeight: 256.0,
+        Keys.carouselWidth: 260.0,
+        Keys.carouselHeight: 260.0,
     ]
 
     func resetAppearance() {
@@ -108,6 +121,8 @@ final class AppSettings: ObservableObject {
         gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
         simpleWidth = defaults.double(forKey: Keys.simpleWidth)
         simpleHeight = defaults.double(forKey: Keys.simpleHeight)
+        carouselWidth = defaults.double(forKey: Keys.carouselWidth)
+        carouselHeight = defaults.double(forKey: Keys.carouselHeight)
     }
 
     /// Binding that keeps typed or stepped values inside `range`.
@@ -125,6 +140,8 @@ final class AppSettings: ObservableObject {
         static let gridCardWidth = "gridCardWidth"
         static let simpleWidth = "simpleWidth"
         static let simpleHeight = "simpleHeight"
+        static let carouselWidth = "carouselWidth"
+        static let carouselHeight = "carouselHeight"
         static let style = "overlayStyle"
     }
 }

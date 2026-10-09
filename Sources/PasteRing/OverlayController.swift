@@ -59,6 +59,9 @@ final class OverlayController: NSObject {
     /// Hotkeys that only exist while the overlay is visible.
     private var sessionHotKeys: [UInt32] = []
     private var scrollAccumulator: CGFloat = 0
+    private var lastScrollStep: Date = .distantPast
+    /// Fastest the scroll wheel may cycle: one entry per this many seconds.
+    private static let scrollStepInterval: TimeInterval = 0.09
     private var isVisible = false
     /// Bumped on every show and hide, so a finished fade-out does not hide a newer show.
     private var presentation = 0
@@ -113,6 +116,7 @@ final class OverlayController: NSObject {
             state.position = 0
         }
         scrollAccumulator = 0
+        lastScrollStep = .distantPast
         isVisible = true
         presentation += 1
 
@@ -193,12 +197,16 @@ final class OverlayController: NSObject {
         let delta = abs(event.scrollingDeltaY) >= abs(event.scrollingDeltaX) ? event.scrollingDeltaY : event.scrollingDeltaX
         let threshold: CGFloat = event.hasPreciseScrollingDeltas ? 30 : 1
 
-        scrollAccumulator += delta
-        while abs(scrollAccumulator) >= threshold {
-            // Content follows the gesture, so scrolling "up" brings the next entry up.
-            move(by: scrollAccumulator < 0 ? 1 : -1)
-            scrollAccumulator -= scrollAccumulator < 0 ? -threshold : threshold
-        }
+        // Capped at one step's worth, so a fast flick does not queue up extra steps.
+        scrollAccumulator = max(-threshold, min(threshold, scrollAccumulator + delta))
+        guard abs(scrollAccumulator) >= threshold,
+              Date().timeIntervalSince(lastScrollStep) >= Self.scrollStepInterval
+        else { return }
+
+        // Content follows the gesture, so scrolling "up" brings the next entry up.
+        move(by: scrollAccumulator < 0 ? 1 : -1)
+        scrollAccumulator = 0
+        lastScrollStep = Date()
     }
 
     @objc private func tick() {
