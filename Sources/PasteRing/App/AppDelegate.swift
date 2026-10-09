@@ -11,6 +11,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var autoQuit = AutoQuit(log: log)
     private lazy var middleClick = MiddleClick(log: log)
     private lazy var remap = Remap(log: log)
+    private lazy var windowSnapping = WindowSnapping(log: log)
     private var settingsWindow: SettingsWindowController?
     private var statusItem: NSStatusItem!
 
@@ -19,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         autoQuit.start()
         middleClick.start()
         remap.start()
+        windowSnapping.start()
         setUpStatusItem()
         LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
@@ -54,7 +56,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, log: log)
         }
         settingsWindow?.show()
     }

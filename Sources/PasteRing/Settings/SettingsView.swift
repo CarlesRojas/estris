@@ -9,6 +9,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case autoQuit
     case middleClick
     case remap
+    case windowSnapping
     /// Hidden until unlocked from the version in General > About.
     case developer
 
@@ -21,6 +22,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .autoQuit: String(localized: "Auto Quit")
         case .middleClick: String(localized: "Middle Click")
         case .remap: String(localized: "Remap")
+        case .windowSnapping: String(localized: "Window Snapping")
         case .developer: String(localized: "Developer")
         }
     }
@@ -32,6 +34,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .autoQuit: "xmark.app"
         case .middleClick: "hand.tap"
         case .remap: "keyboard"
+        case .windowSnapping: "rectangle.split.2x1"
         case .developer: "hammer"
         }
     }
@@ -45,6 +48,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["logs", "debug", "developer", "diagnostics"]
         case .autoQuit:
             ["quit", "close", "window", "last window", "terminate", "excluded", "apps", "delay"]
+        case .windowSnapping:
+            ["window", "snap", "tile", "half", "halves", "corner", "third", "maximize", "resize", "drag", "shortcut"]
         case .remap:
             ["keys", "keyboard", "mouse", "buttons", "mapping", "remap", "device", "event viewer", "mission control", "desktop", "volume", "brightness"]
         case .middleClick:
@@ -107,6 +112,7 @@ struct SettingsSidebar: View {
     @ObservedObject var autoQuitSettings: AutoQuitSettings
     @ObservedObject var middleClickSettings: MiddleClickSettings
     @ObservedObject var remapSettings: RemapSettings
+    @ObservedObject var windowSnappingSettings: WindowSnappingSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -131,6 +137,7 @@ struct SettingsSidebar: View {
         case .autoQuit: autoQuitSettings.isEnabled
         case .middleClick: middleClickSettings.isEnabled
         case .remap: remapSettings.isEnabled
+        case .windowSnapping: windowSnappingSettings.isEnabled
         case .developer: nil
         }
     }
@@ -145,6 +152,7 @@ struct SettingsDetail: View {
     let autoQuit: AutoQuit
     let middleClick: MiddleClick
     let remap: Remap
+    let windowSnapping: WindowSnapping
     let log: AppLog
 
     var body: some View {
@@ -161,6 +169,8 @@ struct SettingsDetail: View {
                     middleClick.settingsPane()
                 case .remap:
                     remap.settingsPane()
+                case .windowSnapping:
+                    windowSnapping.settingsPane()
                 case .developer:
                     DeveloperPane(general: general, log: log)
                 }

@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click and Remap.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap and Window Snapping.
 
 ## Usage
 
@@ -95,6 +95,20 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.
 
+## Window Snapping
+
+Moves the front window to halves, corners, thirds or the whole screen. Off by default; turn it on in **Settings… > Window Snapping**.
+
+- **Shortcuts** (all ⌃⌥, editable in the Shortcuts tab, with **Reset Shortcuts to Defaults**): ← → ↑ ↓ halves; U, I, J, K top left, top right, bottom left, bottom right; ↩ maximize; D, F, G left, center, right third; E, T left and right two thirds; C center; ⌫ restore (the frame before the window was first snapped, or before it was last moved by hand and snapped again).
+- **Dragging** (Settings tab, on by default): drag a window by its title bar to an edge of the screen the pointer is on, see an outline of where it will go, and release:
+  - Corners: quarters. Top edge: maximize.
+  - Left or right edge: that half; near the top or bottom end of the edge, the top or bottom half.
+  - Bottom edge: left, center or right third by where the pointer is; sliding along the bottom from a side third into the middle makes it two thirds on that side.
+  - Edges reach 32 points into the screen, so a drag can stop on an edge shared with another display. Corners reach 64 points along each edge; the top and bottom halves 145 points from the ends of a side edge.
+  - The outline is rounded, dark and see-through; it grows out of the edge or corner and glides between areas.
+- **Resize side-by-side windows together** (on by default): while resizing a window, windows that shared the edge being dragged (within 4 points, overlapping along it) are resized to keep sharing it, live and once more on release. They don't shrink below 120 points.
+- Works through the Accessibility permission (frames) and a global mouse monitor. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
+
 ## Languages
 
 English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching (a **Relaunch** button appears). Dates follow the chosen language.
@@ -121,6 +135,10 @@ Sources/PasteRing/
       MiddleClick.swift        owns the utility
       Model/                   settings and the tap listener
       Settings/                the Middle Click settings pane
+    WindowSnapping/
+      WindowSnapping.swift     owns the utility: shortcuts, snapping, restore frames
+      Model/                   settings, snap actions, Accessibility windows, drag snapper, preview
+      Settings/                the Window Snapping pane
     Remap/
       Remap.swift              owns the utility and its event tap
       Model/                   settings, devices, key catalog, system actions, key mapper, event log
