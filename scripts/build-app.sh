@@ -32,6 +32,8 @@ if [[ -z "$IDENTITY" ]]; then
     fi
 fi
 codesign --force --sign "$IDENTITY" "$APP"
-echo "Signed with: $(codesign -dvv "$APP" 2>&1 | grep -m1 '^Authority=' | cut -d= -f2- || echo 'ad hoc')"
+SIGNATURE="$(codesign -dvv "$APP" 2>&1)"
+AUTHORITY="$(grep '^Authority=' <<<"$SIGNATURE" | head -1 | cut -d= -f2- || true)"
+echo "Signed with: ${AUTHORITY:-ad hoc}"
 
 echo "Built $APP"
