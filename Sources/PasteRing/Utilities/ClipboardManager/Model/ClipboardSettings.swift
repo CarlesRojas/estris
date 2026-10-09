@@ -252,7 +252,7 @@ final class ClipboardSettings: ObservableObject {
         Keys.carouselWidth: 260.0,
         Keys.carouselHeight: 260.0,
         Keys.stackWidth: 520.0,
-        Keys.stackHeight: 170.0,
+        Keys.stackHeight: 256.0,
         Keys.ringChipWidth: 280.0,
         Keys.ringChipHeight: 56.0,
         Keys.showCopyDate: true,
