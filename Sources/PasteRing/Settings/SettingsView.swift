@@ -84,13 +84,13 @@ struct SettingsView: View {
         NavigationSplitView {
             List(panes, selection: $selection) { pane in
                 HStack {
-                    // Outlined symbols in the accent colour, as in Finder's and Mail's sidebars;
-                    // white on the selected row's highlight.
+                    // White in dark mode (the label colour, so they stay visible in light mode),
+                    // and white on the selected row's highlight.
                     Label {
                         Text(pane.title)
                     } icon: {
                         Image(systemName: pane.symbol)
-                            .foregroundStyle(selection == pane ? Color.white : Color.accentColor)
+                            .foregroundStyle(selection == pane ? Color.white : Color.primary)
                             // Switches with the selection highlight, without fading.
                             .transaction { $0.animation = nil }
                     }
