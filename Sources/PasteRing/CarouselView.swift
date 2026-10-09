@@ -15,6 +15,7 @@ struct CarouselView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ContentCard(item: item, isSelected: distance == 0)
+                            .clipActions(item)
                             .rotation3DEffect(
                                 .degrees(distance == 0 ? 0 : (distance < 0 ? 45 : -45)),
                                 axis: (x: 0, y: 1, z: 0),

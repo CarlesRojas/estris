@@ -5,10 +5,12 @@ import SwiftUI
 struct StackView: View {
     private static let visibleRange = 3
     /// Angle between neighbouring entries on the wheel, in degrees.
-    private static let step: Double = 20
-    private static let radius: CGFloat = 240
+    /// A small, steeply curved wheel: cards stay close together but drop back fast,
+    /// which is what reads as depth.
+    private static let step: Double = 38
+    private static let radius: CGFloat = 130
     /// Distance from the viewer to the front of the wheel. Smaller means stronger depth.
-    private static let perspective: CGFloat = 320
+    private static let perspective: CGFloat = 160
 
     @ObservedObject var state: OverlayState
 
@@ -21,6 +23,7 @@ struct StackView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ClipCard(text: item.text, isSelected: distance == 0, appBundleID: item.sourceBundleID)
+                            .clipActions(item)
                             .modifier(WheelPlacement(
                                 angle: Double(distance) * Self.step,
                                 step: Self.step,
@@ -45,7 +48,7 @@ private struct WheelPlacement: ViewModifier, Animatable {
     let radius: CGFloat
     let perspective: CGFloat
     /// Extra shrink for every card but the current one, so the front one stands out.
-    private let backShrink: CGFloat = 0.18
+    private let backShrink: CGFloat = 0.1
 
     var animatableData: Double {
         get { angle }

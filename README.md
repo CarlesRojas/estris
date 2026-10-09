@@ -8,7 +8,8 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 - Hold `⌘⇧` and press `V` to open the overlay in the middle of the screen. The highlighted entry is what will be pasted.
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
-- `⌘⇧Esc` closes the overlay without pasting.
+- `⌘⇧Esc` closes the overlay without pasting. `⌘⇧Delete` removes the selected entry from the history.
+- Moving the mouse keeps the overlay open after you release `⌘⇧`. Click any entry to paste it, click its trash badge to delete it, or click outside to close. While it stays open, plain Return pastes, Esc closes, arrows move and Delete removes.
 
 ## Settings
 
@@ -22,12 +23,12 @@ Open **Settings…** from the menu bar icon.
 **Appearance** (with a live preview over your wallpaper)
 - **Style**:
   - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
-  - *Stack*: entries ride a vertical wheel, coming forward along a curve as you cycle.
-  - *Carousel*: Cover Flow style, neighbours tilted away on either side.
   - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width is adjustable (default 256).
+  - *Carousel*: Cover Flow style, neighbours tilted away on either side.
+  - *Stack*: entries ride a vertical wheel, coming forward along a curve as you cycle.
   - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
-- **Renderer**: which system API draws the surfaces: SwiftUI material (default), Liquid Glass via SwiftUI or AppKit (macOS 26), or vibrancy (`NSVisualEffectView`, with a choice of material).
-- **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (0%), and **Interactive** for SwiftUI glass.
+- Surfaces use the system's frosted material.
+- **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (0%, fades in and out with the overlay).
 - **Reset to Defaults** resets everything in this tab, including the style and its options.
 
 **History** lists every saved entry. The trash button deletes one, **Clear All** deletes everything.

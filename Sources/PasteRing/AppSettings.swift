@@ -4,9 +4,9 @@ import SwiftUI
 /// Order here is the order shown in Settings.
 enum OverlayStyle: String, CaseIterable, Identifiable {
     case simple
-    case stack
-    case carousel
     case grid
+    case carousel
+    case stack
     case ring
 
     var id: Self { self }

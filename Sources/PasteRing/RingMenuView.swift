@@ -26,8 +26,8 @@ struct RingMenuView: View {
                 let angle = Double(index - state.position) * step
                 let distance = circularDistance(index, count: count)
                 RingChip(item: item, isSelected: distance == 0)
-                    .scaleEffect(distance == 0 ? 1.12 : 0.92)
-                    .modifier(RingPlacement(angle: angle, radius: radius))
+                    .clipActions(item)
+                    .modifier(RingPlacement(angle: angle, step: step, radius: radius))
                     .zIndex(distance == 0 ? 1 : 0)
             }
         }
@@ -50,8 +50,13 @@ struct RingMenuView: View {
 
 /// Puts a chip on the circle with a plain offset, animating the angle so chips travel
 /// along the arc. Avoids rotation transforms, which material backgrounds do not survive.
+/// A chip grows as it nears the top, so the selection swells in while it arrives.
 private struct RingPlacement: ViewModifier, Animatable {
+    private static let topScale: CGFloat = 1.12
+    private static let restScale: CGFloat = 0.92
+
     var angle: Double
+    let step: Double
     let radius: CGFloat
 
     var animatableData: Double {
@@ -61,7 +66,12 @@ private struct RingPlacement: ViewModifier, Animatable {
 
     func body(content: Content) -> some View {
         let radians = angle * .pi / 180
-        return content.offset(x: radius * sin(radians), y: -radius * cos(radians))
+        // Angle from the top, in -180...180, since the raw angle keeps growing as the ring turns.
+        let fromTop = abs(remainder(angle, 360))
+        let nearness = step > 0 ? CGFloat(max(0, 1 - fromTop / step)) : 1
+        return content
+            .scaleEffect(Self.restScale + (Self.topScale - Self.restScale) * nearness)
+            .offset(x: radius * sin(radians), y: -radius * cos(radians))
     }
 }
 

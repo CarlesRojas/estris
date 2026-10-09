@@ -8,10 +8,14 @@ struct OverlayRootView: View {
     var body: some View {
         ZStack {
             Color.black.opacity(appearance.backdropDim)
+                // Clicking anywhere outside the elements closes the overlay.
+                .contentShape(Rectangle())
+                .onTapGesture { state.actions.dismiss() }
             content
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .environmentObject(appearance)
+        .environment(\.overlayActions, state.actions)
     }
 
     private var content: some View {

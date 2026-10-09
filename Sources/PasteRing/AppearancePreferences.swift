@@ -47,26 +47,6 @@ struct AppearancePreferences: View {
                 }
 
                 Section("Surface") {
-                    Picker("Renderer", selection: $appearance.renderer) {
-                        ForEach(SurfaceRenderer.allCases) { renderer in
-                            Text(renderer.title).tag(renderer)
-                        }
-                    }
-                    if appearance.renderer.needsMacOS26 && !supportsLiquidGlass {
-                        Text("Needs macOS 26. Drawing with Material instead.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    if appearance.renderer == .vibrancy {
-                        Picker("Material", selection: $appearance.vibrancyMaterial) {
-                            ForEach(VibrancyMaterial.allCases) { material in
-                                Text(material.title).tag(material)
-                            }
-                        }
-                    }
-                    if appearance.renderer == .swiftUIGlass {
-                        Toggle("Interactive", isOn: $appearance.interactive)
-                    }
                     ColorPicker("Tint", selection: $appearance.tint, supportsOpacity: false)
                     slider("Tint strength", value: $appearance.tintOpacity, in: 0...0.6)
                     slider("Selected highlight", value: $appearance.selectedTintOpacity, in: 0...0.6)
@@ -86,10 +66,6 @@ struct AppearancePreferences: View {
         .frame(width: 600, height: 720)
     }
 
-    private var supportsLiquidGlass: Bool {
-        if #available(macOS 26, *) { return true }
-        return false
-    }
 
     /// Real entries when there are enough, so the preview shows familiar text and icons.
     private var previewItems: [ClipItem] {
@@ -142,7 +118,6 @@ private struct AppearancePreview: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .environmentObject(appearance)
-        .environment(\.surfaceInPreview, true)
     }
 
     @ViewBuilder

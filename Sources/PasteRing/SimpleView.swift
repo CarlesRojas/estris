@@ -27,6 +27,20 @@ struct SimpleView: View {
         .padding(20)
         .frame(width: settings.simpleWidth, height: settings.simpleHeight)
         .surface(cornerRadius: 22)
+        .modifier(OptionalClipActions(item: item))
         .transaction { $0.animation = nil }
+    }
+}
+
+private struct OptionalClipActions: ViewModifier {
+    let item: ClipItem?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let item {
+            content.clipActions(item)
+        } else {
+            content
+        }
     }
 }
