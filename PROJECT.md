@@ -107,7 +107,7 @@ To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager
 
 ## Notes
 
-The app needs Accessibility. Builds are signed with the local "PasteRing Development" certificate (see README.md) so the permission survives rebuilds; an ad-hoc signature changes every build and macOS then forgets it.
+The app needs Accessibility. Builds are signed with an Apple Development certificate (see README.md) so the permission survives rebuilds. An ad-hoc signature changes every build and macOS then forgets it; a self-signed certificate was tried and macOS still kept asking.
 
 
 `⌘⇧V` is also "Paste and Match Style" in some apps. PasteRing takes over that shortcut while running.
