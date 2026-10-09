@@ -13,7 +13,7 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 ## Settings
 
-Open **Settings…** from the menu bar icon. The sidebar (with search) has one pane for the whole app and one per utility.
+Open **Settings…** from the menu bar icon. The sidebar (with search) has one pane for the whole app and one per utility; each utility shows whether it is **On** or **Off** at the right of its row, and its pane starts with a switch to turn it on or off.
 
 **General** (applies to every utility)
 - **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.
@@ -21,7 +21,7 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 - **Language** (English for now), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
 - **About**: version and a short description.
 
-**Clipboard Manager** has two tabs:
+**Clipboard Manager** starts with its on/off switch (off stops recording and frees its shortcuts), then two tabs:
 - **Settings**:
   - *Shortcuts*: the shortcut that opens the overlay (default `⌘⇧V`) and any alternatives. Click one and press a new combination; it needs `⌘`, `⌥` or `⌃`.
   - *History*: how many entries to keep (5 to 500, default 50), and three switches, all on by default:
@@ -85,7 +85,7 @@ Sources/PasteRing/
       Settings/                the Clipboard Manager settings pane and its tabs
 ```
 
-To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, optional `menuItems()` and a `settingsPane()`), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`.
+To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting, optional `menuItems()` and a `settingsPane()` that begins with `UtilityHeader`), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, including its state in `isOn(_:)`.
 
 ## Notes
 

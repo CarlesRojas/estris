@@ -40,12 +40,28 @@ enum SettingsPane: String, CaseIterable, Identifiable {
 }
 
 /// The Settings window: a sidebar with General and one pane per utility.
-/// To add a utility, add a `SettingsPane` case and show its pane here.
+/// To add a utility, add a `SettingsPane` case, show its pane here and report its on/off
+/// state in `isOn(_:)`.
 struct SettingsView: View {
     @ObservedObject var general: GeneralSettings
     let clipboard: ClipboardManager
+    @ObservedObject private var clipboardSettings: ClipboardSettings
     @State private var selection: SettingsPane? = .general
     @State private var search = ""
+
+    init(general: GeneralSettings, clipboard: ClipboardManager) {
+        self.general = general
+        self.clipboard = clipboard
+        clipboardSettings = clipboard.settings
+    }
+
+    /// Whether a utility is switched on; nil for panes that are not a utility.
+    private func isOn(_ pane: SettingsPane) -> Bool? {
+        switch pane {
+        case .general: nil
+        case .clipboard: clipboardSettings.isEnabled
+        }
+    }
 
     private var panes: [SettingsPane] {
         SettingsPane.allCases.filter { $0.matches(search) }
@@ -54,7 +70,13 @@ struct SettingsView: View {
     var body: some View {
         NavigationSplitView {
             List(panes, selection: $selection) { pane in
-                Label(pane.title, systemImage: pane.symbol)
+                HStack {
+                    Label(pane.title, systemImage: pane.symbol)
+                    Spacer()
+                    if let isOn = isOn(pane) {
+                        StatusBadge(isOn: isOn)
+                    }
+                }
             }
             .searchable(text: $search, placement: .sidebar, prompt: "Search")
             .navigationSplitViewColumnWidth(min: 180, ideal: 210)

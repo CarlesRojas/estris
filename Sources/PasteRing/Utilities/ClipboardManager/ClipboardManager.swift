@@ -14,6 +14,7 @@ final class ClipboardManager: NSObject {
     private let overlay: OverlayController
     private var observers: Set<AnyCancellable> = []
     private var hotKeys: [UInt32] = []
+    private var hasStarted = false
 
     init(general: GeneralSettings) {
         monitor = ClipboardMonitor(history: history, settings: settings)
@@ -25,11 +26,31 @@ final class ClipboardManager: NSObject {
         settings.$maxItems
             .sink { [weak self] in self?.history.limit = $0 }
             .store(in: &observers)
+        // Published values arrive before the property changes, so use the value passed in.
+        settings.$isEnabled
+            .removeDuplicates()
+            .sink { [weak self] in self?.setActive($0) }
+            .store(in: &observers)
         // Re-register whenever the shortcuts change in Settings.
         settings.$shortcuts
-            .sink { [weak self] in self?.registerShortcuts($0) }
+            .sink { [weak self] shortcuts in
+                guard let self, self.settings.isEnabled else { return }
+                self.registerShortcuts(shortcuts)
+            }
             .store(in: &observers)
-        monitor.start()
+    }
+
+    /// Turning the utility off stops recording, removes its shortcuts and closes the overlay.
+    private func setActive(_ active: Bool) {
+        if active {
+            monitor.start(recordingCurrent: !hasStarted)
+            registerShortcuts(settings.shortcuts)
+        } else {
+            monitor.stop()
+            registerShortcuts([])
+            overlay.dismiss()
+        }
+        hasStarted = true
     }
 
     private func registerShortcuts(_ shortcuts: [Shortcut]) {

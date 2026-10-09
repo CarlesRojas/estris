@@ -68,6 +68,11 @@ final class OverlayController: NSObject {
         }
     }
 
+    /// Closes the overlay without pasting.
+    func dismiss() {
+        hide()
+    }
+
     private func move(by step: Int) {
         guard !state.items.isEmpty else { return }
         state.position += step

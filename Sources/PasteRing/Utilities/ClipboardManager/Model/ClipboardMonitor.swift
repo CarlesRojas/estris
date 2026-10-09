@@ -25,11 +25,22 @@ final class ClipboardMonitor: NSObject {
         super.init()
     }
 
-    func start() {
-        capture()
+    /// Starts watching. `recordingCurrent` also records what is on the clipboard now; when
+    /// turning back on, it is skipped, since that was copied while switched off.
+    func start(recordingCurrent: Bool) {
+        guard timer == nil else { return }
+        if recordingCurrent {
+            capture()
+        }
+        lastChangeCount = pasteboard.changeCount
         let timer = Timer(timeInterval: 0.4, target: self, selector: #selector(poll), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
+    }
+
+    func stop() {
+        timer?.invalidate()
+        timer = nil
     }
 
     /// Writes text to the pasteboard without recording it as a new entry.

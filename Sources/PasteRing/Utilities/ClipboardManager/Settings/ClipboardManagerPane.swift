@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// The Clipboard Manager's settings pane: Settings and History tabs.
+/// The Clipboard Manager's settings pane: the on/off switch, then Settings and History tabs.
 struct ClipboardManagerPane: View {
     private enum Tab: Hashable {
         case settings
@@ -15,6 +15,15 @@ struct ClipboardManagerPane: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            UtilityHeader(
+                title: "Clipboard Manager",
+                symbol: "doc.on.clipboard",
+                summary: "Keeps what you copy and lets you pick what to paste with a shortcut.",
+                isOn: $clipboard.isEnabled
+            )
+
+            Divider()
+
             Picker("View", selection: $tab) {
                 Text("Settings").tag(Tab.settings)
                 Text("History").tag(Tab.history)

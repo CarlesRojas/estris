@@ -42,6 +42,11 @@ final class ClipboardSettings: ObservableObject {
 
     private let defaults = UserDefaults.standard
 
+    /// The whole utility: recording, the overlay and its shortcuts.
+    @Published var isEnabled: Bool {
+        didSet { defaults.set(isEnabled, forKey: Keys.isEnabled) }
+    }
+
     @Published var maxItems: Int {
         didSet { defaults.set(maxItems, forKey: Keys.maxItems) }
     }
@@ -132,12 +137,14 @@ final class ClipboardSettings: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
+            Keys.isEnabled: true,
             Keys.maxItems: 50,
             Keys.ignorePasswords: true,
             Keys.removeDuplicates: true,
             Keys.moveToTopOnPaste: true,
         ])
         defaults.register(defaults: Self.appearanceDefaults)
+        isEnabled = defaults.bool(forKey: Keys.isEnabled)
         maxItems = defaults.integer(forKey: Keys.maxItems)
         ignorePasswords = defaults.bool(forKey: Keys.ignorePasswords)
         removeDuplicates = defaults.bool(forKey: Keys.removeDuplicates)
@@ -248,6 +255,7 @@ final class ClipboardSettings: ObservableObject {
     }
 
     private enum Keys {
+        static let isEnabled = "clipboardManagerEnabled"
         static let maxItems = "maxItems"
         static let ignorePasswords = "ignorePasswords"
         static let removeDuplicates = "removeDuplicates"
