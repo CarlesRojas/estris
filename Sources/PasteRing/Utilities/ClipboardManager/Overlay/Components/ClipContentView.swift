@@ -40,6 +40,8 @@ struct ClipContentView: View {
     /// Show an image whole inside the space it gets, instead of at full width (for cards
     /// that keep a fixed height).
     var fitsImageInside = false
+    /// Where a fitted image sits in its space.
+    var imageAlignment: Alignment = .center
 
     var body: some View {
         switch item.kind {
@@ -51,7 +53,7 @@ struct ClipContentView: View {
                         .scaledToFit()
                         .clipShape(RoundedRectangle(cornerRadius: singleLine ? 4 : 8, style: .continuous))
                         // Centred in the space it gets; chips keep it next to the app icon.
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: singleLine ? .leading : .center)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: singleLine ? .leading : imageAlignment)
                 } else {
                     // The full width of the card at the image's own aspect ratio; anything
                     // taller than the card is cut off at the bottom.

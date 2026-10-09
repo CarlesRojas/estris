@@ -93,7 +93,7 @@ struct HistoryPreferences: View {
 
             Group {
                 if item.kind == .image {
-                    ClipContentView(item: item, fitsImageInside: true)
+                    ClipContentView(item: item, fitsImageInside: true, imageAlignment: .leading)
                         .frame(height: 140)
                 } else {
                     ClipContentView(item: item)
