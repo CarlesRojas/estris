@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import IOKit.pwr_mgt
+import notify
 import SwiftUI
 
 /// The Keep Awake utility: while on, keeps the Mac and its display awake until it has been
@@ -11,9 +12,14 @@ import SwiftUI
 /// everything it needs, so the app only has to create it and call `start()`.
 @MainActor
 final class KeepAwake {
-    /// How often to look again while another app keeps the display on, as macOS doesn't
-    /// tell when that stops.
-    private static let otherHolderRecheck: TimeInterval = 60
+    /// How often to look again while another app keeps the display on, in case the change
+    /// notice below doesn't arrive.
+    private static let otherHolderRecheck: TimeInterval = 5
+    /// What macOS posts when any app starts or stops keeping the Mac or display awake.
+    private static let assertionNotices = [
+        "com.apple.system.powermanagement.assertions",
+        "com.apple.system.powermanagement.assertions.anychange",
+    ]
 
     let settings = KeepAwakeSettings()
     let status = KeepAwakeStatus()
@@ -21,6 +27,9 @@ final class KeepAwake {
     private lazy var power = PowerSource { [weak self] in self?.evaluate() }
     private var observers: Set<AnyCancellable> = []
     private var wakeTokens: [NSObjectProtocol] = []
+    private var noticeTokens: [Int32] = []
+    /// The apps last seen keeping the display on, to log when that changes.
+    private var displayHolders: [String] = []
     private var assertion: IOPMAssertionID?
     private var timer: Timer?
     /// Watches for input after letting go, to hold again when the Mac is used.
@@ -32,6 +41,13 @@ final class KeepAwake {
 
     func start() {
         power.start()
+        for name in Self.assertionNotices {
+            var token: Int32 = 0
+            let status = notify_register_dispatch(name, &token, .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.evaluate() }
+            }
+            if status == NOTIFY_STATUS_OK { noticeTokens.append(token) }
+        }
         let center = NSWorkspace.shared.notificationCenter
         wakeTokens = [NSWorkspace.screensDidWakeNotification, NSWorkspace.didWakeNotification].map { name in
             center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
@@ -76,7 +92,12 @@ final class KeepAwake {
             return
         }
 
-        let otherHolderActive = Self.otherAppKeepsDisplayOn()
+        let holders = Self.appsKeepingDisplayOn()
+        if holders != displayHolders {
+            log(holders.isEmpty ? "no other app keeps the display on" : "display kept on by \(holders.joined(separator: ", "))")
+            displayHolders = holders
+        }
+        let otherHolderActive = !holders.isEmpty
         if status.otherAppKeepsDisplayOn && !otherHolderActive { status.otherHolderEndedAt = Date() }
         status.otherAppKeepsDisplayOn = otherHolderActive
         if otherHolderActive {
@@ -138,21 +159,23 @@ final class KeepAwake {
         self.assertion = nil
     }
 
-    /// Whether another app keeps the display on, as video players do while playing.
-    private static func otherAppKeepsDisplayOn() -> Bool {
+    /// The other apps keeping the display on, as video players do while playing, by name.
+    private static func appsKeepingDisplayOn() -> [String] {
         var byProcess: Unmanaged<CFDictionary>?
         guard IOPMCopyAssertionsByProcess(&byProcess) == kIOReturnSuccess,
               let assertions = byProcess?.takeRetainedValue() as? [NSNumber: [[String: Any]]]
-        else { return false }
+        else { return [] }
         let displayTypes: Set<String> = [
             kIOPMAssertionTypePreventUserIdleDisplaySleep as String,
             kIOPMAssertionTypeNoDisplaySleep as String,
         ]
-        return assertions.contains { pid, list in
-            pid.int32Value != getpid() && list.contains { assertion in
-                (assertion[kIOPMAssertionTypeKey as String] as? String).map(displayTypes.contains) ?? false
-            }
+        return assertions.compactMap { pid, list -> String? in
+            guard pid.int32Value != getpid(),
+                  list.contains(where: { ($0[kIOPMAssertionTypeKey as String] as? String).map(displayTypes.contains) ?? false })
+            else { return nil }
+            return NSRunningApplication(processIdentifier: pid.int32Value)?.localizedName ?? "process \(pid)"
         }
+        .sorted()
     }
 
     private func log(_ message: String) {
