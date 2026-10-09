@@ -41,6 +41,11 @@ final class MiddleClickSettings: ObservableObject {
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
+    /// Back to a three-finger tap; the on/off switch and excluded apps stay as they are.
+    func reset() {
+        fingers = .three
+    }
+
     private enum Keys {
         static let isEnabled = "middleClickEnabled"
         static let fingers = "middleClickFingers"

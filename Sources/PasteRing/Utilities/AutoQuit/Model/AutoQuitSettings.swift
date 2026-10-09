@@ -61,6 +61,11 @@ final class AutoQuitSettings: ObservableObject {
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
+    /// Back to the default delay; the on/off switch and excluded apps stay as they are.
+    func reset() {
+        delay = .oneSecond
+    }
+
     func keepsRunning(_ bundleID: String?) -> Bool {
         guard let bundleID else { return true }
         return Self.alwaysKept[bundleID] != nil || excludedApps.contains(bundleID)

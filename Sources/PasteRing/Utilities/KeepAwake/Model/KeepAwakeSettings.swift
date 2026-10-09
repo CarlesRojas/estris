@@ -75,6 +75,13 @@ final class KeepAwakeSettings: ObservableObject {
         onBattery = KeepAwakeDuration(rawValue: defaults.string(forKey: Keys.onBattery) ?? "") ?? .oneHour
     }
 
+    /// Back to the default durations and the screen saver; the on/off switch stays.
+    func reset() {
+        onPower = .indefinitely
+        onBattery = .oneHour
+        startsScreenSaver = true
+    }
+
     private enum Keys {
         static let isEnabled = "keepAwakeEnabled"
         static let onPower = "keepAwakeOnPower"

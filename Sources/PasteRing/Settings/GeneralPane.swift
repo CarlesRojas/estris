@@ -94,6 +94,9 @@ struct GeneralPane: View {
                     }
                 }
             }
+            Section {
+                Button("Reset to Defaults") { general.reset() }
+            }
         }
         .formStyle(.grouped)
         .settingsPage()

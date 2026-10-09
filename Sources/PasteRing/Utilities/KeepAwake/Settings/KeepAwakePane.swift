@@ -44,6 +44,9 @@ struct KeepAwakePane: View {
                         }
                     }
                 }
+                Section {
+                    Button("Reset to Defaults") { settings.reset() }
+                }
             }
             .formStyle(.grouped)
             .settingsPage()
