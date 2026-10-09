@@ -13,10 +13,6 @@ struct AppearancePreview: View {
                 ContentCard(item: items[0], isSelected: true, width: 200, height: 120, lineLimit: 3)
                 ContentCard(item: items[1], isSelected: false, width: 200, height: 120, lineLimit: 3)
             }
-            HStack(spacing: 14) {
-                RingChip(item: items[2], isSelected: true)
-                RingChip(item: items[3], isSelected: false)
-            }
             PositionPill(text: "2 of 12")
         }
         .frame(maxWidth: .infinity)

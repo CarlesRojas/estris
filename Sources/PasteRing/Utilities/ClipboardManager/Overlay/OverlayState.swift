@@ -5,6 +5,8 @@ final class OverlayState: ObservableObject {
     @Published var items: [ClipItem] = []
     /// Steps taken since opening. Unbounded so the ring keeps turning the same way when it wraps.
     @Published var position = 0
+    /// Visible size of the screen the overlay opened on, for styles that scale to fit it.
+    @Published var screenSize: CGSize?
     /// Grid tiles fitted to the screen the overlay opened on.
     @Published var gridLayout: GridLayout?
 

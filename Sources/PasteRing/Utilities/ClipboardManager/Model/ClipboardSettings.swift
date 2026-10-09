@@ -68,8 +68,8 @@ final class ClipboardSettings: ObservableObject {
     static let carouselSizeRange: ClosedRange<Double> = 180...420
     static let stackWidthRange: ClosedRange<Double> = 360...800
     static let stackHeightRange: ClosedRange<Double> = 120...360
-    static let ringChipWidthRange: ClosedRange<Double> = 200...420
-    static let ringChipHeightRange: ClosedRange<Double> = 40...140
+    static let ringChipWidthRange: ClosedRange<Double> = 160...480
+    static let ringChipHeightRange: ClosedRange<Double> = 80...480
 
     private let defaults = UserDefaults.standard
 
@@ -254,7 +254,7 @@ final class ClipboardSettings: ObservableObject {
         Keys.stackWidth: 520.0,
         Keys.stackHeight: 256.0,
         Keys.ringChipWidth: 280.0,
-        Keys.ringChipHeight: 56.0,
+        Keys.ringChipHeight: 256.0,
         Keys.showCopyDate: true,
         Keys.showDeleteButton: true,
         Keys.showQuickPickKeys: true,

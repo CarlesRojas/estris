@@ -94,6 +94,7 @@ final class OverlayController: NSObject {
             state.items = Array(history.items.prefix(visibleLimit))
             state.position = 0
             state.gridLayout = gridLayout
+            state.screenSize = screen?.visibleFrame.size
         }
         scrollAccumulator = 0
         lastScrollStep = .distantPast

@@ -12,26 +12,21 @@ struct RingMenuView: View {
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
-    @Environment(\.overlayActions) private var actions
 
     var body: some View {
         let count = state.items.count
         let step = count > 0 ? 360 / Double(count) : 0
         let chipWidth = CGFloat(settings.ringChipWidth)
         let chipHeight = CGFloat(settings.ringChipHeight)
-        // Chips holding an image are taller; the ring is spaced for the tallest one.
-        let heights: [CGFloat] = state.items.map {
-            RingChip.fittedHeight(for: $0, width: chipWidth, height: chipHeight, cornerReserve: actions.cornerReserve)
-        }
-        let layoutHeight = heights.max() ?? chipHeight
-        let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: layoutHeight)
-        let selectedHeight = heights.indices.contains(state.selected) ? heights[state.selected] : chipHeight
+        let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: chipHeight)
+        let size = CGSize(width: (radii.width + chipWidth * 0.6) * 2, height: (radii.height + chipHeight + 30) * 2)
+        let scale = fitScale(for: size)
 
         ZStack {
-            // Above the selected chip at the top of the ring (drawn 1.12 times larger there).
+            // Above the selected card at the top of the ring (drawn 1.12 times larger there).
             if let position = state.positionText {
                 PositionPill(text: position)
-                    .offset(y: -radii.height - selectedHeight * 1.12 / 2 - 26)
+                    .offset(y: -radii.height - chipHeight * 1.12 / 2 - 26)
             }
 
             if count == 0 {
@@ -44,14 +39,24 @@ struct RingMenuView: View {
                 // Position is unbounded, so the angle keeps turning the same way past the last entry.
                 let angle = Double(index - state.position) * step
                 let distance = circularDistance(index, count: count)
-                RingChip(item: item, isSelected: distance == 0, width: chipWidth, height: chipHeight)
-                    .clipActions(item, trashInset: 6)
+                // Laid out like a grid tile: app on top, content below.
+                ContentCard(item: item, isSelected: distance == 0, width: chipWidth, height: chipHeight, lineLimit: nil)
+                    .clipActions(item, trashInset: 16)
                     .modifier(RingPlacement(angle: angle, step: step, radii: radii))
                     .zIndex(distance == 0 ? 1 : 0)
             }
         }
-        .frame(width: (radii.width + chipWidth * 0.6) * 2, height: (radii.height + layoutHeight + 30) * 2)
+        .frame(width: size.width, height: size.height)
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.position)
+        // A ring of tall cards can be bigger than the screen: shrink it as a whole to fit.
+        .scaleEffect(scale)
+        .frame(width: size.width * scale, height: size.height * scale)
+    }
+
+    private func fitScale(for size: CGSize) -> CGFloat {
+        guard let screen = state.screenSize, size.width > 0, size.height > 0 else { return 1 }
+        let margin: CGFloat = 60
+        return min(1, (screen.width - margin) / size.width, (screen.height - margin) / size.height)
     }
 
     /// Smallest ellipse (horizontal and vertical radius) on which no two chips overlap.
