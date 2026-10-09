@@ -16,12 +16,12 @@ enum SettingsPane: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .general: "General"
-        case .clipboard: "Clipboard"
-        case .autoQuit: "Auto Quit"
-        case .middleClick: "Middle Click"
-        case .remap: "Remap"
-        case .developer: "Developer"
+        case .general: String(localized: "General")
+        case .clipboard: String(localized: "Clipboard")
+        case .autoQuit: String(localized: "Auto Quit")
+        case .middleClick: String(localized: "Middle Click")
+        case .remap: String(localized: "Remap")
+        case .developer: String(localized: "Developer")
         }
     }
 

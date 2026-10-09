@@ -6,7 +6,7 @@ import SwiftUI
 struct UtilityHeader: View {
     let title: String
     let symbol: String
-    let summary: String
+    let summary: LocalizedStringKey
     var isOn: Binding<Bool>?
 
     var body: some View {
@@ -53,7 +53,7 @@ struct StatusBadge: View {
     var onSelectedRow = false
 
     var body: some View {
-        Text(isOn ? "On" : "Off")
+        Text(isOn ? String(localized: "On") : String(localized: "Off"))
             .font(.caption.weight(.semibold))
             .foregroundStyle(foreground)
             .padding(.horizontal, 8)
@@ -64,7 +64,7 @@ struct StatusBadge: View {
                     Capsule().strokeBorder(Color.white.opacity(0.6), lineWidth: 1)
                 }
             }
-            .accessibilityLabel(isOn ? "On" : "Off")
+            .accessibilityLabel(isOn ? String(localized: "On") : String(localized: "Off"))
     }
 
     private var foreground: Color {

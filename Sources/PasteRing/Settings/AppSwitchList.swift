@@ -38,7 +38,7 @@ struct AppSwitchList: View {
                         }
                     }
                 } header: {
-                    Text(excluded.isEmpty ? "No apps excluded" : (excluded.count == 1 ? "1 app excluded" : "\(excluded.count) apps excluded"))
+                    Text(excluded.isEmpty ? String(localized: "No apps excluded") : (excluded.count == 1 ? String(localized: "1 app excluded") : String(localized: "\(excluded.count) apps excluded")))
                 }
             }
             .formStyle(.grouped)

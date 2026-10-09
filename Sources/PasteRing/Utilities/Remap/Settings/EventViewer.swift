@@ -26,7 +26,7 @@ struct EventViewer: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(log.events.isEmpty ? "No events yet" : "\(log.events.count) events")
+                Text(log.events.isEmpty ? String(localized: "No events yet") : String(localized: "\(log.events.count) events"))
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button("Clear") { log.clear() }
@@ -72,7 +72,7 @@ struct EventViewer: View {
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
                 .frame(width: 90, alignment: .leading)
-            Text(event.phase.rawValue)
+            Text(LocalizedStringKey(event.phase.rawValue))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(event.phase == .down ? Color.accentColor : .secondary)
                 .frame(width: 40, alignment: .leading)

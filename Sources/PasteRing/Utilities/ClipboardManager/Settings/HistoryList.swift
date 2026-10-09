@@ -57,11 +57,11 @@ struct HistoryPreferences: View {
     }
 
     private var countText: String {
-        let total = history.items.count == 1 ? "1 entry" : "\(history.items.count) entries"
-        return search.isEmpty ? total : "\(results.count) of \(total)"
+        let total = history.items.count == 1 ? String(localized: "1 entry") : String(localized: "\(history.items.count) entries")
+        return search.isEmpty ? total : String(localized: "\(results.count) of \(total)")
     }
 
-    private func placeholder(_ text: String) -> some View {
+    private func placeholder(_ text: LocalizedStringKey) -> some View {
         Text(text)
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity)

@@ -14,11 +14,11 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .simple: "Default"
-        case .stack: "Stack"
-        case .carousel: "Carousel"
-        case .grid: "Grid"
-        case .ring: "Ring menu"
+        case .simple: String(localized: "Default")
+        case .stack: String(localized: "Stack")
+        case .carousel: String(localized: "Carousel")
+        case .grid: String(localized: "Grid")
+        case .ring: String(localized: "Ring menu")
         }
     }
 }
@@ -35,11 +35,11 @@ enum HistoryExpiry: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .never: "Never"
-        case .hour: "After 1 hour"
-        case .day: "After 1 day"
-        case .week: "After 1 week"
-        case .month: "After 30 days"
+        case .never: String(localized: "Never")
+        case .hour: String(localized: "After 1 hour")
+        case .day: String(localized: "After 1 day")
+        case .week: String(localized: "After 1 week")
+        case .month: String(localized: "After 30 days")
         }
     }
 

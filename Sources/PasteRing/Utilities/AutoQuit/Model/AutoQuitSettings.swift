@@ -11,10 +11,10 @@ enum QuitDelay: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .immediately: "Immediately"
-        case .oneSecond: "After 1 second"
-        case .fiveSeconds: "After 5 seconds"
-        case .thirtySeconds: "After 30 seconds"
+        case .immediately: String(localized: "Immediately")
+        case .oneSecond: String(localized: "After 1 second")
+        case .fiveSeconds: String(localized: "After 5 seconds")
+        case .thirtySeconds: String(localized: "After 30 seconds")
         }
     }
 
@@ -33,7 +33,7 @@ enum QuitDelay: String, CaseIterable, Identifiable {
 final class AutoQuitSettings: ObservableObject {
     /// Apps that must keep running without windows, with the reason shown in Settings.
     static let alwaysKept: [String: String] = [
-        "com.apple.finder": "The Finder always keeps running",
+        "com.apple.finder": String(localized: "The Finder always keeps running"),
     ]
 
     private let defaults = UserDefaults.standard

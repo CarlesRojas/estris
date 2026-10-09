@@ -12,6 +12,8 @@ struct KeyInfo {
         case symbols = "Symbols"
         case keypad = "Keypad"
         case other = "Other"
+
+        var title: String { localized(rawValue) }
     }
 
     /// Usage page in the upper 32 bits, usage in the lower, as key mappings take it.
@@ -43,33 +45,33 @@ enum KeyCatalog {
             add(0x1E + UInt64(index), code, "\((index + 1) % 10)", .numbers)
         }
 
-        add(0xE3, 0x37, "Left Command", .modifiers)
-        add(0xE7, 0x36, "Right Command", .modifiers)
-        add(0xE2, 0x3A, "Left Option", .modifiers)
-        add(0xE6, 0x3D, "Right Option", .modifiers)
-        add(0xE0, 0x3B, "Left Control", .modifiers)
-        add(0xE4, 0x3E, "Right Control", .modifiers)
-        add(0xE1, 0x38, "Left Shift", .modifiers)
-        add(0xE5, 0x3C, "Right Shift", .modifiers)
-        add(0x39, 0x39, "Caps Lock", .modifiers)
+        add(0xE3, 0x37, String(localized: "Left Command"), .modifiers)
+        add(0xE7, 0x36, String(localized: "Right Command"), .modifiers)
+        add(0xE2, 0x3A, String(localized: "Left Option"), .modifiers)
+        add(0xE6, 0x3D, String(localized: "Right Option"), .modifiers)
+        add(0xE0, 0x3B, String(localized: "Left Control"), .modifiers)
+        add(0xE4, 0x3E, String(localized: "Right Control"), .modifiers)
+        add(0xE1, 0x38, String(localized: "Left Shift"), .modifiers)
+        add(0xE5, 0x3C, String(localized: "Right Shift"), .modifiers)
+        add(0x39, 0x39, String(localized: "Caps Lock"), .modifiers)
         add(KeyCatalog.fnUsage, 0x3F, "fn", .modifiers)
 
-        add(0x28, 0x24, "Return", .editing)
-        add(0x2B, 0x30, "Tab", .editing)
-        add(0x2C, 0x31, "Space", .editing)
-        add(0x2A, 0x33, "Delete", .editing)
-        add(0x4C, 0x75, "Forward Delete", .editing)
-        add(0x29, 0x35, "Escape", .editing)
-        add(0x49, 0x72, "Insert", .editing)
+        add(0x28, 0x24, String(localized: "Return"), .editing)
+        add(0x2B, 0x30, String(localized: "Tab"), .editing)
+        add(0x2C, 0x31, String(localized: "Space"), .editing)
+        add(0x2A, 0x33, String(localized: "Delete"), .editing)
+        add(0x4C, 0x75, String(localized: "Forward Delete"), .editing)
+        add(0x29, 0x35, String(localized: "Escape"), .editing)
+        add(0x49, 0x72, String(localized: "Insert"), .editing)
 
-        add(0x52, 0x7E, "Up Arrow", .navigation)
-        add(0x51, 0x7D, "Down Arrow", .navigation)
-        add(0x50, 0x7B, "Left Arrow", .navigation)
-        add(0x4F, 0x7C, "Right Arrow", .navigation)
-        add(0x4A, 0x73, "Home", .navigation)
-        add(0x4D, 0x77, "End", .navigation)
-        add(0x4B, 0x74, "Page Up", .navigation)
-        add(0x4E, 0x79, "Page Down", .navigation)
+        add(0x52, 0x7E, String(localized: "Up Arrow"), .navigation)
+        add(0x51, 0x7D, String(localized: "Down Arrow"), .navigation)
+        add(0x50, 0x7B, String(localized: "Left Arrow"), .navigation)
+        add(0x4F, 0x7C, String(localized: "Right Arrow"), .navigation)
+        add(0x4A, 0x73, String(localized: "Home"), .navigation)
+        add(0x4D, 0x77, String(localized: "End"), .navigation)
+        add(0x4B, 0x74, String(localized: "Page Up"), .navigation)
+        add(0x4E, 0x79, String(localized: "Page Down"), .navigation)
 
         let functionCodes: [CGKeyCode?] = [0x7A, 0x78, 0x63, 0x76, 0x60, 0x61, 0x62, 0x64, 0x65, 0x6D, 0x67, 0x6F]
         for (index, code) in functionCodes.enumerated() {
@@ -80,42 +82,47 @@ enum KeyCatalog {
             add(0x68 + UInt64(index), code, "F\(index + 13)", .function)
         }
 
-        add(0x2D, 0x1B, "- (Minus)", .symbols)
-        add(0x2E, 0x18, "= (Equals)", .symbols)
-        add(0x2F, 0x21, "[ (Left Bracket)", .symbols)
-        add(0x30, 0x1E, "] (Right Bracket)", .symbols)
-        add(0x31, 0x2A, "\\ (Backslash)", .symbols)
-        add(0x33, 0x29, "; (Semicolon)", .symbols)
-        add(0x34, 0x27, "' (Quote)", .symbols)
-        add(0x35, 0x32, "` (Grave Accent)", .symbols)
-        add(0x36, 0x2B, ", (Comma)", .symbols)
-        add(0x37, 0x2F, ". (Period)", .symbols)
-        add(0x38, 0x2C, "/ (Slash)", .symbols)
-        add(0x64, 0x0A, "§ (Section)", .symbols)
+        add(0x2D, 0x1B, String(localized: "- (Minus)"), .symbols)
+        add(0x2E, 0x18, String(localized: "= (Equals)"), .symbols)
+        add(0x2F, 0x21, String(localized: "[ (Left Bracket)"), .symbols)
+        add(0x30, 0x1E, String(localized: "] (Right Bracket)"), .symbols)
+        add(0x31, 0x2A, String(localized: "\\ (Backslash)"), .symbols)
+        add(0x33, 0x29, String(localized: "; (Semicolon)"), .symbols)
+        add(0x34, 0x27, String(localized: "' (Quote)"), .symbols)
+        add(0x35, 0x32, String(localized: "` (Grave Accent)"), .symbols)
+        add(0x36, 0x2B, String(localized: ", (Comma)"), .symbols)
+        add(0x37, 0x2F, String(localized: ". (Period)"), .symbols)
+        add(0x38, 0x2C, String(localized: "/ (Slash)"), .symbols)
+        add(0x64, 0x0A, String(localized: "§ (Section)"), .symbols)
 
         let keypadCodes: [CGKeyCode] = [0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5B, 0x5C]
         for (index, code) in keypadCodes.enumerated() {
-            add(0x59 + UInt64(index), code, "Keypad \(index + 1)", .keypad)
+            add(0x59 + UInt64(index), code, keypad("\(index + 1)"), .keypad)
         }
-        add(0x62, 0x52, "Keypad 0", .keypad)
-        add(0x63, 0x41, "Keypad .", .keypad)
-        add(0x58, 0x4C, "Keypad Enter", .keypad)
-        add(0x57, 0x45, "Keypad +", .keypad)
-        add(0x56, 0x4E, "Keypad -", .keypad)
-        add(0x55, 0x43, "Keypad *", .keypad)
-        add(0x54, 0x4B, "Keypad /", .keypad)
-        add(0x67, 0x51, "Keypad =", .keypad)
-        add(0x53, 0x47, "Keypad Clear", .keypad)
+        add(0x62, 0x52, keypad("0"), .keypad)
+        add(0x63, 0x41, keypad("."), .keypad)
+        add(0x58, 0x4C, String(localized: "Keypad Enter"), .keypad)
+        add(0x57, 0x45, keypad("+"), .keypad)
+        add(0x56, 0x4E, keypad("-"), .keypad)
+        add(0x55, 0x43, keypad("*"), .keypad)
+        add(0x54, 0x4B, keypad("/"), .keypad)
+        add(0x67, 0x51, keypad("="), .keypad)
+        add(0x53, 0x47, String(localized: "Keypad Clear"), .keypad)
 
-        add(0x46, nil, "Print Screen", .other)
-        add(0x47, nil, "Scroll Lock", .other)
-        add(0x48, nil, "Pause", .other)
-        add(0x65, 0x6E, "Menu", .other)
-        add(0x7F, 0x4A, "Mute", .other)
-        add(0x80, 0x48, "Volume Up", .other)
-        add(0x81, 0x49, "Volume Down", .other)
+        add(0x46, nil, String(localized: "Print Screen"), .other)
+        add(0x47, nil, String(localized: "Scroll Lock"), .other)
+        add(0x48, nil, String(localized: "Pause"), .other)
+        add(0x65, 0x6E, String(localized: "Menu"), .other)
+        add(0x7F, 0x4A, String(localized: "Mute"), .other)
+        add(0x80, 0x48, String(localized: "Volume Up"), .other)
+        add(0x81, 0x49, String(localized: "Volume Down"), .other)
         return keys
     }()
+
+    /// "Keypad 1", "Keypad +" and so on, in the app's language.
+    private static func keypad(_ label: String) -> String {
+        String(localized: "Keypad \(label)")
+    }
 
     private static let byUsage = Dictionary(KeyCatalog.all.map { ($0.usage, $0) }, uniquingKeysWith: { first, _ in first })
     private static let byKeyCode = Dictionary(KeyCatalog.all.compactMap { key in key.keyCode.map { ($0, key) } }, uniquingKeysWith: { first, _ in first })
@@ -125,7 +132,7 @@ enum KeyCatalog {
 
     /// A readable name for any key, listed or not.
     static func name(usage: UInt64) -> String {
-        key(usage: usage)?.name ?? String(format: "Key 0x%llX", usage)
+        key(usage: usage)?.name ?? String(localized: "Key \(String(format: "0x%llX", usage))")
     }
 
     /// The device-specific flag each modifier key sets while held, telling left from right.
@@ -150,12 +157,12 @@ enum KeyCatalog {
 enum MouseButtons {
     static func name(_ number: Int) -> String {
         switch number {
-        case 0: "Left Button"
-        case 1: "Right Button"
-        case 2: "Middle Button"
-        case 3: "Button 4 (Back)"
-        case 4: "Button 5 (Forward)"
-        default: "Button \(number + 1)"
+        case 0: String(localized: "Left Button")
+        case 1: String(localized: "Right Button")
+        case 2: String(localized: "Middle Button")
+        case 3: String(localized: "Button 4 (Back)")
+        case 4: String(localized: "Button 5 (Forward)")
+        default: String(localized: "Button \(number + 1)")
         }
     }
 

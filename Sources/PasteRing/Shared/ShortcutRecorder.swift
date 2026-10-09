@@ -13,11 +13,11 @@ struct ShortcutRecorder: View {
         Button {
             isRecording ? stop() : start()
         } label: {
-            Text(isRecording ? "Press keys…" : shortcut.displayString)
+            Text(isRecording ? String(localized: "Press keys…") : shortcut.displayString)
                 .monospacedDigit()
                 .frame(minWidth: 90)
         }
-        .help(isRecording ? "Press the new shortcut, or Esc to cancel" : "Click to change")
+        .help(isRecording ? String(localized: "Press the new shortcut, or Esc to cancel") : String(localized: "Click to change"))
         .onDisappear(perform: stop)
     }
 

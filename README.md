@@ -16,3 +16,8 @@ Only builds `build/PasteRing.app`, without opening it.
 tccutil reset Accessibility com.carlesrojas.PasteRing
 ```
 Run once after the signing certificate changes, then grant Accessibility again.
+
+```sh
+python3 scripts/check-localization.py
+```
+Checks every visible string is translated in every language.

@@ -110,7 +110,7 @@ private struct MappingsView: View {
     /// "<name> Mappings", with a pencil to rename the device.
     private func header(_ device: InputDevice) -> some View {
         HStack(spacing: 6) {
-            Label("\(device.name) Mappings" + (device.isConnected ? "" : " (not connected)"), systemImage: device.symbol)
+            Label(device.isConnected ? String(localized: "\(device.name) Mappings") : String(localized: "\(device.name) Mappings (not connected)"), systemImage: device.symbol)
             Button {
                 newName = device.name
                 renaming = device
@@ -195,7 +195,7 @@ private struct InputButton: View {
     @State private var isPicking = false
 
     var body: some View {
-        Button(input?.title ?? "Choose…") { isPicking = true }
+        Button(input?.title ?? String(localized: "Choose…")) { isPicking = true }
             .frame(minWidth: 160, alignment: .leading)
             .popover(isPresented: $isPicking, arrowEdge: .bottom) {
                 InputPicker(remap: remap, device: device) { input in
@@ -214,7 +214,7 @@ private struct OutputButton: View {
     @State private var isPicking = false
 
     var body: some View {
-        Button(output?.title ?? "Choose…") { isPicking = true }
+        Button(output?.title ?? String(localized: "Choose…")) { isPicking = true }
             .frame(minWidth: 160, alignment: .leading)
             .popover(isPresented: $isPicking, arrowEdge: .bottom) {
                 ChoiceList(sections: Choices.outputs(for: input)) { output in

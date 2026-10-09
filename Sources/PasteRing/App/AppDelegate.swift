@@ -38,11 +38,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         title.isEnabled = false
         menu.addItem(title)
         menu.addItem(.separator())
-        menu.addItem(makeItem("Settings…", #selector(openSettings), key: ","))
+        menu.addItem(makeItem(String(localized: "Settings…"), #selector(openSettings), key: ","))
         menu.addItem(.separator())
         clipboard.menuItems().forEach(menu.addItem)
         menu.addItem(.separator())
-        menu.addItem(makeItem("Quit PasteRing", #selector(quit), key: "q"))
+        menu.addItem(makeItem(String(localized: "Quit PasteRing"), #selector(quit), key: "q"))
         statusItem.menu = menu
     }
 

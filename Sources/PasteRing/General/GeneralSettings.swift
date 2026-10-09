@@ -1,14 +1,44 @@
 import Foundation
 import SwiftUI
 
+/// The app's language. Translations live in Resources/Localization, one folder per language.
 enum AppLanguage: String, CaseIterable, Identifiable {
+    case system
     case english = "en"
+    case spanish = "es"
+    case french = "fr"
+    case portuguese = "pt-BR"
+    case german = "de"
+    case italian = "it"
+    case catalan = "ca"
 
     var id: Self { self }
 
+    /// Each language in itself, so it can be found whatever language the app is in.
     var title: String {
         switch self {
+        case .system: String(localized: "Same as System")
         case .english: "English"
+        case .spanish: "Español"
+        case .french: "Français"
+        case .portuguese: "Português (Brasil)"
+        case .german: "Deutsch"
+        case .italian: "Italiano"
+        case .catalan: "Català"
+        }
+    }
+
+    /// The locale dates are written in.
+    var locale: Locale {
+        self == .system ? .current : Locale(identifier: rawValue)
+    }
+
+    /// Makes macOS load this language for PasteRing from the next launch.
+    func apply() {
+        if self == .system {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.set([rawValue], forKey: "AppleLanguages")
         }
     }
 }
@@ -41,9 +71,9 @@ enum TimeStyle: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .system: "System setting"
-        case .twentyFourHour: "24-hour"
-        case .twelveHour: "12-hour"
+        case .system: String(localized: "System setting")
+        case .twentyFourHour: String(localized: "24-hour")
+        case .twelveHour: String(localized: "12-hour")
         }
     }
 }
@@ -54,8 +84,14 @@ final class GeneralSettings: ObservableObject {
     private let defaults = UserDefaults.standard
 
     @Published var language: AppLanguage {
-        didSet { defaults.set(language.rawValue, forKey: Keys.language) }
+        didSet {
+            defaults.set(language.rawValue, forKey: Keys.language)
+            language.apply()
+        }
     }
+
+    /// The language PasteRing started in; a change applies after relaunching.
+    let launchLanguage: AppLanguage
 
     @Published var dateStyle: DateStyle {
         didSet { defaults.set(dateStyle.rawValue, forKey: Keys.dateStyle) }
@@ -72,7 +108,9 @@ final class GeneralSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        language = AppLanguage(rawValue: defaults.string(forKey: Keys.language) ?? "") ?? .english
+        let language = AppLanguage(rawValue: defaults.string(forKey: Keys.language) ?? "") ?? .system
+        self.language = language
+        launchLanguage = language
         dateStyle = DateStyle(rawValue: defaults.string(forKey: Keys.dateStyle) ?? "") ?? .monthDay
         timeStyle = TimeStyle(rawValue: defaults.string(forKey: Keys.timeStyle) ?? "") ?? .system
         showsDeveloperSettings = defaults.bool(forKey: Keys.showsDeveloperSettings)

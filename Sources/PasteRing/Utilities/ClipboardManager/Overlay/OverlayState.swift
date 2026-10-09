@@ -20,7 +20,7 @@ final class OverlayState: ObservableObject {
 
     /// "2 of 12" for the position pill; nil when there is nothing to show.
     var positionText: String? {
-        items.isEmpty ? nil : "\(selected + 1) of \(items.count)"
+        items.isEmpty ? nil : String(localized: "\(selected + 1) of \(items.count)")
     }
 
     var selectedItem: ClipItem? {

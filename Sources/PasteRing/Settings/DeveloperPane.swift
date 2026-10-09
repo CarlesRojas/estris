@@ -45,7 +45,7 @@ struct DeveloperPane: View {
             Form {
                 Section {
                     if results.isEmpty {
-                        Text(log.entries.isEmpty ? "Nothing logged yet." : "No entries match \u{201C}\(search)\u{201D}")
+                        Text(log.entries.isEmpty ? String(localized: "Nothing logged yet.") : String(localized: "No entries match \u{201C}\(search)\u{201D}"))
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -69,7 +69,7 @@ struct DeveloperPane: View {
                     }
                 } header: {
                     HStack {
-                        Text(log.entries.count == 1 ? "1 entry" : "\(log.entries.count) entries")
+                        Text(log.entries.count == 1 ? String(localized: "1 entry") : String(localized: "\(log.entries.count) entries"))
                         Spacer()
                         Button("Copy All") {
                             NSPasteboard.general.clearContents()
@@ -90,7 +90,7 @@ struct DeveloperPane: View {
         Form {
             Section {
                 LabeledContent("Accessibility") {
-                    Text(AXIsProcessTrusted() ? "Granted" : "Not granted")
+                    Text(AXIsProcessTrusted() ? String(localized: "Granted") : String(localized: "Not granted"))
                         .foregroundStyle(.secondary)
                 }
             } header: {

@@ -32,6 +32,8 @@ enum SystemAction: String, CaseIterable, Codable {
         case media = "Media"
         case display = "Display and Keyboard"
         case system = "System"
+
+        var title: String { localized(rawValue) }
     }
 
     var section: Section {
@@ -45,30 +47,30 @@ enum SystemAction: String, CaseIterable, Codable {
 
     var title: String {
         switch self {
-        case .missionControl: "Mission Control"
-        case .appWindows: "App Windows"
-        case .showDesktop: "Show Desktop"
-        case .launchpad: "Launchpad"
-        case .nextDesktop: "Next Desktop"
-        case .previousDesktop: "Previous Desktop"
-        case .volumeUp: "Volume Up"
-        case .volumeDown: "Volume Down"
-        case .mute: "Mute"
-        case .playPause: "Play or Pause"
-        case .nextTrack: "Next Track"
-        case .previousTrack: "Previous Track"
-        case .brightnessUp: "Brightness Up"
-        case .brightnessDown: "Brightness Down"
-        case .keyboardBrightnessUp: "Keyboard Brightness Up"
-        case .keyboardBrightnessDown: "Keyboard Brightness Down"
-        case .sleepDisplay: "Sleep Display"
-        case .lockScreen: "Lock Screen"
-        case .spotlight: "Spotlight"
-        case .screenshot: "Screenshot Tools"
-        case .screenshotSelection: "Screenshot of Selection"
-        case .screenshotScreen: "Screenshot of Screen"
-        case .emojiPicker: "Emoji and Symbols"
-        case .forceQuit: "Force Quit Applications"
+        case .missionControl: String(localized: "Mission Control")
+        case .appWindows: String(localized: "App Windows")
+        case .showDesktop: String(localized: "Show Desktop")
+        case .launchpad: String(localized: "Launchpad")
+        case .nextDesktop: String(localized: "Next Desktop")
+        case .previousDesktop: String(localized: "Previous Desktop")
+        case .volumeUp: String(localized: "Volume Up")
+        case .volumeDown: String(localized: "Volume Down")
+        case .mute: String(localized: "Mute")
+        case .playPause: String(localized: "Play or Pause")
+        case .nextTrack: String(localized: "Next Track")
+        case .previousTrack: String(localized: "Previous Track")
+        case .brightnessUp: String(localized: "Brightness Up")
+        case .brightnessDown: String(localized: "Brightness Down")
+        case .keyboardBrightnessUp: String(localized: "Keyboard Brightness Up")
+        case .keyboardBrightnessDown: String(localized: "Keyboard Brightness Down")
+        case .sleepDisplay: String(localized: "Sleep Display")
+        case .lockScreen: String(localized: "Lock Screen")
+        case .spotlight: String(localized: "Spotlight")
+        case .screenshot: String(localized: "Screenshot Tools")
+        case .screenshotSelection: String(localized: "Screenshot of Selection")
+        case .screenshotScreen: String(localized: "Screenshot of Screen")
+        case .emojiPicker: String(localized: "Emoji and Symbols")
+        case .forceQuit: String(localized: "Force Quit Applications")
         }
     }
 
@@ -152,21 +154,21 @@ enum SystemAction: String, CaseIterable, Codable {
     /// Names for the special keys, by the number macOS gives them, for the Event Viewer.
     static func mediaKeyName(_ key: Int) -> String {
         switch key {
-        case 0: "Volume Up"
-        case 1: "Volume Down"
-        case 2: "Brightness Up"
-        case 3: "Brightness Down"
-        case 7: "Mute"
-        case 14: "Eject"
-        case 16: "Play or Pause"
-        case 17: "Next Track"
-        case 18: "Previous Track"
-        case 19: "Fast Forward"
-        case 20: "Rewind"
-        case 21: "Keyboard Brightness Up"
-        case 22: "Keyboard Brightness Down"
-        case 23: "Keyboard Backlight Toggle"
-        default: "Special Key \(key)"
+        case 0: String(localized: "Volume Up")
+        case 1: String(localized: "Volume Down")
+        case 2: String(localized: "Brightness Up")
+        case 3: String(localized: "Brightness Down")
+        case 7: String(localized: "Mute")
+        case 14: String(localized: "Eject")
+        case 16: String(localized: "Play or Pause")
+        case 17: String(localized: "Next Track")
+        case 18: String(localized: "Previous Track")
+        case 19: String(localized: "Fast Forward")
+        case 20: String(localized: "Rewind")
+        case 21: String(localized: "Keyboard Brightness Up")
+        case 22: String(localized: "Keyboard Brightness Down")
+        case 23: String(localized: "Keyboard Backlight Toggle")
+        default: String(localized: "Special Key \(key)")
         }
     }
 }

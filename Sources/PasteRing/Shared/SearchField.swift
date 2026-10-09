@@ -15,7 +15,7 @@ struct SearchField: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSSearchField {
         let field = NSSearchField()
-        field.placeholderString = prompt
+        field.placeholderString = Bundle.main.localizedString(forKey: prompt, value: nil, table: nil)
         field.delegate = context.coordinator
         field.drawsBackground = true
         field.backgroundColor = Self.fill
