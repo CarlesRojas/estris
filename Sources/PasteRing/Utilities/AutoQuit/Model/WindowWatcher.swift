@@ -5,22 +5,22 @@ import ApplicationServices
 /// polling.
 ///
 /// Every regular app gets an Accessibility observer. It hears when the app creates or
-/// focuses windows (each window is then watched for being destroyed), and when a watched
-/// window is destroyed the app's windows are looked at a few times over the next couple of
-/// seconds. If the app has none left, it is checked once more after the chosen delay and
-/// then asked to quit (a normal quit, so unsaved changes can still be saved).
+/// focuses windows (each window is then watched for being destroyed). When a watched window
+/// is destroyed, the app's other windows are looked at right away, leaving out the one that
+/// closed. If none are left, the app is asked to quit after the chosen delay (a normal quit,
+/// so unsaved changes can still be saved).
 ///
 /// Left alone: apps never seen with a window, menu bar and background apps, hidden apps,
 /// excluded apps, and apps that may still have a window the Accessibility API can't see,
 /// such as one on another desktop.
 @MainActor
 final class WindowWatcher {
-    /// Looks after a window is destroyed. A closing window stays on screen while it fades
-    /// out, so one early look can still see it; later looks catch it gone.
+    /// Later looks, used only when the first one can't decide (the app didn't answer, or
+    /// still lists the closed window).
     private static let checkOffsets: [TimeInterval] = [0.35, 1.0, 2.2]
     /// Leaving full screen destroys the full-screen window a moment before the normal one
-    /// comes back, so an empty app is always confirmed once more before quitting.
-    private static let minimumConfirmDelay: TimeInterval = 1.2
+    /// comes back, so closing a full-screen window is always confirmed after this long.
+    private static let fullScreenConfirmDelay: TimeInterval = 1.2
     /// Longest any single Accessibility request may block, so a busy app can't freeze us.
     private static let messagingTimeout: Float = 0.35
     /// Smaller windows (tool tips, helper panels) don't count as an app's window.
@@ -37,6 +37,8 @@ final class WindowWatcher {
     private var observers: [pid_t: AXObserver] = [:]
     /// Apps seen with at least one window since watching started.
     private var hadWindows: Set<pid_t> = []
+    /// Each app's windows that were last seen in full screen.
+    private var fullScreenWindows: [pid_t: [AXUIElement]] = [:]
     /// Last time a round of checks was scheduled per app, so closing several windows at
     /// once schedules one round.
     private var lastCheckRound: [pid_t: Date] = [:]
@@ -89,6 +91,7 @@ final class WindowWatcher {
         workspaceTokens = []
         Array(observers.keys).forEach(detach)
         hadWindows = []
+        fullScreenWindows = [:]
         lastCheckRound = [:]
         attachRetries = []
         windowRetries = [:]
@@ -160,6 +163,7 @@ final class WindowWatcher {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
         }
         hadWindows.remove(pid)
+        fullScreenWindows[pid] = nil
         lastCheckRound[pid] = nil
         attachRetries.remove(pid)
         windowRetries[pid] = nil
@@ -183,8 +187,9 @@ final class WindowWatcher {
             let added = AXObserverAddNotification(observer, window, kAXUIElementDestroyedNotification as CFString, refcon)
             if added == .success || added == .notificationAlreadyRegistered { watched += 1 }
         }
+        fullScreenWindows[pid] = windows.filter(Self.isFullScreen)
         // The window server may show a window the Accessibility API doesn't list yet.
-        let hasWindow = !windows.isEmpty || Self.hasWindowServerWindow(pid: pid)
+        let hasWindow = !windows.isEmpty || Self.hasWindowServerWindow(pid: pid, offscreenOnly: false)
         if hasWindow, hadWindows.insert(pid).inserted {
             log("\(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"): watching \(watched) of \(max(windows.count, 1)) window(s)")
         }
@@ -213,7 +218,11 @@ final class WindowWatcher {
         guard let pid = observers.first(where: { CFEqual($0.value, observer) })?.key else { return }
         if notification == kAXUIElementDestroyedNotification as String {
             log("\(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"): a window closed")
-            scheduleChecks(pid: pid)
+            let wasFullScreen = fullScreenWindows[pid]?.contains { CFEqual($0, element) } ?? false
+            fullScreenWindows[pid]?.removeAll { CFEqual($0, element) }
+            if !check(pid: pid, closed: element, wasFullScreen: wasFullScreen) {
+                scheduleChecks(pid: pid)
+            }
         } else {
             watchWindows(pid: pid, observer: observer)
         }
@@ -227,34 +236,57 @@ final class WindowWatcher {
         lastCheckRound[pid] = now
         for offset in Self.checkOffsets {
             DispatchQueue.main.asyncAfter(deadline: .now() + offset) { [weak self] in
-                self?.check(pid: pid, confirming: false)
+                self?.check(pid: pid, closed: nil, wasFullScreen: false)
             }
         }
     }
 
-    private func check(pid: pid_t, confirming: Bool) {
-        guard isRunning, let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated else { return }
+    /// Looks at the app's windows, leaving out `closed`, the window that was just destroyed
+    /// (it can still be listed and on screen while it fades out). Returns false when the
+    /// look can't decide and should be repeated later.
+    @discardableResult
+    private func check(pid: pid_t, closed: AXUIElement?, wasFullScreen: Bool) -> Bool {
+        guard isRunning, let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated else { return true }
         let name = app.localizedName ?? "pid \(pid)"
-        // Logged so a quit that doesn't happen can be traced in Console (search "Auto Quit").
-        guard hadWindows.contains(pid) else { return log("\(name): never seen with a window") }
-        guard !app.isHidden else { return log("\(name): hidden, left running") }
-        guard !settings.keepsRunning(app.bundleIdentifier) else { return log("\(name): excluded") }
-        guard !Self.isBackgroundApp(app) else { return log("\(name): menu bar or background app") }
-        if let windows = Self.standardWindows(pid: pid) {
-            guard windows.isEmpty else { return log("\(name): still has \(windows.count) window(s)") }
-        } else {
-            return log("\(name): didn't answer, left running")
+        guard hadWindows.contains(pid) else { log("\(name): never seen with a window"); return true }
+        guard !app.isHidden else { log("\(name): hidden, left running"); return true }
+        guard !settings.keepsRunning(app.bundleIdentifier) else { log("\(name): excluded"); return true }
+        guard !Self.isBackgroundApp(app) else { log("\(name): menu bar or background app"); return true }
+        guard let windows = Self.standardWindows(pid: pid) else {
+            log("\(name): didn't answer, looking again shortly")
+            return false
         }
-        guard !Self.hasWindowServerWindow(pid: pid) else { return log("\(name): window server still shows a window") }
+        let others = windows.filter { window in closed.map { !CFEqual(window, $0) } ?? true }
+        guard others.isEmpty else {
+            log("\(name): still has \(others.count) window(s)")
+            // Closing one of several windows is settled; still listing only the closed one isn't.
+            return others.count < windows.count || windows.count > 1
+        }
+        // Everything on this desktop is listed above, so right after a close the window
+        // server is only asked about other desktops; the fading window is still on screen.
+        guard !Self.hasWindowServerWindow(pid: pid, offscreenOnly: closed != nil) else {
+            log("\(name): window server still shows a window")
+            return true
+        }
 
-        guard confirming else {
-            let delay = max(Self.minimumConfirmDelay, settings.delay.interval)
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-                self?.check(pid: pid, confirming: true)
-            }
-            return
+        let delay = wasFullScreen ? max(Self.fullScreenConfirmDelay, settings.delay.interval) : settings.delay.interval
+        guard delay > 0 else {
+            quit(app, name: name)
+            return true
         }
-        hadWindows.remove(pid)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self, self.isRunning, !app.isTerminated, self.hadWindows.contains(pid) else { return }
+            // The closed window is gone by now, so this look counts every window again.
+            guard let windows = Self.standardWindows(pid: pid), windows.isEmpty,
+                  !Self.hasWindowServerWindow(pid: pid, offscreenOnly: false)
+            else { return self.log("\(name): a window came back, left running") }
+            self.quit(app, name: name)
+        }
+        return true
+    }
+
+    private func quit(_ app: NSRunningApplication, name: String) {
+        hadWindows.remove(app.processIdentifier)
         log("\(name): no windows left, quitting")
         app.terminate()
     }
@@ -289,7 +321,7 @@ final class WindowWatcher {
     /// An off-screen window counts only when it has a title, which macOS reports for other
     /// apps' windows only with the Screen Recording permission; without it, a window on
     /// another desktop can't be told apart from a hidden one.
-    private static func hasWindowServerWindow(pid: pid_t) -> Bool {
+    private static func hasWindowServerWindow(pid: pid_t, offscreenOnly: Bool) -> Bool {
         guard let list = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
             return false
         }
@@ -303,11 +335,17 @@ final class WindowWatcher {
                   width >= minimumWindowSide, height >= minimumWindowSide
             else { return false }
             if (window[kCGWindowIsOnscreen as String] as? NSNumber)?.boolValue == true {
-                return true
+                return !offscreenOnly
             }
             let title = window[kCGWindowName as String] as? String ?? ""
             return !title.isEmpty
         }
+    }
+
+    private static func isFullScreen(_ window: AXUIElement) -> Bool {
+        var value: CFTypeRef?
+        AXUIElementCopyAttributeValue(window, "AXFullScreen" as CFString, &value)
+        return (value as? Bool) == true
     }
 
     /// Menu bar and background-only apps take a Dock icon only while a window such as
