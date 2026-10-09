@@ -26,7 +26,6 @@ final class KeepAwake {
     private lazy var power = PowerSource { [weak self] in self?.evaluate() }
     private var observers: Set<AnyCancellable> = []
     private var wakeTokens: [NSObjectProtocol] = []
-    private var noticeTokens: [Int32] = []
     /// The apps last seen keeping the display on, to log when that changes.
     private var displayHolders: [String] = []
     private var assertion: IOPMAssertionID?
@@ -40,12 +39,16 @@ final class KeepAwake {
 
     func start() {
         power.start()
+        let observer = Unmanaged.passUnretained(self).toOpaque()
         for name in Self.assertionNotices {
-            var token: Int32 = 0
-            let status = notify_register_dispatch(name, &token, .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.evaluate() }
-            }
-            if status == NOTIFY_STATUS_OK { noticeTokens.append(token) }
+            CFNotificationCenterAddObserver(
+                CFNotificationCenterGetDarwinNotifyCenter(),
+                observer,
+                assertionsChanged,
+                name as CFString,
+                nil,
+                .deliverImmediately
+            )
         }
         let center = NSWorkspace.shared.notificationCenter
         wakeTokens = [NSWorkspace.screensDidWakeNotification, NSWorkspace.didWakeNotification].map { name in
@@ -179,5 +182,25 @@ final class KeepAwake {
 
     private func log(_ message: String) {
         appLog.record(message, source: "Keep Awake")
+    }
+
+    fileprivate func assertionsDidChange() {
+        evaluate()
+    }
+}
+
+/// Plain C function for the notice that power assertions changed; Keep Awake comes back
+/// through the observer pointer. Darwin notices are delivered on the main thread.
+private func assertionsChanged(
+    _ center: CFNotificationCenter?,
+    _ observer: UnsafeMutableRawPointer?,
+    _ name: CFNotificationName?,
+    _ object: UnsafeRawPointer?,
+    _ userInfo: CFDictionary?
+) {
+    guard let observer else { return }
+    let keepAwake = Unmanaged<KeepAwake>.fromOpaque(observer).takeUnretainedValue()
+    DispatchQueue.main.async {
+        MainActor.assumeIsolated { keepAwake.assertionsDidChange() }
     }
 }
