@@ -91,7 +91,8 @@ struct SettingsView: View {
                     } icon: {
                         Image(systemName: pane.symbol)
                             .foregroundStyle(selection == pane ? Color.white : Color.accentColor)
-                            .animation(.easeInOut(duration: 0.2), value: selection)
+                            // Switches with the selection highlight, without fading.
+                            .transaction { $0.animation = nil }
                     }
                     Spacer()
                     if let isOn = isOn(pane) {
