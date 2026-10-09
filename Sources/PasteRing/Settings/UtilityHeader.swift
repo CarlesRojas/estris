@@ -37,18 +37,17 @@ struct UtilityHeader: View {
 
 /// The on/off state shown at the right of a sidebar row.
 struct StatusBadge: View {
-    /// The system green in light mode. In dark mode the system green is too bright for white
-    /// text, so a deeper green keeps it readable (about 5:1).
-    private static let onColor = Color(nsColor: NSColor(name: nil) { appearance in
-        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-            ? NSColor(srgbRed: 0.10, green: 0.48, blue: 0.20, alpha: 1)
-            : .systemGreen
+    /// White in dark mode and black in light mode, with the text the opposite.
+    private static let onFill = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? .white : .black
+    })
+    private static let onText = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? .black : .white
     })
 
     let isOn: Bool
-    /// On the selected row's coloured highlight, the badge turns white like the row's text
-    /// and icon, instead of putting green on blue: solid white with black text when on, a
-    /// faint white outline when off.
+    /// On the selected row's coloured highlight it is always white with black text when on,
+    /// and a faint white outline when off.
     var onSelectedRow = false
 
     var body: some View {
@@ -70,7 +69,7 @@ struct StatusBadge: View {
         switch (onSelectedRow, isOn) {
         case (true, true): .black
         case (true, false): .white.opacity(0.85)
-        case (false, true): .white
+        case (false, true): Self.onText
         case (false, false): .secondary
         }
     }
@@ -79,7 +78,7 @@ struct StatusBadge: View {
         switch (onSelectedRow, isOn) {
         case (true, true): .white
         case (true, false): .clear
-        case (false, true): Self.onColor
+        case (false, true): Self.onFill
         case (false, false): Color.secondary.opacity(0.2)
         }
     }
