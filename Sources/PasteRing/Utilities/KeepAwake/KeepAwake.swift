@@ -1,7 +1,6 @@
 import AppKit
 import Combine
 import IOKit.pwr_mgt
-import notify
 import SwiftUI
 
 /// The Keep Awake utility: while on, keeps the Mac and its display awake until it has been
