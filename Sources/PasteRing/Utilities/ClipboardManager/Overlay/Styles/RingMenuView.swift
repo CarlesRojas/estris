@@ -81,7 +81,7 @@ struct RingPlacement: ViewModifier, Animatable {
     private static let farScale: CGFloat = 0.5
     /// How unevenly cards are spread: positive packs them closer together towards the
     /// bottom (further away, smaller) and spreads them out near the top. Below 1.
-    private static let spacingSkew: Double = 0.4
+    private static let spacingSkew: Double = 0.2
 
     var angle: Double
     let step: Double
