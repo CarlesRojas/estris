@@ -7,16 +7,10 @@ final class OverlayState: ObservableObject {
     @Published var items: [ClipItem] = []
     /// Steps taken since opening. Unbounded so the ring keeps turning the same way when it wraps.
     @Published var position = 0
-    /// The entry that just left the front by moving forward one step. Set in the same update
-    /// as the position, so styles can animate it separately without a frame of lag.
-    @Published var departing: Departure?
+    /// Grid tiles fitted to the screen the overlay opened on.
+    @Published var gridLayout: GridLayout?
 
     var actions = OverlayActions()
-
-    struct Departure: Equatable {
-        let item: ClipItem
-        let id = UUID()
-    }
 
     var selected: Int {
         items.isEmpty ? 0 : (position % items.count + items.count) % items.count
@@ -24,6 +18,29 @@ final class OverlayState: ObservableObject {
 
     var selectedItem: ClipItem? {
         items.indices.contains(selected) ? items[selected] : nil
+    }
+
+    struct Slot: Identifiable {
+        let id: String
+        let item: ClipItem
+        let distance: Int
+    }
+
+    /// Places each entry at its circular distance from the selection, for styles that loop.
+    /// `lap` is part of the identity, so an entry that wraps to the other end leaves and
+    /// re-enters (with its transition) instead of sweeping across the selection.
+    func circularSlots(within range: ClosedRange<Int>) -> [Slot] {
+        let count = items.count
+        guard count > 0 else { return [] }
+        let lowest = -(count - 1) / 2
+        return items.enumerated().compactMap { index, item in
+            let raw = index - position
+            let shifted = raw - lowest
+            let lap = shifted >= 0 ? shifted / count : -((-shifted + count - 1) / count)
+            let distance = raw - lap * count
+            guard range.contains(distance) else { return nil }
+            return Slot(id: "\(item.id)-\(lap)", item: item, distance: distance)
+        }
     }
 }
 
@@ -88,20 +105,25 @@ final class OverlayController: NSObject {
 
     private func move(by step: Int) {
         guard !state.items.isEmpty else { return }
-        let leavingFront = step == 1 && state.items.count > 1 ? state.selectedItem : nil
-        state.departing = leavingFront.map { OverlayState.Departure(item: $0) }
         state.position += step
     }
 
     private func show() {
-        let visibleLimit = settings.visibleLimit ?? history.items.count
+        let screen = screenWithMouse()
+        var visibleLimit = settings.visibleLimit ?? history.items.count
+        var gridLayout: GridLayout?
+        if settings.style == .grid, let size = screen?.visibleFrame.size {
+            let layout = GridLayout.fitting(settings, in: size)
+            visibleLimit = min(visibleLimit, layout.rows * GridLayout.columns)
+            gridLayout = layout
+        }
         // Reset without animating, so the overlay opens already on the first entry.
         var transaction = Transaction()
         transaction.disablesAnimations = true
         withTransaction(transaction) {
             state.items = Array(history.items.prefix(visibleLimit))
             state.position = 0
-            state.departing = nil
+            state.gridLayout = gridLayout
         }
         scrollAccumulator = 0
         lastScrollStep = .distantPast
@@ -110,7 +132,7 @@ final class OverlayController: NSObject {
 
         if !panel.isVisible {
             panel.alphaValue = 0
-            panel.present(on: screenWithMouse())
+            panel.present(on: screen)
         }
         NSAnimationContext.runAnimationGroup { context in
             context.duration = Self.fadeDuration
@@ -168,7 +190,6 @@ final class OverlayController: NSObject {
     private func delete(_ item: ClipItem) {
         guard let index = state.items.firstIndex(of: item) else { return }
         let selected = state.selected
-        state.departing = nil
         history.remove(item)
         state.items.remove(at: index)
         guard !state.items.isEmpty else {

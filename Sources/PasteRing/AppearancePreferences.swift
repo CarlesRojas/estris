@@ -42,7 +42,11 @@ struct AppearancePreferences: View {
                                 Text("\(settings.gridSize) most recent entries")
                             }
                         }
-                        slider("Card width", value: $settings.gridCardWidth, in: AppSettings.gridCardWidthRange, percent: false)
+                        slider("Width", value: $settings.gridCardWidth, in: AppSettings.gridCardWidthRange, percent: false)
+                        slider("Height", value: $settings.gridCardHeight, in: AppSettings.gridCardHeightRange, percent: false)
+                        Text("Shows fewer rows, and narrower tiles, when they would not fit the screen.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
 
                     if settings.style == .ring {

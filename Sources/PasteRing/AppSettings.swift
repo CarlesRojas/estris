@@ -27,11 +27,12 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
 final class AppSettings: ObservableObject {
     static let maxItemsRange = 5...500
     static let ringSizeRange = 3...12
-    static let gridColumns = 4
+    static let gridColumns = GridLayout.columns
     static let gridSizeRange = 8...24
     static let simpleWidthRange: ClosedRange<Double> = 360...900
     static let simpleHeightRange: ClosedRange<Double> = 120...420
     static let gridCardWidthRange: ClosedRange<Double> = 160...420
+    static let gridCardHeightRange: ClosedRange<Double> = 90...300
     static let carouselSizeRange: ClosedRange<Double> = 180...420
     static let stackWidthRange: ClosedRange<Double> = 360...800
     static let stackHeightRange: ClosedRange<Double> = 120...360
@@ -56,6 +57,10 @@ final class AppSettings: ObservableObject {
 
     @Published var gridCardWidth: Double {
         didSet { defaults.set(gridCardWidth, forKey: Keys.gridCardWidth) }
+    }
+
+    @Published var gridCardHeight: Double {
+        didSet { defaults.set(gridCardHeight, forKey: Keys.gridCardHeight) }
     }
 
     @Published var carouselWidth: Double {
@@ -102,6 +107,7 @@ final class AppSettings: ObservableObject {
         ringSize = defaults.integer(forKey: Keys.ringSize)
         gridSize = defaults.integer(forKey: Keys.gridSize)
         gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
+        gridCardHeight = defaults.double(forKey: Keys.gridCardHeight)
         simpleWidth = defaults.double(forKey: Keys.simpleWidth)
         simpleHeight = defaults.double(forKey: Keys.simpleHeight)
         carouselWidth = defaults.double(forKey: Keys.carouselWidth)
@@ -129,6 +135,7 @@ final class AppSettings: ObservableObject {
         Keys.ringSize: 12,
         Keys.gridSize: 12,
         Keys.gridCardWidth: 256.0,
+        Keys.gridCardHeight: 130.0,
         Keys.simpleWidth: 560.0,
         Keys.simpleHeight: 256.0,
         Keys.carouselWidth: 260.0,
@@ -147,6 +154,7 @@ final class AppSettings: ObservableObject {
         ringSize = defaults.integer(forKey: Keys.ringSize)
         gridSize = defaults.integer(forKey: Keys.gridSize)
         gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
+        gridCardHeight = defaults.double(forKey: Keys.gridCardHeight)
         simpleWidth = defaults.double(forKey: Keys.simpleWidth)
         simpleHeight = defaults.double(forKey: Keys.simpleHeight)
         carouselWidth = defaults.double(forKey: Keys.carouselWidth)
@@ -170,6 +178,7 @@ final class AppSettings: ObservableObject {
         static let ringSize = "ringSize"
         static let gridSize = "gridSize"
         static let gridCardWidth = "gridCardWidth"
+        static let gridCardHeight = "gridCardHeight"
         static let simpleWidth = "simpleWidth"
         static let simpleHeight = "simpleHeight"
         static let carouselWidth = "carouselWidth"
