@@ -19,6 +19,22 @@ struct AppearancePreferences: View {
                         }
                     }
 
+                    if settings.style == .simple {
+                        slider("Width", value: $settings.simpleWidth, in: AppSettings.simpleWidthRange, percent: false)
+                        slider("Height", value: $settings.simpleHeight, in: AppSettings.simpleHeightRange, percent: false)
+                    }
+
+                    if settings.style == .grid {
+                        LabeledContent("Grid shows") {
+                            HStack {
+                                Stepper("Grid shows", value: settings.clamped(\.gridSize, to: AppSettings.gridSizeRange), in: AppSettings.gridSizeRange, step: AppSettings.gridColumns)
+                                    .labelsHidden()
+                                Text("\(settings.gridSize) most recent entries")
+                            }
+                        }
+                        slider("Card width", value: $settings.gridCardWidth, in: AppSettings.gridCardWidthRange, percent: false)
+                    }
+
                     if settings.style == .ring {
                         LabeledContent("Ring shows") {
                             HStack {

@@ -1,14 +1,16 @@
 import SwiftUI
 
-/// Vertical stack: the selected entry in the middle, neighbours above and below.
+/// Vertical wheel: entries ride a circle that curves away from you, so the next one comes
+/// forward and up into the front. Cards always face you; depth shows as size and overlap.
 struct StackView: View {
     private static let visibleRange = 3
-
-    private static let spacing: CGFloat = 8
-    private static let fallbackHeight: CGFloat = 50
+    /// Angle between neighbouring entries on the wheel, in degrees.
+    private static let step: Double = 34
+    private static let radius: CGFloat = 240
+    /// Distance from the viewer to the front of the wheel. Smaller means stronger depth.
+    private static let perspective: CGFloat = 320
 
     @ObservedObject var state: OverlayState
-    @State private var heights: [UUID: CGFloat] = [:]
 
     var body: some View {
         ZStack {
@@ -19,50 +21,39 @@ struct StackView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ClipCard(text: item.text, isSelected: distance == 0, appBundleID: item.sourceBundleID)
-                            .background(GeometryReader { proxy in
-                                Color.clear.preference(key: CardHeights.self, value: [item.id: proxy.size.height])
-                            })
-                            .scaleEffect(scale(distance))
-                            .offset(y: offset(for: index))
+                            .modifier(WheelPlacement(
+                                angle: Double(distance) * Self.step,
+                                radius: Self.radius,
+                                perspective: Self.perspective
+                            ))
                             .zIndex(Double(-abs(distance)))
                     }
                 }
             }
         }
-        .frame(width: 640, height: 480)
-        .onPreferenceChange(CardHeights.self) { heights = $0 }
-        .animation(.spring(response: 0.25, dampingFraction: 0.85), value: state.selected)
-    }
-
-    private func scale(_ distance: Int) -> CGFloat {
-        let scales: [CGFloat] = [1.0, 0.8, 0.68, 0.58]
-        return scales[min(abs(distance), 3)]
-    }
-
-    /// Stacks cards edge to edge (after scaling) outward from the selected one.
-    private func offset(for index: Int) -> CGFloat {
-        let step = index > state.selected ? 1 : -1
-        var y: CGFloat = 0
-        var current = state.selected
-        while current != index {
-            let next = current + step
-            y += halfHeight(current) + halfHeight(next) + Self.spacing
-            current = next
-        }
-        return CGFloat(step) * y
-    }
-
-    private func halfHeight(_ index: Int) -> CGFloat {
-        let height = heights[state.items[index].id] ?? Self.fallbackHeight
-        return height * scale(index - state.selected) / 2
+        .frame(width: 640, height: 560)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: state.selected)
     }
 }
 
-private struct CardHeights: PreferenceKey {
-    static let defaultValue: [UUID: CGFloat] = [:]
+/// Places a card on the wheel. Animating the angle (not the resulting offset and scale)
+/// makes cards travel along the curve instead of in a straight line.
+private struct WheelPlacement: ViewModifier, Animatable {
+    var angle: Double
+    let radius: CGFloat
+    let perspective: CGFloat
 
-    static func reduce(value: inout [UUID: CGFloat], nextValue: () -> [UUID: CGFloat]) {
-        value.merge(nextValue()) { $1 }
+    var animatableData: Double {
+        get { angle }
+        set { angle = newValue }
+    }
+
+    func body(content: Content) -> some View {
+        let radians = angle * .pi / 180
+        let depth = radius * (1 - cos(radians))
+        return content
+            .scaleEffect(perspective / (perspective + depth))
+            .offset(y: radius * sin(radians))
     }
 }
 
@@ -73,13 +64,14 @@ struct ClipCard: View {
     var showsIcon = true
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(alignment: .top, spacing: 14) {
             if showsIcon {
                 AppIconView(bundleID: appBundleID, size: 30)
             }
-            Text(displayText)
-                .font(isSelected ? .title3.weight(.semibold) : .body)
-                .lineLimit(isSelected ? 4 : 1)
+            // Same font size and line limit front and back, so a card keeps its height as it moves.
+            Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
+                .font(.title3.weight(isSelected ? .semibold : .regular))
+                .lineLimit(4)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -87,12 +79,6 @@ struct ClipCard: View {
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
         .surface(cornerRadius: 20, isSelected: isSelected)
-    }
-
-    /// Unselected cards show one line, so collapse newlines to keep the preview meaningful.
-    private var displayText: String {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        return isSelected ? trimmed : text.singleLine
     }
 }
 

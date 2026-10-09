@@ -68,7 +68,7 @@ final class OverlayController: NSObject {
     }
 
     private func show() {
-        let visibleLimit = settings.style == .ring ? settings.ringSize : history.items.count
+        let visibleLimit = settings.visibleLimit ?? history.items.count
         // Reset without animating, so the overlay opens already on the first entry.
         var transaction = Transaction()
         transaction.disablesAnimations = true

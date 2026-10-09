@@ -1,22 +1,23 @@
 import Foundation
 import SwiftUI
 
+/// Order here is the order shown in Settings.
 enum OverlayStyle: String, CaseIterable, Identifiable {
-    case stack
-    case ring
-    case carousel
     case simple
+    case stack
+    case carousel
     case grid
+    case ring
 
     var id: Self { self }
 
     var title: String {
         switch self {
+        case .simple: "Default"
         case .stack: "Stack"
-        case .ring: "Ring menu"
         case .carousel: "Carousel"
-        case .simple: "Simple"
         case .grid: "Grid"
+        case .ring: "Ring menu"
         }
     }
 }
@@ -26,6 +27,11 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
 final class AppSettings: ObservableObject {
     static let maxItemsRange = 5...500
     static let ringSizeRange = 3...12
+    static let gridColumns = 4
+    static let gridSizeRange = 8...24
+    static let simpleWidthRange: ClosedRange<Double> = 360...900
+    static let simpleHeightRange: ClosedRange<Double> = 120...420
+    static let gridCardWidthRange: ClosedRange<Double> = 160...320
 
     private let defaults = UserDefaults.standard
 
@@ -38,16 +44,54 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(ringSize, forKey: Keys.ringSize) }
     }
 
+    /// How many of the most recent entries the grid shows, all at once. A multiple of the columns.
+    @Published var gridSize: Int {
+        didSet { defaults.set(gridSize, forKey: Keys.gridSize) }
+    }
+
+    @Published var gridCardWidth: Double {
+        didSet { defaults.set(gridCardWidth, forKey: Keys.gridCardWidth) }
+    }
+
+    @Published var simpleWidth: Double {
+        didSet { defaults.set(simpleWidth, forKey: Keys.simpleWidth) }
+    }
+
+    @Published var simpleHeight: Double {
+        didSet { defaults.set(simpleHeight, forKey: Keys.simpleHeight) }
+    }
+
     @Published var style: OverlayStyle {
         didSet { defaults.set(style.rawValue, forKey: Keys.style) }
     }
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [Keys.maxItems: 50, Keys.ringSize: 8, Keys.style: OverlayStyle.stack.rawValue])
+        defaults.register(defaults: [
+            Keys.maxItems: 50,
+            Keys.ringSize: 8,
+            Keys.gridSize: 12,
+            Keys.gridCardWidth: 200.0,
+            Keys.simpleWidth: 560.0,
+            Keys.simpleHeight: 200.0,
+            Keys.style: OverlayStyle.simple.rawValue,
+        ])
         maxItems = defaults.integer(forKey: Keys.maxItems)
         ringSize = defaults.integer(forKey: Keys.ringSize)
-        style = OverlayStyle(rawValue: defaults.string(forKey: Keys.style) ?? "") ?? .stack
+        gridSize = defaults.integer(forKey: Keys.gridSize)
+        gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
+        simpleWidth = defaults.double(forKey: Keys.simpleWidth)
+        simpleHeight = defaults.double(forKey: Keys.simpleHeight)
+        style = OverlayStyle(rawValue: defaults.string(forKey: Keys.style) ?? "") ?? .simple
+    }
+
+    /// How many entries the overlay shows for the current style.
+    var visibleLimit: Int? {
+        switch style {
+        case .ring: ringSize
+        case .grid: gridSize
+        case .simple, .stack, .carousel: nil
+        }
     }
 
     /// Binding that keeps typed or stepped values inside `range`.
@@ -61,6 +105,10 @@ final class AppSettings: ObservableObject {
     private enum Keys {
         static let maxItems = "maxItems"
         static let ringSize = "ringSize"
+        static let gridSize = "gridSize"
+        static let gridCardWidth = "gridCardWidth"
+        static let simpleWidth = "simpleWidth"
+        static let simpleHeight = "simpleHeight"
         static let style = "overlayStyle"
     }
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Cover Flow style: the selected card faces you, the others tilt away on either side.
-/// Uses solid cards, since glass breaks under the 3D tilt.
+/// Tilted cards are solid, since glass and blur break under the 3D tilt.
 struct CarouselView: View {
     private static let visibleRange = 3
 
@@ -16,6 +16,8 @@ struct CarouselView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ContentCard(item: item, isSelected: distance == 0)
+                            // Backdrop effects break under the 3D tilt, so only the front card uses one.
+                            .environment(\.surfaceIsSolid, distance != 0)
                             .rotation3DEffect(
                                 .degrees(distance == 0 ? 0 : (distance < 0 ? 45 : -45)),
                                 axis: (x: 0, y: 1, z: 0),
@@ -23,14 +25,12 @@ struct CarouselView: View {
                             )
                             .scaleEffect(distance == 0 ? 1 : 0.82)
                             .offset(x: offset(distance))
-                            .opacity(opacity(distance))
                             .zIndex(Double(-abs(distance)))
                     }
                 }
             }
         }
         .frame(width: 900, height: 340)
-        .environment(\.surfaceIsSolid, true)
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.selected)
     }
 
@@ -38,11 +38,6 @@ struct CarouselView: View {
         guard distance != 0 else { return 0 }
         let magnitude = 190 + CGFloat(abs(distance) - 1) * 80
         return distance < 0 ? -magnitude : magnitude
-    }
-
-    private func opacity(_ distance: Int) -> Double {
-        let opacities: [Double] = [1.0, 0.75, 0.45, 0.2]
-        return opacities[min(abs(distance), 3)]
     }
 }
 

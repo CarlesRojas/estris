@@ -20,8 +20,8 @@ struct OverlayRootView: View {
             case .stack: StackView(state: state)
             case .ring: RingMenuView(state: state)
             case .carousel: CarouselView(state: state)
-            case .simple: SimpleView(state: state)
-            case .grid: GridView(state: state)
+            case .simple: SimpleView(state: state, settings: settings)
+            case .grid: GridView(state: state, settings: settings)
             }
 
             if !state.items.isEmpty {

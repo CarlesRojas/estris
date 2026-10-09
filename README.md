@@ -21,13 +21,13 @@ Open **Settings…** from the menu bar icon.
 
 **Appearance** (with a live preview over your wallpaper)
 - **Style**:
-  - *Stack*: vertical list, selected entry in the middle.
+  - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
+  - *Stack*: entries ride a vertical wheel, coming forward along a curve as you cycle.
+  - *Carousel*: Cover Flow style, neighbours tilted away on either side.
+  - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width is adjustable.
   - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
-  - *Carousel*: Cover Flow style, neighbours turned away on either side.
-  - *Simple*: one rectangle with the entry that will be pasted; cycling only swaps the text.
-  - *Grid*: pages of 12 tiles, the page follows the selection.
-- **Renderer**: which system API draws the surfaces: Liquid Glass via SwiftUI or AppKit (macOS 26), vibrancy (`NSVisualEffectView`, with a choice of material) or SwiftUI material.
-- **Tint**, **Tint strength**, **Selected highlight**, **Shadow**, **Dim screen**, and **Interactive** for SwiftUI glass.
+- **Renderer**: which system API draws the surfaces: SwiftUI material (default), Liquid Glass via SwiftUI or AppKit (macOS 26), or vibrancy (`NSVisualEffectView`, with a choice of material).
+- **Tint** (default black), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (0%), and **Interactive** for SwiftUI glass.
 
 **History** lists every saved entry. The trash button deletes one, **Clear All** deletes everything.
 

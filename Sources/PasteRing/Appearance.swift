@@ -75,20 +75,20 @@ final class AppearanceSettings: ObservableObject {
     private static let key = "appearance"
 
     private struct Stored: Codable {
-        var renderer = SurfaceRenderer.swiftUIGlass.rawValue
+        var renderer = SurfaceRenderer.material.rawValue
         var vibrancyMaterial = VibrancyMaterial.hudWindow.rawValue
-        var tint: [Double] = [1, 1, 1]
-        var tintOpacity = 0.0
-        var selectedTintOpacity = 0.12
+        var tint: [Double] = [0, 0, 0]
+        var tintOpacity = 0.2
+        var selectedTintOpacity = 0.3
         var interactive = false
-        var shadowRadius = 0.0
+        var shadowRadius = 16.0
         var backdropDim = 0.0
     }
 
     init() {
         let stored = UserDefaults.standard.data(forKey: Self.key)
             .flatMap { try? JSONDecoder().decode(Stored.self, from: $0) } ?? Stored()
-        renderer = SurfaceRenderer(rawValue: stored.renderer) ?? .swiftUIGlass
+        renderer = SurfaceRenderer(rawValue: stored.renderer) ?? .material
         vibrancyMaterial = VibrancyMaterial(rawValue: stored.vibrancyMaterial) ?? .hudWindow
         tint = Self.color(from: stored.tint)
         tintOpacity = stored.tintOpacity
@@ -100,7 +100,7 @@ final class AppearanceSettings: ObservableObject {
 
     func reset() {
         let defaults = Stored()
-        renderer = SurfaceRenderer(rawValue: defaults.renderer) ?? .swiftUIGlass
+        renderer = SurfaceRenderer(rawValue: defaults.renderer) ?? .material
         vibrancyMaterial = VibrancyMaterial(rawValue: defaults.vibrancyMaterial) ?? .hudWindow
         tint = Self.color(from: defaults.tint)
         tintOpacity = defaults.tintOpacity
@@ -131,7 +131,7 @@ final class AppearanceSettings: ObservableObject {
     }
 
     private static func color(from components: [Double]) -> Color {
-        guard components.count == 3 else { return .white }
+        guard components.count == 3 else { return .black }
         return Color(.sRGB, red: components[0], green: components[1], blue: components[2])
     }
 
@@ -182,18 +182,19 @@ private struct Surface: ViewModifier {
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        if isSolid {
-            content
-                .background(shape.fill(tint ?? .clear))
-                .background(shape.fill(Color(nsColor: .windowBackgroundColor)))
-                .shadow(color: .black.opacity(isSelected ? 0.35 : 0.15), radius: isSelected ? 18 : 8, y: 6)
-        } else {
-            backdrop(content)
-                .shadow(
-                    color: .black.opacity(appearance.shadowRadius > 0 ? (isSelected ? 0.3 : 0.18) : 0),
-                    radius: appearance.shadowRadius,
-                    y: appearance.shadowRadius / 3
-                )
+        Group {
+            if isSolid {
+                content
+                    .background(shape.fill(tint ?? .clear))
+                    .background(shape.fill(Color(nsColor: .windowBackgroundColor)))
+            } else {
+                backdrop(content)
+            }
+        }
+        .background {
+            if appearance.shadowRadius > 0 {
+                OuterShadow(shape: shape, radius: appearance.shadowRadius, opacity: isSelected ? 0.35 : 0.22)
+            }
         }
     }
 
@@ -293,5 +294,27 @@ private struct VibrancyBackdrop: NSViewRepresentable {
         view.material = material
         view.blendingMode = blending
         view.layer?.cornerRadius = cornerRadius
+    }
+}
+
+/// A shadow drawn only outside `shape`. A plain `.shadow` on the whole view also shadows
+/// the text and shows through translucent surfaces, darkening secondary text.
+private struct OuterShadow: View {
+    let shape: AnyShape
+    let radius: CGFloat
+    let opacity: Double
+
+    var body: some View {
+        shape
+            .fill(Color.black)
+            .shadow(color: .black.opacity(opacity), radius: radius, y: radius / 3)
+            .mask {
+                ZStack {
+                    // Negative padding draws past the frame without changing the layout size.
+                    Rectangle().padding(-radius * 4)
+                    shape.fill(Color.black).blendMode(.destinationOut)
+                }
+                .compositingGroup()
+            }
     }
 }

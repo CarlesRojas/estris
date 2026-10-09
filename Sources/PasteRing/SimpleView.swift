@@ -1,24 +1,32 @@
 import SwiftUI
 
-/// One fixed rectangle showing what will be pasted. Cycling swaps the text, nothing moves.
+/// The default style: one fixed card showing what will be pasted. Cycling swaps the
+/// content, nothing moves.
 struct SimpleView: View {
     @ObservedObject var state: OverlayState
+    @ObservedObject var settings: AppSettings
 
     var body: some View {
         let item = state.selectedItem
-        HStack(alignment: .top, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             if let item {
-                AppIconView(bundleID: item.sourceBundleID, size: 32)
+                HStack(spacing: 10) {
+                    AppIconView(bundleID: item.sourceBundleID, size: 28)
+                    Text(AppIcons.name(for: item.sourceBundleID) ?? "Unknown app")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
+            // No line limit: the text fills the card and truncates where the card ends.
             Text(item?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Clipboard history is empty")
                 .font(.title3)
-                .lineLimit(7)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .padding(20)
-        .frame(width: 560, height: 200)
-        .surface(cornerRadius: 22)
+        .frame(width: settings.simpleWidth, height: settings.simpleHeight)
+        .surface(cornerRadius: 22, isSelected: true)
         .transaction { $0.animation = nil }
     }
 }
