@@ -26,10 +26,9 @@ final class WindowSnapping {
     func start() {
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
-        settings.$isEnabled.map { _ in () }
-            .merge(with: settings.$modifiers.map { _ in () })
+        settings.$isEnabled
             .receive(on: RunLoop.main)
-            .sink { [weak self] in self?.apply() }
+            .sink { [weak self] _ in self?.apply() }
             .store(in: &observers)
     }
 
@@ -47,7 +46,7 @@ final class WindowSnapping {
         }
         dragSnapper.start()
         for action in SnapAction.allCases {
-            let shortcut = settings.shortcut(for: action)
+            let shortcut = action.shortcut
             hotKeys.append(HotKeyCenter.shared.register(keyCode: shortcut.keyCode, modifiers: shortcut.modifiers) { [weak self] in
                 self?.snapFocusedWindow(to: action)
             })

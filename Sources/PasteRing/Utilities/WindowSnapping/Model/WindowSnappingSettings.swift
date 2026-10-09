@@ -1,4 +1,3 @@
-import Carbon.HIToolbox
 import Foundation
 
 /// A drag-to-snap area, switched on or off on its own.
@@ -68,10 +67,6 @@ final class WindowSnappingSettings: ObservableObject {
         didSet { defaults.set(gestures.map(\.rawValue), forKey: Keys.gestures) }
     }
 
-    /// The modifier keys every shortcut uses (Carbon flags); the keys themselves are fixed.
-    @Published var modifiers: UInt32 {
-        didSet { defaults.set(Int(modifiers), forKey: Keys.modifiers) }
-    }
 
     init() {
         let defaults = UserDefaults.standard
@@ -80,7 +75,6 @@ final class WindowSnappingSettings: ObservableObject {
             Keys.snapsByDragging: true,
             Keys.resizesTogether: true,
             Keys.edgeArea: 32.0,
-            Keys.modifiers: controlKey | optionKey,
             Keys.gestures: SnapGesture.defaults.map(\.rawValue),
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
@@ -88,20 +82,12 @@ final class WindowSnappingSettings: ObservableObject {
         resizesTogether = defaults.bool(forKey: Keys.resizesTogether)
         edgeArea = defaults.double(forKey: Keys.edgeArea)
         gestures = Set((defaults.stringArray(forKey: Keys.gestures) ?? []).compactMap(SnapGesture.init(rawValue:)))
-        modifiers = UInt32(defaults.integer(forKey: Keys.modifiers))
-    }
-
-    func shortcut(for action: SnapAction) -> Shortcut {
-        var shortcut = action.defaultShortcut
-        shortcut.modifiers = modifiers
-        return shortcut
     }
 
     private enum Keys {
         static let isEnabled = "windowSnappingEnabled"
         static let snapsByDragging = "windowSnappingByDragging"
         static let resizesTogether = "windowSnappingResizesTogether"
-        static let modifiers = "windowSnappingModifiers"
         static let edgeArea = "windowSnappingEdgeArea"
         static let gestures = "windowSnappingGestures"
     }

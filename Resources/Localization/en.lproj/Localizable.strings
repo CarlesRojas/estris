@@ -61,6 +61,7 @@
 "Carousel" = "Carousel";
 "Center" = "Center";
 "Center Third" = "Center Third";
+"Center Two Thirds" = "Center Two Thirds";
 "Change what keys and mouse buttons do, per device." = "Change what keys and mouse buttons do, per device.";
 "Choose…" = "Choose…";
 "Clear" = "Clear";
@@ -69,8 +70,6 @@
 "Click to change" = "Click to change";
 "Clipboard" = "Clipboard";
 "Clipboard history is empty" = "Clipboard history is empty";
-"Command" = "Command";
-"Control" = "Control";
 "Copy All" = "Copy All";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copying something already in the history moves it to the top instead of adding it again.";
 "Corners" = "Corners";
@@ -156,7 +155,6 @@
 "Middle Click" = "Middle Click";
 "Mission Control" = "Mission Control";
 "Mission Control and Desktops" = "Mission Control and Desktops";
-"Modifier keys" = "Modifier keys";
 "Modifiers" = "Modifiers";
 "Mouse Buttons" = "Mouse Buttons";
 "Move pasted entry to the top" = "Move pasted entry to the top";
@@ -180,7 +178,6 @@
 "Open Accessibility Settings" = "Open Accessibility Settings";
 "Open at login" = "Open at login";
 "Open overlay" = "Open overlay";
-"Option" = "Option";
 "Other" = "Other";
 "Other source" = "Other source";
 "Page Down" = "Page Down";
@@ -240,7 +237,6 @@
 "Settings" = "Settings";
 "Settings…" = "Settings…";
 "Shadow" = "Shadow";
-"Shift" = "Shift";
 "Shortcuts" = "Shortcuts";
 "Show delete button" = "Show delete button";
 "Show Desktop" = "Show Desktop";

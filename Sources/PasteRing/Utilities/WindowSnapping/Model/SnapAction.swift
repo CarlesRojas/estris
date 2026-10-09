@@ -16,6 +16,7 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
     case centerThird
     case lastThird
     case firstTwoThirds
+    case centerTwoThirds
     case lastTwoThirds
     case center
     case restore
@@ -39,7 +40,7 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         switch self {
         case .leftHalf, .rightHalf, .topHalf, .bottomHalf: .halves
         case .topLeft, .topRight, .bottomLeft, .bottomRight: .corners
-        case .firstThird, .centerThird, .lastThird, .firstTwoThirds, .lastTwoThirds: .thirds
+        case .firstThird, .centerThird, .lastThird, .firstTwoThirds, .centerTwoThirds, .lastTwoThirds: .thirds
         case .maximize, .center, .restore: .other
         }
     }
@@ -59,6 +60,7 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .centerThird: String(localized: "Center Third")
         case .lastThird: String(localized: "Right Third")
         case .firstTwoThirds: String(localized: "Left Two Thirds")
+        case .centerTwoThirds: String(localized: "Center Two Thirds")
         case .lastTwoThirds: String(localized: "Right Two Thirds")
         case .center: String(localized: "Center")
         case .restore: String(localized: "Restore")
@@ -80,14 +82,15 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .centerThird: "rectangle.center.inset.filled"
         case .lastThird: "rectangle.trailingthird.inset.filled"
         case .firstTwoThirds: "rectangle.split.3x1"
+        case .centerTwoThirds: "rectangle.split.3x1"
         case .lastTwoThirds: "rectangle.split.3x1"
-        case .center: "rectangle.center.inset.filled"
+        case .center: "dot.square"
         case .restore: "arrow.uturn.backward"
         }
     }
 
-    /// The key for each, with Control and Option; the modifiers can be changed in Settings.
-    var defaultShortcut: Shortcut {
+    /// The shortcut for each: a fixed key with Control and Option.
+    var shortcut: Shortcut {
         let modifiers = UInt32(controlKey | optionKey)
         let key: (Int, String) = switch self {
         case .leftHalf: (kVK_LeftArrow, "←")
@@ -103,6 +106,7 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .centerThird: (kVK_ANSI_F, "F")
         case .lastThird: (kVK_ANSI_G, "G")
         case .firstTwoThirds: (kVK_ANSI_E, "E")
+        case .centerTwoThirds: (kVK_ANSI_R, "R")
         case .lastTwoThirds: (kVK_ANSI_T, "T")
         case .center: (kVK_ANSI_C, "C")
         case .restore: (kVK_Delete, "⌫")
@@ -132,6 +136,7 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .centerThird: rect = NSRect(x: area.minX + third, y: area.minY, width: third, height: area.height)
         case .lastThird: rect = NSRect(x: area.minX + 2 * third, y: area.minY, width: area.width - 2 * third, height: area.height)
         case .firstTwoThirds: rect = NSRect(x: area.minX, y: area.minY, width: 2 * third, height: area.height)
+        case .centerTwoThirds: rect = NSRect(x: area.minX + (third / 2).rounded(.down), y: area.minY, width: 2 * third, height: area.height)
         case .lastTwoThirds: rect = NSRect(x: area.minX + third, y: area.minY, width: area.width - third, height: area.height)
         case .center:
             let width = min(current.width, area.width)

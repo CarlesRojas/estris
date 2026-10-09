@@ -7,7 +7,7 @@ import AppKit
 final class SnapPreview {
     /// Room between the outline and the area, so it reads as a preview of it.
     private static let inset: CGFloat = 6
-    private static let cornerRadius: CGFloat = 12
+    private static let cornerRadius: CGFloat = 20
     private static let duration: TimeInterval = 0.18
 
     private lazy var panel: NSPanel = {

@@ -61,6 +61,7 @@
 "Carousel" = "Karussell";
 "Center" = "Zentrieren";
 "Center Third" = "Mittleres Drittel";
+"Center Two Thirds" = "Mittlere zwei Drittel";
 "Change what keys and mouse buttons do, per device." = "Lege fest, was Tasten und Maustasten tun, für jedes Gerät.";
 "Choose…" = "Auswählen …";
 "Clear" = "Löschen";
@@ -69,8 +70,6 @@
 "Click to change" = "Zum Ändern klicken";
 "Clipboard" = "Zwischenablage";
 "Clipboard history is empty" = "Der Verlauf der Zwischenablage ist leer";
-"Command" = "Befehl";
-"Control" = "Control";
 "Copy All" = "Alles kopieren";
 "Copying something already in the history moves it to the top instead of adding it again." = "Wird etwas kopiert, das schon im Verlauf ist, rückt es nach oben, statt erneut hinzugefügt zu werden.";
 "Corners" = "Ecken";
@@ -156,7 +155,6 @@
 "Middle Click" = "Mittelklick";
 "Mission Control" = "Mission Control";
 "Mission Control and Desktops" = "Mission Control und Schreibtische";
-"Modifier keys" = "Sondertasten";
 "Modifiers" = "Sondertasten";
 "Mouse Buttons" = "Maustasten";
 "Move pasted entry to the top" = "Eingesetzten Eintrag nach oben";
@@ -180,7 +178,6 @@
 "Open Accessibility Settings" = "Bedienungshilfen-Einstellungen öffnen";
 "Open at login" = "Bei der Anmeldung öffnen";
 "Open overlay" = "Overlay öffnen";
-"Option" = "Wahltaste";
 "Other" = "Andere";
 "Other source" = "Andere Quelle";
 "Page Down" = "Bild ab";
@@ -240,7 +237,6 @@
 "Settings" = "Einstellungen";
 "Settings…" = "Einstellungen …";
 "Shadow" = "Schatten";
-"Shift" = "Umschalt";
 "Shortcuts" = "Kurzbefehle";
 "Show delete button" = "Löschtaste anzeigen";
 "Show Desktop" = "Schreibtisch anzeigen";
