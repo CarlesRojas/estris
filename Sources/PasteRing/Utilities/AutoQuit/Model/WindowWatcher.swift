@@ -60,11 +60,13 @@ final class WindowWatcher {
             },
         ]
         NSWorkspace.shared.runningApplications.forEach(attach)
+        log("started, watching \(observers.count) apps, Accessibility \(AXIsProcessTrusted() ? "granted" : "NOT granted")")
     }
 
     func stop() {
         guard isRunning else { return }
         isRunning = false
+        log("stopped")
         let center = NSWorkspace.shared.notificationCenter
         workspaceTokens.forEach(center.removeObserver)
         workspaceTokens = []
@@ -94,7 +96,10 @@ final class WindowWatcher {
         AXUIElementSetMessagingTimeout(application, Self.messagingTimeout)
         let refcon = Unmanaged.passUnretained(self).toOpaque()
         for notification in [kAXWindowCreatedNotification, kAXMainWindowChangedNotification, kAXFocusedWindowChangedNotification] {
-            AXObserverAddNotification(observer, application, notification as CFString, refcon)
+            let added = AXObserverAddNotification(observer, application, notification as CFString, refcon)
+            if added != .success && added != .notificationAlreadyRegistered {
+                log("\(app.localizedName ?? "pid \(pid)"): can't listen for \(notification) (error \(added.rawValue))")
+            }
         }
         CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
         observers[pid] = observer
@@ -113,7 +118,9 @@ final class WindowWatcher {
     private func watchWindows(pid: pid_t, observer: AXObserver) {
         let windows = Self.standardWindows(pid: pid) ?? []
         guard !windows.isEmpty else { return }
-        hadWindows.insert(pid)
+        if hadWindows.insert(pid).inserted {
+            log("\(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"): watching \(windows.count) window(s)")
+        }
         let refcon = Unmanaged.passUnretained(self).toOpaque()
         for window in windows {
             // Registering a window twice is harmless; it just reports it's already watched.
