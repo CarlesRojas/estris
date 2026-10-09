@@ -141,6 +141,7 @@ struct SettingsIcon: View {
 
 /// System Settings has no button to hide its sidebar.
 private struct HidesSidebarToggle: ViewModifier {
+    @ViewBuilder
     func body(content: Content) -> some View {
         if #available(macOS 14, *) {
             content.toolbar(removing: .sidebarToggle)
