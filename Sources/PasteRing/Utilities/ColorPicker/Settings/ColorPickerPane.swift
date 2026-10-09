@@ -3,8 +3,6 @@ import SwiftUI
 /// The Color Picker settings pane: the on/off switch, the shortcut and the copy format.
 struct ColorPickerPane: View {
     @ObservedObject var settings: ColorPickerSettings
-    @State private var screenRecordingAllowed = ScreenSampler.isAllowed
-    private static let screenRecordingSettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!
 
     var body: some View {
         VStack(spacing: 0) {
@@ -16,19 +14,6 @@ struct ColorPickerPane: View {
             )
 
             Form {
-                if !screenRecordingAllowed {
-                    Section {
-                        LabeledContent {
-                            Button("Open Screen Recording Settings") {
-                                ScreenSampler.requestAccess()
-                                NSWorkspace.shared.open(Self.screenRecordingSettingsURL)
-                            }
-                        } label: {
-                            Text("Screen Recording")
-                            Text("Allow it, then relaunch PasteRing, to see the color's value while picking.")
-                        }
-                    }
-                }
                 Section("Shortcut") {
                     LabeledContent("Pick a color") {
                         ShortcutRecorder(shortcut: $settings.shortcut)
@@ -60,6 +45,5 @@ struct ColorPickerPane: View {
             .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .onAppear { screenRecordingAllowed = ScreenSampler.isAllowed }
     }
 }

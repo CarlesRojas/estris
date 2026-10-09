@@ -43,7 +43,6 @@
 "After 30 days" = "Nach 30 Tagen";
 "After 30 seconds" = "Nach 30 Sekunden";
 "After 5 seconds" = "Nach 5 Sekunden";
-"Allow it, then relaunch PasteRing, to see the color's value while picking." = "Erlaube sie und starte PasteRing neu, um den Farbwert beim Auswählen zu sehen.";
 "Allowed" = "Erlaubt";
 "Already mapped above" = "Bereits weiter oben belegt";
 "Already mapped on %@" = "Bereits auf %@ belegt";
@@ -204,7 +203,6 @@
 "Open Accessibility Settings" = "Bedienungshilfen-Einstellungen öffnen";
 "Open at login" = "Bei der Anmeldung öffnen";
 "Open overlay" = "Overlay öffnen";
-"Open Screen Recording Settings" = "Einstellungen für Bildschirmaufnahme öffnen";
 "Other" = "Andere";
 "Other source" = "Andere Quelle";
 "Page Down" = "Bild ab";
@@ -260,7 +258,6 @@
 "Ring menu" = "Ringmenü";
 "Ring shows" = "Ring zeigt";
 "Same as System" = "Wie das System";
-"Screen Recording" = "Bildschirmaufnahme";
 "Screenshot of Screen" = "Bildschirmfoto des Bildschirms";
 "Screenshot of Selection" = "Bildschirmfoto der Auswahl";
 "Screenshot Tools" = "Bildschirmfoto-Werkzeuge";
