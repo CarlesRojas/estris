@@ -112,10 +112,19 @@ struct SearchField: NSViewRepresentable {
     @Binding var text: String
     var prompt = "Search"
 
+    /// A touch lighter than the window behind it, so the field stands out from the page.
+    private static let fill = NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            ? NSColor.white.withAlphaComponent(0.12)
+            : NSColor.white
+    }
+
     func makeNSView(context: Context) -> NSSearchField {
         let field = NSSearchField()
         field.placeholderString = prompt
         field.delegate = context.coordinator
+        field.drawsBackground = true
+        field.backgroundColor = Self.fill
         return field
     }
 
