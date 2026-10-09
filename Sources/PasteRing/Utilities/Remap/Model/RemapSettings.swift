@@ -99,6 +99,7 @@ final class RemapSettings: ObservableObject {
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         customNames = defaults.dictionary(forKey: Keys.customNames) as? [String: String] ?? [:]
         deviceLessInputs = defaults.data(forKey: Keys.deviceLessInputs).flatMap { try? JSONDecoder().decode(Set<RemapInput>.self, from: $0) } ?? []
+        removeEmptyMappings()
         devices = defaults.data(forKey: Keys.devices).flatMap { try? JSONDecoder().decode([String: DeviceMappings].self, from: $0) } ?? [:]
     }
 
@@ -167,6 +168,13 @@ final class RemapSettings: ObservableObject {
         guard let index = entry.mappings.firstIndex(where: { $0.id == mapping.id }) else { return }
         entry.mappings[index] = mapping
         devices[deviceID] = entry
+    }
+
+    /// Drops mappings with neither side chosen.
+    func removeEmptyMappings() {
+        for (id, entry) in devices where entry.mappings.contains(where: { $0.input == nil && $0.output == nil }) {
+            devices[id]?.mappings.removeAll { $0.input == nil && $0.output == nil }
+        }
     }
 
     func remove(_ mapping: Mapping, from deviceID: String) {

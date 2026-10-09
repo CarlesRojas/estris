@@ -65,17 +65,24 @@ private struct MappingsView: View {
                         ForEach(mappings) { mapping in
                             row(mapping, on: device)
                         }
-                        Button("Add Mapping") {
-                            settings.addMapping(to: device)
-                        }
                     } header: {
                         header(device)
+                    } footer: {
+                        Button {
+                            settings.addMapping(to: device)
+                        } label: {
+                            Label("Add Mapping", systemImage: "plus")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .padding(.top, 4)
                     }
                     .id(device.id)
                 }
             }
             .formStyle(.grouped)
             .settingsPage()
+            // Rows left with both sides empty are dropped once the page is left.
+            .onDisappear { settings.removeEmptyMappings() }
             .onAppear {
                 devices.refresh()
                 guard !selection.isEmpty else { return }
