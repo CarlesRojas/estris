@@ -24,7 +24,7 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 - **Language** (English for now), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
 - **About**: version and a short description.
 
-**Clipboard Manager** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
+**Clipboard** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
 - **Settings**:
   - *General*: how many entries to keep (5 to 500, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and three switches, all on by default:
     - **Ignore passwords**: skips text copied from password fields and password managers.

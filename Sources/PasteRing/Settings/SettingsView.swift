@@ -11,22 +11,14 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .general: "General"
-        case .clipboard: "Clipboard Manager"
-        }
-    }
-
-    /// Tile colour behind the icon, as in System Settings.
-    var color: Color {
-        switch self {
-        case .general: .gray
-        case .clipboard: .blue
+        case .clipboard: "Clipboard"
         }
     }
 
     var symbol: String {
         switch self {
-        case .general: "gearshape"
-        case .clipboard: "doc.on.clipboard"
+        case .general: "gearshape.2"
+        case .clipboard: "list.clipboard"
         }
     }
 
@@ -92,17 +84,15 @@ struct SettingsView: View {
         NavigationSplitView {
             List(panes, selection: $selection) { pane in
                 HStack {
-                    Label {
-                        Text(pane.title)
-                    } icon: {
-                        SettingsIcon(symbol: pane.symbol, color: pane.color)
-                    }
+                    // Outlined symbols in the accent colour, as in Finder's and Mail's sidebars.
+                    Label(pane.title, systemImage: pane.symbol)
                     Spacer()
                     if let isOn = isOn(pane) {
                         StatusBadge(isOn: isOn)
                     }
                 }
             }
+            .listStyle(.sidebar)
             .searchable(text: $search, placement: .sidebar, prompt: "Search")
             .modifier(HidesSidebarToggle())
             .navigationSplitViewColumnWidth(min: 180, ideal: 210)
@@ -135,20 +125,6 @@ struct SettingsView: View {
     }
 }
 
-/// A white symbol on a coloured rounded tile, like the icons in System Settings.
-struct SettingsIcon: View {
-    let symbol: String
-    let color: Color
-    var size: CGFloat = 20
-
-    var body: some View {
-        Image(systemName: symbol)
-            .font(.system(size: size * 0.6, weight: .medium))
-            .foregroundStyle(.white)
-            .frame(width: size, height: size)
-            .background(color.gradient, in: RoundedRectangle(cornerRadius: size * 0.25, style: .continuous))
-    }
-}
 
 /// System Settings has no button to hide its sidebar.
 private struct HidesSidebarToggle: ViewModifier {

@@ -6,13 +6,15 @@ import SwiftUI
 struct UtilityHeader: View {
     let title: String
     let symbol: String
-    var color: Color = .blue
     let summary: String
     @Binding var isOn: Bool
 
     var body: some View {
         HStack(spacing: 14) {
-            SettingsIcon(symbol: symbol, color: isOn ? color : .gray, size: 40)
+            Image(systemName: symbol)
+                .font(.system(size: 26, weight: .regular))
+                .foregroundStyle(isOn ? Color.accentColor : .secondary)
+                .frame(width: 40, height: 40)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.headline)
