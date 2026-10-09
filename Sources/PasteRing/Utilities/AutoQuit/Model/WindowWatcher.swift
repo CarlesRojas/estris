@@ -85,7 +85,11 @@ final class WindowWatcher {
         }
 
         var created: AXObserver?
-        guard AXObserverCreate(pid, windowWatcherCallback, &created) == .success, let observer = created else { return }
+        let result = AXObserverCreate(pid, windowWatcherCallback, &created)
+        guard result == .success, let observer = created else {
+            // Usually missing Accessibility permission; tried again when the app comes forward.
+            return log("\(app.localizedName ?? "pid \(pid)"): can't watch (error \(result.rawValue))")
+        }
         let application = AXUIElementCreateApplication(pid)
         AXUIElementSetMessagingTimeout(application, Self.messagingTimeout)
         let refcon = Unmanaged.passUnretained(self).toOpaque()
@@ -121,6 +125,7 @@ final class WindowWatcher {
     fileprivate func handle(notification: String, observer: AXObserver, element: AXUIElement) {
         guard let pid = observers.first(where: { CFEqual($0.value, observer) })?.key else { return }
         if notification == kAXUIElementDestroyedNotification as String {
+            log("\(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"): a window closed")
             scheduleChecks(pid: pid)
         } else {
             watchWindows(pid: pid, observer: observer)
@@ -141,13 +146,19 @@ final class WindowWatcher {
     }
 
     private func check(pid: pid_t, confirming: Bool) {
-        guard isRunning, hadWindows.contains(pid),
-              let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated,
-              !app.isHidden,
-              !settings.keepsRunning(app.bundleIdentifier),
-              !Self.isBackgroundApp(app),
-              !hasAnyWindow(pid: pid)
-        else { return }
+        guard isRunning, let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated else { return }
+        let name = app.localizedName ?? "pid \(pid)"
+        // Logged so a quit that doesn't happen can be traced in Console (search "Auto Quit").
+        guard hadWindows.contains(pid) else { return log("\(name): never seen with a window") }
+        guard !app.isHidden else { return log("\(name): hidden, left running") }
+        guard !settings.keepsRunning(app.bundleIdentifier) else { return log("\(name): excluded") }
+        guard !Self.isBackgroundApp(app) else { return log("\(name): menu bar or background app") }
+        if let windows = Self.standardWindows(pid: pid) {
+            guard windows.isEmpty else { return log("\(name): still has \(windows.count) window(s)") }
+        } else {
+            return log("\(name): didn't answer, left running")
+        }
+        guard !Self.hasWindowServerWindow(pid: pid) else { return log("\(name): window server still shows a window") }
 
         guard confirming else {
             let delay = max(Self.minimumConfirmDelay, settings.delay.interval)
@@ -157,14 +168,12 @@ final class WindowWatcher {
             return
         }
         hadWindows.remove(pid)
+        log("\(name): no windows left, quitting")
         app.terminate()
     }
 
-    /// Any standard window (including minimized ones) the app still has, or, when the
-    /// Accessibility API can't say, a possible one in the window server's list.
-    private func hasAnyWindow(pid: pid_t) -> Bool {
-        guard let windows = Self.standardWindows(pid: pid) else { return true }
-        return !windows.isEmpty || Self.hasWindowServerWindow(pid: pid)
+    private func log(_ message: String) {
+        NSLog("PasteRing Auto Quit: %@", message)
     }
 
     /// Document and app windows (not panels, sheets or palettes) on the current desktop,
@@ -187,20 +196,30 @@ final class WindowWatcher {
         }
     }
 
-    /// Whether the window server lists a normal-level window of the app that the
-    /// Accessibility API may be missing, such as one on another desktop. Counted
-    /// generously: an app is never quit while it might still have a window somewhere.
+    /// Whether the window server shows a window of the app that the Accessibility API
+    /// missed. Only on-screen windows count: almost every app keeps hidden, off-screen
+    /// windows after its last one closes, so counting those meant nothing was ever quit.
+    /// An off-screen window counts only when it has a title, which macOS reports for other
+    /// apps' windows only with the Screen Recording permission; without it, a window on
+    /// another desktop can't be told apart from a hidden one.
     private static func hasWindowServerWindow(pid: pid_t) -> Bool {
         guard let list = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
-            return true
+            return false
         }
         return list.contains { window in
-            (window[kCGWindowOwnerPID as String] as? pid_t) == pid
-                && (window[kCGWindowLayer as String] as? Int) == 0
-                && (window[kCGWindowAlpha as String] as? Double ?? 1) > 0
-                && ((window[kCGWindowBounds as String] as? [String: CGFloat]).map {
-                    ($0["Width"] ?? 0) >= minimumWindowSide && ($0["Height"] ?? 0) >= minimumWindowSide
-                } ?? false)
+            guard (window[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value == pid,
+                  (window[kCGWindowLayer as String] as? NSNumber)?.intValue == 0,
+                  ((window[kCGWindowAlpha as String] as? NSNumber)?.doubleValue ?? 1) > 0,
+                  let bounds = window[kCGWindowBounds as String] as? [String: Any],
+                  let width = (bounds["Width"] as? NSNumber)?.doubleValue,
+                  let height = (bounds["Height"] as? NSNumber)?.doubleValue,
+                  width >= minimumWindowSide, height >= minimumWindowSide
+            else { return false }
+            if (window[kCGWindowIsOnscreen as String] as? NSNumber)?.boolValue == true {
+                return true
+            }
+            let title = window[kCGWindowName as String] as? String ?? ""
+            return !title.isEmpty
         }
     }
 

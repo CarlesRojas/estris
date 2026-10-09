@@ -78,7 +78,8 @@ Quits an app when you close its last window, the way apps on iPad and many Windo
 - **Quit**: immediately, or after 1, 5 or 30 seconds (default 1 second) with no windows.
 - **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: it is never quit. The Finder is always excluded.
 - It reacts to windows closing (no polling): when an app's window is destroyed, the app is checked a few times over the next two seconds, and quit only if it still has no windows after the chosen delay.
-- Apps opened without a window, menu bar and background apps, and hidden apps are left alone: an app is only quit after it was seen with a window. If an app might still have a window macOS doesn't report to other apps (for example on another desktop), it is not quit.
+- Apps opened without a window, menu bar and background apps, and hidden apps are left alone: an app is only quit after it was seen with a window. Windows on other desktops are only noticed with the Screen Recording permission (macOS hides other apps' window titles without it), so without it closing the last window on this desktop can quit an app that still has one elsewhere.
+- Decisions are logged: open Console and search for "PasteRing Auto Quit" to see why an app was or wasn't quit.
 - Needs the Accessibility permission to see each app's windows.
 
 ## Project structure
