@@ -5,11 +5,20 @@ import Carbon.HIToolbox
 final class HotKeyCenter {
     static let shared = HotKeyCenter()
 
+    private struct Definition {
+        let keyCode: UInt32
+        let modifiers: UInt32
+        let handler: () -> Void
+    }
+
     private let signature: OSType = 0x5052_4E47 // "PRNG"
-    private var handlers: [UInt32: () -> Void] = [:]
+    private var definitions: [UInt32: Definition] = [:]
     private var refs: [UInt32: EventHotKeyRef] = [:]
     private var nextID: UInt32 = 1
     private var eventHandler: EventHandlerRef?
+    /// While suspended, hotkeys stay defined but are not registered, so key presses reach
+    /// the app normally (for example while recording a new shortcut).
+    private var isSuspended = false
 
     private init() {
         var spec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
@@ -25,7 +34,7 @@ final class HotKeyCenter {
                 &hotKeyID
             )
             guard status == noErr else { return status }
-            HotKeyCenter.shared.handlers[hotKeyID.id]?()
+            HotKeyCenter.shared.definitions[hotKeyID.id]?.handler()
             return noErr
         }, 1, &spec, nil, &eventHandler)
     }
@@ -34,10 +43,36 @@ final class HotKeyCenter {
     func register(keyCode: UInt32, modifiers: UInt32, handler: @escaping () -> Void) -> UInt32 {
         let id = nextID
         nextID += 1
+        definitions[id] = Definition(keyCode: keyCode, modifiers: modifiers, handler: handler)
+        if !isSuspended {
+            activate(id)
+        }
+        return id
+    }
+
+    func unregister(_ id: UInt32) {
+        deactivate(id)
+        definitions.removeValue(forKey: id)
+    }
+
+    func suspend() {
+        guard !isSuspended else { return }
+        isSuspended = true
+        definitions.keys.forEach(deactivate)
+    }
+
+    func resume() {
+        guard isSuspended else { return }
+        isSuspended = false
+        definitions.keys.forEach(activate)
+    }
+
+    private func activate(_ id: UInt32) {
+        guard let definition = definitions[id], refs[id] == nil else { return }
         var ref: EventHotKeyRef?
         let status = RegisterEventHotKey(
-            keyCode,
-            modifiers,
+            definition.keyCode,
+            definition.modifiers,
             EventHotKeyID(signature: signature, id: id),
             GetApplicationEventTarget(),
             0,
@@ -45,17 +80,14 @@ final class HotKeyCenter {
         )
         if status == noErr, let ref {
             refs[id] = ref
-            handlers[id] = handler
         } else {
-            NSLog("PasteRing: failed to register hotkey \(keyCode) (status \(status))")
+            NSLog("PasteRing: failed to register hotkey \(definition.keyCode) (status \(status))")
         }
-        return id
     }
 
-    func unregister(_ id: UInt32) {
+    private func deactivate(_ id: UInt32) {
         if let ref = refs.removeValue(forKey: id) {
             UnregisterEventHotKey(ref)
         }
-        handlers.removeValue(forKey: id)
     }
 }
