@@ -19,6 +19,7 @@ struct KeepAwakePane: View {
                 Section("Sleep after being idle for") {
                     picker("On power adapter", selection: $settings.onPower)
                     picker("On battery", selection: $settings.onBattery)
+                    Toggle("Start the screen saver instead of sleeping", isOn: $settings.startsScreenSaver)
                 }
                 if settings.isEnabled {
                     Section("Status") {

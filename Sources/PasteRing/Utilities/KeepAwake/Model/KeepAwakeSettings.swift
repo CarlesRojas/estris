@@ -60,6 +60,11 @@ final class KeepAwakeSettings: ObservableObject {
         didSet { defaults.set(onPower.rawValue, forKey: Keys.onPower) }
     }
 
+    /// When the idle time runs out, start the screen saver instead of sleeping.
+    @Published var startsScreenSaver: Bool {
+        didSet { defaults.set(startsScreenSaver, forKey: Keys.startsScreenSaver) }
+    }
+
     /// How long while on battery.
     @Published var onBattery: KeepAwakeDuration {
         didSet { defaults.set(onBattery.rawValue, forKey: Keys.onBattery) }
@@ -67,7 +72,9 @@ final class KeepAwakeSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
+        defaults.register(defaults: [Keys.startsScreenSaver: true])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
+        startsScreenSaver = defaults.bool(forKey: Keys.startsScreenSaver)
         onPower = KeepAwakeDuration(rawValue: defaults.string(forKey: Keys.onPower) ?? "") ?? .indefinitely
         onBattery = KeepAwakeDuration(rawValue: defaults.string(forKey: Keys.onBattery) ?? "") ?? .oneHour
     }
@@ -76,6 +83,7 @@ final class KeepAwakeSettings: ObservableObject {
         static let isEnabled = "keepAwakeEnabled"
         static let onPower = "keepAwakeOnPower"
         static let onBattery = "keepAwakeOnBattery"
+        static let startsScreenSaver = "keepAwakeStartsScreenSaver"
     }
 }
 

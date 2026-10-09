@@ -278,6 +278,7 @@
 "Special Key %lld" = "Tasto speciale %lld";
 "Spotlight" = "Spotlight";
 "Stack" = "Pila";
+"Start the screen saver instead of sleeping" = "Avvia il salvaschermo invece dello stop";
 "Startup" = "Avvio";
 "State" = "Stato";
 "Status" = "Stato";

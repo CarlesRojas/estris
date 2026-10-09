@@ -278,6 +278,7 @@
 "Special Key %lld" = "Touche spéciale %lld";
 "Spotlight" = "Spotlight";
 "Stack" = "Pile";
+"Start the screen saver instead of sleeping" = "Lancer l’économiseur d’écran au lieu de la veille";
 "Startup" = "Démarrage";
 "State" = "État";
 "Status" = "État";

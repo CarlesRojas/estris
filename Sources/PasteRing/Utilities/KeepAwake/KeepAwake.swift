@@ -6,14 +6,16 @@ import SwiftUI
 /// The Keep Awake utility: while on, keeps the Mac and its display awake until it has been
 /// idle for as long as chosen for the current power source (power adapter or battery). Idle
 /// means no mouse, keyboard or trackpad input and nothing else keeping the display on (a
-/// playing video does); any of those starts the count again. Once idle for that long it puts
-/// the Mac to sleep, and holds again when the Mac wakes or is used. Owns
+/// playing video does); any of those starts the count again. Once idle for that long it starts
+/// the screen saver or puts the Mac to sleep, and holds again when the Mac wakes or is used. Owns
 /// everything it needs, so the app only has to create it and call `start()`.
 @MainActor
 final class KeepAwake {
     /// How often to look again while another app keeps the display on, in case the change
     /// notice below doesn't arrive.
     private static let otherHolderRecheck: TimeInterval = 5
+    /// How long the countdown shows 0:00 before the time is up.
+    private static let zeroShownFor: TimeInterval = 1
     /// What macOS posts when any app starts or stops keeping the Mac or display awake.
     private static let assertionNotices = [
         "com.apple.system.powermanagement.assertions",
@@ -119,26 +121,39 @@ final class KeepAwake {
             hold()
             status.state = .active
             lookAgain(in: limit - idle)
+        } else if status.state == .active, idle < limit + Self.zeroShownFor {
+            // The countdown shows 0:00 for a moment before acting; using the Mac meanwhile
+            // still starts it over.
+            lookAgain(in: limit + Self.zeroShownFor - idle)
         } else {
             release()
             let wasCounting = status.state == .active
             status.state = .idle
             watchForActivity()
-            // The time is up: sleep now rather than waiting for macOS's own timers.
-            if wasCounting { sleepNow() }
+            if wasCounting { timeIsUp() }
         }
     }
 
-    /// Puts the Mac to sleep, as macOS's own `pmset sleepnow` does.
-    private func sleepNow() {
-        log("idle for the chosen time, sleeping")
+    /// The idle time ran out: start the screen saver or sleep, rather than waiting for
+    /// macOS's own timers.
+    private func timeIsUp() {
+        if settings.startsScreenSaver {
+            log("idle for the chosen time, starting the screen saver")
+            run("/usr/bin/open", ["-a", "ScreenSaverEngine"])
+        } else {
+            log("idle for the chosen time, sleeping")
+            run("/usr/bin/pmset", ["sleepnow"])
+        }
+    }
+
+    private func run(_ path: String, _ arguments: [String]) {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
-        process.arguments = ["sleepnow"]
+        process.executableURL = URL(fileURLWithPath: path)
+        process.arguments = arguments
         do {
             try process.run()
         } catch {
-            log("can't put the Mac to sleep: \(error.localizedDescription)")
+            log("can't run \(path): \(error.localizedDescription)")
         }
     }
 

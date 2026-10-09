@@ -278,6 +278,7 @@
 "Special Key %lld" = "Sondertaste %lld";
 "Spotlight" = "Spotlight";
 "Stack" = "Stapel";
+"Start the screen saver instead of sleeping" = "Bildschirmschoner statt Ruhezustand starten";
 "Startup" = "Start";
 "State" = "Zustand";
 "Status" = "Status";
