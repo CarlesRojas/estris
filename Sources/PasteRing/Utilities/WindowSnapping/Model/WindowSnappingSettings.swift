@@ -55,6 +55,11 @@ final class WindowSnappingSettings: ObservableObject {
         didSet { defaults.set(resizesTogether, forKey: Keys.resizesTogether) }
     }
 
+    /// Fit snaps to the space left by windows already tiled on the screen.
+    @Published var fillsSpace: Bool {
+        didSet { defaults.set(fillsSpace, forKey: Keys.fillsSpace) }
+    }
+
     /// How far into the screen, in points, the edges reach for dragging.
     @Published var edgeArea: Double {
         didSet { defaults.set(edgeArea, forKey: Keys.edgeArea) }
@@ -75,12 +80,14 @@ final class WindowSnappingSettings: ObservableObject {
             Keys.isEnabled: false,
             Keys.snapsByDragging: true,
             Keys.resizesTogether: true,
+            Keys.fillsSpace: true,
             Keys.edgeArea: Self.defaultEdgeArea,
             Keys.gestures: SnapGesture.defaults.map(\.rawValue),
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         snapsByDragging = defaults.bool(forKey: Keys.snapsByDragging)
         resizesTogether = defaults.bool(forKey: Keys.resizesTogether)
+        fillsSpace = defaults.bool(forKey: Keys.fillsSpace)
         edgeArea = defaults.double(forKey: Keys.edgeArea)
         gestures = Set((defaults.stringArray(forKey: Keys.gestures) ?? []).compactMap(SnapGesture.init(rawValue:)))
     }
@@ -89,6 +96,7 @@ final class WindowSnappingSettings: ObservableObject {
     func reset() {
         snapsByDragging = true
         resizesTogether = true
+        fillsSpace = true
         edgeArea = Self.defaultEdgeArea
         gestures = SnapGesture.defaults
     }
@@ -98,6 +106,7 @@ final class WindowSnappingSettings: ObservableObject {
         static let snapsByDragging = "windowSnappingByDragging"
         static let resizesTogether = "windowSnappingResizesTogether"
         static let edgeArea = "windowSnappingEdgeArea"
+        static let fillsSpace = "windowSnappingFillsSpace"
         static let gestures = "windowSnappingGestures"
     }
 }

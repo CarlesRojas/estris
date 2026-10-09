@@ -69,8 +69,18 @@ final class WindowSnapping {
             restoreFrames.remove(at: saved)
             return
         }
-        guard let current = window.frame, let target = action.frame(in: screen, current: current) else { return }
+        guard let current = window.frame, let usual = action.frame(in: screen, current: current) else { return }
+        var target = usual
+        if settings.fillsSpace {
+            let tiled = SpaceFiller.tiledWindows(on: screen, excluding: window)
+            target = SpaceFiller.fit(usual, for: action, on: screen, among: tiled, pid: window.pid)
+        }
         window.setFrame(target)
+        // An app that won't get as small as the space gets the usual snap instead.
+        if target != usual, SpaceFiller.refused(asked: target, got: window.frame, pid: window.pid) {
+            target = usual
+            window.setFrame(target)
+        }
         // Apps can round the size, so what it ended up as is what a later move is compared to.
         let snapped = window.frame ?? target
         if let saved {

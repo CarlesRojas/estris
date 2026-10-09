@@ -48,6 +48,7 @@ struct WindowSnappingPane: View {
             }
             .disabled(!settings.snapsByDragging)
             Toggle("Resize side-by-side windows together", isOn: $settings.resizesTogether)
+            Toggle("Fill the space next to other windows", isOn: $settings.fillsSpace)
         }
     }
 

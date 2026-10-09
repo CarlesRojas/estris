@@ -54,6 +54,8 @@ final class DragSnapper {
     private var lastRead = Date.distantPast
     private var target: (action: SnapAction, screen: NSScreen)?
     private var neighbours: [Neighbour]?
+    /// The tiled windows on each screen the drag has passed over, for filling space.
+    private var tiled: [NSScreen: [NSRect]] = [:]
 
     init(settings: WindowSnappingSettings, snapper: @escaping (AXWindow, SnapAction, NSScreen, NSRect) -> Void) {
         self.settings = settings
@@ -157,6 +159,7 @@ final class DragSnapper {
         mode = .undecided
         target = nil
         neighbours = nil
+        tiled = [:]
         preview.hide()
     }
 
@@ -167,11 +170,16 @@ final class DragSnapper {
         guard let screen = NSScreen.screens.first(where: { NSMouseInRect(point, $0.frame, false) }),
               let found = snapArea(at: point, on: screen.frame),
               let window, let current = window.frame,
-              let area = found.action.frame(in: screen, current: current)
+              let usual = found.action.frame(in: screen, current: current)
         else {
             target = nil
             preview.hide()
             return
+        }
+        var area = usual
+        if settings.fillsSpace {
+            if tiled[screen] == nil { tiled[screen] = SpaceFiller.tiledWindows(on: screen, excluding: window) }
+            area = SpaceFiller.fit(usual, for: found.action, on: screen, among: tiled[screen] ?? [], pid: window.pid)
         }
         target = (found.action, screen)
         preview.show(area, from: found.edge)

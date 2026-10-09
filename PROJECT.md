@@ -99,7 +99,7 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
 
 Moves the front window to halves, corners, thirds or the whole screen. Off by default; turn it on in **Settings… > Window Snapping**.
 
-- The pane is one page: Dragging, Gestures and Shortcuts sections, and **Reset to Defaults** (dragging, edge area, resizing together and gestures; not the on/off switch).
+- The pane is one page: Dragging, Gestures and Shortcuts sections, and **Reset to Defaults** (dragging, edge area, resizing together, filling space and gestures; not the on/off switch).
 - **Shortcuts** (all ⌃⌥, fixed, listed in the Shortcuts section): ← → ↑ ↓ halves; U, I, J, K top left, top right, bottom left, bottom right; ↩ maximize; D, F, G left, center, right third; E, R, T left, center and right two thirds; C center; ⌫ restore (the frame before the window was first snapped, or before it was last moved by hand and snapped again).
 - **Dragging** (on by default): drag a window by its title bar to an edge of the screen the pointer is on, see an outline of where it will go, and release:
   - Corners: quarters. Top edge: maximize.
@@ -109,6 +109,12 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
   - **Gestures**: each area can be switched off (all on by default except the top and bottom halves). An area that is off leaves its place to the next one that applies, such as the side half instead of a corner.
   - The outline is rounded, dark and see-through, with a faint white border; it grows out of the edge or corner and glides between areas.
 - **Resize side-by-side windows together** (on by default): a dragged edge is treated as a line across the whole screen. Every other window mostly on the same screen with an edge on that line (within 4 points), on either side and anywhere along it, has that edge moved with it, live and once more on release; so with a window in each corner, dragging any part of the middle line moves all four. A window with edges on two moved lines (dragging a corner) follows both. Windows don't shrink below 120 points.
+- **Fill the space next to other windows** (on by default; shortcuts and dragging, preview included): a snap's sides that aren't on a screen edge move to the nearest edge of a tiled window, growing into a gap or shrinking away from a window.
+  - Tiled windows: on the same screen, touching a screen edge (within 8 points), and at least half visible (sampled on a grid, against the windows in front). The moved window doesn't count.
+  - Never overlaps them: where the free space isn't a rectangle, it leaves the gap.
+  - Each direction stays between 0.5 and 1.6 times the usual size, or keeps the usual size (a third next to a single third doesn't become two thirds).
+  - Maximize, Center and Restore never fill.
+  - If the app won't get as small as the space, the window gets the usual snap and the app's minimum is remembered, so later previews for it show the usual snap.
 - Works through the Accessibility permission (frames of other apps' windows) and a listen-only event tap, which also sees drags of PasteRing's own windows; those are moved directly. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
 
 ## Languages
@@ -139,7 +145,7 @@ Sources/PasteRing/
       Settings/                the Middle Click settings pane
     WindowSnapping/
       WindowSnapping.swift     owns the utility: shortcuts, snapping, restore frames
-      Model/                   settings, snap actions, Accessibility windows, drag snapper, preview
+      Model/                   settings, snap actions, Accessibility windows, drag snapper, space filler, preview
       Settings/                the Window Snapping pane
     Remap/
       Remap.swift              owns the utility and its event tap
