@@ -82,9 +82,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         if let window = settingsWindow {
             window.contentMinSize = Self.settingsMinimumSize
             window.minSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: Self.settingsMinimumSize)).size
+            // Once SwiftUI has built the split view, stop its sidebar from being collapsed by
+            // dragging the divider.
+            DispatchQueue.main.async {
+                Self.lockSidebar(in: window.contentView)
+            }
         }
         // Don't start with a text field focused (and its contents selected).
         settingsWindow?.makeFirstResponder(nil)
+    }
+
+    /// Finds the split view SwiftUI uses for the sidebar and marks its first item (the
+    /// sidebar) as not collapsible.
+    private static func lockSidebar(in view: NSView?) {
+        guard let view else { return }
+        if let splitView = view as? NSSplitView,
+           let controller = splitView.delegate as? NSSplitViewController,
+           let sidebar = controller.splitViewItems.first {
+            sidebar.canCollapse = false
+            return
+        }
+        view.subviews.forEach { lockSidebar(in: $0) }
     }
 
     /// Last line of defence for the minimum size, whatever else changes the window's limits.

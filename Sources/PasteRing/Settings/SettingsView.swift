@@ -81,7 +81,8 @@ struct SettingsView: View {
     }
 
     private var splitView: some View {
-        NavigationSplitView {
+        // Always showing both columns: any attempt to hide the sidebar is ignored.
+        NavigationSplitView(columnVisibility: .constant(.all)) {
             List(panes, selection: $selection) { pane in
                 HStack {
                     // White in dark mode (the label colour, so they stay visible in light mode),
