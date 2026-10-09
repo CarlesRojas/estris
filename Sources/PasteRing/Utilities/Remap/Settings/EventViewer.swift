@@ -58,7 +58,10 @@ struct EventViewer: View {
             }
         }
         .onAppear { remap.isViewing = true }
-        .onDisappear { remap.isViewing = false }
+        .onDisappear {
+            remap.isViewing = false
+            remap.isOverViewerLink = false
+        }
     }
 
     private func row(_ event: InputEvent) -> some View {
@@ -73,7 +76,10 @@ struct EventViewer: View {
                 .frame(width: 40, alignment: .leading)
             HStack(spacing: 6) {
                 if let source = event.source, let input = event.input, input != .mouseButton(0) {
-                    RemapLink(title: event.name) { map(source, input) }
+                    RemapLink(title: event.name, onHover: { remap.isOverViewerLink = $0 }) {
+                        remap.isOverViewerLink = false
+                        map(source, input)
+                    }
                 } else {
                     Text(event.name)
                 }
@@ -92,6 +98,7 @@ struct EventViewer: View {
 /// A key or button name that opens a mapping from it; underlined while hovered.
 private struct RemapLink: View {
     let title: String
+    let onHover: (Bool) -> Void
     let action: () -> Void
     @State private var isHovered = false
 
@@ -101,7 +108,10 @@ private struct RemapLink: View {
                 .underline(isHovered)
         }
         .buttonStyle(.link)
-        .onHover { isHovered = $0 }
+        .onHover { hovering in
+            isHovered = hovering
+            onHover(hovering)
+        }
         .help("Remap it")
     }
 }
