@@ -1,6 +1,5 @@
 import AppKit
 import Combine
-import IOKit
 import IOKit.pwr_mgt
 import SwiftUI
 
@@ -26,9 +25,6 @@ final class KeepAwake {
     private var timer: Timer?
     /// Watches for input after letting go, to hold again when the Mac is used.
     private var activityMonitor: Any?
-    /// When another app last stopped keeping the display on, which counts as activity.
-    private var otherHolderEndedAt = Date.distantPast
-    private var otherHolderWasActive = false
 
     init(log: AppLog) {
         appLog = log
@@ -68,6 +64,7 @@ final class KeepAwake {
             return
         }
         let duration = status.isOnBattery ? settings.onBattery : settings.onPower
+        status.limit = duration.seconds
         guard let limit = duration.seconds else {
             hold()
             status.state = .indefinitely
@@ -80,8 +77,8 @@ final class KeepAwake {
         }
 
         let otherHolderActive = Self.otherAppKeepsDisplayOn()
-        if otherHolderWasActive && !otherHolderActive { otherHolderEndedAt = Date() }
-        otherHolderWasActive = otherHolderActive
+        if status.otherAppKeepsDisplayOn && !otherHolderActive { status.otherHolderEndedAt = Date() }
+        status.otherAppKeepsDisplayOn = otherHolderActive
         if otherHolderActive {
             hold()
             status.state = .active
@@ -89,7 +86,7 @@ final class KeepAwake {
             return
         }
 
-        let idle = min(Self.inputIdleTime, Date().timeIntervalSince(otherHolderEndedAt))
+        let idle = status.idleTime
         if idle < limit {
             hold()
             status.state = .active
@@ -139,16 +136,6 @@ final class KeepAwake {
         guard let assertion else { return }
         IOPMAssertionRelease(assertion)
         self.assertion = nil
-    }
-
-    /// Seconds since the last mouse, keyboard or trackpad input.
-    private static var inputIdleTime: TimeInterval {
-        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOHIDSystem"))
-        guard service != 0 else { return 0 }
-        defer { IOObjectRelease(service) }
-        let value = IORegistryEntryCreateCFProperty(service, "HIDIdleTime" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue()
-        guard let nanoseconds = (value as? NSNumber)?.uint64Value else { return 0 }
-        return TimeInterval(nanoseconds) / 1_000_000_000
     }
 
     /// Whether another app keeps the display on, as video players do while playing.

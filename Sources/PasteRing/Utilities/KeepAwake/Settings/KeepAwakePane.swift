@@ -21,12 +21,21 @@ struct KeepAwakePane: View {
                     picker("On battery", selection: $settings.onBattery)
                 }
                 if settings.isEnabled {
-                    Section("Now") {
+                    Section("Status") {
                         LabeledContent("Power source") {
                             Text(status.isOnBattery ? String(localized: "Battery") : String(localized: "Power adapter"))
                         }
-                        LabeledContent("Keeping awake") {
+                        LabeledContent("State") {
                             Text(stateText)
+                        }
+                        if status.remaining != nil {
+                            // Ticks while the pane is open.
+                            TimelineView(.periodic(from: .now, by: 1)) { _ in
+                                LabeledContent("Sleeps in") {
+                                    Text(Self.countdown(status.remaining ?? 0))
+                                        .monospacedDigit()
+                                }
+                            }
                         }
                     }
                 }
@@ -48,10 +57,19 @@ struct KeepAwakePane: View {
 
     private var stateText: String {
         switch status.state {
-        case .off, .paused: String(localized: "No")
-        case .indefinitely: String(localized: "Indefinitely")
-        case .active: String(localized: "Yes")
-        case .idle: String(localized: "No, idle")
+        case .off, .paused: String(localized: "Not keeping awake")
+        case .indefinitely: String(localized: "Always on")
+        case .active: status.otherAppKeepsDisplayOn ? String(localized: "Active, an app keeps the display on") : String(localized: "Active")
+        case .idle: String(localized: "Inactive, macOS sleep settings apply")
         }
+    }
+
+    /// "4:05" or "1:04:05".
+    private static func countdown(_ seconds: TimeInterval) -> String {
+        let total = Int(seconds.rounded(.up))
+        let hours = total / 3600
+        let minutes = total / 60 % 60
+        let rest = total % 60
+        return hours > 0 ? String(format: "%d:%02d:%02d", hours, minutes, rest) : String(format: "%d:%02d", minutes, rest)
     }
 }

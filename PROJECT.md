@@ -128,7 +128,7 @@ Keeps the Mac and its display awake until it has been idle for a chosen time. Tu
 - While not idle for that long it holds a `PreventUserIdleDisplaySleep` power assertion; once idle for that long it releases it, so macOS's own sleep settings apply (the display sleeps soon after, as macOS has been counting the same idle time), and a global input monitor or the screen or Mac waking holds it again.
 - It looks again exactly when the idle time would run out; while another app keeps the display on it looks once a minute, as macOS doesn't tell when that stops.
 - Plugging in or out (IOKit power source notifications) applies the other choice at once. "Don't keep awake" pauses it; "Indefinitely" always holds.
-- **Now** (while on): the current power source, and whether it keeps awake (Yes, Indefinitely, No, or No, idle).
+- **Status** (while on): the power source; the state (Active, or Active while another app keeps the display on; Inactive, when macOS's sleep settings apply; Always on; Not keeping awake); and, while counting, **Sleeps in** with a countdown that ticks while the pane is open and stays full while the Mac is used.
 
 ## Languages
 

@@ -33,6 +33,8 @@
 "` (Grave Accent)" = "` (Grave Accent)";
 "About" = "About";
 "Accessibility" = "Accessibility";
+"Active" = "Active";
+"Active, an app keeps the display on" = "Active, an app keeps the display on";
 "Add Alternative Shortcut" = "Add Alternative Shortcut";
 "Add Mapping" = "Add Mapping";
 "After 1 day" = "After 1 day";
@@ -46,6 +48,7 @@
 "Already mapped above" = "Already mapped above";
 "Already mapped on %@" = "Already mapped on %@";
 "Alternative" = "Alternative";
+"Always on" = "Always on";
 "Another device" = "Another device";
 "App Windows" = "App Windows";
 "Appearance" = "Appearance";
@@ -125,11 +128,11 @@
 "Home" = "Home";
 "Ignore passwords" = "Ignore passwords";
 "Immediately" = "Immediately";
+"Inactive, macOS sleep settings apply" = "Inactive, macOS sleep settings apply";
 "Indefinitely" = "Indefinitely";
 "Insert" = "Insert";
 "Keep Awake" = "Keep Awake";
 "Keep up to" = "Keep up to";
-"Keeping awake" = "Keeping awake";
 "Keeps copied images in the history alongside text and files." = "Keeps copied images in the history alongside text and files.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Keeps what you copy and lets you pick what to paste with a shortcut.";
 "Key %@" = "Key %@";
@@ -177,16 +180,14 @@
 "Never" = "Never";
 "Next Desktop" = "Next Desktop";
 "Next Track" = "Next Track";
-"No" = "No";
 "No apps excluded" = "No apps excluded";
 "No clipboard entries yet" = "No clipboard entries yet";
 "No entries match “%@”" = "No entries match “%@”";
 "No events yet" = "No events yet";
-"No, idle" = "No, idle";
 "Not granted" = "Not granted";
+"Not keeping awake" = "Not keeping awake";
 "Nothing" = "Nothing";
 "Nothing logged yet." = "Nothing logged yet.";
-"Now" = "Now";
 "Numbers" = "Numbers";
 "Off" = "Off";
 "On" = "On";
@@ -268,6 +269,7 @@
 "Skips text copied from password fields and password managers." = "Skips text copied from password fields and password managers.";
 "Sleep after being idle for" = "Sleep after being idle for";
 "Sleep Display" = "Sleep Display";
+"Sleeps in" = "Sleeps in";
 "Snap by dragging a window to a screen edge" = "Snap by dragging a window to a screen edge";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge.";
 "Space" = "Space";
@@ -276,6 +278,7 @@
 "Spotlight" = "Spotlight";
 "Stack" = "Stack";
 "Startup" = "Startup";
+"State" = "State";
 "Status" = "Status";
 "Stops your Mac and its display from going to sleep." = "Stops your Mac and its display from going to sleep.";
 "Style" = "Style";
@@ -313,5 +316,4 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.";
 "Width" = "Width";
 "Window Snapping" = "Window Snapping";
-"Yes" = "Yes";
 "§ (Section)" = "§ (Section)";

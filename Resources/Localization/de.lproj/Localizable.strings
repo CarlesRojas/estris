@@ -33,6 +33,8 @@
 "` (Grave Accent)" = "` (Gravis)";
 "About" = "Über";
 "Accessibility" = "Bedienungshilfen";
+"Active" = "Aktiv";
+"Active, an app keeps the display on" = "Aktiv, eine App hält das Display an";
 "Add Alternative Shortcut" = "Alternativen Kurzbefehl hinzufügen";
 "Add Mapping" = "Belegung hinzufügen";
 "After 1 day" = "Nach 1 Tag";
@@ -46,6 +48,7 @@
 "Already mapped above" = "Bereits weiter oben belegt";
 "Already mapped on %@" = "Bereits auf %@ belegt";
 "Alternative" = "Alternative";
+"Always on" = "Immer an";
 "Another device" = "Anderes Gerät";
 "App Windows" = "App-Fenster";
 "Appearance" = "Erscheinungsbild";
@@ -125,11 +128,11 @@
 "Home" = "Pos1";
 "Ignore passwords" = "Passwörter ignorieren";
 "Immediately" = "Sofort";
+"Inactive, macOS sleep settings apply" = "Inaktiv, es gelten die Ruhezustand-Einstellungen von macOS";
 "Indefinitely" = "Unbegrenzt";
 "Insert" = "Einfügen";
 "Keep Awake" = "Wach halten";
 "Keep up to" = "Behalten bis";
-"Keeping awake" = "Wach gehalten";
 "Keeps copied images in the history alongside text and files." = "Behält kopierte Bilder neben Text und Dateien im Verlauf.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Bewahrt auf, was du kopierst, und lässt dich per Kurzbefehl wählen, was eingesetzt wird.";
 "Key %@" = "Taste %@";
@@ -177,16 +180,14 @@
 "Never" = "Nie";
 "Next Desktop" = "Nächster Schreibtisch";
 "Next Track" = "Nächster Titel";
-"No" = "Nein";
 "No apps excluded" = "Keine Apps ausgeschlossen";
 "No clipboard entries yet" = "Noch keine Einträge in der Zwischenablage";
 "No entries match “%@”" = "Keine Einträge passen zu „%@“";
 "No events yet" = "Noch keine Ereignisse";
-"No, idle" = "Nein, inaktiv";
 "Not granted" = "Nicht erteilt";
+"Not keeping awake" = "Hält nicht wach";
 "Nothing" = "Nichts";
 "Nothing logged yet." = "Noch nichts protokolliert.";
-"Now" = "Jetzt";
 "Numbers" = "Zahlen";
 "Off" = "Aus";
 "On" = "Ein";
@@ -268,6 +269,7 @@
 "Skips text copied from password fields and password managers." = "Überspringt Text aus Passwortfeldern und Passwortmanagern.";
 "Sleep after being idle for" = "Ruhezustand nach Inaktivität von";
 "Sleep Display" = "Display ausschalten";
+"Sleeps in" = "Ruhezustand in";
 "Snap by dragging a window to a screen edge" = "Einrasten durch Ziehen eines Fensters an einen Bildschirmrand";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Lass Fenster per Kurzbefehl oder durch Ziehen an einen Bildschirmrand in Hälften, Ecken und Drittel einrasten.";
 "Space" = "Leertaste";
@@ -276,6 +278,7 @@
 "Spotlight" = "Spotlight";
 "Stack" = "Stapel";
 "Startup" = "Start";
+"State" = "Zustand";
 "Status" = "Status";
 "Stops your Mac and its display from going to sleep." = "Verhindert, dass dein Mac und sein Display in den Ruhezustand wechseln.";
 "Style" = "Stil";
@@ -313,5 +316,4 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Wenn aus, behält der Verlauf die Reihenfolge des Kopierens, und ⌘V setzt weiter den zuletzt kopierten Text ein.";
 "Width" = "Breite";
 "Window Snapping" = "Fenster einrasten";
-"Yes" = "Ja";
 "§ (Section)" = "§ (Paragraf)";

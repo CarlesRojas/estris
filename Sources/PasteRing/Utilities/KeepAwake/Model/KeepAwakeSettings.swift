@@ -1,4 +1,5 @@
 import Foundation
+import IOKit
 
 /// How long the Mac may be idle before Keep Awake lets it sleep.
 enum KeepAwakeDuration: String, CaseIterable, Identifiable {
@@ -94,4 +95,32 @@ final class KeepAwakeStatus: ObservableObject {
 
     @Published var state = State.off
     @Published var isOnBattery = false
+    /// How long the Mac may be idle on the current power source, for the countdown.
+    @Published var limit: TimeInterval?
+    /// Whether another app keeps the display on, such as a playing video.
+    @Published var otherAppKeepsDisplayOn = false
+    /// When another app last stopped keeping the display on, which counts as activity.
+    var otherHolderEndedAt = Date.distantPast
+
+    /// Seconds the Mac has been idle: since the last input or another app keeping the
+    /// display on.
+    var idleTime: TimeInterval {
+        min(Self.inputIdleTime, Date().timeIntervalSince(otherHolderEndedAt))
+    }
+
+    /// Seconds left until the Mac may sleep, while counting down.
+    var remaining: TimeInterval? {
+        guard state == .active, !otherAppKeepsDisplayOn, let limit else { return nil }
+        return max(0, limit - idleTime)
+    }
+
+    /// Seconds since the last mouse, keyboard or trackpad input.
+    static var inputIdleTime: TimeInterval {
+        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOHIDSystem"))
+        guard service != 0 else { return 0 }
+        defer { IOObjectRelease(service) }
+        let value = IORegistryEntryCreateCFProperty(service, "HIDIdleTime" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue()
+        guard let nanoseconds = (value as? NSNumber)?.uint64Value else { return 0 }
+        return TimeInterval(nanoseconds) / 1_000_000_000
+    }
 }

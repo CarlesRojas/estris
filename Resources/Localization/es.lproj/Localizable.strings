@@ -33,6 +33,8 @@
 "` (Grave Accent)" = "` (Acento grave)";
 "About" = "Acerca de";
 "Accessibility" = "Accesibilidad";
+"Active" = "Activo";
+"Active, an app keeps the display on" = "Activo, una app mantiene la pantalla encendida";
 "Add Alternative Shortcut" = "Añadir atajo alternativo";
 "Add Mapping" = "Añadir asignación";
 "After 1 day" = "Tras 1 día";
@@ -46,6 +48,7 @@
 "Already mapped above" = "Ya asignado más arriba";
 "Already mapped on %@" = "Ya asignado en %@";
 "Alternative" = "Alternativa";
+"Always on" = "Siempre activo";
 "Another device" = "Otro dispositivo";
 "App Windows" = "Ventanas de la app";
 "Appearance" = "Apariencia";
@@ -125,11 +128,11 @@
 "Home" = "Inicio";
 "Ignore passwords" = "Ignorar contraseñas";
 "Immediately" = "Inmediatamente";
+"Inactive, macOS sleep settings apply" = "Inactivo, se aplican los ajustes de reposo de macOS";
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Insertar";
 "Keep Awake" = "Mantener despierto";
 "Keep up to" = "Conservar hasta";
-"Keeping awake" = "Manteniendo despierto";
 "Keeps copied images in the history alongside text and files." = "Guarda las imágenes copiadas en el historial junto al texto y los archivos.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Guarda lo que copias y te deja elegir qué pegar con un atajo.";
 "Key %@" = "Tecla %@";
@@ -177,16 +180,14 @@
 "Never" = "Nunca";
 "Next Desktop" = "Escritorio siguiente";
 "Next Track" = "Pista siguiente";
-"No" = "No";
 "No apps excluded" = "Ninguna app excluida";
 "No clipboard entries yet" = "Aún no hay entradas en el portapapeles";
 "No entries match “%@”" = "Ninguna entrada coincide con «%@»";
 "No events yet" = "Aún no hay eventos";
-"No, idle" = "No, inactivo";
 "Not granted" = "No concedido";
+"Not keeping awake" = "Sin mantener despierto";
 "Nothing" = "Nada";
 "Nothing logged yet." = "Aún no hay registros.";
-"Now" = "Ahora";
 "Numbers" = "Números";
 "Off" = "Desactivado";
 "On" = "Activado";
@@ -268,6 +269,7 @@
 "Skips text copied from password fields and password managers." = "Omite el texto copiado de campos de contraseña y gestores de contraseñas.";
 "Sleep after being idle for" = "Reposo tras estar inactivo";
 "Sleep Display" = "Reposo de la pantalla";
+"Sleeps in" = "Reposo en";
 "Snap by dragging a window to a screen edge" = "Ajustar al arrastrar una ventana a un borde de la pantalla";
 "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge." = "Ajusta ventanas a mitades, esquinas y tercios con atajos o arrastrándolas a un borde de la pantalla.";
 "Space" = "Espacio";
@@ -276,6 +278,7 @@
 "Spotlight" = "Spotlight";
 "Stack" = "Pila";
 "Startup" = "Inicio";
+"State" = "Estado";
 "Status" = "Estado";
 "Stops your Mac and its display from going to sleep." = "Evita que tu Mac y su pantalla entren en reposo.";
 "Style" = "Estilo";
@@ -313,5 +316,4 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Si está desactivado, el historial mantiene el orden en que se copiaron las cosas y ⌘V sigue pegando el último texto copiado.";
 "Width" = "Anchura";
 "Window Snapping" = "Ajuste de ventanas";
-"Yes" = "Sí";
 "§ (Section)" = "§ (Sección)";
