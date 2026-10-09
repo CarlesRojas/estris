@@ -33,10 +33,12 @@ enum RemapOutput: Codable, Hashable {
     }
 }
 
+/// A key or button and what it does instead. Either side is empty until chosen; an
+/// incomplete mapping does nothing.
 struct Mapping: Codable, Identifiable, Hashable {
     var id = UUID()
-    var input: RemapInput
-    var output: RemapOutput
+    var input: RemapInput?
+    var output: RemapOutput?
 }
 
 /// A device's mappings, with its name kept so it still shows while disconnected.
@@ -87,18 +89,20 @@ final class RemapSettings: ObservableObject {
         devices[deviceID]?.mappings ?? []
     }
 
-    /// Adds a mapping, replacing any other one for the same key or button.
-    func add(_ mapping: Mapping, to device: InputDevice) {
+    /// Adds an empty mapping at the end of the device's list.
+    func addMapping(to device: InputDevice) {
         var entry = devices[device.id] ?? DeviceMappings(name: device.name, kind: device.kind)
         entry.name = device.name
-        entry.mappings.removeAll { $0.input == mapping.input }
-        entry.mappings.append(mapping)
+        entry.mappings.append(Mapping())
         devices[device.id] = entry
     }
 
+    /// Changes a mapping, removing any other one for the same key or button.
     func update(_ mapping: Mapping, on deviceID: String) {
         guard var entry = devices[deviceID] else { return }
-        entry.mappings.removeAll { $0.input == mapping.input && $0.id != mapping.id }
+        if mapping.input != nil {
+            entry.mappings.removeAll { $0.input == mapping.input && $0.id != mapping.id }
+        }
         guard let index = entry.mappings.firstIndex(where: { $0.id == mapping.id }) else { return }
         entry.mappings[index] = mapping
         devices[deviceID] = entry

@@ -34,7 +34,6 @@ private struct MappingsView: View {
     @ObservedObject var settings: RemapSettings
     @ObservedObject var devices: InputDevices
     @State private var selection = ""
-    @State private var isAdding = false
     @State private var isRenaming = false
     @State private var newName = ""
 
@@ -80,7 +79,7 @@ private struct MappingsView: View {
                         row(mapping, on: device)
                     }
                     Button("Add Mapping") {
-                        isAdding = true
+                        settings.addMapping(to: device)
                     }
                 } header: {
                     Text("Mappings")
@@ -89,13 +88,6 @@ private struct MappingsView: View {
         }
         .formStyle(.grouped)
         .settingsPage()
-        .sheet(isPresented: $isAdding) {
-            if let device {
-                NewMappingSheet(remap: remap, device: device) { mapping in
-                    settings.add(mapping, to: device)
-                }
-            }
-        }
         .alert("Rename Device", isPresented: $isRenaming) {
             TextField("Name", text: $newName)
             Button("Rename") {
@@ -146,48 +138,6 @@ private struct MappingsView: View {
             .buttonStyle(.borderless)
             .help("Remove this mapping")
         }
-    }
-}
-
-/// Picks the key or button to remap from, by pressing it or from the list.
-private struct NewMappingSheet: View {
-    let remap: Remap
-    let device: InputDevice
-    let add: (Mapping) -> Void
-    @Environment(\.dismiss) private var dismiss
-    @State private var input: RemapInput?
-    @State private var output: RemapOutput?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("New Mapping for \(device.name)")
-                .font(.headline)
-            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 12) {
-                GridRow {
-                    Text("From")
-                    InputButton(remap: remap, device: device, input: input) { input = $0 }
-                }
-                GridRow {
-                    Text("To")
-                    OutputButton(input: input, output: output) { output = $0 }
-                }
-            }
-            HStack {
-                Spacer()
-                Button("Cancel") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                Button("Add") {
-                    if let input, let output {
-                        add(Mapping(input: input, output: output))
-                    }
-                    dismiss()
-                }
-                .keyboardShortcut(.defaultAction)
-                .disabled(input == nil || output == nil)
-            }
-        }
-        .padding(20)
-        .frame(width: 420)
     }
 }
 

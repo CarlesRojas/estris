@@ -16,7 +16,7 @@ enum KeyMapper {
         if settings.isEnabled {
             for (deviceID, entry) in settings.devices {
                 let pairs: [[String: NSNumber]] = entry.mappings.compactMap { mapping in
-                    guard case .key(let source) = mapping.input, case .key(let destination) = mapping.output else { return nil }
+                    guard case .key(let source)? = mapping.input, case .key(let destination)? = mapping.output else { return nil }
                     return [
                         "HIDKeyboardModifierMappingSrc": NSNumber(value: source),
                         "HIDKeyboardModifierMappingDst": NSNumber(value: destination),

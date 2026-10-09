@@ -134,11 +134,11 @@ final class Remap {
         }
 
         guard settings.isEnabled, let device, let input = parsed.input,
-              let mapping = settings.mappings(for: device.id).first(where: { $0.input == input })
+              let output = settings.mappings(for: device.id).first(where: { $0.input == input })?.output
         else { return true }
         // Set on the keyboard itself, so this already is the new key.
-        if case .key = input, case .key = mapping.output { return true }
-        perform(mapping.output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
+        if case .key = input, case .key = output { return true }
+        perform(output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
         return false
     }
 
