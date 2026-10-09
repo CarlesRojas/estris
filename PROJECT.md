@@ -91,6 +91,7 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Every interface of a device (keyboard, pointer, media keys, vendor extras) maps to it, since a mouse can send side buttons through any of them; only devices with a keyboard or pointer interface are listed.
   - Devices are identified by vendor, product and name, so mappings survive reconnects; identical devices share mappings.
   - Devices can be renamed (**Rename…** next to the Device menu); an empty name goes back to the original.
+  - A press that reaches macOS without its device takes the mappings of a device that has one for it (a mouse first for buttons, a keyboard first for keys).
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.
 

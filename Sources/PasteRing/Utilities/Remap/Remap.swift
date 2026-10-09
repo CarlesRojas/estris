@@ -131,8 +131,11 @@ final class Remap {
         // A click on Create Mapping in the Event Viewer; logging it would add a row and move
         // the list under the pointer.
         let isLinkClick = isOverViewerLink && (type == .leftMouseDown || type == .leftMouseUp)
+        // Some presses reach macOS without their device; they take the mappings of the device
+        // that has one for them.
+        let target = device ?? parsed.input.flatMap(deviceMapping)
         if isViewing, !parsed.isRepeat, !isLinkClick {
-            let (original, result) = remapping(of: parsed.input, on: device)
+            let (original, result) = remapping(of: parsed.input, on: target)
             eventLog.record(InputEvent(
                 device: device.map(settings.name(of:)) ?? unknownSource(sender: sender, event: event),
                 source: device,
@@ -157,11 +160,12 @@ final class Remap {
             }
         }
 
-        guard settings.isEnabled, let device, let input = parsed.input,
-              let output = settings.mappings(for: device.id).first(where: { $0.input == input })?.output
+        guard settings.isEnabled, let target, let input = parsed.input,
+              let output = settings.mappings(for: target.id).first(where: { $0.input == input })?.output
         else { return true }
-        // Set on the keyboard itself, so this already is the new key.
-        if case .key = input, case .key = output { return true }
+        // Set on the keyboard itself, so this already is the new key; a press without its
+        // device didn't go through that, so it is changed here.
+        if case .key = input, case .key = output, device != nil { return true }
         perform(output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
         return false
     }
@@ -175,6 +179,18 @@ final class Remap {
         let pid = pid_t(event.getIntegerValueField(.eventSourceUnixProcessID))
         guard pid > 0 else { return "Other source" }
         return "Posted by \(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "process \(pid)")"
+    }
+
+    /// The device whose mappings a press without a device takes: one with a complete mapping
+    /// for it, preferring a mouse for buttons and a keyboard for keys.
+    private func deviceMapping(for input: RemapInput) -> InputDevice? {
+        let preferred: InputDevice.Kind
+        if case .mouseButton = input { preferred = .mouse } else { preferred = .keyboard }
+        let candidates = settings.devices
+            .filter { _, entry in entry.mappings.contains { $0.input == input && $0.output != nil } }
+            .map { id, entry in InputDevice(id: id, name: entry.name, kind: entry.kind) }
+            .sorted { ($0.kind == preferred ? 0 : 1, $0.id) < ($1.kind == preferred ? 0 : 1, $1.id) }
+        return candidates.first
     }
 
     /// For the Event Viewer: what an event was remapped to, and, for a key changed on the
