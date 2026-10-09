@@ -77,7 +77,7 @@ final class AppearanceSettings: ObservableObject {
     private struct Stored: Codable {
         var renderer = SurfaceRenderer.material.rawValue
         var vibrancyMaterial = VibrancyMaterial.hudWindow.rawValue
-        var tint: [Double] = [0, 0, 0]
+        var tint: [Double] = [0.5, 0.5, 0.5]
         var tintOpacity = 0.2
         var selectedTintOpacity = 0.3
         var interactive = false
@@ -131,7 +131,7 @@ final class AppearanceSettings: ObservableObject {
     }
 
     private static func color(from components: [Double]) -> Color {
-        guard components.count == 3 else { return .black }
+        guard components.count == 3 else { return Color(.sRGB, red: 0.5, green: 0.5, blue: 0.5) }
         return Color(.sRGB, red: components[0], green: components[1], blue: components[2])
     }
 

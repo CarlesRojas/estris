@@ -27,12 +27,7 @@ struct RingMenuView: View {
                 let distance = circularDistance(index, count: count)
                 RingChip(item: item, isSelected: distance == 0)
                     .scaleEffect(distance == 0 ? 1.12 : 0.92)
-                    .opacity(opacity(distance, count: count))
-                    // Offset does not move the layout frame, so the outer rotation pivots
-                    // around the ring centre; the inner one keeps the chip upright.
-                    .rotationEffect(.degrees(-angle))
-                    .offset(y: -radius)
-                    .rotationEffect(.degrees(angle))
+                    .modifier(RingPlacement(angle: angle, radius: radius))
                     .zIndex(distance == 0 ? 1 : 0)
             }
         }
@@ -51,11 +46,22 @@ struct RingMenuView: View {
         let forward = ((index - state.selected) % count + count) % count
         return min(forward, count - forward)
     }
+}
 
-    private func opacity(_ distance: Int, count: Int) -> Double {
-        guard distance > 0 else { return 1 }
-        let farthest = max(count / 2, 1)
-        return 0.8 - 0.4 * Double(distance - 1) / Double(max(farthest - 1, 1))
+/// Puts a chip on the circle with a plain offset, animating the angle so chips travel
+/// along the arc. Avoids rotation transforms, which material backgrounds do not survive.
+private struct RingPlacement: ViewModifier, Animatable {
+    var angle: Double
+    let radius: CGFloat
+
+    var animatableData: Double {
+        get { angle }
+        set { angle = newValue }
+    }
+
+    func body(content: Content) -> some View {
+        let radians = angle * .pi / 180
+        return content.offset(x: radius * sin(radians), y: -radius * cos(radians))
     }
 }
 
@@ -67,7 +73,7 @@ struct RingChip: View {
         HStack(spacing: 6) {
             AppIconView(bundleID: item.sourceBundleID, size: 18)
             Text(item.text.singleLine)
-                .font(.callout.weight(isSelected ? .semibold : .regular))
+                .font(.callout)
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)

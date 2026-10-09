@@ -31,7 +31,7 @@ final class AppSettings: ObservableObject {
     static let gridSizeRange = 8...24
     static let simpleWidthRange: ClosedRange<Double> = 360...900
     static let simpleHeightRange: ClosedRange<Double> = 120...420
-    static let gridCardWidthRange: ClosedRange<Double> = 160...320
+    static let gridCardWidthRange: ClosedRange<Double> = 160...420
 
     private let defaults = UserDefaults.standard
 
@@ -67,15 +67,8 @@ final class AppSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [
-            Keys.maxItems: 50,
-            Keys.ringSize: 8,
-            Keys.gridSize: 12,
-            Keys.gridCardWidth: 200.0,
-            Keys.simpleWidth: 560.0,
-            Keys.simpleHeight: 200.0,
-            Keys.style: OverlayStyle.simple.rawValue,
-        ])
+        defaults.register(defaults: [Keys.maxItems: 50])
+        defaults.register(defaults: Self.appearanceDefaults)
         maxItems = defaults.integer(forKey: Keys.maxItems)
         ringSize = defaults.integer(forKey: Keys.ringSize)
         gridSize = defaults.integer(forKey: Keys.gridSize)
@@ -92,6 +85,29 @@ final class AppSettings: ObservableObject {
         case .grid: gridSize
         case .simple, .stack, .carousel: nil
         }
+    }
+
+    /// Defaults for the settings shown in the Appearance tab. Add new ones here so
+    /// Reset to Defaults covers them.
+    private static let appearanceDefaults: [String: Any] = [
+        Keys.style: OverlayStyle.simple.rawValue,
+        Keys.ringSize: 8,
+        Keys.gridSize: 12,
+        Keys.gridCardWidth: 256.0,
+        Keys.simpleWidth: 560.0,
+        Keys.simpleHeight: 256.0,
+    ]
+
+    func resetAppearance() {
+        for key in Self.appearanceDefaults.keys {
+            defaults.removeObject(forKey: key)
+        }
+        style = OverlayStyle(rawValue: defaults.string(forKey: Keys.style) ?? "") ?? .simple
+        ringSize = defaults.integer(forKey: Keys.ringSize)
+        gridSize = defaults.integer(forKey: Keys.gridSize)
+        gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
+        simpleWidth = defaults.double(forKey: Keys.simpleWidth)
+        simpleHeight = defaults.double(forKey: Keys.simpleHeight)
     }
 
     /// Binding that keeps typed or stepped values inside `range`.

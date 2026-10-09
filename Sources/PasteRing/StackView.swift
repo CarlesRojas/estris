@@ -5,8 +5,8 @@ import SwiftUI
 struct StackView: View {
     private static let visibleRange = 3
     /// Angle between neighbouring entries on the wheel, in degrees.
-    private static let step: Double = 34
-    private static let radius: CGFloat = 240
+    private static let step: Double = 26
+    private static let radius: CGFloat = 230
     /// Distance from the viewer to the front of the wheel. Smaller means stronger depth.
     private static let perspective: CGFloat = 320
 
@@ -68,9 +68,9 @@ struct ClipCard: View {
             if showsIcon {
                 AppIconView(bundleID: appBundleID, size: 30)
             }
-            // Same font size and line limit front and back, so a card keeps its height as it moves.
+            // Same font and line limit front and back, so nothing reflows as a card moves.
             Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
-                .font(.title3.weight(isSelected ? .semibold : .regular))
+                .font(.title3)
                 .lineLimit(4)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)

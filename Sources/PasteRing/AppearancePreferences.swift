@@ -75,7 +75,10 @@ struct AppearancePreferences: View {
                 }
 
                 Section {
-                    Button("Reset to Defaults") { appearance.reset() }
+                    Button("Reset to Defaults") {
+                        settings.resetAppearance()
+                        appearance.reset()
+                    }
                 }
             }
             .formStyle(.grouped)

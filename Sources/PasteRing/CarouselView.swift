@@ -1,7 +1,6 @@
 import SwiftUI
 
 /// Cover Flow style: the selected card faces you, the others tilt away on either side.
-/// Tilted cards are solid, since glass and blur break under the 3D tilt.
 struct CarouselView: View {
     private static let visibleRange = 3
 
@@ -16,8 +15,6 @@ struct CarouselView: View {
                     let distance = index - state.selected
                     if abs(distance) <= Self.visibleRange {
                         ContentCard(item: item, isSelected: distance == 0)
-                            // Backdrop effects break under the 3D tilt, so only the front card uses one.
-                            .environment(\.surfaceIsSolid, distance != 0)
                             .rotation3DEffect(
                                 .degrees(distance == 0 ? 0 : (distance < 0 ? 45 : -45)),
                                 axis: (x: 0, y: 1, z: 0),
@@ -59,8 +56,9 @@ struct ContentCard: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
+                // Same font whether selected or not: a heavier weight rewraps the text.
                 Text(item.text.trimmingCharacters(in: .whitespacesAndNewlines))
-                    .font(.body.weight(isSelected ? .medium : .regular))
+                    .font(.body)
                     .lineLimit(lineLimit)
                     .truncationMode(.tail)
             } else {
