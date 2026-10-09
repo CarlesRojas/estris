@@ -41,8 +41,13 @@ struct CarouselView: View {
             }
         }
         .frame(width: width * 3.5, height: height + 80)
-        // The frame leaves 40pt below the cards; the pill only has to move for more.
-        .preference(key: OverlayGrowthKey.self, value: frontGrowth - 40)
+        // Just below the front card, moving down when it grows for an image.
+        .overlay {
+            if let position = state.positionText {
+                PositionPill(text: position)
+                    .offset(y: height / 2 + max(0, frontGrowth) + 30)
+            }
+        }
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.selected)
     }
 

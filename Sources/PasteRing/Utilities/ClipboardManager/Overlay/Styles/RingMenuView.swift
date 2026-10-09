@@ -5,9 +5,9 @@ import SwiftUI
 /// need room side by side at the top and bottom, but stack closely at the sides.
 struct RingMenuView: View {
     private static let minRadius: CGFloat = 120
-    private static let chipGap: CGFloat = 6
+    private static let chipGap: CGFloat = 4
     /// Widest the ring may get relative to its height, so it still reads as a ring.
-    private static let maxAspect: CGFloat = 1.6
+    private static let maxAspect: CGFloat = 2.2
     private static var radiiCache: [String: CGSize] = [:]
 
     @ObservedObject var state: OverlayState
@@ -21,6 +21,11 @@ struct RingMenuView: View {
         let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: chipHeight)
 
         ZStack {
+            // The middle of the ring is empty: the natural place for the pill.
+            if let position = state.positionText {
+                PositionPill(text: position)
+            }
+
             if count == 0 {
                 Text("Clipboard history is empty")
                     .font(.system(size: 15, weight: .medium))
@@ -46,9 +51,9 @@ struct RingMenuView: View {
         let key = "\(count)-\(Int(chipWidth))-\(Int(chipHeight))"
         if let cached = radiiCache[key] { return cached }
 
-        // The chip at the top is drawn a little larger, so allow for that.
-        let width = chipWidth * 1.04 + chipGap
-        let height = chipHeight * 1.04 + chipGap
+        // Chips may touch the enlarged top chip slightly; it is drawn above its neighbours.
+        let width = chipWidth + chipGap
+        let height = chipHeight + chipGap
         let angles = (0..<count).map { 2 * Double.pi * Double($0) / Double(count) }
 
         func fits(_ rx: CGFloat, _ ry: CGFloat) -> Bool {

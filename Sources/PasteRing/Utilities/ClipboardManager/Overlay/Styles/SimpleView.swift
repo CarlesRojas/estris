@@ -9,14 +9,18 @@ struct SimpleView: View {
     var body: some View {
         let item = state.selectedItem
         let height = settings.simpleHeight
-        let fitted = EntryCard.fittedHeight(for: item, width: settings.simpleWidth, height: height)
-        EntryCard(item: item, width: settings.simpleWidth, height: height)
-            .modifier(OptionalClipActions(item: item))
-            // Laid out at the usual height with the top pinned: a taller card for an image
-            // grows downward only, and the position pill moves down with it.
-            .frame(height: height, alignment: .top)
-            .preference(key: OverlayGrowthKey.self, value: fitted - height)
-            .transaction { $0.animation = nil }
+        VStack(spacing: 12) {
+            // Above the card, so a card that grows for an image never covers it.
+            if let position = state.positionText {
+                PositionPill(text: position)
+            }
+            EntryCard(item: item, width: settings.simpleWidth, height: height)
+                .modifier(OptionalClipActions(item: item))
+                // Laid out at the usual height with the top pinned: a taller card for an image
+                // grows downward only.
+                .frame(height: height, alignment: .top)
+        }
+        .transaction { $0.animation = nil }
     }
 }
 

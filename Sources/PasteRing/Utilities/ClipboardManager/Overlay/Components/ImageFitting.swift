@@ -17,13 +17,3 @@ enum ImageFitting {
         return min(max(baseHeight, needed), max(baseHeight, maxCardHeight))
     }
 }
-
-/// How far a style's front card reaches below the area it was laid out in, so the position
-/// pill can move down out of its way.
-struct OverlayGrowthKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
-    }
-}

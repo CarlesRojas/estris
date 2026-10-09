@@ -10,8 +10,18 @@ struct GridView: View {
     }
 
     var body: some View {
+        VStack(spacing: 12) {
+            // Above the grid, clear of its rows.
+            if let position = state.positionText {
+                PositionPill(text: position)
+            }
+            grid
+        }
+    }
+
+    private var grid: some View {
         let layout = layout
-        Group {
+        return Group {
             if state.items.isEmpty {
                 ContentCard(item: nil, isSelected: true, width: 480, height: 160)
             } else {

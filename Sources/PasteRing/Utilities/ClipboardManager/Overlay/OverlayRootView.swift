@@ -5,7 +5,6 @@ struct OverlayRootView: View {
     @ObservedObject var settings: ClipboardSettings
     @ObservedObject var appearance: AppearanceSettings
     @ObservedObject var general: GeneralSettings
-    @State private var growth: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -37,21 +36,9 @@ struct OverlayRootView: View {
         return actions
     }
 
-    private var content: some View {
-        style
-            .onPreferenceChange(OverlayGrowthKey.self) { growth = max(0, $0) }
-            // The pill hangs below the style without taking part in its layout, so the style
-            // stays put on screen; it moves down when a card grows for an image.
-            .overlay(alignment: .bottom) {
-                if !state.items.isEmpty {
-                    PositionPill(text: "\(state.selected + 1) of \(state.items.count)")
-                        .alignmentGuide(.bottom) { pill in pill[.top] - 16 - growth }
-                }
-            }
-    }
-
+    /// Each style places its own "2 of 12" pill, where it fits that layout.
     @ViewBuilder
-    private var style: some View {
+    private var content: some View {
         switch settings.style {
         case .stack: StackView(state: state, settings: settings)
         case .ring: RingMenuView(state: state, settings: settings)
