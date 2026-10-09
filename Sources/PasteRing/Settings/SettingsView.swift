@@ -8,6 +8,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case clipboard
     case autoQuit
     case middleClick
+    case remap
     /// Hidden until unlocked from the version in General > About.
     case developer
 
@@ -19,6 +20,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .clipboard: "Clipboard"
         case .autoQuit: "Auto Quit"
         case .middleClick: "Middle Click"
+        case .remap: "Remap"
         case .developer: "Developer"
         }
     }
@@ -29,6 +31,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .clipboard: "list.clipboard"
         case .autoQuit: "xmark.app"
         case .middleClick: "hand.tap"
+        case .remap: "keyboard"
         case .developer: "hammer"
         }
     }
@@ -42,6 +45,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["logs", "debug", "developer", "diagnostics"]
         case .autoQuit:
             ["quit", "close", "window", "last window", "terminate", "excluded", "apps", "delay"]
+        case .remap:
+            ["keys", "keyboard", "mouse", "buttons", "mapping", "remap", "device", "event viewer", "mission control", "desktop", "volume", "brightness"]
         case .middleClick:
             ["trackpad", "mouse", "middle", "tap", "fingers", "click"]
         case .clipboard:
@@ -101,6 +106,7 @@ struct SettingsSidebar: View {
     @ObservedObject var clipboardSettings: ClipboardSettings
     @ObservedObject var autoQuitSettings: AutoQuitSettings
     @ObservedObject var middleClickSettings: MiddleClickSettings
+    @ObservedObject var remapSettings: RemapSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -110,6 +116,8 @@ struct SettingsSidebar: View {
 
             List(navigation.panes, selection: $navigation.selection) { pane in
                 SidebarRow(pane: pane, isOn: isOn(pane), isSelected: navigation.selection == pane)
+                    // Typing a letter would otherwise jump to the pane starting with it.
+                    .background(TypeSelectDisabler())
             }
             .listStyle(.sidebar)
         }
@@ -122,6 +130,7 @@ struct SettingsSidebar: View {
         case .clipboard: clipboardSettings.isEnabled
         case .autoQuit: autoQuitSettings.isEnabled
         case .middleClick: middleClickSettings.isEnabled
+        case .remap: remapSettings.isEnabled
         case .developer: nil
         }
     }
@@ -135,6 +144,7 @@ struct SettingsDetail: View {
     let clipboard: ClipboardManager
     let autoQuit: AutoQuit
     let middleClick: MiddleClick
+    let remap: Remap
     let log: AppLog
 
     var body: some View {
@@ -149,6 +159,8 @@ struct SettingsDetail: View {
                     autoQuit.settingsPane()
                 case .middleClick:
                     middleClick.settingsPane()
+                case .remap:
+                    remap.settingsPane()
                 case .developer:
                     DeveloperPane(general: general, log: log)
                 }
@@ -213,4 +225,23 @@ private struct SidebarRowContent: View {
         }
         .transaction { $0.animation = nil }
     }
+}
+
+/// Turns off "type to select" on the list it is placed in: SwiftUI has no setting for it, so
+/// it finds the AppKit table behind the list.
+private struct TypeSelectDisabler: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        // The view joins the table on the next pass.
+        DispatchQueue.main.async {
+            var ancestor = view.superview
+            while let current = ancestor, !(current is NSTableView) {
+                ancestor = current.superview
+            }
+            (ancestor as? NSTableView)?.allowsTypeSelect = false
+        }
+        return view
+    }
+
+    func updateNSView(_ view: NSView, context: Context) {}
 }

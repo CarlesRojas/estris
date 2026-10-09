@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit and Middle Click.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click and Remap.
 
 ## Usage
 
@@ -75,6 +75,26 @@ Middle click from the trackpad, which macOS doesn't offer. Off by default; turn 
 - It reads the trackpad's raw touches through the private MultitouchSupport framework and posts the click, so it needs the Accessibility permission.
 - To use three fingers, turn off Look Up's three-finger tap in System Settings > Trackpad.
 
+## Remap
+
+Changes what keys and mouse buttons do, per device. Off by default; turn it on in **Settings… > Remap**.
+
+- **Mappings**: every device (connected keyboards, mice and trackpads, and disconnected ones that still have mappings) is its own group, "<name> Mappings", all on one page; the pencil next to the title renames it. One group per physical device. Any key or button a device sends can be remapped on its entry; whether it looks like a keyboard or a mouse only picks its icon and which inputs the picker lists first. **Add Mapping** (the button at the right under each group) adds an empty row to it; rows with both sides still empty are dropped when the page is left or the app relaunches; each row's source and result are buttons that open a picker, so adding and editing work the same. A row missing either side does nothing.
+  - Source: any key or mouse button except the left one. **Record** captures the next key or button pressed on that device; or pick from a searchable, sectioned list.
+  - Result: another key, a mouse button, a system action (Mission Control, App Windows, Show Desktop, Launchpad, next or previous desktop, volume, mute, media, display and keyboard brightness, sleep display, lock screen, Spotlight, screenshots, emoji picker, Force Quit) or nothing.
+  - Only the first mapping for a source applies: a later row for the same key or button on the same device shows "Already mapped above", with its result disabled. Nothing is deleted.
+  - The swap button turns a mapping around (result becomes source); off when the result can't be a source, such as a system action.
+- **Event Viewer**: every key and button pressed and released (Down and Up), newest at the bottom (the list follows new events unless scrolled up): the readable name, then the raw codes in parentheses (macOS key code and HID usage, or the button number macOS uses, counted from 0), and the device. A remapped event shows the key or button pressed, then an arrow and what it was remapped to, in blue. A key changed on the keyboard itself reaches macOS as the new key, so its original is worked out from the mappings: pressing the real target key can show as remapped too. Media keys are shown too. Hovering a row that can be remapped shows **Create Mapping**, which opens Mappings on that device with a mapping from it (or its existing one). Left clicks on that button aren't logged, so clicking it doesn't move the list; every other click is. Events posted by other apps (for example a mouse utility re-sending side buttons) have no device and show "Posted by" and the app; events from an interface PasteRing doesn't know show "Unknown device" and its ID. Logs only while the tab is open.
+- How it works:
+  - Key to key: set on the keyboard itself through the system's per-device `UserKeyMapping` property, so modifiers and Caps Lock work like real keys. Set again when a device connects or the Mac wakes; cleared when Remap is turned off or the app quits.
+  - Everything else: an event tap that reads the sending device from the HID event inside each event (private `CGEventCopyIOHIDEvent` and `IOHIDEventGetSenderID`), swallows the original and posts the result.
+  - Every interface of a device (keyboard, pointer, media keys, vendor extras) maps to it, since a mouse can send side buttons through any of them; only devices with a keyboard or pointer interface are listed.
+  - Devices are identified by vendor, product and name, so mappings survive reconnects; identical devices share mappings.
+  - Devices can be renamed (pencil next to the group title); an empty name goes back to the original.
+  - A press that reaches macOS without its device (seen while recording or pressing) is remembered as device-less. It takes the oldest complete mapping for it on any device; newer mappings of it on other devices show "Already mapped on" that device, with their result disabled.
+  - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
+- Needs the Accessibility permission.
+
 ## Project structure
 
 PasteRing is meant to grow into a set of macOS utilities, so code is grouped by area:
@@ -84,7 +104,7 @@ Sources/PasteRing/
   App/                    entry point, app delegate (menu bar item, Settings window)
   General/                settings shared by every utility (language, date and time format)
   Settings/               the Settings window: sidebar, search, General pane
-  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons)
+  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher)
   Utilities/
     AutoQuit/
       AutoQuit.swift           owns the utility
@@ -92,8 +112,12 @@ Sources/PasteRing/
       Settings/                the Auto Quit settings pane
     MiddleClick/
       MiddleClick.swift        owns the utility
-      Model/                   settings, tap listener, device watcher
+      Model/                   settings and the tap listener
       Settings/                the Middle Click settings pane
+    Remap/
+      Remap.swift              owns the utility and its event tap
+      Model/                   settings, devices, key catalog, system actions, key mapper, event log
+      Settings/                the Remap pane: mappings, pickers, Event Viewer
     ClipboardManager/
       ClipboardManager.swift   owns the utility; created and started by the app delegate
       Model/                   history, clipboard monitor, settings
