@@ -39,59 +39,46 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     }
 }
 
-/// The Settings window: a sidebar with General and one pane per utility.
-/// To add a utility, add a `SettingsPane` case, show its pane here and report its on/off
-/// state in `isOn(_:)`.
-struct SettingsView: View {
-    @ObservedObject var general: GeneralSettings
-    let clipboard: ClipboardManager
-    @ObservedObject private var clipboardSettings: ClipboardSettings
-    @State private var selection: SettingsPane? = .general
-    @State private var search = ""
-
-    init(general: GeneralSettings, clipboard: ClipboardManager) {
-        self.general = general
-        self.clipboard = clipboard
-        clipboardSettings = clipboard.settings
-    }
-
-    /// Whether a utility is switched on; nil for panes that are not a utility.
-    private func isOn(_ pane: SettingsPane) -> Bool? {
-        switch pane {
-        case .general: nil
-        case .clipboard: clipboardSettings.isEnabled
+/// What the Settings window is showing, shared by the sidebar and the detail column.
+@MainActor
+final class SettingsNavigation: ObservableObject {
+    @Published var selection: SettingsPane? = .general
+    @Published var search = "" {
+        // Jump to the first match when the search hides the open pane.
+        didSet {
+            if let selection, !panes.contains(selection), let first = panes.first {
+                self.selection = first
+            }
         }
     }
 
-    private var panes: [SettingsPane] {
+    var panes: [SettingsPane] {
         SettingsPane.allCases.filter { $0.matches(search) }
     }
+}
+
+/// The Settings sidebar: a search field and one row per pane, each utility showing whether
+/// it is on. To add a utility, add a `SettingsPane` case, report its state in `isOn(_:)`
+/// and show its pane in `SettingsDetail`.
+struct SettingsSidebar: View {
+    @ObservedObject var navigation: SettingsNavigation
+    @ObservedObject var clipboardSettings: ClipboardSettings
 
     var body: some View {
-        // Pin the whole view to the window's size, whatever the panes would like to be, so it
-        // can never be laid out taller than the window and shift off screen. Long panes
-        // scroll inside instead.
-        GeometryReader { proxy in
-            splitView
-                .frame(width: proxy.size.width, height: proxy.size.height)
-        }
-        // Cover the title bar too: the sidebar reaches the top like in System Settings, and
-        // the split view keeps its contents clear of the window buttons on its own.
-        .ignoresSafeArea()
-    }
+        VStack(spacing: 0) {
+            SearchField(text: $navigation.search)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
 
-    private var splitView: some View {
-        // Always showing both columns: any attempt to hide the sidebar is ignored.
-        NavigationSplitView(columnVisibility: .constant(.all)) {
-            List(panes, selection: $selection) { pane in
+            List(navigation.panes, selection: $navigation.selection) { pane in
                 HStack {
-                    // White in dark mode (the label colour, so they stay visible in light mode),
-                    // and white on the selected row's highlight.
+                    // The label colour (white in dark mode), and white on the selected row's
+                    // highlight.
                     Label {
                         Text(pane.title)
                     } icon: {
                         Image(systemName: pane.symbol)
-                            .foregroundStyle(selection == pane ? Color.white : Color.primary)
+                            .foregroundStyle(navigation.selection == pane ? Color.white : Color.primary)
                             // Switches with the selection highlight, without fading.
                             .transaction { $0.animation = nil }
                     }
@@ -102,48 +89,37 @@ struct SettingsView: View {
                 }
             }
             .listStyle(.sidebar)
-            .searchable(text: $search, placement: .sidebar, prompt: "Search")
-            .modifier(HidesSidebarToggle())
-            // Fixed width: the sidebar can't be resized, like System Settings.
-            .navigationSplitViewColumnWidth(min: 215, ideal: 215, max: 215)
-        } detail: {
+        }
+    }
+
+    /// Whether a utility is switched on; nil for panes that are not a utility.
+    private func isOn(_ pane: SettingsPane) -> Bool? {
+        switch pane {
+        case .general: nil
+        case .clipboard: clipboardSettings.isEnabled
+        }
+    }
+}
+
+/// The selected pane. Pinned to the space it is given, so a long pane scrolls instead of
+/// trying to grow the window.
+struct SettingsDetail: View {
+    @ObservedObject var navigation: SettingsNavigation
+    @ObservedObject var general: GeneralSettings
+    let clipboard: ClipboardManager
+
+    var body: some View {
+        GeometryReader { proxy in
             Group {
-                switch selection ?? .general {
+                switch navigation.selection ?? .general {
                 case .general:
                     GeneralPane(general: general)
                 case .clipboard:
                     clipboard.settingsPane()
                 }
             }
-            // The split view sizes the window from the detail column's preferred size. A long
-            // form prefers its full height (taller than the screen), which pushed everything
-            // off the top and bottom when switching panes. Fixed small minimum and ideal sizes
-            // keep the window as it is; the forms scroll instead.
-            .frame(
-                minWidth: 520, idealWidth: 640, maxWidth: .infinity,
-                minHeight: 0, idealHeight: 500, maxHeight: .infinity,
-                alignment: .top
-            )
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
         }
         .environment(\.dateTimeFormat, general.dateTimeFormat)
-        // Jump to the first match when the search hides the open pane.
-        .onChange(of: search) { _ in
-            if let selection, !panes.contains(selection), let first = panes.first {
-                self.selection = first
-            }
-        }
-    }
-}
-
-
-/// System Settings has no button to hide its sidebar.
-private struct HidesSidebarToggle: ViewModifier {
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if #available(macOS 14, *) {
-            content.toolbar(removing: .sidebarToggle)
-        } else {
-            content
-        }
     }
 }

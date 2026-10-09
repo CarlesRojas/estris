@@ -4,10 +4,10 @@ import SwiftUI
 /// Creates the shared settings and every utility, and owns the menu bar item and the
 /// Settings window. Each utility sets itself up in `start()`.
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
     private let general = GeneralSettings()
     private lazy var clipboard = ClipboardManager(general: general)
-    private var settingsWindow: NSWindow?
+    private var settingsWindow: SettingsWindowController?
     private var statusItem: NSStatusItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -40,76 +40,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         return item
     }
 
-    private static let settingsMinimumSize = NSSize(width: 820, height: 600)
-
     @objc private func openSettings() {
         if settingsWindow == nil {
-            let settingsView = SettingsView(general: general, clipboard: clipboard)
-            let hostingController = NSHostingController(rootView: settingsView)
-            // The window sets its own size. Letting SwiftUI drive it made the window adopt the
-            // Clipboard Manager pane's (very tall) minimum height, so the content overflowed the
-            // window above and below.
-            hostingController.sizingOptions = []
-            if #available(macOS 14, *) {
-                // Don't let SwiftUI put a title back into the window.
-                hostingController.sceneBridgingOptions = [.toolbars]
-            }
-            let window = NSWindow(contentViewController: hostingController)
-            // Laid out like System Settings: no visible title, and the sidebar runs to the top
-            // of the window with the close, minimize and zoom buttons inside it. No title at all,
-            // so none can show.
-            window.title = ""
-            window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
-            window.titleVisibility = .hidden
-            window.titlebarAppearsTransparent = true
-            window.toolbar = NSToolbar(identifier: "Settings")
-            window.toolbarStyle = .unified
-            // Set after the style mask and toolbar, which can reset it. Covers both the content
-            // and the whole frame so the window can't be dragged smaller.
-            // 80% of the screen's height, within sensible limits.
-            let screenHeight = NSScreen.main?.visibleFrame.height ?? 800
-            window.setContentSize(NSSize(width: 880, height: min(max(screenHeight * 0.8, 640), 1100)))
-            window.isReleasedWhenClosed = false
-            window.delegate = self
-            window.center()
-            settingsWindow = window
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard)
         }
-        // Accessory apps are not activated automatically, so the window would open behind others.
-        NSApp.activate(ignoringOtherApps: true)
-        settingsWindow?.makeKeyAndOrderFront(nil)
-        // The split view sets its own minimum once it has laid out, which can be smaller;
-        // apply ours afterwards, on both the content and the whole frame.
-        if let window = settingsWindow {
-            window.contentMinSize = Self.settingsMinimumSize
-            window.minSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: Self.settingsMinimumSize)).size
-            // Once SwiftUI has built the split view, stop its sidebar from being collapsed by
-            // dragging the divider.
-            DispatchQueue.main.async {
-                Self.lockSidebar(in: window.contentView)
-            }
-        }
-        // Don't start with a text field focused (and its contents selected).
-        settingsWindow?.makeFirstResponder(nil)
-    }
-
-    /// Finds the split view SwiftUI uses for the sidebar and marks its first item (the
-    /// sidebar) as not collapsible.
-    private static func lockSidebar(in view: NSView?) {
-        guard let view else { return }
-        if let splitView = view as? NSSplitView,
-           let controller = splitView.delegate as? NSSplitViewController,
-           let sidebar = controller.splitViewItems.first {
-            sidebar.canCollapse = false
-            return
-        }
-        view.subviews.forEach { lockSidebar(in: $0) }
-    }
-
-    /// Last line of defence for the minimum size, whatever else changes the window's limits.
-    func windowWillResize(_ sender: NSWindow, to frameSize: NSSize) -> NSSize {
-        guard sender == settingsWindow else { return frameSize }
-        let minimum = sender.frameRect(forContentRect: NSRect(origin: .zero, size: Self.settingsMinimumSize)).size
-        return NSSize(width: max(frameSize.width, minimum.width), height: max(frameSize.height, minimum.height))
+        settingsWindow?.show()
     }
 
     @objc private func quit() {
