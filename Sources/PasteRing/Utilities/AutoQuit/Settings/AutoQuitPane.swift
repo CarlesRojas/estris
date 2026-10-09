@@ -36,10 +36,6 @@ struct AutoQuitPane: View {
                 }
             } header: {
                 Text("General")
-            } footer: {
-                Text("Apps opened without a window, and apps that live in the menu bar, are left alone. The Finder is never quit. Needs Accessibility access to see each app's windows.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)

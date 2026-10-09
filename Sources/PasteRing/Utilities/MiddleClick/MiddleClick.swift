@@ -3,7 +3,8 @@ import Combine
 import SwiftUI
 
 /// The Middle Click utility: a trackpad tap with three or four fingers clicks the middle
-/// button. Owns everything it needs, so the app only has to create it and call `start()`.
+/// button, except in excluded apps. Owns everything it needs, so the app only has to create
+/// it and call `start()`.
 @MainActor
 final class MiddleClick {
     let settings = MiddleClickSettings()
@@ -13,6 +14,9 @@ final class MiddleClick {
 
     init(log: AppLog) {
         listener = TapListener(log: log)
+        listener.isExcluded = { [settings] bundleID in
+            bundleID.map { settings.excludedApps.contains($0) } ?? false
+        }
     }
 
     func start() {

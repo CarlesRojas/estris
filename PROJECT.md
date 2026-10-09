@@ -71,6 +71,7 @@ Quits an app when you close its last window, the way apps on iPad and many Windo
 Middle click from the trackpad, which macOS doesn't offer. Off by default; turn it on in **Settings… > Middle Click**.
 
 - **Tap with**: three fingers (default) or four. A quick tap with the fingers held still clicks the middle button where the pointer is.
+- **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: tapping while it is in front does nothing.
 - It reads the trackpad's raw touches through the private MultitouchSupport framework and posts the click, so it needs the Accessibility permission.
 - To use three fingers, turn off Look Up's three-finger tap in System Settings > Trackpad.
 

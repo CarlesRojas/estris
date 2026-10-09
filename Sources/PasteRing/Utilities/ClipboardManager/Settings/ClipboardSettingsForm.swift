@@ -85,9 +85,6 @@ struct ClipboardSettingsForm: View {
                     }
                     slider("Width", value: $settings.gridCardWidth, in: ClipboardSettings.gridCardWidthRange, percent: false)
                     slider("Height", value: $settings.gridCardHeight, in: ClipboardSettings.gridCardHeightRange, percent: false)
-                    Text("Shows fewer rows, and narrower tiles, when they would not fit the screen.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
 
                 if settings.style == .ring {
@@ -138,10 +135,6 @@ struct ClipboardSettingsForm: View {
                 }
             } header: {
                 Text("Shortcuts")
-            } footer: {
-                Text("Keep the modifiers held and press the key again to move through entries; release them to paste. Click a shortcut to change it.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)

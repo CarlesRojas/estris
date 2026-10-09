@@ -7,12 +7,18 @@ import AppKit
 /// away) and posts the click itself, which needs Accessibility access.
 @MainActor
 final class TapListener {
+    /// The listener taps are reported to; there is one, owned by `MiddleClick`.
+    fileprivate static weak var current: TapListener?
+
+    /// Whether a tap is ignored while the app with this bundle identifier is in front.
+    var isExcluded: (String?) -> Bool = { _ in false }
     private let appLog: AppLog
     /// The devices being listened to; holding the list keeps them alive.
     private var devices: CFArray?
 
     init(log: AppLog) {
         appLog = log
+        Self.current = self
     }
 
     /// Listens for a tap with `fingers` fingers, or stops listening when it is 0.
@@ -42,6 +48,15 @@ final class TapListener {
             _ = api.stop(pointer)
         }
         devices = nil
+    }
+
+    fileprivate func tapped() {
+        guard !isExcluded(NSWorkspace.shared.frontmostApplication?.bundleIdentifier) else { return }
+        guard let location = CGEvent(source: nil)?.location else { return }
+        for type in [CGEventType.otherMouseDown, .otherMouseUp] {
+            CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: location, mouseButton: .center)?
+                .post(tap: .cghidEventTap)
+        }
     }
 
     private func log(_ message: String) {
@@ -108,7 +123,11 @@ private final class TapDetector: @unchecked Sendable {
             reset()
             return isTap
         }
-        if isTap { Self.clickMiddleButton() }
+        guard isTap else { return }
+        // The excluded apps are checked, and the click posted, on the main thread.
+        DispatchQueue.main.async {
+            MainActor.assumeIsolated { TapListener.current?.tapped() }
+        }
     }
 
     private func locked<T>(_ body: () -> T) -> T {
@@ -122,14 +141,6 @@ private final class TapDetector: @unchecked Sendable {
         mostFingers = 0
         moved = false
         origins = [:]
-    }
-
-    private static func clickMiddleButton() {
-        guard let location = CGEvent(source: nil)?.location else { return }
-        for type in [CGEventType.otherMouseDown, .otherMouseUp] {
-            CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: location, mouseButton: .center)?
-                .post(tap: .cghidEventTap)
-        }
     }
 }
 

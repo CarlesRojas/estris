@@ -28,15 +28,22 @@ final class MiddleClickSettings: ObservableObject {
         didSet { defaults.set(fingers.rawValue, forKey: Keys.fingers) }
     }
 
+    /// Bundle identifiers of apps where a tap doesn't middle click.
+    @Published var excludedApps: Set<String> {
+        didSet { defaults.set(Array(excludedApps), forKey: Keys.excludedApps) }
+    }
+
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [Keys.isEnabled: false, Keys.fingers: TapFingers.three.rawValue])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         fingers = TapFingers(rawValue: defaults.integer(forKey: Keys.fingers)) ?? .three
+        excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
     private enum Keys {
         static let isEnabled = "middleClickEnabled"
         static let fingers = "middleClickFingers"
+        static let excludedApps = "middleClickExcludedApps"
     }
 }

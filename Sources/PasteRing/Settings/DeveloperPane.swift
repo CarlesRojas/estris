@@ -101,10 +101,6 @@ struct DeveloperPane: View {
                 Button("Hide Developer Settings") {
                     general.showsDeveloperSettings = false
                 }
-            } footer: {
-                Text("Click the version in General > About six times to show them again.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
