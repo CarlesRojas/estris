@@ -1,9 +1,8 @@
 import AppKit
-import Carbon.HIToolbox
 import Combine
 import SwiftUI
 
-/// The clipboard utility: records copied text and shows the overlay on ⌘⇧V.
+/// The clipboard utility: records copied text and shows the overlay on its shortcuts.
 /// Owns everything it needs, so the app only has to create it and call `start()`.
 @MainActor
 final class ClipboardManager: NSObject {
@@ -13,24 +12,32 @@ final class ClipboardManager: NSObject {
 
     private let monitor: ClipboardMonitor
     private let overlay: OverlayController
-    private var maxItemsObserver: AnyCancellable?
+    private var observers: Set<AnyCancellable> = []
+    private var hotKeys: [UInt32] = []
 
     init(general: GeneralSettings) {
-        monitor = ClipboardMonitor(history: history)
+        monitor = ClipboardMonitor(history: history, settings: settings)
         overlay = OverlayController(history: history, monitor: monitor, settings: settings, appearance: appearance, general: general)
         super.init()
     }
 
     func start() {
-        maxItemsObserver = settings.$maxItems.sink { [weak self] in
-            self?.history.limit = $0
-        }
+        settings.$maxItems
+            .sink { [weak self] in self?.history.limit = $0 }
+            .store(in: &observers)
+        // Re-register whenever the shortcuts change in Settings.
+        settings.$shortcuts
+            .sink { [weak self] in self?.registerShortcuts($0) }
+            .store(in: &observers)
         monitor.start()
-        HotKeyCenter.shared.register(
-            keyCode: UInt32(kVK_ANSI_V),
-            modifiers: UInt32(cmdKey | shiftKey)
-        ) { [weak self] in
-            self?.overlay.cycle()
+    }
+
+    private func registerShortcuts(_ shortcuts: [Shortcut]) {
+        hotKeys.forEach(HotKeyCenter.shared.unregister)
+        hotKeys = shortcuts.map { shortcut in
+            HotKeyCenter.shared.register(keyCode: shortcut.keyCode, modifiers: shortcut.modifiers) { [weak self] in
+                self?.overlay.cycle(with: shortcut)
+            }
         }
     }
 

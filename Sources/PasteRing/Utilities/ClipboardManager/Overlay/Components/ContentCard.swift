@@ -2,9 +2,6 @@ import SwiftUI
 
 /// Fixed-size card with the source app and the text, shared by Carousel and Grid.
 struct ContentCard: View {
-    /// Width kept free in the header for the date and trash button.
-    static let cornerReserve: CGFloat = 120
-
     let item: ClipItem?
     let isSelected: Bool
     @Environment(\.overlayActions) private var actions
@@ -23,7 +20,7 @@ struct ContentCard: View {
                         .lineLimit(1)
                 }
                 // Room for the date and trash button in the corner.
-                .padding(.trailing, actions.isEnabled ? Self.cornerReserve : 0)
+                .padding(.trailing, actions.cornerReserve)
                 // Same font whether selected or not: a heavier weight rewraps the text.
                 Text(item.text.trimmingCharacters(in: .whitespacesAndNewlines))
                     .font(.body)

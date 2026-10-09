@@ -8,6 +8,16 @@ struct OverlayActions {
     /// Clicking outside every element.
     var dismiss: () -> Void = {}
     var isEnabled = false
+    var showsDate = true
+    var showsDelete = true
+
+    /// Width elements keep free in their top-right corner for the date and trash button.
+    var cornerReserve: CGFloat {
+        guard isEnabled else { return 0 }
+        let date: CGFloat = showsDate ? 92 : 0
+        let delete: CGFloat = showsDelete ? 26 : 0
+        return date + delete
+    }
 }
 
 private struct OverlayActionsKey: EnvironmentKey {
@@ -23,7 +33,7 @@ extension EnvironmentValues {
 
 extension View {
     /// Clicking pastes `item`. The top-right corner shows when it was copied and a trash
-/// button that deletes it. Hovering tints the element a little.
+    /// button that deletes it, each optional. Hovering tints the element a little.
     /// `trashInset` lines the date and button up with the element's first row.
     func clipActions(_ item: ClipItem, trashInset: CGFloat = 12) -> some View {
         modifier(ClipActions(item: item, trashInset: trashInset))
@@ -48,22 +58,17 @@ private struct ClipActions: ViewModifier {
                 .onTapGesture { actions.pick(item) }
                 .overlay(alignment: .topTrailing) {
                     HStack(spacing: 2) {
-                        Text(dateTimeFormat.string(from: item.date))
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(.tertiary)
-                            .lineLimit(1)
-                        Button {
-                            actions.delete(item)
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(isTrashHovered ? .primary : .tertiary)
-                                .frame(width: 24, height: 24)
-                                .contentShape(Rectangle())
+                        if actions.showsDate {
+                            Text(dateTimeFormat.string(from: item.date))
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.tertiary)
+                                .lineLimit(1)
+                                // Keeps the date clear of the corner when there is no trash button.
+                                .frame(minHeight: 24)
                         }
-                        .buttonStyle(.plain)
-                        .onHover { isTrashHovered = $0 }
-                        .help("Delete from history")
+                        if actions.showsDelete {
+                            deleteButton
+                        }
                     }
                     .padding(trashInset)
                 }
@@ -72,6 +77,21 @@ private struct ClipActions: ViewModifier {
         } else {
             content
         }
+    }
+
+    private var deleteButton: some View {
+        Button {
+            actions.delete(item)
+        } label: {
+            Image(systemName: "trash")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(isTrashHovered ? .primary : .tertiary)
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { isTrashHovered = $0 }
+        .help("Delete from history")
     }
 }
 

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Carbon.HIToolbox
 
 /// Order here is the order shown in Settings.
 enum OverlayStyle: String, CaseIterable, Identifiable {
@@ -43,6 +44,35 @@ final class ClipboardSettings: ObservableObject {
 
     @Published var maxItems: Int {
         didSet { defaults.set(maxItems, forKey: Keys.maxItems) }
+    }
+
+    /// Skip text copied from password fields and password managers.
+    @Published var ignorePasswords: Bool {
+        didSet { defaults.set(ignorePasswords, forKey: Keys.ignorePasswords) }
+    }
+
+    /// Copying something already in the history moves it to the top instead of adding it again.
+    @Published var removeDuplicates: Bool {
+        didSet { defaults.set(removeDuplicates, forKey: Keys.removeDuplicates) }
+    }
+
+    /// Pasting an entry from the overlay makes it the most recent one. When off, the history
+    /// keeps copy order and ⌘V goes back to the last copied text after the paste.
+    @Published var moveToTopOnPaste: Bool {
+        didSet { defaults.set(moveToTopOnPaste, forKey: Keys.moveToTopOnPaste) }
+    }
+
+    /// Shortcuts that open the overlay. Always at least one.
+    @Published var shortcuts: [Shortcut] {
+        didSet { defaults.set(try? JSONEncoder().encode(shortcuts), forKey: Keys.shortcuts) }
+    }
+
+    @Published var showCopyDate: Bool {
+        didSet { defaults.set(showCopyDate, forKey: Keys.showCopyDate) }
+    }
+
+    @Published var showDeleteButton: Bool {
+        didSet { defaults.set(showDeleteButton, forKey: Keys.showDeleteButton) }
     }
 
     /// How many of the most recent entries the ring menu shows. All of them fit on the circle.
@@ -101,9 +131,21 @@ final class ClipboardSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [Keys.maxItems: 50])
+        defaults.register(defaults: [
+            Keys.maxItems: 50,
+            Keys.ignorePasswords: true,
+            Keys.removeDuplicates: true,
+            Keys.moveToTopOnPaste: true,
+        ])
         defaults.register(defaults: Self.appearanceDefaults)
         maxItems = defaults.integer(forKey: Keys.maxItems)
+        ignorePasswords = defaults.bool(forKey: Keys.ignorePasswords)
+        removeDuplicates = defaults.bool(forKey: Keys.removeDuplicates)
+        moveToTopOnPaste = defaults.bool(forKey: Keys.moveToTopOnPaste)
+        let savedShortcuts = defaults.data(forKey: Keys.shortcuts).flatMap { try? JSONDecoder().decode([Shortcut].self, from: $0) }
+        shortcuts = savedShortcuts?.isEmpty == false ? savedShortcuts! : [Self.defaultShortcut]
+        showCopyDate = defaults.bool(forKey: Keys.showCopyDate)
+        showDeleteButton = defaults.bool(forKey: Keys.showDeleteButton)
         ringSize = defaults.integer(forKey: Keys.ringSize)
         gridSize = defaults.integer(forKey: Keys.gridSize)
         gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
@@ -144,6 +186,8 @@ final class ClipboardSettings: ObservableObject {
         Keys.stackHeight: 170.0,
         Keys.ringChipWidth: 280.0,
         Keys.ringChipHeight: 56.0,
+        Keys.showCopyDate: true,
+        Keys.showDeleteButton: true,
     ]
 
     func resetAppearance() {
@@ -163,6 +207,36 @@ final class ClipboardSettings: ObservableObject {
         stackHeight = defaults.double(forKey: Keys.stackHeight)
         ringChipWidth = defaults.double(forKey: Keys.ringChipWidth)
         ringChipHeight = defaults.double(forKey: Keys.ringChipHeight)
+        showCopyDate = defaults.bool(forKey: Keys.showCopyDate)
+        showDeleteButton = defaults.bool(forKey: Keys.showDeleteButton)
+    }
+
+    static let defaultShortcut = Shortcut(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | shiftKey), keyLabel: "V")
+
+    /// Adds another shortcut, starting from one not in use; the user then records over it.
+    func addAlternativeShortcut() {
+        let candidates = [
+            Shortcut(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | optionKey), keyLabel: "V"),
+            Shortcut(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(controlKey | shiftKey), keyLabel: "V"),
+            Shortcut(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | controlKey), keyLabel: "V"),
+            Shortcut(keyCode: UInt32(kVK_ANSI_B), modifiers: UInt32(cmdKey | shiftKey), keyLabel: "B"),
+        ]
+        if let unused = candidates.first(where: { !shortcuts.contains($0) }) {
+            shortcuts.append(unused)
+        }
+    }
+
+    /// Binding for one shortcut; ignores a change that would duplicate another one.
+    func shortcutBinding(_ shortcut: Shortcut) -> Binding<Shortcut> {
+        Binding(
+            get: { self.shortcuts.first { $0.id == shortcut.id } ?? shortcut },
+            set: { new in
+                guard let index = self.shortcuts.firstIndex(where: { $0.id == shortcut.id }),
+                      !self.shortcuts.contains(where: { $0.id == new.id && $0.id != shortcut.id })
+                else { return }
+                self.shortcuts[index] = new
+            }
+        )
     }
 
     /// Binding that keeps typed or stepped values inside `range`.
@@ -175,6 +249,12 @@ final class ClipboardSettings: ObservableObject {
 
     private enum Keys {
         static let maxItems = "maxItems"
+        static let ignorePasswords = "ignorePasswords"
+        static let removeDuplicates = "removeDuplicates"
+        static let moveToTopOnPaste = "moveToTopOnPaste"
+        static let shortcuts = "shortcuts"
+        static let showCopyDate = "showCopyDate"
+        static let showDeleteButton = "showDeleteButton"
         static let ringSize = "ringSize"
         static let gridSize = "gridSize"
         static let gridCardWidth = "gridCardWidth"

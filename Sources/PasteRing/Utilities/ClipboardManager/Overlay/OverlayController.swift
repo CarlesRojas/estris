@@ -2,9 +2,10 @@ import AppKit
 import Carbon.HIToolbox
 import SwiftUI
 
-/// Shows the overlay while ⌘⇧ is held. ⌘⇧V, ⌘⇧ arrows and the scroll wheel move the
-/// selection, releasing pastes the selected entry, ⌘⇧Esc cancels, ⌘⇧Delete removes the
-/// selected entry. While ⌘⇧ is held, clicking an entry pastes it.
+/// Shows the overlay while the shortcut's modifiers are held (⌘⇧ for the default ⌘⇧V).
+/// Pressing the shortcut again, the arrows (with those modifiers) or scrolling moves the
+/// selection; releasing pastes the selected entry; Esc cancels; Delete removes the
+/// selected entry. While the modifiers are held, clicking an entry pastes it.
 @MainActor
 final class OverlayController: NSObject {
     private static let fadeDuration: TimeInterval = 0.15
@@ -24,6 +25,7 @@ final class OverlayController: NSObject {
     /// Fastest the scroll wheel may cycle: one entry per this many seconds.
     private static let scrollStepInterval: TimeInterval = 0.09
     private var isVisible = false
+    private var activeShortcut = ClipboardSettings.defaultShortcut
     /// Bumped on every show and hide, so a finished fade-out does not hide a newer show.
     private var presentation = 0
 
@@ -55,10 +57,13 @@ final class OverlayController: NSObject {
         }
     }
 
-    func cycle() {
+    /// Opens the overlay, or moves to the next entry if it is already open. `shortcut` is
+    /// the one that was pressed: the overlay stays open while its modifiers are held.
+    func cycle(with shortcut: Shortcut) {
         if isVisible {
             move(by: 1)
         } else {
+            activeShortcut = shortcut
             show()
         }
     }
@@ -103,7 +108,7 @@ final class OverlayController: NSObject {
         RunLoop.main.add(timer, forMode: .common)
         modifierTimer = timer
 
-        registerKeys(modifiers: UInt32(cmdKey | shiftKey))
+        registerKeys(modifiers: activeShortcut.modifiers)
     }
 
     private func registerKeys(modifiers: UInt32) {
@@ -180,8 +185,8 @@ final class OverlayController: NSObject {
     }
 
     @objc private func tick() {
-        let flags = NSEvent.modifierFlags
-        if !flags.contains(.command) || !flags.contains(.shift) {
+        // Releasing any of the shortcut's modifiers pastes.
+        if !NSEvent.modifierFlags.isSuperset(of: activeShortcut.modifierFlags) {
             commit()
         }
     }
@@ -193,12 +198,23 @@ final class OverlayController: NSObject {
             return
         }
         hide()
-        history.promote(item)
+        if settings.moveToTopOnPaste {
+            history.promote(item)
+        }
         monitor.write(item.text)
 
         guard Paster.isTrusted(prompt: true) else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             Paster.paste()
+        }
+
+        // Without moving to the top, put the last copied text back once the paste has gone
+        // through, so the next ⌘V pastes what was copied last, not what was picked.
+        if !settings.moveToTopOnPaste, let latest = history.items.first, latest.id != item.id {
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 400_000_000)
+                self?.monitor.write(latest.text)
+            }
         }
     }
 

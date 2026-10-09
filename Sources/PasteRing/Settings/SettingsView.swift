@@ -28,7 +28,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .general:
             ["login", "startup", "language", "accessibility", "permission", "date", "time", "format", "version", "about"]
         case .clipboard:
-            ["history", "paste", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
+            ["history", "paste", "shortcut", "hotkey", "keyboard", "password", "duplicate", "date", "delete", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
         }
     }
 

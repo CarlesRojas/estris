@@ -20,9 +20,13 @@ final class ClipboardHistory: ObservableObject {
         items = Self.load()
     }
 
-    func add(_ text: String, sourceBundleID: String?) {
+    /// Adds `text` as the most recent entry. With `removingDuplicates`, an older entry with
+    /// the same text is dropped, so it moves to the top instead of appearing twice.
+    func add(_ text: String, sourceBundleID: String?, removingDuplicates: Bool) {
         var updated = items
-        updated.removeAll { $0.text == text }
+        if removingDuplicates {
+            updated.removeAll { $0.text == text }
+        }
         updated.insert(ClipItem(text: text, sourceBundleID: sourceBundleID), at: 0)
         items = updated
         trim()

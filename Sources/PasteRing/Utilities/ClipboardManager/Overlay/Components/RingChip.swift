@@ -16,7 +16,7 @@ struct RingChip: View {
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 // Room for the date and trash button in the corner.
-                .padding(.trailing, actions.isEnabled ? ContentCard.cornerReserve - 14 : 0)
+                .padding(.trailing, max(0, actions.cornerReserve - 12))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

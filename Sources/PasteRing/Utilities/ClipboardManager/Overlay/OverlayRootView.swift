@@ -16,8 +16,15 @@ struct OverlayRootView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .environmentObject(appearance)
-        .environment(\.overlayActions, state.actions)
+        .environment(\.overlayActions, actions)
         .environment(\.dateTimeFormat, general.dateTimeFormat)
+    }
+
+    private var actions: OverlayActions {
+        var actions = state.actions
+        actions.showsDate = settings.showCopyDate
+        actions.showsDelete = settings.showDeleteButton
+        return actions
     }
 
     private var content: some View {

@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// The Clipboard Manager's Settings tab: history, style and surface, each in a section.
+/// The Clipboard Manager's Settings tab: shortcuts, history, style and surface, each in a section.
 struct ClipboardSettingsForm: View {
     @ObservedObject var settings: ClipboardSettings
     @ObservedObject var appearance: AppearanceSettings
@@ -10,6 +10,34 @@ struct ClipboardSettingsForm: View {
 
     var body: some View {
         Form {
+            Section {
+                ForEach(settings.shortcuts) { shortcut in
+                    LabeledContent(shortcut == settings.shortcuts.first ? "Open overlay" : "Alternative") {
+                        HStack {
+                            ShortcutRecorder(shortcut: settings.shortcutBinding(shortcut))
+                            if settings.shortcuts.count > 1 {
+                                Button {
+                                    settings.shortcuts.removeAll { $0.id == shortcut.id }
+                                } label: {
+                                    Image(systemName: "minus.circle")
+                                }
+                                .buttonStyle(.borderless)
+                                .help("Remove this shortcut")
+                            }
+                        }
+                    }
+                }
+                Button("Add Alternative Shortcut") {
+                    settings.addAlternativeShortcut()
+                }
+            } header: {
+                Text("Shortcuts")
+            } footer: {
+                Text("Keep the modifiers held and press the key again to move through entries; release them to paste. Click a shortcut to change it.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("History") {
                 LabeledContent("Keep up to") {
                     HStack {
@@ -22,6 +50,18 @@ struct ClipboardSettingsForm: View {
                             .labelsHidden()
                         Text("entries")
                     }
+                }
+                Toggle(isOn: $settings.ignorePasswords) {
+                    Text("Ignore passwords")
+                    Text("Skips text copied from password fields and password managers.")
+                }
+                Toggle(isOn: $settings.removeDuplicates) {
+                    Text("Remove duplicates")
+                    Text("Copying something already in the history moves it to the top instead of adding it again.")
+                }
+                Toggle(isOn: $settings.moveToTopOnPaste) {
+                    Text("Move pasted entry to the top")
+                    Text("When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.")
                 }
             }
 
@@ -76,6 +116,9 @@ struct ClipboardSettingsForm: View {
                     slider("Width", value: $settings.ringChipWidth, in: ClipboardSettings.ringChipWidthRange, percent: false)
                     slider("Height", value: $settings.ringChipHeight, in: ClipboardSettings.ringChipHeightRange, percent: false)
                 }
+
+                Toggle("Show when entries were copied", isOn: $settings.showCopyDate)
+                Toggle("Show delete button", isOn: $settings.showDeleteButton)
             }
 
             Section("Surface") {

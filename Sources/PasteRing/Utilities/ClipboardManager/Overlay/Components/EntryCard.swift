@@ -20,7 +20,7 @@ struct EntryCard: View {
                         .lineLimit(1)
                 }
                 // Room for the date and trash button in the corner.
-                .padding(.trailing, actions.isEnabled ? ContentCard.cornerReserve : 0)
+                .padding(.trailing, actions.cornerReserve)
             }
             Text(item?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Clipboard history is empty")
                 .font(.title3)
