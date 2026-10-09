@@ -1,16 +1,13 @@
 import SwiftUI
 
-/// Ring menu: every entry sits on one ring, evenly spaced. The ring turns so the
-/// selected entry is at the top. It is an ellipse, as tight as the chips allow: wide chips
-/// need room side by side at the top and bottom, but stack closely at the sides.
+/// Ring menu: every entry sits on one oval, evenly spaced, and the oval turns so the
+/// selected entry is at the top. The oval and the cards keep their size however many
+/// entries there are: with more, cards simply overlap more, the ones nearer the top in
+/// front of those further round.
 struct RingMenuView: View {
-    private static let minRadius: CGFloat = 120
-    private static let chipGap: CGFloat = 4
-    /// Widest the ring may get relative to its height, so it still reads as a ring.
-    private static let maxAspect: CGFloat = 2.2
-    private static var radiiCache: [String: CGSize] = [:]
-    /// How much shorter the ring is vertically than the no-overlap fit.
-    private static let verticalSquash: CGFloat = 0.8
+    /// Oval radii as multiples of the card's width and height.
+    private static let horizontalRadius: CGFloat = 1.6
+    private static let verticalRadius: CGFloat = 0.9
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
@@ -20,13 +17,11 @@ struct RingMenuView: View {
         let step = count > 0 ? 360 / Double(count) : 0
         let chipWidth = CGFloat(settings.ringChipWidth)
         let chipHeight = CGFloat(settings.ringChipHeight)
-        let radii = Self.radii(count: count, chipWidth: chipWidth, chipHeight: chipHeight)
-        // Room for the enlarged card at the top and the pill above it.
-        let topExtra = chipHeight * (RingPlacement.topScale - 1)
-        let size = CGSize(
-            width: max((radii.width + chipWidth * 0.6) * 2, chipWidth * RingPlacement.topScale),
-            height: (radii.height + chipHeight + 30) * 2 + topExtra * 2
-        )
+        let radii = CGSize(width: chipWidth * Self.horizontalRadius, height: chipHeight * Self.verticalRadius)
+        // Fixed for a given card size: the enlarged top card and the pill above it reach
+        // furthest from the centre; side cards are a little smaller than full size.
+        let topReach = radii.height + chipHeight * RingPlacement.topScale / 2 + 46
+        let size = CGSize(width: (radii.width + chipWidth * 0.55) * 2, height: topReach * 2)
         let scale = fitScale(for: size)
 
         ZStack {
@@ -65,42 +60,6 @@ struct RingMenuView: View {
         guard let screen = state.screenSize, size.width > 0, size.height > 0 else { return 1 }
         let margin: CGFloat = 60
         return min(1, (screen.width - margin) / size.width, (screen.height - margin) / size.height)
-    }
-
-    /// Smallest ellipse (horizontal and vertical radius) on which no two chips overlap.
-    private static func radii(count: Int, chipWidth: CGFloat, chipHeight: CGFloat) -> CGSize {
-        let key = "\(count)-\(Int(chipWidth))-\(Int(chipHeight))"
-        if let cached = radiiCache[key] { return cached }
-
-        // Chips may touch the enlarged top chip slightly; it is drawn above its neighbours.
-        let width = chipWidth + chipGap
-        let height = chipHeight + chipGap
-        let angles = (0..<count).map { 2 * Double.pi * Double($0) / Double(count) }
-
-        func fits(_ rx: CGFloat, _ ry: CGFloat) -> Bool {
-            let points = angles.map { CGPoint(x: rx * sin($0), y: -ry * cos($0)) }
-            for i in points.indices {
-                for j in points.indices where j > i {
-                    if abs(points[i].x - points[j].x) < width && abs(points[i].y - points[j].y) < height {
-                        return false
-                    }
-                }
-            }
-            return true
-        }
-
-        var result = CGSize(width: minRadius, height: minRadius)
-        search: for ry in stride(from: minRadius, through: 2000, by: 4) {
-            for rx in stride(from: ry, through: ry * maxAspect, by: 4) where fits(rx, ry) {
-                result = CGSize(width: rx, height: ry)
-                break search
-            }
-        }
-        // Cards shrink towards the bottom of the ring, so it can be flatter than the
-        // full-size cards would allow without them crowding each other.
-        result.height *= verticalSquash
-        radiiCache[key] = result
-        return result
     }
 
     private func circularDistance(_ index: Int, count: Int) -> Int {
