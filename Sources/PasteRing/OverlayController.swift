@@ -20,15 +20,11 @@ final class OverlayState: ObservableObject {
 }
 
 /// Shows the overlay while ⌘⇧ is held. ⌘⇧V, ⌘⇧ arrows and the scroll wheel move the
-/// selection, releasing pastes, ⌘⇧Esc cancels, ⌘⇧Delete removes the selected entry.
-///
-/// Moving the mouse makes the overlay stay open after ⌘⇧ is released, so entries can be
-/// clicked. It then also takes plain Return, Esc, arrows and Delete until it closes.
+/// selection, releasing pastes the selected entry, ⌘⇧Esc cancels, ⌘⇧Delete removes the
+/// selected entry. While ⌘⇧ is held, clicking an entry pastes it.
 @MainActor
 final class OverlayController: NSObject {
     private static let fadeDuration: TimeInterval = 0.15
-    /// How far the pointer has to move before the overlay stops closing on release.
-    private static let stickyDistance: CGFloat = 24
 
     private let history: ClipboardHistory
     private let monitor: ClipboardMonitor
@@ -41,8 +37,6 @@ final class OverlayController: NSObject {
     private var sessionHotKeys: [UInt32] = []
     private var scrollAccumulator: CGFloat = 0
     private var isVisible = false
-    private var isSticky = false
-    private var mouseAtShow: NSPoint = .zero
     /// Bumped on every show and hide, so a finished fade-out does not hide a newer show.
     private var presentation = 0
 
@@ -97,8 +91,6 @@ final class OverlayController: NSObject {
         }
         scrollAccumulator = 0
         isVisible = true
-        isSticky = false
-        mouseAtShow = NSEvent.mouseLocation
         presentation += 1
 
         if !panel.isVisible {
@@ -153,18 +145,6 @@ final class OverlayController: NSObject {
         }
     }
 
-    /// Stops closing on release once the pointer moves, and takes plain keys instead.
-    private func becomeSticky() {
-        isSticky = true
-        registerKeys(modifiers: 0)
-        let confirm: [Int] = [kVK_Return, kVK_ANSI_KeypadEnter]
-        sessionHotKeys += confirm.map { keyCode in
-            HotKeyCenter.shared.register(keyCode: UInt32(keyCode), modifiers: 0) { [weak self] in
-                self?.commit()
-            }
-        }
-    }
-
     private func deleteSelected() {
         guard let item = state.selectedItem else { return }
         delete(item)
@@ -199,13 +179,6 @@ final class OverlayController: NSObject {
     }
 
     @objc private func tick() {
-        if !isSticky {
-            let mouse = NSEvent.mouseLocation
-            if hypot(mouse.x - mouseAtShow.x, mouse.y - mouseAtShow.y) > Self.stickyDistance {
-                becomeSticky()
-            }
-        }
-        guard !isSticky else { return }
         let flags = NSEvent.modifierFlags
         if !flags.contains(.command) || !flags.contains(.shift) {
             commit()
