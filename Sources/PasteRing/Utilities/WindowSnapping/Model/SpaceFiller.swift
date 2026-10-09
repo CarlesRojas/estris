@@ -68,8 +68,8 @@ enum SpaceFiller {
         var rect = usual
         // Twice, as moving the sides of one direction changes which windows the other meets.
         for _ in 0..<2 {
-            rect = fitHorizontally(rect, usual: usual, freeLeft: freeLeft, freeRight: freeRight, among: tiled, range: range)
-            rect = fitVertically(rect, usual: usual, freeBottom: freeBottom, freeTop: freeTop, among: tiled, range: range)
+            rect = fitHorizontally(rect, usual: usual, freeLeft: freeLeft, freeRight: freeRight, among: tiled, range: range, area: area)
+            rect = fitVertically(rect, usual: usual, freeBottom: freeBottom, freeTop: freeTop, among: tiled, range: range, area: area)
         }
         if let minimum = minimumSizes[pid], rect.width < minimum.width || rect.height < minimum.height {
             return usual
@@ -87,32 +87,57 @@ enum SpaceFiller {
         return true
     }
 
-    private static func fitHorizontally(_ rect: NSRect, usual: NSRect, freeLeft: Bool, freeRight: Bool, among tiled: [NSRect], range: ClosedRange<CGFloat>) -> NSRect {
+    private static func fitHorizontally(_ rect: NSRect, usual: NSRect, freeLeft: Bool, freeRight: Bool, among tiled: [NSRect], range: ClosedRange<CGFloat>, area: NSRect) -> NSRect {
         let beside = tiled.filter { overlap($0.minY, $0.maxY, rect.minY, rect.maxY) > tolerance }
         var minX = rect.minX
         var maxX = rect.maxX
-        if freeLeft, let edge = beside.filter({ $0.maxX < usual.maxX - tolerance && $0.minX < usual.minX + tolerance }).map(\.maxX).max() {
-            minX = edge
+        // Vertical lines where other tiled windows' sides are, for a side with nothing beside it.
+        let lines = tiled.flatMap { [$0.minX, $0.maxX] }.filter { $0 > area.minX + tolerance && $0 < area.maxX - tolerance }
+        if freeLeft {
+            if let edge = beside.filter({ $0.maxX < usual.maxX - tolerance && $0.minX < usual.minX + tolerance }).map(\.maxX).max() {
+                minX = edge
+            } else if let line = nearest(to: usual.minX, among: lines.filter { $0 < rect.maxX - tolerance }) {
+                minX = line
+            }
         }
-        if freeRight, let edge = beside.filter({ $0.minX > usual.minX + tolerance && $0.maxX > usual.maxX - tolerance }).map(\.minX).min() {
-            maxX = edge
+        if freeRight {
+            if let edge = beside.filter({ $0.minX > usual.minX + tolerance && $0.maxX > usual.maxX - tolerance }).map(\.minX).min() {
+                maxX = edge
+            } else if let line = nearest(to: usual.maxX, among: lines.filter { $0 > minX + tolerance }) {
+                maxX = line
+            }
         }
         guard range.contains((maxX - minX) / usual.width) else { return NSRect(x: usual.minX, y: rect.minY, width: usual.width, height: rect.height) }
         return NSRect(x: minX, y: rect.minY, width: maxX - minX, height: rect.height)
     }
 
-    private static func fitVertically(_ rect: NSRect, usual: NSRect, freeBottom: Bool, freeTop: Bool, among tiled: [NSRect], range: ClosedRange<CGFloat>) -> NSRect {
+    private static func fitVertically(_ rect: NSRect, usual: NSRect, freeBottom: Bool, freeTop: Bool, among tiled: [NSRect], range: ClosedRange<CGFloat>, area: NSRect) -> NSRect {
         let above = tiled.filter { overlap($0.minX, $0.maxX, rect.minX, rect.maxX) > tolerance }
         var minY = rect.minY
         var maxY = rect.maxY
-        if freeBottom, let edge = above.filter({ $0.maxY < usual.maxY - tolerance && $0.minY < usual.minY + tolerance }).map(\.maxY).max() {
-            minY = edge
+        // Horizontal lines where other tiled windows' tops and bottoms are, for a side with
+        // nothing above or below it.
+        let lines = tiled.flatMap { [$0.minY, $0.maxY] }.filter { $0 > area.minY + tolerance && $0 < area.maxY - tolerance }
+        if freeBottom {
+            if let edge = above.filter({ $0.maxY < usual.maxY - tolerance && $0.minY < usual.minY + tolerance }).map(\.maxY).max() {
+                minY = edge
+            } else if let line = nearest(to: usual.minY, among: lines.filter { $0 < rect.maxY - tolerance }) {
+                minY = line
+            }
         }
-        if freeTop, let edge = above.filter({ $0.minY > usual.minY + tolerance && $0.maxY > usual.maxY - tolerance }).map(\.minY).min() {
-            maxY = edge
+        if freeTop {
+            if let edge = above.filter({ $0.minY > usual.minY + tolerance && $0.maxY > usual.maxY - tolerance }).map(\.minY).min() {
+                maxY = edge
+            } else if let line = nearest(to: usual.maxY, among: lines.filter { $0 > minY + tolerance }) {
+                maxY = line
+            }
         }
         guard range.contains((maxY - minY) / usual.height) else { return NSRect(x: rect.minX, y: usual.minY, width: rect.width, height: usual.height) }
         return NSRect(x: rect.minX, y: minY, width: rect.width, height: maxY - minY)
+    }
+
+    private static func nearest(to value: CGFloat, among lines: [CGFloat]) -> CGFloat? {
+        lines.min { abs($0 - value) < abs($1 - value) }
     }
 
     private static func nearlyEqual(_ a: NSRect, _ b: NSRect) -> Bool {
