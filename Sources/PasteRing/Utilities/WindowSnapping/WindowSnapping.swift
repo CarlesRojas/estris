@@ -27,7 +27,7 @@ final class WindowSnapping {
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
         settings.$isEnabled.map { _ in () }
-            .merge(with: settings.$shortcuts.map { _ in () })
+            .merge(with: settings.$modifiers.map { _ in () })
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.apply() }
             .store(in: &observers)

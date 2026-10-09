@@ -86,7 +86,7 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         }
     }
 
-    /// The usual shortcuts for these, all with Control and Option.
+    /// The key for each, with Control and Option; the modifiers can be changed in Settings.
     var defaultShortcut: Shortcut {
         let modifiers = UInt32(controlKey | optionKey)
         let key: (Int, String) = switch self {

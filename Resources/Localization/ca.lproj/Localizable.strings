@@ -69,6 +69,8 @@
 "Click to change" = "Fes clic per canviar";
 "Clipboard" = "Porta-retalls";
 "Clipboard history is empty" = "L’historial del porta-retalls és buit";
+"Command" = "Ordre";
+"Control" = "Control";
 "Copy All" = "Copia-ho tot";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar una cosa que ja és a l’historial la mou a dalt en lloc d’afegir-la de nou.";
 "Corners" = "Cantonades";
@@ -154,6 +156,7 @@
 "Middle Click" = "Clic central";
 "Mission Control" = "Mission Control";
 "Mission Control and Desktops" = "Mission Control i escriptoris";
+"Modifier keys" = "Tecles modificadores";
 "Modifiers" = "Modificadors";
 "Mouse Buttons" = "Botons del ratolí";
 "Move pasted entry to the top" = "Mou l’entrada enganxada a dalt";
@@ -177,6 +180,7 @@
 "Open Accessibility Settings" = "Obre la configuració d’accessibilitat";
 "Open at login" = "Obre en iniciar la sessió";
 "Open overlay" = "Obre el tauler";
+"Option" = "Opció";
 "Other" = "Altres";
 "Other source" = "Una altra font";
 "Page Down" = "Av Pàg";
@@ -209,7 +213,6 @@
 "Rename Device" = "Canvia el nom del dispositiu";
 "Rename this device" = "Canvia el nom d’aquest dispositiu";
 "Reset Appearance to Defaults" = "Restableix l’aparença per defecte";
-"Reset Shortcuts to Defaults" = "Restableix les dreceres per defecte";
 "Resize side-by-side windows together" = "Redimensiona juntes les finestres del costat";
 "Restore" = "Restaura";
 "Return" = "Retorn";
@@ -237,6 +240,7 @@
 "Settings" = "Configuració";
 "Settings…" = "Configuració…";
 "Shadow" = "Ombra";
+"Shift" = "Majúscules";
 "Shortcuts" = "Dreceres";
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";

@@ -69,6 +69,8 @@
 "Click to change" = "Haz clic para cambiar";
 "Clipboard" = "Portapapeles";
 "Clipboard history is empty" = "El historial del portapapeles está vacío";
+"Command" = "Comando";
+"Control" = "Control";
 "Copy All" = "Copiar todo";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar algo que ya está en el historial lo sube arriba en lugar de añadirlo de nuevo.";
 "Corners" = "Esquinas";
@@ -154,6 +156,7 @@
 "Middle Click" = "Clic central";
 "Mission Control" = "Mission Control";
 "Mission Control and Desktops" = "Mission Control y escritorios";
+"Modifier keys" = "Teclas modificadoras";
 "Modifiers" = "Modificadores";
 "Mouse Buttons" = "Botones del ratón";
 "Move pasted entry to the top" = "Subir la entrada pegada arriba";
@@ -177,6 +180,7 @@
 "Open Accessibility Settings" = "Abrir ajustes de accesibilidad";
 "Open at login" = "Abrir al iniciar sesión";
 "Open overlay" = "Abrir el panel";
+"Option" = "Opción";
 "Other" = "Otras";
 "Other source" = "Otra fuente";
 "Page Down" = "Av Pág";
@@ -209,7 +213,6 @@
 "Rename Device" = "Cambiar nombre del dispositivo";
 "Rename this device" = "Cambiar el nombre de este dispositivo";
 "Reset Appearance to Defaults" = "Restablecer la apariencia predeterminada";
-"Reset Shortcuts to Defaults" = "Restablecer atajos predeterminados";
 "Resize side-by-side windows together" = "Redimensionar juntas las ventanas contiguas";
 "Restore" = "Restaurar";
 "Return" = "Retorno";
@@ -237,6 +240,7 @@
 "Settings" = "Ajustes";
 "Settings…" = "Ajustes…";
 "Shadow" = "Sombra";
+"Shift" = "Mayúsculas";
 "Shortcuts" = "Atajos";
 "Show delete button" = "Mostrar botón de eliminar";
 "Show Desktop" = "Mostrar escritorio";

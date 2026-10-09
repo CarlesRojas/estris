@@ -99,8 +99,9 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
 
 Moves the front window to halves, corners, thirds or the whole screen. Off by default; turn it on in **Settings… > Window Snapping**.
 
-- **Shortcuts** (all ⌃⌥, editable in the Shortcuts tab, with **Reset Shortcuts to Defaults**): ← → ↑ ↓ halves; U, I, J, K top left, top right, bottom left, bottom right; ↩ maximize; D, F, G left, center, right third; E, T left and right two thirds; C center; ⌫ restore (the frame before the window was first snapped, or before it was last moved by hand and snapped again).
-- **Dragging** (Settings tab, on by default): drag a window by its title bar to an edge of the screen the pointer is on, see an outline of where it will go, and release:
+- The pane is one page: Dragging, Gestures and Shortcuts sections.
+- **Shortcuts** (⌃⌥ by default; the Shortcuts section changes the modifier keys, shared by all of them, while the keys are fixed; one of ⌃, ⌥ or ⌘ must stay on): ← → ↑ ↓ halves; U, I, J, K top left, top right, bottom left, bottom right; ↩ maximize; D, F, G left, center, right third; E, T left and right two thirds; C center; ⌫ restore (the frame before the window was first snapped, or before it was last moved by hand and snapped again).
+- **Dragging** (on by default): drag a window by its title bar to an edge of the screen the pointer is on, see an outline of where it will go, and release:
   - Corners: quarters. Top edge: maximize.
   - Left or right edge: that half; near the top or bottom end of the edge, the top or bottom half.
   - Bottom edge: left, center or right third by where the pointer is; sliding along the bottom from a side third into the middle makes it two thirds on that side.
