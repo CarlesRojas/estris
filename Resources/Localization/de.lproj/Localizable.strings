@@ -16,8 +16,14 @@
 "/ (Slash)" = "/ (Schrägstrich)";
 "1 app excluded" = "1 App ausgeschlossen";
 "1 entry" = "1 Eintrag";
+"1 hour" = "1 Stunde";
 "12-hour" = "12 Stunden";
+"15 minutes" = "15 Minuten";
+"2 hours" = "2 Stunden";
 "24-hour" = "24 Stunden";
+"30 minutes" = "30 Minuten";
+"4 hours" = "4 Stunden";
+"8 hours" = "8 Stunden";
 "; (Semicolon)" = "; (Semikolon)";
 "= (Equals)" = "= (Gleich)";
 "[ (Left Bracket)" = "[ (Eckige Klammer auf)";
@@ -43,6 +49,7 @@
 "App Windows" = "App-Fenster";
 "Appearance" = "Erscheinungsbild";
 "Auto Quit" = "Automatisch beenden";
+"Battery" = "Batterie";
 "Bottom edge: thirds" = "Unterer Rand: Drittel";
 "Bottom edge: two thirds when sliding to the middle" = "Unterer Rand: zwei Drittel beim Ziehen zur Mitte";
 "Bottom Half" = "Untere Hälfte";
@@ -85,6 +92,7 @@
 "development build" = "Entwicklungsversion";
 "Dim screen" = "Bildschirm abdunkeln";
 "Display and Keyboard" = "Display und Tastatur";
+"Don't keep awake" = "Nicht wach halten";
 "Down" = "Gedrückt";
 "Down Arrow" = "Pfeil nach unten";
 "Dragging" = "Ziehen";
@@ -116,8 +124,12 @@
 "Home" = "Pos1";
 "Ignore passwords" = "Passwörter ignorieren";
 "Immediately" = "Sofort";
+"Indefinitely" = "Unbegrenzt";
 "Insert" = "Einfügen";
+"Keep Awake" = "Wach halten";
+"Keep awake for" = "Wach halten für";
 "Keep up to" = "Behalten bis";
+"Keeping awake" = "Wach gehalten";
 "Keeps copied images in the history alongside text and files." = "Behält kopierte Bilder neben Text und Dateien im Verlauf.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Bewahrt auf, was du kopierst, und lässt dich per Kurzbefehl wählen, was eingesetzt wird.";
 "Key %@" = "Taste %@";
@@ -165,6 +177,7 @@
 "Never" = "Nie";
 "Next Desktop" = "Nächster Schreibtisch";
 "Next Track" = "Nächster Titel";
+"No" = "Nein";
 "No apps excluded" = "Keine Apps ausgeschlossen";
 "No clipboard entries yet" = "Noch keine Einträge in der Zwischenablage";
 "No entries match “%@”" = "Keine Einträge passen zu „%@“";
@@ -172,9 +185,12 @@
 "Not granted" = "Nicht erteilt";
 "Nothing" = "Nichts";
 "Nothing logged yet." = "Noch nichts protokolliert.";
+"Now" = "Jetzt";
 "Numbers" = "Zahlen";
 "Off" = "Aus";
 "On" = "Ein";
+"On battery" = "Mit Batterie";
+"On power adapter" = "Am Netzteil";
 "Only the first mapping for a key or button applies." = "Nur die erste Belegung einer Taste gilt.";
 "Open Accessibility Settings" = "Bedienungshilfen-Einstellungen öffnen";
 "Open at login" = "Bei der Anmeldung öffnen";
@@ -190,6 +206,8 @@
 "Permissions" = "Berechtigungen";
 "Play or Pause" = "Wiedergabe oder Pause";
 "Posted by %@" = "Gesendet von %@";
+"Power adapter" = "Netzteil";
+"Power source" = "Stromquelle";
 "Press a key or button on %@" = "Drücke eine Taste auf %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Drücke den Kurzbefehl erneut für die genaue Größe oder halte beim Ziehen ⌘ gedrückt.";
 "Press keys…" = "Tasten drücken …";
@@ -257,6 +275,7 @@
 "Stack" = "Stapel";
 "Startup" = "Start";
 "Status" = "Status";
+"Stops your Mac and its display from going to sleep." = "Verhindert, dass dein Mac und sein Display in den Ruhezustand wechseln.";
 "Style" = "Stil";
 "Swap From and To" = "Quelle und Ziel tauschen";
 "Symbols" = "Symbole";
@@ -280,6 +299,7 @@
 "Top right corner" = "Ecke oben rechts";
 "Unknown app" = "Unbekannte App";
 "Unknown device %@" = "Unbekanntes Gerät %@";
+"Until %@" = "Bis %@";
 "Up" = "Losgelassen";
 "Up Arrow" = "Pfeil nach oben";
 "usage %@" = "Usage %@";

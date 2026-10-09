@@ -16,8 +16,14 @@
 "/ (Slash)" = "/ (Barra)";
 "1 app excluded" = "1 app exclosa";
 "1 entry" = "1 entrada";
+"1 hour" = "1 hora";
 "12-hour" = "12 hores";
+"15 minutes" = "15 minuts";
+"2 hours" = "2 hores";
 "24-hour" = "24 hores";
+"30 minutes" = "30 minuts";
+"4 hours" = "4 hores";
+"8 hours" = "8 hores";
 "; (Semicolon)" = "; (Punt i coma)";
 "= (Equals)" = "= (Igual)";
 "[ (Left Bracket)" = "[ (Claudàtor d’obertura)";
@@ -43,6 +49,7 @@
 "App Windows" = "Finestres de l’app";
 "Appearance" = "Aparença";
 "Auto Quit" = "Tancament automàtic";
+"Battery" = "Bateria";
 "Bottom edge: thirds" = "Vora inferior: terços";
 "Bottom edge: two thirds when sliding to the middle" = "Vora inferior: dos terços en lliscar cap al centre";
 "Bottom Half" = "Meitat inferior";
@@ -85,6 +92,7 @@
 "development build" = "versió de desenvolupament";
 "Dim screen" = "Enfosqueix la pantalla";
 "Display and Keyboard" = "Pantalla i teclat";
+"Don't keep awake" = "No el mantinguis despert";
 "Down" = "Premut";
 "Down Arrow" = "Fletxa avall";
 "Dragging" = "Arrossegar";
@@ -116,8 +124,12 @@
 "Home" = "Inici";
 "Ignore passwords" = "Ignora les contrasenyes";
 "Immediately" = "Immediatament";
+"Indefinitely" = "Indefinidament";
 "Insert" = "Insereix";
+"Keep Awake" = "Mantén despert";
+"Keep awake for" = "Mantén despert durant";
 "Keep up to" = "Conserva fins a";
+"Keeping awake" = "Mantenint despert";
 "Keeps copied images in the history alongside text and files." = "Desa les imatges copiades a l’historial juntament amb el text i els fitxers.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Desa el que copies i et deixa triar què enganxar amb una drecera.";
 "Key %@" = "Tecla %@";
@@ -165,6 +177,7 @@
 "Never" = "Mai";
 "Next Desktop" = "Escriptori següent";
 "Next Track" = "Pista següent";
+"No" = "No";
 "No apps excluded" = "Cap app exclosa";
 "No clipboard entries yet" = "Encara no hi ha cap entrada al porta-retalls";
 "No entries match “%@”" = "Cap entrada coincideix amb «%@»";
@@ -172,9 +185,12 @@
 "Not granted" = "No concedit";
 "Nothing" = "Res";
 "Nothing logged yet." = "Encara no hi ha cap registre.";
+"Now" = "Ara";
 "Numbers" = "Números";
 "Off" = "Desactivat";
 "On" = "Activat";
+"On battery" = "Amb bateria";
+"On power adapter" = "Amb adaptador de corrent";
 "Only the first mapping for a key or button applies." = "Només s’aplica la primera assignació d’una tecla o botó.";
 "Open Accessibility Settings" = "Obre la configuració d’accessibilitat";
 "Open at login" = "Obre en iniciar la sessió";
@@ -190,6 +206,8 @@
 "Permissions" = "Permisos";
 "Play or Pause" = "Reprodueix o posa en pausa";
 "Posted by %@" = "Enviat per %@";
+"Power adapter" = "Adaptador de corrent";
+"Power source" = "Font d’alimentació";
 "Press a key or button on %@" = "Prem una tecla o un botó a %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Prem la drecera un altre cop per a la mida exacta, o mantén ⌘ en arrossegar.";
 "Press keys…" = "Prem les tecles…";
@@ -257,6 +275,7 @@
 "Stack" = "Pila";
 "Startup" = "Inici";
 "Status" = "Estat";
+"Stops your Mac and its display from going to sleep." = "Evita que el Mac i la pantalla entrin en repòs.";
 "Style" = "Estil";
 "Swap From and To" = "Intercanvia origen i destinació";
 "Symbols" = "Símbols";
@@ -280,6 +299,7 @@
 "Top right corner" = "Cantonada superior dreta";
 "Unknown app" = "App desconeguda";
 "Unknown device %@" = "Dispositiu desconegut %@";
+"Until %@" = "Fins a les %@";
 "Up" = "Deixat anar";
 "Up Arrow" = "Fletxa amunt";
 "usage %@" = "ús %@";

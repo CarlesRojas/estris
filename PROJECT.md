@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap and Window Snapping.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping and Keep Awake.
 
 ## Usage
 
@@ -119,6 +119,15 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
   - If the app won't get as small as the space, the window gets the usual snap and the app's minimum is remembered, so later previews for it show the usual snap.
 - Works through the Accessibility permission (frames of other apps' windows) and a listen-only event tap, which also sees drags of PasteRing's own windows; those are moved directly. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
 
+## Keep Awake
+
+Stops the Mac and its display from sleeping when idle. Turn it on with the switch in **Settings… > Keep Awake**; it turns itself off when its time is up.
+
+- **Keep awake for**, separately **On power adapter** (default Indefinitely) and **On battery** (default 1 hour): Don't keep awake, 15 or 30 minutes, 1, 2, 4 or 8 hours, or Indefinitely.
+- The time counts from when it was turned on. Plugging in or out switches to the other choice at once (counted from the same start); "Don't keep awake" pauses it until the source changes again.
+- **Now** (while on): the current power source, and whether it keeps awake, indefinitely or until when.
+- Works with a power assertion (`PreventUserIdleDisplaySleep`), released when it turns off or the app quits; power source changes come from IOKit's power source notifications.
+
 ## Languages
 
 English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching (a **Relaunch** button appears). Dates follow the chosen language.
@@ -149,6 +158,10 @@ Sources/PasteRing/
       WindowSnapping.swift     owns the utility: shortcuts, snapping, restore frames
       Model/                   settings, snap actions, Accessibility windows, drag snapper, space filler, preview
       Settings/                the Window Snapping pane
+    KeepAwake/
+      KeepAwake.swift          owns the utility: power assertion and timer
+      Model/                   settings, status, power source
+      Settings/                the Keep Awake pane
     Remap/
       Remap.swift              owns the utility and its event tap
       Model/                   settings, devices, key catalog, system actions, key mapper, event log

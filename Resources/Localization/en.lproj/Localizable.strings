@@ -16,8 +16,14 @@
 "/ (Slash)" = "/ (Slash)";
 "1 app excluded" = "1 app excluded";
 "1 entry" = "1 entry";
+"1 hour" = "1 hour";
 "12-hour" = "12-hour";
+"15 minutes" = "15 minutes";
+"2 hours" = "2 hours";
 "24-hour" = "24-hour";
+"30 minutes" = "30 minutes";
+"4 hours" = "4 hours";
+"8 hours" = "8 hours";
 "; (Semicolon)" = "; (Semicolon)";
 "= (Equals)" = "= (Equals)";
 "[ (Left Bracket)" = "[ (Left Bracket)";
@@ -43,6 +49,7 @@
 "App Windows" = "App Windows";
 "Appearance" = "Appearance";
 "Auto Quit" = "Auto Quit";
+"Battery" = "Battery";
 "Bottom edge: thirds" = "Bottom edge: thirds";
 "Bottom edge: two thirds when sliding to the middle" = "Bottom edge: two thirds when sliding to the middle";
 "Bottom Half" = "Bottom Half";
@@ -85,6 +92,7 @@
 "development build" = "development build";
 "Dim screen" = "Dim screen";
 "Display and Keyboard" = "Display and Keyboard";
+"Don't keep awake" = "Don't keep awake";
 "Down" = "Down";
 "Down Arrow" = "Down Arrow";
 "Dragging" = "Dragging";
@@ -116,8 +124,12 @@
 "Home" = "Home";
 "Ignore passwords" = "Ignore passwords";
 "Immediately" = "Immediately";
+"Indefinitely" = "Indefinitely";
 "Insert" = "Insert";
+"Keep Awake" = "Keep Awake";
+"Keep awake for" = "Keep awake for";
 "Keep up to" = "Keep up to";
+"Keeping awake" = "Keeping awake";
 "Keeps copied images in the history alongside text and files." = "Keeps copied images in the history alongside text and files.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Keeps what you copy and lets you pick what to paste with a shortcut.";
 "Key %@" = "Key %@";
@@ -165,6 +177,7 @@
 "Never" = "Never";
 "Next Desktop" = "Next Desktop";
 "Next Track" = "Next Track";
+"No" = "No";
 "No apps excluded" = "No apps excluded";
 "No clipboard entries yet" = "No clipboard entries yet";
 "No entries match “%@”" = "No entries match “%@”";
@@ -172,9 +185,12 @@
 "Not granted" = "Not granted";
 "Nothing" = "Nothing";
 "Nothing logged yet." = "Nothing logged yet.";
+"Now" = "Now";
 "Numbers" = "Numbers";
 "Off" = "Off";
 "On" = "On";
+"On battery" = "On battery";
+"On power adapter" = "On power adapter";
 "Only the first mapping for a key or button applies." = "Only the first mapping for a key or button applies.";
 "Open Accessibility Settings" = "Open Accessibility Settings";
 "Open at login" = "Open at login";
@@ -190,6 +206,8 @@
 "Permissions" = "Permissions";
 "Play or Pause" = "Play or Pause";
 "Posted by %@" = "Posted by %@";
+"Power adapter" = "Power adapter";
+"Power source" = "Power source";
 "Press a key or button on %@" = "Press a key or button on %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Press a shortcut again for the exact size, or hold ⌘ while dragging.";
 "Press keys…" = "Press keys…";
@@ -257,6 +275,7 @@
 "Stack" = "Stack";
 "Startup" = "Startup";
 "Status" = "Status";
+"Stops your Mac and its display from going to sleep." = "Stops your Mac and its display from going to sleep.";
 "Style" = "Style";
 "Swap From and To" = "Swap From and To";
 "Symbols" = "Symbols";
@@ -280,6 +299,7 @@
 "Top right corner" = "Top right corner";
 "Unknown app" = "Unknown app";
 "Unknown device %@" = "Unknown device %@";
+"Until %@" = "Until %@";
 "Up" = "Up";
 "Up Arrow" = "Up Arrow";
 "usage %@" = "usage %@";
