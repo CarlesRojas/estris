@@ -4,6 +4,8 @@ import SwiftUI
 struct EventViewer: View {
     let remap: Remap
     @ObservedObject var log: EventLog
+    /// Opens a new mapping from the clicked key or button on its device.
+    let map: (InputDevice, RemapInput) -> Void
 
     private static let timeFormat: DateFormatter = {
         let formatter = DateFormatter()
@@ -32,13 +34,18 @@ struct EventViewer: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(event.phase == .down ? Color.accentColor : .secondary)
                         .frame(width: 40, alignment: .leading)
-                    Text(event.name)
-                        .frame(width: 170, alignment: .leading)
-                        .lineLimit(1)
-                    Text(event.detail)
-                        .font(.system(.callout, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    HStack(spacing: 6) {
+                        if let source = event.source, let input = event.input, input != .mouseButton(0) {
+                            Button(event.name) { map(source, input) }
+                                .buttonStyle(.link)
+                                .help("Remap it")
+                        } else {
+                            Text(event.name)
+                        }
+                        Text("(\(event.detail))")
+                            .foregroundStyle(.secondary)
+                    }
+                    .lineLimit(1)
                     Spacer()
                     Text(event.device)
                         .foregroundStyle(.secondary)

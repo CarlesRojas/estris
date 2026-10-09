@@ -97,6 +97,14 @@ final class RemapSettings: ObservableObject {
         devices[device.id] = entry
     }
 
+    /// Adds a mapping from a key or button, unless the device already has one for it.
+    func addMapping(from input: RemapInput, to device: InputDevice) {
+        guard !mappings(for: device.id).contains(where: { $0.input == input }) else { return }
+        var entry = devices[device.id] ?? DeviceMappings(name: device.name, kind: device.kind)
+        entry.mappings.append(Mapping(input: input))
+        devices[device.id] = entry
+    }
+
     /// Changes a mapping, removing any other one for the same key or button.
     func update(_ mapping: Mapping, on deviceID: String) {
         guard var entry = devices[deviceID] else { return }

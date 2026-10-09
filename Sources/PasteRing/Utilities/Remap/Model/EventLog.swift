@@ -10,6 +10,9 @@ struct InputEvent: Identifiable {
     let id = UUID()
     let time = Date()
     let device: String
+    /// The device and input it came from, when it can be remapped.
+    let source: InputDevice?
+    let input: RemapInput?
     let phase: Phase
     let name: String
     let detail: String

@@ -10,6 +10,8 @@ struct RemapPane: View {
     let remap: Remap
     @ObservedObject var settings: RemapSettings
     @State private var tab = Tab.mappings
+    /// The device shown in Mappings, kept here so the Event Viewer can open one.
+    @State private var selection = ""
 
     var body: some View {
         UtilityPane(
@@ -20,9 +22,13 @@ struct RemapPane: View {
         ) { tab in
             switch tab {
             case .mappings:
-                MappingsView(remap: remap, settings: settings, devices: remap.devices)
+                MappingsView(remap: remap, settings: settings, devices: remap.devices, selection: $selection)
             case .eventViewer:
-                EventViewer(remap: remap, log: remap.eventLog)
+                EventViewer(remap: remap, log: remap.eventLog) { device, input in
+                    settings.addMapping(from: input, to: device)
+                    selection = device.id
+                    self.tab = .mappings
+                }
             }
         }
     }
@@ -33,7 +39,7 @@ private struct MappingsView: View {
     let remap: Remap
     @ObservedObject var settings: RemapSettings
     @ObservedObject var devices: InputDevices
-    @State private var selection = ""
+    @Binding var selection: String
     @State private var isRenaming = false
     @State private var newName = ""
 
@@ -107,12 +113,26 @@ private struct MappingsView: View {
     }
 
     private func deviceLabel(_ device: InputDevice) -> some View {
-        let count = settings.mappings(for: device.id).count
-        return Label(
-            device.name + (device.isConnected ? "" : " (not connected)") + (count > 0 ? " (\(count))" : ""),
-            systemImage: device.symbol
-        )
-        .tag(device.id)
+        Label(device.name + (device.isConnected ? "" : " (not connected)"), systemImage: device.symbol)
+            .tag(device.id)
+    }
+
+    /// The mapping turned around, or nil when its result can't be a source (a system action,
+    /// nothing, or the left button).
+    private func swapped(_ mapping: Mapping) -> Mapping? {
+        var result = mapping
+        switch mapping.output {
+        case nil: result.input = nil
+        case .key(let usage)?: result.input = .key(usage)
+        case .mouseButton(let number)? where number > 0: result.input = .mouseButton(number)
+        default: return nil
+        }
+        switch mapping.input {
+        case nil: result.output = nil
+        case .key(let usage)?: result.output = .key(usage)
+        case .mouseButton(let number)?: result.output = .mouseButton(number)
+        }
+        return result
     }
 
     private func row(_ mapping: Mapping, on device: InputDevice) -> some View {
@@ -130,6 +150,15 @@ private struct MappingsView: View {
                 settings.update(changed, on: device.id)
             }
             Spacer()
+            let turned = swapped(mapping)
+            Button {
+                if let turned { settings.update(turned, on: device.id) }
+            } label: {
+                Image(systemName: "arrow.left.arrow.right")
+            }
+            .buttonStyle(.borderless)
+            .disabled(turned == nil)
+            .help("Swap From and To")
             Button {
                 settings.remove(mapping, from: device.id)
             } label: {
