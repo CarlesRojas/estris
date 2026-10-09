@@ -1,121 +1,227 @@
 import AppKit
 import ApplicationServices
 
-/// Watches regular apps and quits one once its last window has been closed.
+/// Quits an app once its last window has closed, reacting to window events instead of
+/// polling.
 ///
-/// An app only counts as having closed its last window if it was seen with a window first,
-/// so apps opened without one (or that live in the menu bar) are left alone. Before
-/// quitting, it also checks for windows the Accessibility API can't see, such as windows
-/// on another desktop, and holds off if there might be any.
+/// Every regular app gets an Accessibility observer. It hears when the app creates or
+/// focuses windows (each window is then watched for being destroyed), and when a watched
+/// window is destroyed the app's windows are looked at a few times over the next couple of
+/// seconds. If the app has none left, it is checked once more after the chosen delay and
+/// then asked to quit (a normal quit, so unsaved changes can still be saved).
+///
+/// Left alone: apps never seen with a window, menu bar and background apps, hidden apps,
+/// excluded apps, and apps that may still have a window the Accessibility API can't see,
+/// such as one on another desktop.
 @MainActor
-final class WindowWatcher: NSObject {
-    private static let pollInterval: TimeInterval = 0.5
+final class WindowWatcher {
+    /// Looks after a window is destroyed. A closing window stays on screen while it fades
+    /// out, so one early look can still see it; later looks catch it gone.
+    private static let checkOffsets: [TimeInterval] = [0.35, 1.0, 2.2]
+    /// Leaving full screen destroys the full-screen window a moment before the normal one
+    /// comes back, so an empty app is always confirmed once more before quitting.
+    private static let minimumConfirmDelay: TimeInterval = 1.2
+    /// Longest any single Accessibility request may block, so a busy app can't freeze us.
+    private static let messagingTimeout: Float = 0.35
     /// Smaller windows (tool tips, helper panels) don't count as an app's window.
     private static let minimumWindowSide: CGFloat = 80
 
     private let settings: AutoQuitSettings
-    private var timer: Timer?
+    private var isRunning = false
+    private var observers: [pid_t: AXObserver] = [:]
     /// Apps seen with at least one window since watching started.
     private var hadWindows: Set<pid_t> = []
-    /// When each app was first seen without windows after having had some.
-    private var emptySince: [pid_t: Date] = [:]
+    /// Last time a round of checks was scheduled per app, so closing several windows at
+    /// once schedules one round.
+    private var lastCheckRound: [pid_t: Date] = [:]
+    private var workspaceTokens: [NSObjectProtocol] = []
 
     init(settings: AutoQuitSettings) {
         self.settings = settings
-        super.init()
     }
 
     func start() {
-        guard timer == nil else { return }
-        hadWindows = []
-        emptySince = [:]
-        let timer = Timer(timeInterval: Self.pollInterval, target: self, selector: #selector(check), userInfo: nil, repeats: true)
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
+        guard !isRunning else { return }
+        isRunning = true
+
+        let center = NSWorkspace.shared.notificationCenter
+        let app = { (note: Notification) in note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication }
+        workspaceTokens = [
+            center.addObserver(forName: NSWorkspace.didLaunchApplicationNotification, object: nil, queue: .main) { [weak self] note in
+                MainActor.assumeIsolated { app(note).map { self?.attach($0) } }
+            },
+            center.addObserver(forName: NSWorkspace.didTerminateApplicationNotification, object: nil, queue: .main) { [weak self] note in
+                MainActor.assumeIsolated { app(note).map { self?.detach(pid: $0.processIdentifier) } }
+            },
+            // Some apps only become regular (take a Dock icon) once they show a window, so
+            // they're missed at launch; coming to the front is a sure moment to catch them.
+            center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] note in
+                MainActor.assumeIsolated { app(note).map { self?.attach($0) } }
+            },
+        ]
+        NSWorkspace.shared.runningApplications.forEach(attach)
     }
 
     func stop() {
-        timer?.invalidate()
-        timer = nil
+        guard isRunning else { return }
+        isRunning = false
+        let center = NSWorkspace.shared.notificationCenter
+        workspaceTokens.forEach(center.removeObserver)
+        workspaceTokens = []
+        Array(observers.keys).forEach(detach)
+        hadWindows = []
+        lastCheckRound = [:]
     }
 
-    @objc private func check() {
-        // Window lists come from the Accessibility API.
-        guard Paster.isTrusted(prompt: false) else { return }
+    // MARK: - Observers
 
-        let ownPID = ProcessInfo.processInfo.processIdentifier
-        let apps = NSWorkspace.shared.runningApplications.filter {
-            $0.activationPolicy == .regular && !$0.isTerminated && $0.processIdentifier != ownPID
+    private func attach(_ app: NSRunningApplication) {
+        guard isRunning, app.activationPolicy == .regular else { return }
+        let pid = app.processIdentifier
+        guard pid != getpid() else { return }
+        if let observer = observers[pid] {
+            watchWindows(pid: pid, observer: observer)
+            return
         }
-        let livePIDs = Set(apps.map(\.processIdentifier))
-        hadWindows.formIntersection(livePIDs)
-        emptySince = emptySince.filter { livePIDs.contains($0.key) }
 
-        var otherWindows: [pid_t: Int]?
-        for app in apps where !settings.keepsRunning(app.bundleIdentifier) {
-            let pid = app.processIdentifier
-            // Unknown (the app isn't answering) counts as having windows: never quit on doubt.
-            let windowCount = Self.standardWindowCount(pid: pid) ?? 1
-            if windowCount > 0 {
-                hadWindows.insert(pid)
-                emptySince[pid] = nil
-                continue
-            }
-            guard hadWindows.contains(pid) else { continue }
-
-            // Only look these up when an app actually ran out of windows.
-            if otherWindows == nil {
-                otherWindows = Self.possibleWindowCounts()
-            }
-            if otherWindows?[pid, default: 0] ?? 0 > 0 {
-                emptySince[pid] = nil
-                continue
-            }
-
-            let since = emptySince[pid] ?? Date()
-            emptySince[pid] = since
-            if Date().timeIntervalSince(since) >= settings.delay.interval {
-                hadWindows.remove(pid)
-                emptySince[pid] = nil
-                app.terminate()
-            }
-        }
-    }
-
-    /// Document and app windows (not panels, sheets or palettes), including minimized ones,
-    /// on the current desktop. Nil when the app can't be asked.
-    private static func standardWindowCount(pid: pid_t) -> Int? {
+        var created: AXObserver?
+        guard AXObserverCreate(pid, windowWatcherCallback, &created) == .success, let observer = created else { return }
         let application = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(application, Self.messagingTimeout)
+        let refcon = Unmanaged.passUnretained(self).toOpaque()
+        for notification in [kAXWindowCreatedNotification, kAXMainWindowChangedNotification, kAXFocusedWindowChangedNotification] {
+            AXObserverAddNotification(observer, application, notification as CFString, refcon)
+        }
+        CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
+        observers[pid] = observer
+        watchWindows(pid: pid, observer: observer)
+    }
+
+    private func detach(pid: pid_t) {
+        if let observer = observers.removeValue(forKey: pid) {
+            CFRunLoopRemoveSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
+        }
+        hadWindows.remove(pid)
+        lastCheckRound[pid] = nil
+    }
+
+    /// Registers for each current window's destruction, and notes the app has had windows.
+    private func watchWindows(pid: pid_t, observer: AXObserver) {
+        let windows = Self.standardWindows(pid: pid) ?? []
+        guard !windows.isEmpty else { return }
+        hadWindows.insert(pid)
+        let refcon = Unmanaged.passUnretained(self).toOpaque()
+        for window in windows {
+            // Registering a window twice is harmless; it just reports it's already watched.
+            AXObserverAddNotification(observer, window, kAXUIElementDestroyedNotification as CFString, refcon)
+        }
+    }
+
+    /// Called from the observer callback, on the main run loop.
+    fileprivate func handle(notification: String, observer: AXObserver, element: AXUIElement) {
+        guard let pid = observers.first(where: { CFEqual($0.value, observer) })?.key else { return }
+        if notification == kAXUIElementDestroyedNotification as String {
+            scheduleChecks(pid: pid)
+        } else {
+            watchWindows(pid: pid, observer: observer)
+        }
+    }
+
+    // MARK: - Deciding to quit
+
+    private func scheduleChecks(pid: pid_t) {
+        let now = Date()
+        if let last = lastCheckRound[pid], now.timeIntervalSince(last) < 0.25 { return }
+        lastCheckRound[pid] = now
+        for offset in Self.checkOffsets {
+            DispatchQueue.main.asyncAfter(deadline: .now() + offset) { [weak self] in
+                self?.check(pid: pid, confirming: false)
+            }
+        }
+    }
+
+    private func check(pid: pid_t, confirming: Bool) {
+        guard isRunning, hadWindows.contains(pid),
+              let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated,
+              !app.isHidden,
+              !settings.keepsRunning(app.bundleIdentifier),
+              !Self.isBackgroundApp(app),
+              !hasAnyWindow(pid: pid)
+        else { return }
+
+        guard confirming else {
+            let delay = max(Self.minimumConfirmDelay, settings.delay.interval)
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                self?.check(pid: pid, confirming: true)
+            }
+            return
+        }
+        hadWindows.remove(pid)
+        app.terminate()
+    }
+
+    /// Any standard window (including minimized ones) the app still has, or, when the
+    /// Accessibility API can't say, a possible one in the window server's list.
+    private func hasAnyWindow(pid: pid_t) -> Bool {
+        guard let windows = Self.standardWindows(pid: pid) else { return true }
+        return !windows.isEmpty || Self.hasWindowServerWindow(pid: pid)
+    }
+
+    /// Document and app windows (not panels, sheets or palettes) on the current desktop,
+    /// minimized ones included. Nil when the app doesn't answer.
+    private static func standardWindows(pid: pid_t) -> [AXUIElement]? {
+        let application = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(application, messagingTimeout)
+        // Asks for windows rather than anything else about the app: Chromium-based apps
+        // switch on full accessibility (and keep paying for it) when asked other things.
         var value: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(application, "AXWindows" as CFString, &value) == .success,
+        guard AXUIElementCopyAttributeValue(application, kAXWindowsAttribute as CFString, &value) == .success,
               let windows = value as? [AXUIElement]
         else { return nil }
         return windows.filter { window in
+            AXUIElementSetMessagingTimeout(window, messagingTimeout)
             var subrole: CFTypeRef?
-            AXUIElementCopyAttributeValue(window, "AXSubrole" as CFString, &subrole)
-            return subrole as? String == "AXStandardWindow"
-        }.count
+            AXUIElementCopyAttributeValue(window, kAXSubroleAttribute as CFString, &subrole)
+            let value = subrole as? String
+            return value == "AXStandardWindow" || value == "AXFullScreenWindow"
+        }
     }
 
-    /// Normal-level windows the window server knows about but that aren't on screen, per
-    /// app: mostly windows on other desktops. Counted generously, so an app is never quit
-    /// while it might still have a window somewhere.
-    private static func possibleWindowCounts() -> [pid_t: Int] {
+    /// Whether the window server lists a normal-level window of the app that the
+    /// Accessibility API may be missing, such as one on another desktop. Counted
+    /// generously: an app is never quit while it might still have a window somewhere.
+    private static func hasWindowServerWindow(pid: pid_t) -> Bool {
         guard let list = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
-            return [:]
+            return true
         }
-        var counts: [pid_t: Int] = [:]
-        for window in list {
-            guard (window[kCGWindowLayer as String] as? Int) == 0,
-                  (window[kCGWindowIsOnscreen as String] as? Bool) != true,
-                  (window[kCGWindowAlpha as String] as? Double ?? 1) > 0,
-                  let pid = window[kCGWindowOwnerPID as String] as? pid_t,
-                  let bounds = window[kCGWindowBounds as String] as? [String: CGFloat],
-                  (bounds["Width"] ?? 0) >= minimumWindowSide,
-                  (bounds["Height"] ?? 0) >= minimumWindowSide
-            else { continue }
-            counts[pid, default: 0] += 1
+        return list.contains { window in
+            (window[kCGWindowOwnerPID as String] as? pid_t) == pid
+                && (window[kCGWindowLayer as String] as? Int) == 0
+                && (window[kCGWindowAlpha as String] as? Double ?? 1) > 0
+                && ((window[kCGWindowBounds as String] as? [String: CGFloat]).map {
+                    ($0["Width"] ?? 0) >= minimumWindowSide && ($0["Height"] ?? 0) >= minimumWindowSide
+                } ?? false)
         }
-        return counts
+    }
+
+    /// Menu bar and background-only apps take a Dock icon only while a window such as
+    /// their settings is open; closing it isn't a reason to quit them.
+    private static func isBackgroundApp(_ app: NSRunningApplication) -> Bool {
+        guard let url = app.bundleURL, let info = Bundle(url: url)?.infoDictionary else { return false }
+        return info["LSUIElement"] as? Bool == true || info["LSBackgroundOnly"] as? Bool == true
+    }
+}
+
+/// Plain C function for AXObserver; the watcher comes back through the refcon.
+private func windowWatcherCallback(
+    _ observer: AXObserver,
+    _ element: AXUIElement,
+    _ notification: CFString,
+    _ refcon: UnsafeMutableRawPointer?
+) {
+    guard let refcon else { return }
+    let watcher = Unmanaged<WindowWatcher>.fromOpaque(refcon).takeUnretainedValue()
+    MainActor.assumeIsolated {
+        watcher.handle(notification: notification as String, observer: observer, element: element)
     }
 }

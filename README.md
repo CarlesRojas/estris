@@ -77,7 +77,8 @@ Quits an app when you close its last window, the way apps on iPad and many Windo
 
 - **Quit**: immediately, or after 1, 5 or 30 seconds (default 1 second) with no windows.
 - **Excluded Apps**: every installed app with a switch; switch one off and it is never quit. The Finder is always kept.
-- Apps opened without a window, and apps that live in the menu bar, are left alone: an app is only quit after it was seen with a window. If an app might still have a window on another desktop, it is not quit.
+- It reacts to windows closing (no polling): when an app's window is destroyed, the app is checked a few times over the next two seconds, and quit only if it still has no windows after the chosen delay.
+- Apps opened without a window, menu bar and background apps, and hidden apps are left alone: an app is only quit after it was seen with a window. If an app might still have a window macOS doesn't report to other apps (for example on another desktop), it is not quit.
 - Needs the Accessibility permission to see each app's windows.
 
 ## Project structure
