@@ -43,6 +43,7 @@
 "After 30 days" = "After 30 days";
 "After 30 seconds" = "After 30 seconds";
 "After 5 seconds" = "After 5 seconds";
+"Allow it, then relaunch PasteRing, to see the color's value while picking." = "Allow it, then relaunch PasteRing, to see the color's value while picking.";
 "Allowed" = "Allowed";
 "Already mapped above" = "Already mapped above";
 "Already mapped on %@" = "Already mapped on %@";
@@ -203,6 +204,7 @@
 "Open Accessibility Settings" = "Open Accessibility Settings";
 "Open at login" = "Open at login";
 "Open overlay" = "Open overlay";
+"Open Screen Recording Settings" = "Open Screen Recording Settings";
 "Other" = "Other";
 "Other source" = "Other source";
 "Page Down" = "Page Down";
@@ -258,6 +260,7 @@
 "Ring menu" = "Ring menu";
 "Ring shows" = "Ring shows";
 "Same as System" = "Same as System";
+"Screen Recording" = "Screen Recording";
 "Screenshot of Screen" = "Screenshot of Screen";
 "Screenshot of Selection" = "Screenshot of Selection";
 "Screenshot Tools" = "Screenshot Tools";

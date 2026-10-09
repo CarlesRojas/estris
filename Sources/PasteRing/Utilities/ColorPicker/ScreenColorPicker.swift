@@ -2,14 +2,16 @@ import AppKit
 import Combine
 import SwiftUI
 
-/// The Color Picker utility: a shortcut shows macOS's color sampler, a loupe by the pointer
-/// with the color under it; a click copies that color in the chosen format and shows it by
-/// the pointer for a moment. Owns everything it needs, so the app only has to create it and
+/// The Color Picker utility: a shortcut shows a loupe at the pointer with a label under it,
+/// the color and its value in the chosen format, following the pointer; clicking copies it
+/// and the label says Copied for a moment. Without the Screen Recording permission it falls
+/// back to macOS's own sampler, and the label only shows once picked. Owns everything it needs, so the app only has to create it and
 /// call `start()`.
 @MainActor
 final class ScreenColorPicker {
     let settings = ColorPickerSettings()
-    private let badge = PickedColorBadge()
+    private let hud = PickerHUD()
+    private var session: PickerSession?
     private var hotKey: UInt32?
     private var observers: Set<AnyCancellable> = []
     private var isPicking = false
@@ -42,16 +44,32 @@ final class ScreenColorPicker {
     private func pick() {
         guard !isPicking else { return }
         isPicking = true
-        NSColorSampler().show { [weak self] color in
-            MainActor.assumeIsolated {
-                guard let self else { return }
-                self.isPicking = false
-                guard let color else { return }
-                let text = self.settings.format.string(for: color, hashPrefix: self.settings.hashPrefix)
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(text, forType: .string)
-                self.badge.show(color, text: text)
+        guard ScreenSampler.isAllowed else {
+            // Without Screen Recording the value can't follow the pointer: use macOS's own
+            // sampler, and show the label once picked.
+            ScreenSampler.requestAccess()
+            NSColorSampler().show { [weak self] color in
+                MainActor.assumeIsolated {
+                    self?.isPicking = false
+                    if let color { self?.copy(color, at: NSEvent.mouseLocation) }
+                }
             }
+            return
         }
+        let session = PickerSession(hud: hud, format: { [settings] in settings.format.string(for: $0, hashPrefix: settings.hashPrefix) }) { [weak self] color, point in
+            guard let self else { return }
+            self.isPicking = false
+            self.session = nil
+            if let color { self.copy(color, at: point) } else { self.hud.hide() }
+        }
+        self.session = session
+        session.begin()
+    }
+
+    private func copy(_ color: NSColor, at point: NSPoint) {
+        let text = settings.format.string(for: color, hashPrefix: settings.hashPrefix)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        hud.showPicked(color, text: text, at: point)
     }
 }

@@ -136,9 +136,11 @@ Keeps the Mac and its display awake until it has been idle for a chosen time, th
 
 Picks a color anywhere on screen with a shortcut and copies it. Off by default; turn it on in **Settings… > Color Picker**.
 
-- **Shortcut** (default ⇧⌘C, which browsers also use for Inspect Element) shows macOS's color sampler (`NSColorSampler`): a loupe by the pointer with the color and pixels under it. Click picks, Esc cancels. No Screen Recording permission needed.
+- **Shortcut** (default ⇧⌘C, which browsers also use for Inspect Element) starts picking: a loupe centred on the pointer shows the pixels under it magnified, with the centre one outlined, and under it a label follows the pointer with the color and its value in the chosen format. Releasing a click picks; Esc or a right click cancels. The pointer is a crosshair.
+- The label is a capsule in the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings): the color in a circle at the left, concentric with the capsule's end, and the value centred to its right. Once picked, the loupe goes, the label adds "Copied", and fades out after a moment.
 - **Copy as**: Hex (`#FF8000`, with **Include # prefix**, on by default), RGB (`rgb(255, 128, 0)`), HSL (`hsl(30, 100%, 50%)`) or SwiftUI (`Color(red: 1.000, green: 0.502, blue: 0.000)`), in sRGB. An example shows the chosen format.
-- After picking, a badge by the pointer shows the color and the copied text for a moment.
+- Reading the screen live needs the Screen Recording permission (the pane offers to open its settings; a relaunch is needed after allowing). Without it, the shortcut shows macOS's own sampler (`NSColorSampler`) instead, and the label only shows once picked.
+- How: a nearly clear window over each screen takes the pointer, clicks and Esc; each move captures a small square below it (`CGWindowListCreateImage`, looked up at run time since newer SDKs mark it unavailable) and reads the centre pixel in sRGB.
 
 ## Languages
 
@@ -172,7 +174,7 @@ Sources/PasteRing/
       Settings/                the Window Snapping pane
     ColorPicker/
       ScreenColorPicker.swift  owns the utility (named so it doesn't hide SwiftUI's ColorPicker)
-      Model/                   settings and formats, the picked-color badge
+      Model/                   settings and formats, picking session, loupe and label, screen sampling
       Settings/                the Color Picker pane
     KeepAwake/
       KeepAwake.swift          owns the utility: power assertion and timer

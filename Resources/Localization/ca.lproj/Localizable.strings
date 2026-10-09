@@ -43,6 +43,7 @@
 "After 30 days" = "Al cap de 30 dies";
 "After 30 seconds" = "Al cap de 30 segons";
 "After 5 seconds" = "Al cap de 5 segons";
+"Allow it, then relaunch PasteRing, to see the color's value while picking." = "Permet-ho i torna a obrir el PasteRing per veure el valor del color mentre tries.";
 "Allowed" = "Permès";
 "Already mapped above" = "Ja assignat més amunt";
 "Already mapped on %@" = "Ja assignat a %@";
@@ -203,6 +204,7 @@
 "Open Accessibility Settings" = "Obre la configuració d’accessibilitat";
 "Open at login" = "Obre en iniciar la sessió";
 "Open overlay" = "Obre el tauler";
+"Open Screen Recording Settings" = "Obre la configuració de gravació de pantalla";
 "Other" = "Altres";
 "Other source" = "Una altra font";
 "Page Down" = "Av Pàg";
@@ -258,6 +260,7 @@
 "Ring menu" = "Menú en anell";
 "Ring shows" = "L’anell mostra";
 "Same as System" = "Igual que el sistema";
+"Screen Recording" = "Gravació de pantalla";
 "Screenshot of Screen" = "Captura de la pantalla";
 "Screenshot of Selection" = "Captura de la selecció";
 "Screenshot Tools" = "Eines de captura de pantalla";

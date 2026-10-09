@@ -43,6 +43,7 @@
 "After 30 days" = "Tras 30 días";
 "After 30 seconds" = "Tras 30 segundos";
 "After 5 seconds" = "Tras 5 segundos";
+"Allow it, then relaunch PasteRing, to see the color's value while picking." = "Permítelo y vuelve a abrir PasteRing para ver el valor del color mientras eliges.";
 "Allowed" = "Permitido";
 "Already mapped above" = "Ya asignado más arriba";
 "Already mapped on %@" = "Ya asignado en %@";
@@ -203,6 +204,7 @@
 "Open Accessibility Settings" = "Abrir ajustes de accesibilidad";
 "Open at login" = "Abrir al iniciar sesión";
 "Open overlay" = "Abrir el panel";
+"Open Screen Recording Settings" = "Abrir ajustes de grabación de pantalla";
 "Other" = "Otras";
 "Other source" = "Otra fuente";
 "Page Down" = "Av Pág";
@@ -258,6 +260,7 @@
 "Ring menu" = "Menú en anillo";
 "Ring shows" = "El anillo muestra";
 "Same as System" = "Igual que el sistema";
+"Screen Recording" = "Grabación de pantalla";
 "Screenshot of Screen" = "Captura de la pantalla";
 "Screenshot of Selection" = "Captura de la selección";
 "Screenshot Tools" = "Herramientas de captura";
