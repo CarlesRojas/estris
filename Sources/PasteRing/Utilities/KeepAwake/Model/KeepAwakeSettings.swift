@@ -89,7 +89,8 @@ final class KeepAwakeStatus: ObservableObject {
         case indefinitely
         /// Keeping awake, as the Mac was used within the chosen time.
         case active
-        /// Idle for the chosen time: macOS's own sleep settings apply until it is used again.
+        /// Idle for the chosen time: the Mac was put to sleep, or macOS's own sleep settings
+        /// apply until it is used again.
         case idle
     }
 
@@ -101,11 +102,13 @@ final class KeepAwakeStatus: ObservableObject {
     @Published var otherAppKeepsDisplayOn = false
     /// When another app last stopped keeping the display on, which counts as activity.
     var otherHolderEndedAt = Date.distantPast
+    /// When the Mac or its screen last woke, which counts as activity.
+    var lastWake = Date.distantPast
 
     /// Seconds the Mac has been idle: since the last input or another app keeping the
     /// display on.
     var idleTime: TimeInterval {
-        min(Self.inputIdleTime, Date().timeIntervalSince(otherHolderEndedAt))
+        min(Self.inputIdleTime, Date().timeIntervalSince(otherHolderEndedAt), Date().timeIntervalSince(lastWake))
     }
 
     /// Seconds left until the Mac may sleep, while counting down.

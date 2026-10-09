@@ -6,8 +6,8 @@ import SwiftUI
 /// The Keep Awake utility: while on, keeps the Mac and its display awake until it has been
 /// idle for as long as chosen for the current power source (power adapter or battery). Idle
 /// means no mouse, keyboard or trackpad input and nothing else keeping the display on (a
-/// playing video does); any of those starts the count again. Once idle for that long it lets
-/// go, so macOS's own sleep settings apply, and holds again when the Mac is used. Owns
+/// playing video does); any of those starts the count again. Once idle for that long it puts
+/// the Mac to sleep, and holds again when the Mac wakes or is used. Owns
 /// everything it needs, so the app only has to create it and call `start()`.
 @MainActor
 final class KeepAwake {
@@ -53,7 +53,12 @@ final class KeepAwake {
         let center = NSWorkspace.shared.notificationCenter
         wakeTokens = [NSWorkspace.screensDidWakeNotification, NSWorkspace.didWakeNotification].map { name in
             center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.evaluate() }
+                MainActor.assumeIsolated {
+                    // Waking counts as activity, so the count starts over instead of the
+                    // Mac being put straight back to sleep.
+                    self?.status.lastWake = Date()
+                    self?.evaluate()
+                }
             }
         }
         // Published values arrive before the property changes; applying on the next turn of
@@ -116,8 +121,24 @@ final class KeepAwake {
             lookAgain(in: limit - idle)
         } else {
             release()
+            let wasCounting = status.state == .active
             status.state = .idle
             watchForActivity()
+            // The time is up: sleep now rather than waiting for macOS's own timers.
+            if wasCounting { sleepNow() }
+        }
+    }
+
+    /// Puts the Mac to sleep, as macOS's own `pmset sleepnow` does.
+    private func sleepNow() {
+        log("idle for the chosen time, sleeping")
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
+        process.arguments = ["sleepnow"]
+        do {
+            try process.run()
+        } catch {
+            log("can't put the Mac to sleep: \(error.localizedDescription)")
         }
     }
 
