@@ -44,10 +44,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if settingsWindow == nil {
             let settingsView = SettingsView(general: general, clipboard: clipboard)
             let hostingController = NSHostingController(rootView: settingsView)
-            // Only enforce the minimum size. By default the window also follows the content's
-            // ideal size, which for a long form is taller than the screen.
-            hostingController.sizingOptions = [.minSize]
+            // The window sets its own size. Letting SwiftUI drive it made the window adopt the
+            // Clipboard Manager pane's (very tall) minimum height, so the content overflowed the
+            // window above and below.
+            hostingController.sizingOptions = []
             let window = NSWindow(contentViewController: hostingController)
+            window.contentMinSize = NSSize(width: 820, height: 600)
             window.title = "PasteRing"
             // Content starts below the title bar, so the sidebar never runs under it.
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable]

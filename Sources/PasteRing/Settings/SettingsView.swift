@@ -68,6 +68,16 @@ struct SettingsView: View {
     }
 
     var body: some View {
+        // Pin the whole view to the window's size, whatever the panes would like to be, so it
+        // can never be laid out taller than the window and shift off screen. Long panes
+        // scroll inside instead.
+        GeometryReader { proxy in
+            splitView
+                .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+    }
+
+    private var splitView: some View {
         NavigationSplitView {
             List(panes, selection: $selection) { pane in
                 HStack {
@@ -89,7 +99,6 @@ struct SettingsView: View {
             }
         }
         .environment(\.dateTimeFormat, general.dateTimeFormat)
-        .frame(minWidth: 820, maxWidth: .infinity, minHeight: 640, maxHeight: .infinity)
         // Jump to the first match when the search hides the open pane.
         .onChange(of: search) { _ in
             if let selection, !panes.contains(selection), let first = panes.first {

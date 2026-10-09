@@ -37,6 +37,9 @@ struct ClipboardManagerPane: View {
                     .tag(Tab.excludedApps)
             }
             .padding([.horizontal, .bottom], 16)
+            // Shrink to the space left; the tabs' content scrolls.
+            .frame(minHeight: 0, maxHeight: .infinity)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
