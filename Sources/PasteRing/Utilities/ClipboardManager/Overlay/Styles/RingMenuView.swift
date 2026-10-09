@@ -76,7 +76,7 @@ struct RingMenuView: View {
 /// towards the bottom, and the selected card at the top is enlarged to about the size of
 /// the Stack's front card.
 struct RingPlacement: ViewModifier, Animatable {
-    static let topScale: CGFloat = 1.6
+    static let topScale: CGFloat = 1.3
     /// Size at the bottom of the ring, the furthest point.
     private static let farScale: CGFloat = 0.5
 
