@@ -68,12 +68,14 @@ private struct MappingsView: View {
                     } header: {
                         header(device)
                     } footer: {
-                        Button {
-                            settings.addMapping(to: device)
-                        } label: {
-                            Label("Add Mapping", systemImage: "plus")
+                        HStack {
+                            Spacer()
+                            Button {
+                                settings.addMapping(to: device)
+                            } label: {
+                                Label("Add Mapping", systemImage: "plus")
+                            }
                         }
-                        .buttonStyle(.borderedProminent)
                         .padding(.top, 4)
                     }
                     .id(device.id)
