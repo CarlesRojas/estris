@@ -24,7 +24,7 @@ final class Remap {
         didSet { updateTap() }
     }
 
-    /// Whether the pointer is on a name in the Event Viewer that opens a mapping.
+    /// Whether the pointer is on a Create Mapping button in the Event Viewer.
     var isOverViewerLink = false
 
     /// Waiting for a key or button on a device, to remap it.
@@ -125,8 +125,8 @@ final class Remap {
             }
         }
 
-        // A click on a name in the Event Viewer is for opening its mapping; logging it would
-        // add a row and move the list under the pointer.
+        // A click on Create Mapping in the Event Viewer; logging it would add a row and move
+        // the list under the pointer.
         let isLinkClick = isOverViewerLink && (type == .leftMouseDown || type == .leftMouseUp)
         if isViewing, !parsed.isRepeat, !isLinkClick {
             eventLog.record(InputEvent(device: device.map(settings.name(of:)) ?? "Other source", source: device, input: parsed.input, phase: parsed.phase, name: parsed.name, detail: parsed.detail))

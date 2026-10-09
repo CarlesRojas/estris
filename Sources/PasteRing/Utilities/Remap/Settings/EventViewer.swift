@@ -14,6 +14,8 @@ struct EventViewer: View {
     /// added, which isn't the user scrolling away.
     @State private var lastAutoScroll = Date.distantPast
     private static let bottomID = "bottom"
+    /// The row under the pointer, which shows Create Mapping when its input can be remapped.
+    @State private var hoveredRow: UUID?
 
     private static let timeFormat: DateFormatter = {
         let formatter = DateFormatter()
@@ -75,16 +77,17 @@ struct EventViewer: View {
                 .foregroundStyle(event.phase == .down ? Color.accentColor : .secondary)
                 .frame(width: 40, alignment: .leading)
             HStack(spacing: 6) {
-                if let source = event.source, let input = event.input, input != .mouseButton(0) {
-                    RemapLink(title: event.name, onHover: { remap.isOverViewerLink = $0 }) {
+                Text(event.name)
+                Text("(\(event.detail))")
+                    .foregroundStyle(.secondary)
+                if hoveredRow == event.id, let source = event.source, let input = event.input, input != .mouseButton(0) {
+                    Button("Create Mapping") {
                         remap.isOverViewerLink = false
                         map(source, input)
                     }
-                } else {
-                    Text(event.name)
+                    .controlSize(.small)
+                    .onHover { remap.isOverViewerLink = $0 }
                 }
-                Text("(\(event.detail))")
-                    .foregroundStyle(.secondary)
             }
             .lineLimit(1)
             Spacer()
@@ -92,26 +95,16 @@ struct EventViewer: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
-    }
-}
-
-/// A key or button name that opens a mapping from it; underlined while hovered.
-private struct RemapLink: View {
-    let title: String
-    let onHover: (Bool) -> Void
-    let action: () -> Void
-    @State private var isHovered = false
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .underline(isHovered)
-        }
-        .buttonStyle(.link)
+        // Tall enough for the button, so rows don't grow when it appears.
+        .frame(minHeight: 22)
+        .contentShape(Rectangle())
         .onHover { hovering in
-            isHovered = hovering
-            onHover(hovering)
+            if hovering {
+                hoveredRow = event.id
+            } else if hoveredRow == event.id {
+                hoveredRow = nil
+            }
         }
-        .help("Remap it")
     }
 }
+
