@@ -28,12 +28,13 @@ struct RemapPane: View {
     }
 }
 
-/// Devices on the left, the selected device's mappings on the right.
+/// A device menu at the top, then the chosen device's mappings.
 private struct MappingsView: View {
     let remap: Remap
     @ObservedObject var settings: RemapSettings
     @ObservedObject var devices: InputDevices
-    @State private var selection: String?
+    @State private var selection = ""
+    @State private var isAdding = false
 
     /// Connected devices, then disconnected ones that still have mappings.
     private var listed: [InputDevice] {
@@ -47,106 +48,86 @@ private struct MappingsView: View {
 
     var body: some View {
         let items = listed
-        HStack(spacing: 0) {
-            List(selection: $selection) {
-                section("Keyboards", devices: items.filter { $0.kind == .keyboard })
-                section("Mice and Trackpads", devices: items.filter { $0.kind == .mouse })
+        let device = items.first { $0.id == selection }
+        Form {
+            Section {
+                Picker("Device", selection: $selection) {
+                    deviceGroup("Keyboards", devices: items.filter { $0.kind == .keyboard })
+                    deviceGroup("Mice and Trackpads", devices: items.filter { $0.kind == .mouse })
+                }
             }
-            .listStyle(.sidebar)
-            .frame(width: 250)
 
-            Divider()
-
-            if let device = items.first(where: { $0.id == selection }) {
-                DeviceMappingsView(remap: remap, settings: settings, device: device)
-                    .id(device.id)
-            } else {
-                Text("No device selected")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if let device {
+                let mappings = settings.mappings(for: device.id)
+                Section {
+                    if mappings.isEmpty {
+                        Text("No mappings")
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(mappings) { mapping in
+                        row(mapping, on: device)
+                    }
+                    Button("Add Mapping") {
+                        isAdding = true
+                    }
+                } header: {
+                    Text("Mappings")
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .settingsPage()
+        .sheet(isPresented: $isAdding) {
+            if let device {
+                NewMappingSheet(remap: remap, device: device) { mapping in
+                    settings.add(mapping, to: device)
+                }
             }
         }
         .onAppear {
             devices.refresh()
-            if selection == nil { selection = listed.first?.id }
+            if device == nil { selection = listed.first?.id ?? "" }
         }
     }
 
     @ViewBuilder
-    private func section(_ title: String, devices: [InputDevice]) -> some View {
+    private func deviceGroup(_ title: String, devices: [InputDevice]) -> some View {
         if !devices.isEmpty {
             Section(title) {
                 ForEach(devices) { device in
-                    HStack {
-                        Label(device.name, systemImage: device.kind == .keyboard ? "keyboard" : "computermouse")
-                            .lineLimit(1)
-                            .opacity(device.isConnected ? 1 : 0.5)
-                        Spacer()
-                        let count = settings.mappings(for: device.id).count
-                        if count > 0 {
-                            Text("\(count)")
-                                .monospacedDigit()
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+                    let count = settings.mappings(for: device.id).count
+                    Label(
+                        device.name + (device.isConnected ? "" : " (not connected)") + (count > 0 ? " (\(count))" : ""),
+                        systemImage: device.kind == .keyboard ? "keyboard" : "computermouse"
+                    )
                     .tag(device.id)
                 }
             }
         }
     }
-}
 
-/// A device's mappings, each a source and what it becomes.
-private struct DeviceMappingsView: View {
-    let remap: Remap
-    @ObservedObject var settings: RemapSettings
-    let device: InputDevice
-    @State private var isAdding = false
-
-    var body: some View {
-        let mappings = settings.mappings(for: device.id)
-        Form {
-            Section {
-                if mappings.isEmpty {
-                    Text("No mappings")
-                        .foregroundStyle(.secondary)
-                }
-                ForEach(mappings) { mapping in
-                    HStack(spacing: 10) {
-                        InputButton(remap: remap, device: device, input: mapping.input) { input in
-                            var changed = mapping
-                            changed.input = input
-                            settings.update(changed, on: device.id)
-                        }
-                        Image(systemName: "arrow.right")
-                            .foregroundStyle(.secondary)
-                        OutputButton(input: mapping.input, output: mapping.output) { output in
-                            var changed = mapping
-                            changed.output = output
-                            settings.update(changed, on: device.id)
-                        }
-                        Spacer()
-                        Button {
-                            settings.remove(mapping, from: device.id)
-                        } label: {
-                            Image(systemName: "trash")
-                        }
-                        .buttonStyle(.borderless)
-                        .help("Remove this mapping")
-                    }
-                }
-                Button("Add Mapping") {
-                    isAdding = true
-                }
-            } header: {
-                Text(device.isConnected ? device.name : "\(device.name) (not connected)")
+    private func row(_ mapping: Mapping, on device: InputDevice) -> some View {
+        HStack(spacing: 10) {
+            InputButton(remap: remap, device: device, input: mapping.input) { input in
+                var changed = mapping
+                changed.input = input
+                settings.update(changed, on: device.id)
             }
-        }
-        .formStyle(.grouped)
-        .sheet(isPresented: $isAdding) {
-            NewMappingSheet(remap: remap, device: device) { mapping in
-                settings.add(mapping, to: device)
+            Image(systemName: "arrow.right")
+                .foregroundStyle(.secondary)
+            OutputButton(input: mapping.input, output: mapping.output) { output in
+                var changed = mapping
+                changed.output = output
+                settings.update(changed, on: device.id)
             }
+            Spacer()
+            Button {
+                settings.remove(mapping, from: device.id)
+            } label: {
+                Image(systemName: "trash")
+            }
+            .buttonStyle(.borderless)
+            .help("Remove this mapping")
         }
     }
 }

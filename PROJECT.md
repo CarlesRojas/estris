@@ -79,7 +79,7 @@ Middle click from the trackpad, which macOS doesn't offer. Off by default; turn 
 
 Changes what keys and mouse buttons do, per device. Off by default; turn it on in **Settings… > Remap**.
 
-- **Mappings**: connected keyboards and mice (and disconnected ones that still have mappings) on the left; the selected device's mappings on the right. **Add Mapping** picks a source and a result:
+- **Mappings**: a **Device** menu at the top lists connected keyboards and mice (and disconnected ones that still have mappings), grouped by kind; the chosen device's mappings are below it. **Add Mapping** picks a source and a result:
   - Source: any key or mouse button except the left one. **Record** captures the next key or button pressed on that device; or pick from a searchable, sectioned list.
   - Result: another key, a mouse button, a system action (Mission Control, App Windows, Show Desktop, Launchpad, next or previous desktop, volume, mute, media, display and keyboard brightness, sleep display, lock screen, Spotlight, screenshots, emoji picker, Force Quit) or nothing.
   - One mapping per source; adding another for the same source replaces it.
