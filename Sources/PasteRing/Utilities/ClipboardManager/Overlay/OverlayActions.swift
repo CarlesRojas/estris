@@ -67,13 +67,13 @@ private struct ClipActions: ViewModifier {
                         if let key = actions.quickPickKey(item) {
                             Text(key)
                                 .font(.caption.monospacedDigit())
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                                 .padding(.trailing, 6)
                         }
                         if actions.showsDate {
                             Text(dateTimeFormat.string(from: item.date))
                                 .font(.caption.monospacedDigit())
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
                         if actions.showsDelete {
@@ -97,7 +97,7 @@ private struct ClipActions: ViewModifier {
         } label: {
             Image(systemName: "trash")
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(isTrashHovered ? .primary : .tertiary)
+                .foregroundStyle(isTrashHovered ? .primary : .secondary)
                 .frame(width: 24, height: 24)
                 .contentShape(Rectangle())
         }
