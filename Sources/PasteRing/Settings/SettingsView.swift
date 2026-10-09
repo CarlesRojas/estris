@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 /// One entry in the settings sidebar: the app-wide General pane, then one per utility.
@@ -6,6 +7,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case general
     case clipboard
     case autoQuit
+    /// Hidden until unlocked from the version in General > About.
+    case developer
 
     var id: Self { self }
 
@@ -14,6 +17,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .general: "General"
         case .clipboard: "Clipboard"
         case .autoQuit: "Auto Quit"
+        case .developer: "Developer"
         }
     }
 
@@ -22,6 +26,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .general: "gearshape"
         case .clipboard: "list.clipboard"
         case .autoQuit: "xmark.app"
+        case .developer: "hammer"
         }
     }
 
@@ -30,6 +35,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         switch self {
         case .general:
             ["login", "startup", "language", "accessibility", "permission", "date", "time", "format", "version", "about"]
+        case .developer:
+            ["logs", "debug", "developer", "diagnostics"]
         case .autoQuit:
             ["quit", "close", "window", "last window", "terminate", "excluded", "apps", "delay"]
         case .clipboard:
@@ -47,6 +54,9 @@ enum SettingsPane: String, CaseIterable, Identifiable {
 /// What the Settings window is showing, shared by the sidebar and the detail column.
 @MainActor
 final class SettingsNavigation: ObservableObject {
+    private let general: GeneralSettings
+    private var observer: AnyCancellable?
+
     @Published var selection: SettingsPane? = .general
     @Published var search = "" {
         // Jump to the first match when the search hides the open pane.
@@ -57,8 +67,24 @@ final class SettingsNavigation: ObservableObject {
         }
     }
 
+    init(general: GeneralSettings) {
+        self.general = general
+        // The sidebar rebuilds when the Developer pane is unlocked or hidden; it opens when
+        // unlocked.
+        observer = general.$showsDeveloperSettings.dropFirst().sink { [weak self] shows in
+            self?.objectWillChange.send()
+            if shows {
+                self?.selection = .developer
+            } else if self?.selection == .developer {
+                self?.selection = .general
+            }
+        }
+    }
+
     var panes: [SettingsPane] {
-        SettingsPane.allCases.filter { $0.matches(search) }
+        SettingsPane.allCases.filter { pane in
+            (pane != .developer || general.showsDeveloperSettings) && pane.matches(search)
+        }
     }
 }
 
@@ -89,6 +115,7 @@ struct SettingsSidebar: View {
         case .general: nil
         case .clipboard: clipboardSettings.isEnabled
         case .autoQuit: autoQuitSettings.isEnabled
+        case .developer: nil
         }
     }
 }
@@ -100,6 +127,7 @@ struct SettingsDetail: View {
     @ObservedObject var general: GeneralSettings
     let clipboard: ClipboardManager
     let autoQuit: AutoQuit
+    let log: AppLog
 
     var body: some View {
         GeometryReader { proxy in
@@ -111,6 +139,8 @@ struct SettingsDetail: View {
                     clipboard.settingsPane()
                 case .autoQuit:
                     autoQuit.settingsPane()
+                case .developer:
+                    DeveloperPane(general: general, log: log)
                 }
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)

@@ -36,11 +36,11 @@ final class WindowWatcher {
     private var lastCheckRound: [pid_t: Date] = [:]
     private var workspaceTokens: [NSObjectProtocol] = []
 
-    private let activity: AutoQuitActivity
+    private let appLog: AppLog
 
-    init(settings: AutoQuitSettings, activity: AutoQuitActivity) {
+    init(settings: AutoQuitSettings, log: AppLog) {
         self.settings = settings
-        self.activity = activity
+        appLog = log
     }
 
     func start() {
@@ -183,7 +183,7 @@ final class WindowWatcher {
     }
 
     private func log(_ message: String) {
-        activity.record(message)
+        appLog.record(message, source: "Auto Quit")
     }
 
     /// Document and app windows (not panels, sheets or palettes) on the current desktop,

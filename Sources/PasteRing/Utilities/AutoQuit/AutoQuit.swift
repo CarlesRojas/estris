@@ -7,12 +7,11 @@ import SwiftUI
 @MainActor
 final class AutoQuit {
     let settings = AutoQuitSettings()
-    let activity = AutoQuitActivity()
     private let watcher: WindowWatcher
     private var observers: Set<AnyCancellable> = []
 
-    init() {
-        watcher = WindowWatcher(settings: settings, activity: activity)
+    init(log: AppLog) {
+        watcher = WindowWatcher(settings: settings, log: log)
     }
 
     func start() {
@@ -31,6 +30,6 @@ final class AutoQuit {
 
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
-        AutoQuitPane(settings: settings, activity: activity)
+        AutoQuitPane(settings: settings)
     }
 }

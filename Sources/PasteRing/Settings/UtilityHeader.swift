@@ -2,18 +2,18 @@ import AppKit
 import SwiftUI
 
 /// The first row of every utility's settings pane: what it is, and a switch that turns the
-/// whole utility on or off.
+/// whole utility on or off (none for panes that aren't a utility, such as Developer).
 struct UtilityHeader: View {
     let title: String
     let symbol: String
     let summary: String
-    @Binding var isOn: Bool
+    var isOn: Binding<Bool>?
 
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: symbol)
                 .font(.system(size: 26, weight: .regular))
-                .foregroundStyle(isOn ? Color.accentColor : .secondary)
+                .foregroundStyle(isOn?.wrappedValue ?? true ? Color.accentColor : .secondary)
                 .frame(width: 40, height: 40)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -24,10 +24,12 @@ struct UtilityHeader: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 12)
-            Toggle(title, isOn: $isOn)
-                .toggleStyle(.switch)
-                .labelsHidden()
-                .controlSize(.large)
+            if let isOn {
+                Toggle(title, isOn: isOn)
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                    .controlSize(.large)
+            }
         }
         // Lines up with the grouped boxes below.
         .padding(.horizontal, SettingsLayout.contentInset)

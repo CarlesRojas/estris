@@ -6,13 +6,14 @@ struct UtilityPane<Tab, Content: View>: View
 where Tab: CaseIterable & Hashable & RawRepresentable, Tab.RawValue == String, Tab.AllCases: RandomAccessCollection {
     let pane: SettingsPane
     let summary: String
-    @Binding var isOn: Bool
+    /// The utility's on/off switch; nil for panes without one.
+    var isOn: Binding<Bool>?
     @Binding var tab: Tab
     @ViewBuilder let content: (Tab) -> Content
 
     var body: some View {
         VStack(spacing: 0) {
-            UtilityHeader(title: pane.title, symbol: pane.symbol, summary: summary, isOn: $isOn)
+            UtilityHeader(title: pane.title, symbol: pane.symbol, summary: summary, isOn: isOn)
 
             Picker("View", selection: $tab) {
                 ForEach(Array(Tab.allCases), id: \.self) { tab in

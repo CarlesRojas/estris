@@ -71,6 +71,13 @@ The build is ad-hoc signed by default, so macOS may forget the permission after 
 SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/build-app.sh
 ```
 
+## Developer settings
+
+Click the version in **Settings… > General > About** six times to add a **Developer** pane to the sidebar:
+
+- **Logs**: what the utilities noticed and decided (newest first, searchable), with **Copy All** for bug reports and **Clear**.
+- **Settings**: status details and settings regular users don't need, including **Hide Developer Settings**.
+
 ## Auto Quit
 
 Quits an app when you close its last window, the way apps on iPad and many Windows apps behave. Off by default; turn it on in **Settings… > Auto Quit**.
@@ -79,7 +86,7 @@ Quits an app when you close its last window, the way apps on iPad and many Windo
 - **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: it is never quit. The Finder is always excluded.
 - It reacts to windows closing (no polling): when an app's window is destroyed, the app is checked a few times over the next two seconds, and quit only if it still has no windows after the chosen delay.
 - Apps opened without a window, menu bar and background apps, and hidden apps are left alone: an app is only quit after it was seen with a window. Windows on other desktops are only noticed with the Screen Recording permission (macOS hides other apps' window titles without it), so without it closing the last window on this desktop can quit an app that still has one elsewhere.
-- Decisions are logged: open Console and search for "PasteRing Auto Quit" to see why an app was or wasn't quit.
+- Decisions are logged under **Developer > Logs** (and in Console, as "PasteRing Auto Quit") to see why an app was or wasn't quit.
 - Needs the Accessibility permission to see each app's windows.
 
 ## Project structure

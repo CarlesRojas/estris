@@ -7,7 +7,8 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let general = GeneralSettings()
     private lazy var clipboard = ClipboardManager(general: general)
-    private let autoQuit = AutoQuit()
+    private let log = AppLog()
+    private lazy var autoQuit = AutoQuit(log: log)
     private var settingsWindow: SettingsWindowController?
     private var statusItem: NSStatusItem!
 
@@ -44,7 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, log: log)
         }
         settingsWindow?.show()
     }
