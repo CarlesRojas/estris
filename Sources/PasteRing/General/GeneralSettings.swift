@@ -116,13 +116,6 @@ final class GeneralSettings: ObservableObject {
         showsDeveloperSettings = defaults.bool(forKey: Keys.showsDeveloperSettings)
     }
 
-    /// Back to the default language and formats; Developer settings stay as they are.
-    func reset() {
-        language = .system
-        dateStyle = .monthDay
-        timeStyle = .system
-    }
-
     var dateTimeFormat: DateTimeFormat {
         DateTimeFormat(language: language, dateStyle: dateStyle, timeStyle: timeStyle)
     }

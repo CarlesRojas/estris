@@ -19,7 +19,7 @@ History is saved in `~/Library/Application Support/PasteRing` (readable by your 
 
 Open **Settings…** from the menu bar icon. The sidebar (with search) has one pane for the whole app and one per utility; each utility shows whether it is **On** or **Off** at the right of its row, and its pane starts with a switch to turn it on or off.
 
-Every pane but Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
+Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
 **General** (applies to every utility)
 - **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.
