@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 /// One input service (a keyboard or pointing interface) as the system's input event service
