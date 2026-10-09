@@ -103,7 +103,8 @@ struct SettingsView: View {
             .listStyle(.sidebar)
             .searchable(text: $search, placement: .sidebar, prompt: "Search")
             .modifier(HidesSidebarToggle())
-            .navigationSplitViewColumnWidth(min: 180, ideal: 210)
+            // Fixed width: the sidebar can't be resized, like System Settings.
+            .navigationSplitViewColumnWidth(min: 215, ideal: 215, max: 215)
         } detail: {
             Group {
                 switch selection ?? .general {

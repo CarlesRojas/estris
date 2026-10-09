@@ -4,7 +4,7 @@ import SwiftUI
 /// Creates the shared settings and every utility, and owns the menu bar item and the
 /// Settings window. Each utility sets itself up in `start()`.
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private let general = GeneralSettings()
     private lazy var clipboard = ClipboardManager(general: general)
     private var settingsWindow: NSWindow?
@@ -66,20 +66,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.toolbarStyle = .unified
             // Set after the style mask and toolbar, which can reset it. Covers both the content
             // and the whole frame so the window can't be dragged smaller.
-            window.contentMinSize = Self.settingsMinimumSize
-            window.minSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: Self.settingsMinimumSize)).size
             // 80% of the screen's height, within sensible limits.
             let screenHeight = NSScreen.main?.visibleFrame.height ?? 800
             window.setContentSize(NSSize(width: 880, height: min(max(screenHeight * 0.8, 640), 1100)))
             window.isReleasedWhenClosed = false
+            window.delegate = self
             window.center()
             settingsWindow = window
         }
         // Accessory apps are not activated automatically, so the window would open behind others.
         NSApp.activate(ignoringOtherApps: true)
         settingsWindow?.makeKeyAndOrderFront(nil)
+        // The split view sets its own minimum once it has laid out, which can be smaller;
+        // apply ours afterwards, on both the content and the whole frame.
+        if let window = settingsWindow {
+            window.contentMinSize = Self.settingsMinimumSize
+            window.minSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: Self.settingsMinimumSize)).size
+        }
         // Don't start with a text field focused (and its contents selected).
         settingsWindow?.makeFirstResponder(nil)
+    }
+
+    /// Last line of defence for the minimum size, whatever else changes the window's limits.
+    func windowWillResize(_ sender: NSWindow, to frameSize: NSSize) -> NSSize {
+        guard sender == settingsWindow else { return frameSize }
+        let minimum = sender.frameRect(forContentRect: NSRect(origin: .zero, size: Self.settingsMinimumSize)).size
+        return NSSize(width: max(frameSize.width, minimum.width), height: max(frameSize.height, minimum.height))
     }
 
     @objc private func quit() {
