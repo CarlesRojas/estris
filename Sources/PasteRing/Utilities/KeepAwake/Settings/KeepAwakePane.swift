@@ -25,15 +25,19 @@ struct KeepAwakePane: View {
                         LabeledContent("Power source") {
                             Text(status.isOnBattery ? String(localized: "Battery") : String(localized: "Power adapter"))
                         }
-                        LabeledContent("State") {
-                            Text(stateText)
-                        }
-                        if status.remaining != nil {
-                            // Ticks while the pane is open.
-                            TimelineView(.periodic(from: .now, by: 1)) { _ in
-                                LabeledContent("Sleeps in") {
-                                    Text(Self.countdown(status.remaining ?? 0))
-                                        .monospacedDigit()
+                        // Refreshed every second while the pane is open, so the state follows
+                        // what the Mac is doing and the countdown ticks.
+                        TimelineView(.periodic(from: .now, by: 1)) { _ in
+                            VStack(spacing: 0) {
+                                LabeledContent("State") {
+                                    Text(stateText)
+                                }
+                                if let remaining = status.remaining {
+                                    Divider().padding(.vertical, 8)
+                                    LabeledContent("Sleeps in") {
+                                        Text(Self.countdown(remaining))
+                                            .monospacedDigit()
+                                    }
                                 }
                             }
                         }
@@ -55,14 +59,21 @@ struct KeepAwakePane: View {
         }
     }
 
+    /// Active while the Mac is being used (input within the last second, or another app keeping
+    /// the display on), Inactive while counting down and once the time is up.
     private var stateText: String {
         switch status.state {
-        case .off, .paused: String(localized: "Not keeping awake")
-        case .indefinitely: String(localized: "Always on")
-        case .active: status.otherAppKeepsDisplayOn ? String(localized: "Active, an app keeps the display on") : String(localized: "Active")
-        case .idle: String(localized: "Inactive, macOS sleep settings apply")
+        case .off, .paused: return String(localized: "Not keeping awake")
+        case .indefinitely: return String(localized: "Always on")
+        case .idle: return String(localized: "Inactive, macOS sleep settings apply")
+        case .active:
+            if status.otherAppKeepsDisplayOn { return String(localized: "Active, an app keeps the display on") }
+            return status.idleTime < Self.activeWindow ? String(localized: "Active") : String(localized: "Inactive")
         }
     }
+
+    /// How recent input must be to count as being used right now.
+    private static let activeWindow: TimeInterval = 1
 
     /// "4:05" or "1:04:05".
     private static func countdown(_ seconds: TimeInterval) -> String {
