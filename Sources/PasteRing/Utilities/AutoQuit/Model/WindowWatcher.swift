@@ -25,6 +25,12 @@ final class WindowWatcher {
     private static let messagingTimeout: Float = 0.35
     /// Smaller windows (tool tips, helper panels) don't count as an app's window.
     private static let minimumWindowSide: CGFloat = 80
+    /// Waits before asking again an app that refused or didn't answer while being set up
+    /// (busy launching, or not yet accepting Accessibility requests).
+    private static let attachRetryDelays: [TimeInterval] = [0.15, 0.4, 1.0, 2.5, 5.0, 10.0]
+    /// Looks again, from the first miss, when a window isn't watched yet: the Accessibility
+    /// API often lists a new window late, and a window nobody watches closes silently.
+    private static let windowRetryOffsets: [TimeInterval] = [0.5, 1.5, 4.0]
 
     private let settings: AutoQuitSettings
     private var isRunning = false
@@ -34,6 +40,10 @@ final class WindowWatcher {
     /// Last time a round of checks was scheduled per app, so closing several windows at
     /// once schedules one round.
     private var lastCheckRound: [pid_t: Date] = [:]
+    /// Apps in a round of attach retries, so coming to the front doesn't start another.
+    private var attachRetries: Set<pid_t> = []
+    /// Apps in a round of window retries: when the round started and how many looks are queued.
+    private var windowRetries: [pid_t: (origin: DispatchTime, scheduled: Int)] = [:]
     private var workspaceTokens: [NSObjectProtocol] = []
 
     private let appLog: AppLog
@@ -61,6 +71,10 @@ final class WindowWatcher {
             center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] note in
                 MainActor.assumeIsolated { app(note).map { self?.attach($0) } }
             },
+            // Windows on a desktop that wasn't visible can only be seen once it is.
+            center.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.refreshAll() }
+            },
         ]
         NSWorkspace.shared.runningApplications.forEach(attach)
         log("started, watching \(observers.count) apps, Accessibility \(AXIsProcessTrusted() ? "granted" : "NOT granted")")
@@ -76,34 +90,66 @@ final class WindowWatcher {
         Array(observers.keys).forEach(detach)
         hadWindows = []
         lastCheckRound = [:]
+        attachRetries = []
+        windowRetries = [:]
     }
 
     // MARK: - Observers
 
     private func attach(_ app: NSRunningApplication) {
-        guard isRunning, app.activationPolicy == .regular else { return }
+        attach(app, attempt: 0)
+    }
+
+    private func attach(_ app: NSRunningApplication, attempt: Int) {
+        guard isRunning, app.activationPolicy == .regular, !app.isTerminated else { return }
         let pid = app.processIdentifier
         guard pid != getpid() else { return }
         if let observer = observers[pid] {
+            windowRetries[pid] = nil
             watchWindows(pid: pid, observer: observer)
             return
         }
+        if attempt == 0, attachRetries.contains(pid) { return }
+        let name = app.localizedName ?? "pid \(pid)"
 
-        var created: AXObserver?
-        let result = AXObserverCreate(pid, windowWatcherCallback, &created)
-        guard result == .success, let observer = created else {
-            // Usually missing Accessibility permission; tried again when the app comes forward.
-            return log("\(app.localizedName ?? "pid \(pid)"): can't watch (error \(result.rawValue))")
-        }
         let application = AXUIElementCreateApplication(pid)
         AXUIElementSetMessagingTimeout(application, Self.messagingTimeout)
-        let refcon = Unmanaged.passUnretained(self).toOpaque()
-        for notification in [kAXWindowCreatedNotification, kAXMainWindowChangedNotification, kAXFocusedWindowChangedNotification] {
-            let added = AXObserverAddNotification(observer, application, notification as CFString, refcon)
-            if added != .success && added != .notificationAlreadyRegistered {
-                log("\(app.localizedName ?? "pid \(pid)"): can't listen for \(notification) (error \(added.rawValue))")
+        var attached: AXObserver?
+        var failure: AXError?
+        var created: AXObserver?
+        let result = AXObserverCreate(pid, windowWatcherCallback, &created)
+        if result == .success, let created {
+            let refcon = Unmanaged.passUnretained(self).toOpaque()
+            var listening = 0
+            for notification in [kAXWindowCreatedNotification, kAXMainWindowChangedNotification, kAXFocusedWindowChangedNotification, kAXApplicationShownNotification] {
+                let added = AXObserverAddNotification(created, application, notification as CFString, refcon)
+                if added == .success || added == .notificationAlreadyRegistered {
+                    listening += 1
+                } else {
+                    failure = added
+                }
             }
+            // Partly listening is still useful; not listening at all means the app isn't ready.
+            if listening > 0 { attached = created }
+        } else {
+            failure = result
         }
+
+        guard let observer = attached else {
+            // A launching or busy app can refuse at first; ask again a few times, spaced out.
+            guard attempt < Self.attachRetryDelays.count else {
+                attachRetries.remove(pid)
+                return log("\(name): can't watch (error \(failure?.rawValue ?? 0)), will try again when it comes to the front")
+            }
+            if attempt == 0 { log("\(name): not ready to be watched (error \(failure?.rawValue ?? 0)), retrying") }
+            attachRetries.insert(pid)
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.attachRetryDelays[attempt]) { [weak self] in
+                self?.attach(app, attempt: attempt + 1)
+            }
+            return
+        }
+        if attempt > 0 { log("\(name): watching after \(attempt) retries") }
+        attachRetries.remove(pid)
         CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
         observers[pid] = observer
         watchWindows(pid: pid, observer: observer)
@@ -115,19 +161,50 @@ final class WindowWatcher {
         }
         hadWindows.remove(pid)
         lastCheckRound[pid] = nil
+        attachRetries.remove(pid)
+        windowRetries[pid] = nil
+    }
+
+    private func refreshAll() {
+        for (pid, observer) in observers {
+            windowRetries[pid] = nil
+            watchWindows(pid: pid, observer: observer)
+        }
     }
 
     /// Registers for each current window's destruction, and notes the app has had windows.
+    /// Looks again shortly when a window may be left unwatched.
     private func watchWindows(pid: pid_t, observer: AXObserver) {
         let windows = Self.standardWindows(pid: pid) ?? []
-        guard !windows.isEmpty else { return }
-        if hadWindows.insert(pid).inserted {
-            log("\(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"): watching \(windows.count) window(s)")
-        }
         let refcon = Unmanaged.passUnretained(self).toOpaque()
+        var watched = 0
         for window in windows {
             // Registering a window twice is harmless; it just reports it's already watched.
-            AXObserverAddNotification(observer, window, kAXUIElementDestroyedNotification as CFString, refcon)
+            let added = AXObserverAddNotification(observer, window, kAXUIElementDestroyedNotification as CFString, refcon)
+            if added == .success || added == .notificationAlreadyRegistered { watched += 1 }
+        }
+        // The window server may show a window the Accessibility API doesn't list yet.
+        let hasWindow = !windows.isEmpty || Self.hasWindowServerWindow(pid: pid)
+        if hasWindow, hadWindows.insert(pid).inserted {
+            log("\(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"): watching \(watched) of \(max(windows.count, 1)) window(s)")
+        }
+
+        let needsRetry = hasWindow ? watched < max(windows.count, 1) : !hadWindows.contains(pid)
+        guard needsRetry else {
+            windowRetries[pid] = nil
+            return
+        }
+        var retry = windowRetries[pid] ?? (origin: .now(), scheduled: 0)
+        guard retry.scheduled < Self.windowRetryOffsets.count else { return }
+        let offset = Self.windowRetryOffsets[retry.scheduled]
+        retry.scheduled += 1
+        windowRetries[pid] = retry
+        let round = retry.origin
+        DispatchQueue.main.asyncAfter(deadline: round + offset) { [weak self] in
+            // Skipped when a newer round replaced this one, or the app went away.
+            guard let self, self.isRunning, self.windowRetries[pid]?.origin == round,
+                  let observer = self.observers[pid] else { return }
+            self.watchWindows(pid: pid, observer: observer)
         }
     }
 
