@@ -17,7 +17,7 @@ final class AppearanceSettings: ObservableObject {
         var tintOpacity = 0.2
         var selectedTintOpacity = 0.3
         var shadowRadius = 16.0
-        var backdropDim = 0.0
+        var backdropDim = 0.5
     }
 
     init() {

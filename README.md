@@ -28,7 +28,7 @@ Open **Settings…** from the menu bar icon.
   - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling drops the front card down behind the pile and brings the next one forward.
   - *Ring menu*: the most recent entries (3 to 12, default 8) spread around a circle that turns to bring the selected one to the top.
 - Surfaces use the system's frosted material.
-- **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (0%, fades in and out with the overlay).
+- **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16), **Dim screen** (50%, fades in and out with the overlay).
 - **Reset to Defaults** resets everything in this tab, including the style and its options.
 
 **History** lists every saved entry. The trash button deletes one, **Clear All** deletes everything.
