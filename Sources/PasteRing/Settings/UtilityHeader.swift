@@ -36,6 +36,9 @@ struct UtilityHeader: View {
 
 /// The on/off state shown at the right of a sidebar row.
 struct StatusBadge: View {
+    /// Dark enough for white text to stay readable (about 5:1), in light and dark mode.
+    private static let onColor = Color(.sRGB, red: 0.10, green: 0.48, blue: 0.20)
+
     let isOn: Bool
 
     var body: some View {
@@ -45,7 +48,7 @@ struct StatusBadge: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
             .background(
-                Capsule().fill(isOn ? Color.green : Color.secondary.opacity(0.2))
+                Capsule().fill(isOn ? Self.onColor : Color.secondary.opacity(0.2))
             )
             .accessibilityLabel(isOn ? "On" : "Off")
     }

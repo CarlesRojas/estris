@@ -43,7 +43,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func openSettings() {
         if settingsWindow == nil {
             let settingsView = SettingsView(general: general, clipboard: clipboard)
-            let window = NSWindow(contentViewController: NSHostingController(rootView: settingsView))
+            let hostingController = NSHostingController(rootView: settingsView)
+            // Only enforce the minimum size. By default the window also follows the content's
+            // ideal size, which for a long form is taller than the screen.
+            hostingController.sizingOptions = [.minSize]
+            let window = NSWindow(contentViewController: hostingController)
             window.title = "PasteRing"
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
             window.setContentSize(NSSize(width: 880, height: 700))
