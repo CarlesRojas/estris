@@ -58,7 +58,7 @@ enum HistoryExpiry: String, CaseIterable, Identifiable {
 @MainActor
 final class ClipboardSettings: ObservableObject {
     static let maxItemsRange = 5...500
-    static let ringSizeRange = 3...12
+    static let ringSizeRange = 3...24
     static let gridColumns = GridLayout.columns
     static let gridSizeRange = 8...24
     static let simpleWidthRange: ClosedRange<Double> = 360...900
@@ -237,7 +237,7 @@ final class ClipboardSettings: ObservableObject {
     /// Reset to Defaults covers them.
     private static let appearanceDefaults: [String: Any] = [
         Keys.style: OverlayStyle.simple.rawValue,
-        Keys.ringSize: 12,
+        Keys.ringSize: 16,
         Keys.gridSize: 12,
         Keys.gridCardWidth: 320.0,
         Keys.gridCardHeight: 256.0,

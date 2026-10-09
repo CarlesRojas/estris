@@ -9,6 +9,8 @@ struct RingMenuView: View {
     /// Widest the ring may get relative to its height, so it still reads as a ring.
     private static let maxAspect: CGFloat = 2.2
     private static var radiiCache: [String: CGSize] = [:]
+    /// How much shorter the ring is vertically than the no-overlap fit.
+    private static let verticalSquash: CGFloat = 0.8
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
@@ -94,6 +96,9 @@ struct RingMenuView: View {
                 break search
             }
         }
+        // Cards shrink towards the bottom of the ring, so it can be flatter than the
+        // full-size cards would allow without them crowding each other.
+        result.height *= verticalSquash
         radiiCache[key] = result
         return result
     }
