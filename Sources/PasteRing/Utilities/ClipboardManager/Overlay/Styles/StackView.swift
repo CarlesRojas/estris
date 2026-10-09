@@ -41,12 +41,3 @@ struct StackView: View {
         .animation(.spring(response: 0.45, dampingFraction: 1), value: state.position)
     }
 }
-
-extension String {
-    /// Trimmed, with line breaks shown as ⏎ so one-line previews stay meaningful.
-    var singleLine: String {
-        trimmingCharacters(in: .whitespacesAndNewlines)
-            .split(whereSeparator: \.isNewline)
-            .joined(separator: " ⏎ ")
-    }
-}

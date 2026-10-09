@@ -2,48 +2,6 @@ import AppKit
 import Carbon.HIToolbox
 import SwiftUI
 
-@MainActor
-final class OverlayState: ObservableObject {
-    @Published var items: [ClipItem] = []
-    /// Steps taken since opening. Unbounded so the ring keeps turning the same way when it wraps.
-    @Published var position = 0
-    /// Grid tiles fitted to the screen the overlay opened on.
-    @Published var gridLayout: GridLayout?
-
-    var actions = OverlayActions()
-
-    var selected: Int {
-        items.isEmpty ? 0 : (position % items.count + items.count) % items.count
-    }
-
-    var selectedItem: ClipItem? {
-        items.indices.contains(selected) ? items[selected] : nil
-    }
-
-    struct Slot: Identifiable {
-        let id: String
-        let item: ClipItem
-        let distance: Int
-    }
-
-    /// Places each entry at its circular distance from the selection, for styles that loop.
-    /// `lap` is part of the identity, so an entry that wraps to the other end leaves and
-    /// re-enters (with its transition) instead of sweeping across the selection.
-    func circularSlots(within range: ClosedRange<Int>) -> [Slot] {
-        let count = items.count
-        guard count > 0 else { return [] }
-        let lowest = -(count - 1) / 2
-        return items.enumerated().compactMap { index, item in
-            let raw = index - position
-            let shifted = raw - lowest
-            let lap = shifted >= 0 ? shifted / count : -((-shifted + count - 1) / count)
-            let distance = raw - lap * count
-            guard range.contains(distance) else { return nil }
-            return Slot(id: "\(item.id)-\(lap)", item: item, distance: distance)
-        }
-    }
-}
-
 /// Shows the overlay while ⌘⇧ is held. ⌘⇧V, ⌘⇧ arrows and the scroll wheel move the
 /// selection, releasing pastes the selected entry, ⌘⇧Esc cancels, ⌘⇧Delete removes the
 /// selected entry. While ⌘⇧ is held, clicking an entry pastes it.
@@ -247,46 +205,5 @@ final class OverlayController: NSObject {
     private func screenWithMouse() -> NSScreen? {
         let mouse = NSEvent.mouseLocation
         return NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main
-    }
-}
-
-/// Lets the first click on an overlay element act right away; the panel never becomes key.
-final class OverlayHostingView<Content: View>: NSHostingView<Content> {
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
-}
-
-/// Transparent panel covering the whole screen so it receives scroll events wherever
-/// the pointer is, keeping them from scrolling the app underneath.
-final class OverlayPanel: NSPanel {
-    var onScroll: ((NSEvent) -> Void)?
-
-    override var canBecomeKey: Bool { false }
-    override var canBecomeMain: Bool { false }
-
-    func configure() {
-        isFloatingPanel = true
-        level = .popUpMenu
-        backgroundColor = .clear
-        isOpaque = false
-        hasShadow = false
-        hidesOnDeactivate = false
-        ignoresMouseEvents = false
-        isReleasedWhenClosed = false
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
-    }
-
-    func present(on screen: NSScreen?) {
-        if let screen {
-            setFrame(screen.frame, display: true)
-        }
-        orderFrontRegardless()
-    }
-
-    override func sendEvent(_ event: NSEvent) {
-        if event.type == .scrollWheel {
-            onScroll?(event)
-        } else {
-            super.sendEvent(event)
-        }
     }
 }

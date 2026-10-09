@@ -1,19 +1,5 @@
 import SwiftUI
 
-/// The default style: one fixed card showing what will be pasted. Cycling swaps the
-/// content, nothing moves.
-struct SimpleView: View {
-    @ObservedObject var state: OverlayState
-    @ObservedObject var settings: ClipboardSettings
-
-    var body: some View {
-        let item = state.selectedItem
-        EntryCard(item: item, width: settings.simpleWidth, height: settings.simpleHeight)
-            .modifier(OptionalClipActions(item: item))
-            .transaction { $0.animation = nil }
-    }
-}
-
 /// App icon and name on top, the copied text below, filling the card and truncating where
 /// it ends. Used by Default and Stack.
 struct EntryCard: View {
@@ -44,18 +30,5 @@ struct EntryCard: View {
         .padding(20)
         .frame(width: width, height: height)
         .surface(cornerRadius: 22, isSelected: isSelected)
-    }
-}
-
-private struct OptionalClipActions: ViewModifier {
-    let item: ClipItem?
-
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if let item {
-            content.clipActions(item, trashInset: 22)
-        } else {
-            content
-        }
     }
 }

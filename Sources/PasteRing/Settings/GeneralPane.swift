@@ -1,84 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// One entry in the settings sidebar: the app-wide General pane, then one per utility.
-enum SettingsPane: String, CaseIterable, Identifiable {
-    case general
-    case clipboard
-
-    var id: Self { self }
-
-    var title: String {
-        switch self {
-        case .general: "General"
-        case .clipboard: "Clipboard Manager"
-        }
-    }
-
-    var symbol: String {
-        switch self {
-        case .general: "gearshape"
-        case .clipboard: "doc.on.clipboard"
-        }
-    }
-
-    /// What the sidebar search matches besides the title.
-    var keywords: [String] {
-        switch self {
-        case .general:
-            ["login", "startup", "language", "accessibility", "permission", "date", "time", "format", "version", "about"]
-        case .clipboard:
-            ["history", "paste", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
-        }
-    }
-
-    func matches(_ search: String) -> Bool {
-        let query = search.trimmingCharacters(in: .whitespaces).lowercased()
-        guard !query.isEmpty else { return true }
-        return title.lowercased().contains(query) || keywords.contains { $0.contains(query) }
-    }
-}
-
-struct SettingsView: View {
-    @ObservedObject var general: GeneralSettings
-    @ObservedObject var clipboard: ClipboardSettings
-    @ObservedObject var appearance: AppearanceSettings
-    @ObservedObject var history: ClipboardHistory
-    @State private var selection: SettingsPane? = .general
-    @State private var search = ""
-
-    private var panes: [SettingsPane] {
-        SettingsPane.allCases.filter { $0.matches(search) }
-    }
-
-    var body: some View {
-        NavigationSplitView {
-            List(panes, selection: $selection) { pane in
-                Label(pane.title, systemImage: pane.symbol)
-            }
-            .searchable(text: $search, placement: .sidebar, prompt: "Search")
-            .navigationSplitViewColumnWidth(min: 180, ideal: 210)
-        } detail: {
-            switch selection ?? .general {
-            case .general:
-                GeneralPane(general: general)
-            case .clipboard:
-                ClipboardManagerPane(clipboard: clipboard, appearance: appearance, history: history)
-            }
-        }
-        .environment(\.dateTimeFormat, general.dateTimeFormat)
-        .frame(minWidth: 820, minHeight: 640)
-        // Jump to the first match when the search hides the open pane.
-        .onChange(of: search) { _ in
-            if let selection, !panes.contains(selection), let first = panes.first {
-                self.selection = first
-            }
-        }
-    }
-}
-
-// MARK: - General
-
 /// Settings shared by every utility.
 struct GeneralPane: View {
     private static let accessibilitySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
@@ -183,39 +105,5 @@ struct GeneralPane: View {
     private func refreshStatus() {
         openAtLogin = LoginItem.isEnabled
         accessibilityGranted = Paster.isTrusted(prompt: false)
-    }
-}
-
-// MARK: - Clipboard Manager
-
-struct ClipboardManagerPane: View {
-    private enum Tab: Hashable {
-        case settings
-        case history
-    }
-
-    @ObservedObject var clipboard: ClipboardSettings
-    @ObservedObject var appearance: AppearanceSettings
-    @ObservedObject var history: ClipboardHistory
-    @State private var tab = Tab.settings
-
-    var body: some View {
-        VStack(spacing: 0) {
-            Picker("View", selection: $tab) {
-                Text("Settings").tag(Tab.settings)
-                Text("History").tag(Tab.history)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .fixedSize()
-            .padding(.vertical, 12)
-
-            switch tab {
-            case .settings:
-                ClipboardSettingsForm(settings: clipboard, appearance: appearance, history: history)
-            case .history:
-                HistoryPreferences(history: history)
-            }
-        }
     }
 }

@@ -60,6 +60,28 @@ The build is ad-hoc signed by default, so macOS may forget the permission after 
 SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/build-app.sh
 ```
 
+## Project structure
+
+PasteRing is meant to grow into a set of macOS utilities, so code is grouped by area:
+
+```
+Sources/PasteRing/
+  App/                    entry point, app delegate (menu bar item, Settings window)
+  General/                settings shared by every utility (language, date and time format)
+  Settings/               the Settings window: sidebar, search, General pane
+  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons)
+  Utilities/
+    ClipboardManager/
+      ClipboardManager.swift   owns the utility; created and started by the app delegate
+      Model/                   history, clipboard monitor, settings
+      Overlay/                 the ⌘⇧V overlay: controller, panel, state, surface
+        Components/            cards and chips shared by the styles
+        Styles/                one view per overlay style
+      Settings/                the Clipboard Manager settings pane and its tabs
+```
+
+To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, optional `menuItems()` and a `settingsPane()`), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`.
+
 ## Notes
 
 `⌘⇧V` is also "Paste and Match Style" in some apps. PasteRing takes over that shortcut while running.

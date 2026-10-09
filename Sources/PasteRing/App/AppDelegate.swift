@@ -1,36 +1,18 @@
 import AppKit
-import Carbon.HIToolbox
-import Combine
 import SwiftUI
 
+/// Creates the shared settings and every utility, and owns the menu bar item and the
+/// Settings window. Each utility sets itself up in `start()`.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let history = ClipboardHistory()
     private let general = GeneralSettings()
-    private let settings = ClipboardSettings()
-    private let appearance = AppearanceSettings()
-    private var maxItemsObserver: AnyCancellable?
-    private var preferencesWindow: NSWindow?
-    private var monitor: ClipboardMonitor!
-    private var overlay: OverlayController!
+    private lazy var clipboard = ClipboardManager(general: general)
+    private var settingsWindow: NSWindow?
     private var statusItem: NSStatusItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        maxItemsObserver = settings.$maxItems.sink { [weak self] in
-            self?.history.limit = $0
-        }
-        monitor = ClipboardMonitor(history: history)
-        overlay = OverlayController(history: history, monitor: monitor, settings: settings, appearance: appearance, general: general)
-        monitor.start()
+        clipboard.start()
         setUpStatusItem()
-
-        HotKeyCenter.shared.register(
-            keyCode: UInt32(kVK_ANSI_V),
-            modifiers: UInt32(cmdKey | shiftKey)
-        ) { [weak self] in
-            self?.overlay.cycle()
-        }
-
         LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
     }
@@ -40,13 +22,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "PasteRing")
 
         let menu = NSMenu()
-        let title = NSMenuItem(title: "PasteRing: ⌘⇧V to cycle", action: nil, keyEquivalent: "")
+        let title = NSMenuItem(title: "PasteRing", action: nil, keyEquivalent: "")
         title.isEnabled = false
         menu.addItem(title)
         menu.addItem(.separator())
-        menu.addItem(makeItem("Settings…", #selector(openPreferences), key: ","))
-        menu.addItem(makeItem("Clear History", #selector(clearHistory)))
-        menu.addItem(makeItem("Grant Accessibility Access…", #selector(requestAccessibility)))
+        menu.addItem(makeItem("Settings…", #selector(openSettings), key: ","))
+        menu.addItem(.separator())
+        clipboard.menuItems().forEach(menu.addItem)
         menu.addItem(.separator())
         menu.addItem(makeItem("Quit PasteRing", #selector(quit), key: "q"))
         statusItem.menu = menu
@@ -58,30 +40,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return item
     }
 
-    @objc private func openPreferences() {
-        if preferencesWindow == nil {
-            let settingsView = SettingsView(general: general, clipboard: settings, appearance: appearance, history: history)
+    @objc private func openSettings() {
+        if settingsWindow == nil {
+            let settingsView = SettingsView(general: general, clipboard: clipboard)
             let window = NSWindow(contentViewController: NSHostingController(rootView: settingsView))
             window.title = "PasteRing"
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
             window.setContentSize(NSSize(width: 880, height: 700))
             window.isReleasedWhenClosed = false
             window.center()
-            preferencesWindow = window
+            settingsWindow = window
         }
         // Accessory apps are not activated automatically, so the window would open behind others.
         NSApp.activate(ignoringOtherApps: true)
-        preferencesWindow?.makeKeyAndOrderFront(nil)
+        settingsWindow?.makeKeyAndOrderFront(nil)
         // Don't start with a text field focused (and its contents selected).
-        preferencesWindow?.makeFirstResponder(nil)
-    }
-
-    @objc private func clearHistory() {
-        history.clear()
-    }
-
-    @objc private func requestAccessibility() {
-        _ = Paster.isTrusted(prompt: true)
+        settingsWindow?.makeFirstResponder(nil)
     }
 
     @objc private func quit() {
