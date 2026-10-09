@@ -150,12 +150,11 @@ private struct MappingsView: View {
                 changed.output = output
                 settings.update(changed, on: device.id)
             }
-            // This input reaches macOS without its device, so only one device can map it.
             .disabled(conflict != nil)
             if let conflict {
-                Label("Already mapped on \(conflict)", systemImage: "exclamationmark.triangle.fill")
+                Label(conflict.message, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
-                    .help("This button reaches macOS without saying which device sent it, so only the mapping on \(conflict) applies.")
+                    .help(conflict.explanation)
             }
             Spacer()
             let turned = swapped(mapping)

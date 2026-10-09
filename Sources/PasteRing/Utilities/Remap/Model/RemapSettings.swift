@@ -50,6 +50,25 @@ struct DeviceMappings: Codable {
     var mappings: [Mapping] = []
 }
 
+enum MappingConflict {
+    case above
+    case otherDevice(String)
+
+    var message: String {
+        switch self {
+        case .above: "Already mapped above"
+        case .otherDevice(let name): "Already mapped on \(name)"
+        }
+    }
+
+    var explanation: String {
+        switch self {
+        case .above: "Only the first mapping for a key or button applies."
+        case .otherDevice(let name): "This button reaches macOS without saying which device sent it, so only the mapping on \(name) applies."
+        }
+    }
+}
+
 /// Remap preferences, persisted in UserDefaults.
 @MainActor
 final class RemapSettings: ObservableObject {
@@ -103,20 +122,23 @@ final class RemapSettings: ObservableObject {
     func activeDevice(for input: RemapInput) -> (id: String, entry: DeviceMappings)? {
         devices
             .compactMap { id, entry -> (id: String, entry: DeviceMappings, created: Date)? in
-                guard let mapping = entry.mappings.first(where: { $0.input == input && $0.output != nil }) else { return nil }
+                guard let mapping = entry.mappings.first(where: { $0.input == input }), mapping.output != nil else { return nil }
                 return (id, entry, mapping.created ?? .distantPast)
             }
             .min { ($0.created, $0.id) < ($1.created, $1.id) }
             .map { ($0.id, $0.entry) }
     }
 
-    /// The other device whose mapping wins over this one, when its input arrives without a
-    /// device; nil when this one applies.
-    func conflict(for mapping: Mapping, on deviceID: String) -> String? {
-        guard let input = mapping.input, deviceLessInputs.contains(input),
-              let active = activeDevice(for: input), active.id != deviceID
-        else { return nil }
-        return customNames[active.id] ?? active.entry.name
+    /// Why a mapping doesn't apply, or nil when it does: an earlier row on the same device has
+    /// the same key or button, or, for one that arrives without its device, another device's
+    /// mapping wins.
+    func conflict(for mapping: Mapping, on deviceID: String) -> MappingConflict? {
+        guard let input = mapping.input else { return nil }
+        if let first = mappings(for: deviceID).first(where: { $0.input == input }), first.id != mapping.id {
+            return .above
+        }
+        guard deviceLessInputs.contains(input), let active = activeDevice(for: input), active.id != deviceID else { return nil }
+        return .otherDevice(customNames[active.id] ?? active.entry.name)
     }
 
     func mappings(for deviceID: String) -> [Mapping] {
@@ -139,12 +161,9 @@ final class RemapSettings: ObservableObject {
         devices[device.id] = entry
     }
 
-    /// Changes a mapping, removing any other one for the same key or button.
+    /// Changes a mapping. Another one for the same key or button stays; only the first applies.
     func update(_ mapping: Mapping, on deviceID: String) {
         guard var entry = devices[deviceID] else { return }
-        if mapping.input != nil {
-            entry.mappings.removeAll { $0.input == mapping.input && $0.id != mapping.id }
-        }
         guard let index = entry.mappings.firstIndex(where: { $0.id == mapping.id }) else { return }
         entry.mappings[index] = mapping
         devices[deviceID] = entry
