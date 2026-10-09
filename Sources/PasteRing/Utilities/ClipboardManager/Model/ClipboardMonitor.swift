@@ -115,7 +115,7 @@ final class ClipboardMonitor: NSObject {
         let kind: ClipKind
         if !fileURLs.isEmpty {
             kind = .files
-        } else if let string {
+        } else if string != nil {
             kind = hasRichText ? .richText : .text
         } else if hasImage {
             guard settings.recordImages else { return nil }

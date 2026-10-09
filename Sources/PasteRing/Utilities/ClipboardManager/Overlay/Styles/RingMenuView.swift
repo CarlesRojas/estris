@@ -17,10 +17,10 @@ struct RingMenuView: View {
     var body: some View {
         let count = state.items.count
         let step = count > 0 ? 360 / Double(count) : 0
-        let chipWidth = settings.ringChipWidth
-        let chipHeight = settings.ringChipHeight
+        let chipWidth = CGFloat(settings.ringChipWidth)
+        let chipHeight = CGFloat(settings.ringChipHeight)
         // Chips holding an image are taller; the ring is spaced for the tallest one.
-        let heights = state.items.map {
+        let heights: [CGFloat] = state.items.map {
             RingChip.fittedHeight(for: $0, width: chipWidth, height: chipHeight, cornerReserve: actions.cornerReserve)
         }
         let layoutHeight = heights.max() ?? chipHeight
