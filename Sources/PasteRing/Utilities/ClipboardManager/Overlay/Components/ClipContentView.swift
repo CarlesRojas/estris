@@ -50,7 +50,8 @@ struct ClipContentView: View {
                         .resizable()
                         .scaledToFit()
                         .clipShape(RoundedRectangle(cornerRadius: singleLine ? 4 : 8, style: .continuous))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: singleLine ? .leading : .topLeading)
+                        // Centred in the space it gets; chips keep it next to the app icon.
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: singleLine ? .leading : .center)
                 } else {
                     // The full width of the card at the image's own aspect ratio; anything
                     // taller than the card is cut off at the bottom.

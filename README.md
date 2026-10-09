@@ -35,7 +35,7 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
   - *Appearance*, with a live preview over your wallpaper:
     - **Style**:
       - *Default*: one card with the source app and the entry that will be pasted; cycling only swaps the content. Width and height are adjustable.
-      - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width and height are adjustable (default 280 by 320). On a smaller screen it shows fewer rows, and narrower tiles, so everything fits.
+      - *Grid*: the most recent 8 to 24 entries (default 12) as tiles, all on screen at once. Tile width and height are adjustable (default 320 by 256). On a smaller screen it shows fewer rows, and narrower tiles, so everything fits.
       - *Carousel*: Cover Flow style, neighbours tilted away on either side. Card width and height are adjustable (default 260 by 260).
       - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling slides the front card down and fades it out while the next one comes forward; going back plays the same motion in reverse. Card width and height are adjustable (default 520 by 170).
       - *Ring menu*: the most recent entries (3 to 12, default 12) spread around a ring (an ellipse as tight as the chips allow) that turns to bring the selected one to the top. Chip width and height are adjustable (default 280 by 56); the ring grows to fit.
