@@ -48,12 +48,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // Clipboard Manager pane's (very tall) minimum height, so the content overflowed the
             // window above and below.
             hostingController.sizingOptions = []
+            if #available(macOS 14, *) {
+                // Don't let SwiftUI put a title back into the window.
+                hostingController.sceneBridgingOptions = [.toolbars]
+            }
             let window = NSWindow(contentViewController: hostingController)
             window.contentMinSize = NSSize(width: 820, height: 600)
             // Laid out like System Settings: no visible title, and the sidebar runs to the top
-            // of the window with the close, minimize and zoom buttons inside it. The title is
-            // still set for Mission Control and the Window menu.
-            window.title = "PasteRing"
+            // of the window with the close, minimize and zoom buttons inside it. No title at all,
+            // so none can show.
+            window.title = ""
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
             window.titleVisibility = .hidden
             window.titlebarAppearsTransparent = true
