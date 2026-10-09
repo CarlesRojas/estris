@@ -116,6 +116,8 @@ struct SettingsSidebar: View {
 
             List(navigation.panes, selection: $navigation.selection) { pane in
                 SidebarRow(pane: pane, isOn: isOn(pane), isSelected: navigation.selection == pane)
+                    // Typing a letter would otherwise jump to the pane starting with it.
+                    .background(TypeSelectDisabler())
             }
             .listStyle(.sidebar)
         }
@@ -223,4 +225,23 @@ private struct SidebarRowContent: View {
         }
         .transaction { $0.animation = nil }
     }
+}
+
+/// Turns off "type to select" on the list it is placed in: SwiftUI has no setting for it, so
+/// it finds the AppKit table behind the list.
+private struct TypeSelectDisabler: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        // The view joins the table on the next pass.
+        DispatchQueue.main.async {
+            var ancestor = view.superview
+            while let current = ancestor, !(current is NSTableView) {
+                ancestor = current.superview
+            }
+            (ancestor as? NSTableView)?.allowsTypeSelect = false
+        }
+        return view
+    }
+
+    func updateNSView(_ view: NSView, context: Context) {}
 }
