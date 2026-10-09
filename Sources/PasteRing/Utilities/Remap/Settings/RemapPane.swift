@@ -218,30 +218,43 @@ private struct InputPicker: View {
     @State private var isRecording = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            Button {
-                if isRecording {
-                    remap.cancelRecording()
-                    isRecording = false
-                } else {
-                    isRecording = true
-                    remap.record(on: device.id) { input in
+        Group {
+            if isRecording {
+                // Nothing that takes keys while waiting, so the press reaches the recorder.
+                VStack(spacing: 16) {
+                    Image(systemName: "record.circle.fill")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.red)
+                    Text("Press a key or button on \(device.name)")
+                        .font(.headline)
+                        .multilineTextAlignment(.center)
+                    Button("Cancel") {
+                        remap.cancelRecording()
                         isRecording = false
+                    }
+                }
+                .padding(24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack(spacing: 0) {
+                    Button {
+                        isRecording = true
+                        remap.record(on: device.id) { input in
+                            isRecording = false
+                            choose(input)
+                        }
+                    } label: {
+                        Label("Record from \(device.name)", systemImage: "record.circle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .controlSize(.large)
+                    .disabled(!device.isConnected)
+                    .padding([.horizontal, .top], 12)
+
+                    ChoiceList(sections: Choices.inputs(for: device)) { input in
                         choose(input)
                     }
                 }
-            } label: {
-                Label(isRecording ? "Press a key or button on \(device.name)…" : "Record from \(device.name)",
-                      systemImage: isRecording ? "record.circle.fill" : "record.circle")
-                    .frame(maxWidth: .infinity)
-            }
-            .controlSize(.large)
-            .disabled(!device.isConnected)
-            .padding([.horizontal, .top], 12)
-
-            ChoiceList(sections: Choices.inputs(for: device)) { input in
-                remap.cancelRecording()
-                choose(input)
             }
         }
         .frame(width: 340, height: 480)

@@ -56,6 +56,7 @@ final class Remap {
     /// Calls `done` with the next key or button pressed on the device, which isn't passed on.
     func record(on deviceID: String, _ done: @escaping (RemapInput) -> Void) {
         recording = (deviceID, done)
+        log("recording: waiting for a key or button on \(deviceID)")
         updateTap()
     }
 
@@ -125,12 +126,17 @@ final class Remap {
             eventLog.record(InputEvent(device: device.map(settings.name(of:)) ?? "Other source", source: device, input: parsed.input, phase: parsed.phase, name: parsed.name, detail: parsed.detail))
         }
 
-        if let recording, let input = parsed.input, parsed.phase == .down,
-           input != .mouseButton(0), device?.id == recording.deviceID {
-            self.recording = nil
-            updateTap()
-            recording.done(input)
-            return false
+        if let recording, let input = parsed.input, parsed.phase == .down, input != .mouseButton(0) {
+            // Presses whose device is unknown are taken too: some reach macOS without it.
+            if let device, device.id != recording.deviceID {
+                log("recording: ignored \(parsed.name) from \(device.name), another device")
+            } else {
+                log("recording: \(parsed.name) from \(device?.name ?? "an unknown device")")
+                self.recording = nil
+                updateTap()
+                recording.done(input)
+                return false
+            }
         }
 
         guard settings.isEnabled, let device, let input = parsed.input,
