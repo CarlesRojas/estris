@@ -15,6 +15,14 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         }
     }
 
+    /// Tile colour behind the icon, as in System Settings.
+    var color: Color {
+        switch self {
+        case .general: .gray
+        case .clipboard: .blue
+        }
+    }
+
     var symbol: String {
         switch self {
         case .general: "gearshape"
@@ -75,13 +83,20 @@ struct SettingsView: View {
             splitView
                 .frame(width: proxy.size.width, height: proxy.size.height)
         }
+        // Cover the title bar too: the sidebar reaches the top like in System Settings, and
+        // the split view keeps its contents clear of the window buttons on its own.
+        .ignoresSafeArea()
     }
 
     private var splitView: some View {
         NavigationSplitView {
             List(panes, selection: $selection) { pane in
                 HStack {
-                    Label(pane.title, systemImage: pane.symbol)
+                    Label {
+                        Text(pane.title)
+                    } icon: {
+                        SettingsIcon(symbol: pane.symbol, color: pane.color)
+                    }
                     Spacer()
                     if let isOn = isOn(pane) {
                         StatusBadge(isOn: isOn)
@@ -89,6 +104,7 @@ struct SettingsView: View {
                 }
             }
             .searchable(text: $search, placement: .sidebar, prompt: "Search")
+            .modifier(HidesSidebarToggle())
             .navigationSplitViewColumnWidth(min: 180, ideal: 210)
         } detail: {
             switch selection ?? .general {
@@ -104,6 +120,32 @@ struct SettingsView: View {
             if let selection, !panes.contains(selection), let first = panes.first {
                 self.selection = first
             }
+        }
+    }
+}
+
+/// A white symbol on a coloured rounded tile, like the icons in System Settings.
+struct SettingsIcon: View {
+    let symbol: String
+    let color: Color
+    var size: CGFloat = 20
+
+    var body: some View {
+        Image(systemName: symbol)
+            .font(.system(size: size * 0.6, weight: .medium))
+            .foregroundStyle(.white)
+            .frame(width: size, height: size)
+            .background(color.gradient, in: RoundedRectangle(cornerRadius: size * 0.25, style: .continuous))
+    }
+}
+
+/// System Settings has no button to hide its sidebar.
+private struct HidesSidebarToggle: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 14, *) {
+            content.toolbar(removing: .sidebarToggle)
+        } else {
+            content
         }
     }
 }

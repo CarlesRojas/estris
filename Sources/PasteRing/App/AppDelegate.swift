@@ -50,9 +50,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             hostingController.sizingOptions = []
             let window = NSWindow(contentViewController: hostingController)
             window.contentMinSize = NSSize(width: 820, height: 600)
+            // Laid out like System Settings: no visible title, and the sidebar runs to the top
+            // of the window with the close, minimize and zoom buttons inside it. The title is
+            // still set for Mission Control and the Window menu.
             window.title = "PasteRing"
-            // Content starts below the title bar, so the sidebar never runs under it.
-            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
+            window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
+            window.toolbar = NSToolbar(identifier: "Settings")
+            window.toolbarStyle = .unified
             window.setContentSize(NSSize(width: 880, height: 700))
             window.isReleasedWhenClosed = false
             window.center()

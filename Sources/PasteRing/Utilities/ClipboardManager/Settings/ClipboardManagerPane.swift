@@ -19,7 +19,8 @@ struct ClipboardManagerPane: View {
         VStack(spacing: 0) {
             UtilityHeader(
                 title: "Clipboard Manager",
-                symbol: "doc.on.clipboard",
+                symbol: SettingsPane.clipboard.symbol,
+                color: SettingsPane.clipboard.color,
                 summary: "Keeps what you copy and lets you pick what to paste with a shortcut.",
                 isOn: $clipboard.isEnabled
             )
