@@ -79,6 +79,9 @@ struct RingPlacement: ViewModifier, Animatable {
     static let topScale: CGFloat = 1.3
     /// Size at the bottom of the ring, the furthest point.
     private static let farScale: CGFloat = 0.5
+    /// How unevenly cards are spread: positive packs them closer together towards the
+    /// bottom (further away, smaller) and spreads them out near the top. Below 1.
+    private static let spacingSkew: Double = 0.4
 
     var angle: Double
     let step: Double
@@ -91,7 +94,11 @@ struct RingPlacement: ViewModifier, Animatable {
     }
 
     func body(content: Content) -> some View {
-        let radians = angle * .pi / 180
+        // Even slots, warped so they sit closer together the further round they are:
+        // the gap between neighbours grows by (1 + skew) at the top and shrinks by
+        // (1 - skew) at the bottom, and the top and bottom stay where they are.
+        let even = remainder(angle, 360) * .pi / 180
+        let radians = even + Self.spacingSkew * sin(even)
         // Angle from the top, in -180...180, since the raw angle keeps growing as the ring turns.
         let fromTop = abs(remainder(angle, 360))
         let nearness = step > 0 ? CGFloat(max(0, 1 - fromTop / step)) : 1
