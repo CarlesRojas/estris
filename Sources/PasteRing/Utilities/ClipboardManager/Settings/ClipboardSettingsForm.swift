@@ -33,7 +33,7 @@ struct ClipboardSettingsForm: View {
             } header: {
                 Text("Shortcuts")
             } footer: {
-                Text("Keep the modifiers held and press the key again to move through entries; release them to paste. Click a shortcut to change it.")
+                Text("Keep the modifiers held and press the key again to move through entries; release them to paste. With the modifiers held, 1 to 9 paste the first nine entries. Click a shortcut to change it.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -49,6 +49,11 @@ struct ClipboardSettingsForm: View {
                         Stepper("Keep up to", value: settings.clamped(\.maxItems, to: ClipboardSettings.maxItemsRange), in: ClipboardSettings.maxItemsRange, step: 5)
                             .labelsHidden()
                         Text("entries")
+                    }
+                }
+                Picker("Delete entries", selection: $settings.expiry) {
+                    ForEach(HistoryExpiry.allCases) { expiry in
+                        Text(expiry.title).tag(expiry)
                     }
                 }
                 Toggle(isOn: $settings.ignorePasswords) {
@@ -119,6 +124,7 @@ struct ClipboardSettingsForm: View {
 
                 Toggle("Show when entries were copied", isOn: $settings.showCopyDate)
                 Toggle("Show delete button", isOn: $settings.showDeleteButton)
+                Toggle("Show quick-pick keys", isOn: $settings.showQuickPickKeys)
             }
 
             Section("Surface") {

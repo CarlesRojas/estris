@@ -13,8 +13,8 @@ struct EntryCard: View {
         VStack(alignment: .leading, spacing: 12) {
             if let item {
                 HStack(spacing: 10) {
-                    AppIconView(bundleID: item.sourceBundleID, size: 28)
-                    Text(AppIcons.name(for: item.sourceBundleID) ?? "Unknown app")
+                    SourceIcon(item: item, size: 28)
+                    Text(item.sourceName)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -22,10 +22,15 @@ struct EntryCard: View {
                 // Room for the date and trash button in the corner.
                 .padding(.trailing, actions.cornerReserve)
             }
-            Text(item?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Clipboard history is empty")
-                .font(.title3)
-                .truncationMode(.tail)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            Group {
+                if let item {
+                    ClipContentView(item: item, font: .title3)
+                } else {
+                    Text("Clipboard history is empty")
+                        .font(.title3)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .padding(20)
         .frame(width: width, height: height)

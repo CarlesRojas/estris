@@ -4,7 +4,10 @@ import Foundation
 @MainActor
 final class ClipboardHistory: ObservableObject {
     @Published private(set) var items: [ClipItem] {
-        didSet { save() }
+        didSet {
+            deletePayloads(removedFrom: oldValue)
+            save()
+        }
     }
 
     var limit = 50 {
@@ -18,18 +21,25 @@ final class ClipboardHistory: ObservableObject {
 
     init() {
         items = Self.load()
+        ClipPayloadStore.deleteAll(except: Set(items.map(\.id)))
     }
 
-    /// Adds `text` as the most recent entry. With `removingDuplicates`, an older entry with
-    /// the same text is dropped, so it moves to the top instead of appearing twice.
-    func add(_ text: String, sourceBundleID: String?, removingDuplicates: Bool) {
+    /// Adds `item` as the most recent entry. With `removingDuplicates`, an older entry with
+    /// the same content is dropped, so it moves to the top instead of appearing twice.
+    func add(_ item: ClipItem, removingDuplicates: Bool) {
         var updated = items
         if removingDuplicates {
-            updated.removeAll { $0.text == text }
+            updated.removeAll { $0.hasSameContent(as: item) }
         }
-        updated.insert(ClipItem(text: text, sourceBundleID: sourceBundleID), at: 0)
+        updated.insert(item, at: 0)
         items = updated
         trim()
+    }
+
+    /// Drops entries copied before `date`.
+    func removeEntries(olderThan date: Date) {
+        guard items.contains(where: { $0.date < date }) else { return }
+        items.removeAll { $0.date < date }
     }
 
     func promote(_ item: ClipItem) {
@@ -50,6 +60,13 @@ final class ClipboardHistory: ObservableObject {
     private func trim() {
         if items.count > limit {
             items.removeLast(items.count - limit)
+        }
+    }
+
+    private func deletePayloads(removedFrom oldItems: [ClipItem]) {
+        let kept = Set(items.map(\.id))
+        for item in oldItems where item.hasPayload == true && !kept.contains(item.id) {
+            ClipPayloadStore.delete(item.id)
         }
     }
 

@@ -15,6 +15,7 @@ final class ClipboardManager: NSObject {
     private var observers: Set<AnyCancellable> = []
     private var hotKeys: [UInt32] = []
     private var hasStarted = false
+    private var expiryTimer: Timer?
 
     init(general: GeneralSettings) {
         monitor = ClipboardMonitor(history: history, settings: settings)
@@ -31,6 +32,12 @@ final class ClipboardManager: NSObject {
             .removeDuplicates()
             .sink { [weak self] in self?.setActive($0) }
             .store(in: &observers)
+        settings.$expiry
+            .sink { [weak self] in self?.removeExpired($0) }
+            .store(in: &observers)
+        let expiryTimer = Timer(timeInterval: 60, target: self, selector: #selector(checkExpiry), userInfo: nil, repeats: true)
+        RunLoop.main.add(expiryTimer, forMode: .common)
+        self.expiryTimer = expiryTimer
         // Re-register whenever the shortcuts change in Settings.
         settings.$shortcuts
             .sink { [weak self] shortcuts in
@@ -72,6 +79,15 @@ final class ClipboardManager: NSObject {
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
         ClipboardManagerPane(clipboard: settings, appearance: appearance, history: history)
+    }
+
+    @objc private func checkExpiry() {
+        removeExpired(settings.expiry)
+    }
+
+    private func removeExpired(_ expiry: HistoryExpiry) {
+        guard let interval = expiry.interval else { return }
+        history.removeEntries(olderThan: Date().addingTimeInterval(-interval))
     }
 
     @objc private func clearHistory() {

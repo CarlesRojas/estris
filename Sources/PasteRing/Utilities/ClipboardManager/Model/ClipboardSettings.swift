@@ -23,6 +23,37 @@ enum OverlayStyle: String, CaseIterable, Identifiable {
     }
 }
 
+/// How long entries stay in the history.
+enum HistoryExpiry: String, CaseIterable, Identifiable {
+    case never
+    case hour
+    case day
+    case week
+    case month
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .never: "Never"
+        case .hour: "After 1 hour"
+        case .day: "After 1 day"
+        case .week: "After 1 week"
+        case .month: "After 30 days"
+        }
+    }
+
+    var interval: TimeInterval? {
+        switch self {
+        case .never: nil
+        case .hour: 3600
+        case .day: 86_400
+        case .week: 7 * 86_400
+        case .month: 30 * 86_400
+        }
+    }
+}
+
 /// User preferences, persisted in UserDefaults.
 @MainActor
 final class ClipboardSettings: ObservableObject {
@@ -65,6 +96,20 @@ final class ClipboardSettings: ObservableObject {
     /// keeps copy order and ⌘V goes back to the last copied text after the paste.
     @Published var moveToTopOnPaste: Bool {
         didSet { defaults.set(moveToTopOnPaste, forKey: Keys.moveToTopOnPaste) }
+    }
+
+    @Published var expiry: HistoryExpiry {
+        didSet { defaults.set(expiry.rawValue, forKey: Keys.expiry) }
+    }
+
+    /// Bundle identifiers of apps whose copies are not recorded.
+    @Published var excludedApps: Set<String> {
+        didSet { defaults.set(Array(excludedApps), forKey: Keys.excludedApps) }
+    }
+
+    /// Show each entry's quick-pick key (the shortcut's modifiers plus 1 to 9) in the overlay.
+    @Published var showQuickPickKeys: Bool {
+        didSet { defaults.set(showQuickPickKeys, forKey: Keys.showQuickPickKeys) }
     }
 
     /// Shortcuts that open the overlay. Always at least one.
@@ -153,6 +198,9 @@ final class ClipboardSettings: ObservableObject {
         shortcuts = savedShortcuts?.isEmpty == false ? savedShortcuts! : [Self.defaultShortcut]
         showCopyDate = defaults.bool(forKey: Keys.showCopyDate)
         showDeleteButton = defaults.bool(forKey: Keys.showDeleteButton)
+        showQuickPickKeys = defaults.bool(forKey: Keys.showQuickPickKeys)
+        expiry = HistoryExpiry(rawValue: defaults.string(forKey: Keys.expiry) ?? "") ?? .never
+        excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
         ringSize = defaults.integer(forKey: Keys.ringSize)
         gridSize = defaults.integer(forKey: Keys.gridSize)
         gridCardWidth = defaults.double(forKey: Keys.gridCardWidth)
@@ -195,6 +243,7 @@ final class ClipboardSettings: ObservableObject {
         Keys.ringChipHeight: 56.0,
         Keys.showCopyDate: true,
         Keys.showDeleteButton: true,
+        Keys.showQuickPickKeys: true,
     ]
 
     func resetAppearance() {
@@ -216,6 +265,7 @@ final class ClipboardSettings: ObservableObject {
         ringChipHeight = defaults.double(forKey: Keys.ringChipHeight)
         showCopyDate = defaults.bool(forKey: Keys.showCopyDate)
         showDeleteButton = defaults.bool(forKey: Keys.showDeleteButton)
+        showQuickPickKeys = defaults.bool(forKey: Keys.showQuickPickKeys)
     }
 
     static let defaultShortcut = Shortcut(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | shiftKey), keyLabel: "V")
@@ -263,6 +313,9 @@ final class ClipboardSettings: ObservableObject {
         static let shortcuts = "shortcuts"
         static let showCopyDate = "showCopyDate"
         static let showDeleteButton = "showDeleteButton"
+        static let showQuickPickKeys = "showQuickPickKeys"
+        static let expiry = "historyExpiry"
+        static let excludedApps = "excludedApps"
         static let ringSize = "ringSize"
         static let gridSize = "gridSize"
         static let gridCardWidth = "gridCardWidth"

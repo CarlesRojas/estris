@@ -25,7 +25,7 @@ final class OverlayController: NSObject {
     /// Fastest the scroll wheel may cycle: one entry per this many seconds.
     private static let scrollStepInterval: TimeInterval = 0.09
     private var isVisible = false
-    private var activeShortcut = ClipboardSettings.defaultShortcut
+    private var activeShortcut: Shortcut { state.activeShortcut }
     /// Bumped on every show and hide, so a finished fade-out does not hide a newer show.
     private var presentation = 0
 
@@ -63,7 +63,7 @@ final class OverlayController: NSObject {
         if isVisible {
             move(by: 1)
         } else {
-            activeShortcut = shortcut
+            state.activeShortcut = shortcut
             show()
         }
     }
@@ -125,7 +125,9 @@ final class OverlayController: NSObject {
             (kVK_RightArrow, { [weak self] in self?.move(by: 1) }),
             (kVK_Delete, { [weak self] in self?.deleteSelected() }),
             (kVK_ForwardDelete, { [weak self] in self?.deleteSelected() }),
-        ]
+        ] + Self.digitKeys.enumerated().map { index, keyCode -> (Int, () -> Void) in
+            (keyCode, { [weak self] in self?.quickPick(index) })
+        }
         sessionHotKeys += bindings.map { keyCode, handler in
             HotKeyCenter.shared.register(keyCode: UInt32(keyCode), modifiers: modifiers, handler: handler)
         }
@@ -150,6 +152,17 @@ final class OverlayController: NSObject {
             guard let self, self.presentation == fadingOut else { return }
             self.panel.orderOut(nil)
         }
+    }
+
+    private static let digitKeys = [
+        kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5,
+        kVK_ANSI_6, kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9,
+    ]
+
+    /// Pastes the entry at `index` (0 for the key 1).
+    private func quickPick(_ index: Int) {
+        guard state.items.indices.contains(index) else { return }
+        commit(state.items[index])
     }
 
     private func deleteSelected() {
@@ -206,7 +219,7 @@ final class OverlayController: NSObject {
         if settings.moveToTopOnPaste {
             history.promote(item)
         }
-        monitor.write(item.text)
+        monitor.write(item)
 
         guard Paster.isTrusted(prompt: true) else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -218,7 +231,7 @@ final class OverlayController: NSObject {
         if !settings.moveToTopOnPaste, let latest = history.items.first, latest.id != item.id {
             Task { @MainActor [weak self] in
                 try? await Task.sleep(nanoseconds: 400_000_000)
-                self?.monitor.write(latest.text)
+                self?.monitor.write(latest)
             }
         }
     }

@@ -13,8 +13,8 @@ struct ContentCard: View {
         VStack(alignment: .leading, spacing: 10) {
             if let item {
                 HStack(spacing: 8) {
-                    AppIconView(bundleID: item.sourceBundleID, size: 24)
-                    Text(AppIcons.name(for: item.sourceBundleID) ?? "Unknown app")
+                    SourceIcon(item: item, size: 24)
+                    Text(item.sourceName)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -22,10 +22,8 @@ struct ContentCard: View {
                 // Room for the date and trash button in the corner.
                 .padding(.trailing, actions.cornerReserve)
                 // Same font whether selected or not: a heavier weight rewraps the text.
-                Text(item.text.trimmingCharacters(in: .whitespacesAndNewlines))
-                    .font(.body)
+                ClipContentView(item: item)
                     .lineLimit(lineLimit)
-                    .truncationMode(.tail)
             } else {
                 Text("Clipboard history is empty")
                     .font(.body.weight(.medium))

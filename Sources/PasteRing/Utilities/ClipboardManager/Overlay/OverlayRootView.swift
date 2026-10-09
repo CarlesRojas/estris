@@ -24,6 +24,15 @@ struct OverlayRootView: View {
         var actions = state.actions
         actions.showsDate = settings.showCopyDate
         actions.showsDelete = settings.showDeleteButton
+        actions.showsQuickPickKeys = settings.showQuickPickKeys
+        if settings.showQuickPickKeys {
+            let items = state.items
+            let modifiers = state.activeShortcut.modifierSymbols
+            actions.quickPickKey = { item in
+                guard let index = items.firstIndex(where: { $0.id == item.id }), index < 9 else { return nil }
+                return "\(modifiers)\(index + 1)"
+            }
+        }
         return actions
     }
 

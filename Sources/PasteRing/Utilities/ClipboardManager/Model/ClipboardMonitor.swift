@@ -1,7 +1,8 @@
 import AppKit
 import ApplicationServices
 
-/// Polls the general pasteboard (macOS has no change notification) and records new text.
+/// Polls the general pasteboard (macOS has no change notification) and records what is
+/// copied: text, rich text, images and files.
 @MainActor
 final class ClipboardMonitor: NSObject {
     private let pasteboard = NSPasteboard.general
@@ -17,6 +18,13 @@ final class ClipboardMonitor: NSObject {
     ]
     /// The marker password managers put on passwords.
     private static let concealedType = NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType")
+    /// Marks content that arrived through Universal Clipboard from another Apple device.
+    private static let universalClipboardType = NSPasteboard.PasteboardType("com.apple.is-remote-clipboard")
+    private static let richTextTypes: Set<NSPasteboard.PasteboardType> = [
+        .rtf, .rtfd, .html, .init("com.apple.flat-rtfd"),
+    ]
+    /// Larger copies (a huge image, say) are not kept.
+    private static let maxPayloadBytes = 25 * 1024 * 1024
 
     init(history: ClipboardHistory, settings: ClipboardSettings) {
         self.history = history
@@ -43,10 +51,22 @@ final class ClipboardMonitor: NSObject {
         timer = nil
     }
 
-    /// Writes text to the pasteboard without recording it as a new entry.
-    func write(_ text: String) {
+    /// Puts an entry back on the pasteboard, exactly as it was copied, without recording it
+    /// as a new entry.
+    func write(_ item: ClipItem) {
         pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
+        if item.hasPayload == true, let payload = ClipPayloadStore.load(item.id) {
+            let objects = payload.map { types in
+                let pasteboardItem = NSPasteboardItem()
+                for (type, data) in types {
+                    pasteboardItem.setData(data, forType: .init(type))
+                }
+                return pasteboardItem
+            }
+            pasteboard.writeObjects(objects)
+        } else {
+            pasteboard.setString(item.text, forType: .string)
+        }
         lastChangeCount = pasteboard.changeCount
     }
 
@@ -73,10 +93,99 @@ final class ClipboardMonitor: NSObject {
         if settings.ignorePasswords, types.contains(Self.concealedType) || focusIsInPasswordField() {
             return
         }
-        guard let text = pasteboard.string(forType: .string),
-              !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        else { return }
-        history.add(text, sourceBundleID: sourceBundleID(), removingDuplicates: settings.removeDuplicates)
+        // Universal Clipboard content comes from another device: the app here didn't copy it.
+        let isFromOtherDevice = types.contains(Self.universalClipboardType)
+        let source = isFromOtherDevice ? nil : sourceBundleID()
+        if let source, settings.excludedApps.contains(source) {
+            return
+        }
+        guard let item = makeItem(types: types, source: source, isFromOtherDevice: isFromOtherDevice) else { return }
+        history.add(item, removingDuplicates: settings.removeDuplicates)
+    }
+
+    /// Plain text is kept as text only. Rich text, images and files keep every pasteboard
+    /// type, so pasting gives back the original.
+    private func makeItem(types: [NSPasteboard.PasteboardType], source: String?, isFromOtherDevice: Bool) -> ClipItem? {
+        let fileURLs = (pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL]) ?? []
+        let string = pasteboard.string(forType: .string).flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
+        let hasImage = types.contains(.png) || types.contains(.tiff)
+        let hasRichText = types.contains(where: Self.richTextTypes.contains)
+
+        let kind: ClipKind
+        if !fileURLs.isEmpty {
+            kind = .files
+        } else if let string {
+            kind = hasRichText ? .richText : .text
+        } else if hasImage {
+            kind = .image
+        } else {
+            return nil
+        }
+
+        if kind == .text, let string {
+            return ClipItem(text: string, sourceBundleID: source, isFromOtherDevice: isFromOtherDevice)
+        }
+
+        let payload = snapshot()
+        let size = payload.reduce(0) { total, item in total + item.values.reduce(0) { $0 + $1.count } }
+        guard size > 0, size <= Self.maxPayloadBytes else { return nil }
+
+        var thumbnail: Data?
+        let text: String
+        switch kind {
+        case .files:
+            text = fileURLs.map(\.lastPathComponent).joined(separator: "\n")
+        case .image:
+            let image = imageThumbnail()
+            thumbnail = image?.data
+            text = image.map { "Image \($0.pixelSize)" } ?? "Image"
+        case .text, .richText:
+            text = string ?? ""
+        }
+
+        let item = ClipItem(
+            text: text,
+            sourceBundleID: source,
+            kind: kind,
+            isFromOtherDevice: isFromOtherDevice,
+            fingerprint: ClipPayloadStore.fingerprint(of: payload),
+            hasPayload: true
+        )
+        ClipPayloadStore.save(payload, thumbnail: thumbnail, for: item.id)
+        return item
+    }
+
+    /// Every pasteboard item with all its types, minus system-generated ones.
+    private func snapshot() -> ClipPayload {
+        (pasteboard.pasteboardItems ?? []).map { pasteboardItem in
+            var types: [String: Data] = [:]
+            for type in pasteboardItem.types where !type.rawValue.hasPrefix("dyn.") {
+                if let data = pasteboardItem.data(forType: type) {
+                    types[type.rawValue] = data
+                }
+            }
+            return types
+        }
+    }
+
+    /// A small PNG of the copied image, and its size in pixels.
+    private func imageThumbnail(maxSide: CGFloat = 480) -> (data: Data, pixelSize: String)? {
+        guard let image = NSImage(pasteboard: pasteboard), image.size.width > 0, image.size.height > 0 else { return nil }
+        let pixels = image.representations.first.map { NSSize(width: $0.pixelsWide, height: $0.pixelsHigh) } ?? image.size
+        let scale = min(1, maxSide / max(image.size.width, image.size.height))
+        let width = max(1, Int(image.size.width * scale))
+        let height = max(1, Int(image.size.height * scale))
+        guard let bitmap = NSBitmapImageRep(
+            bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height, bitsPerSample: 8,
+            samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
+            bytesPerRow: 0, bitsPerPixel: 0
+        ) else { return nil }
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
+        image.draw(in: NSRect(x: 0, y: 0, width: width, height: height))
+        NSGraphicsContext.restoreGraphicsState()
+        guard let data = bitmap.representation(using: .png, properties: [:]) else { return nil }
+        return (data, "\(Int(pixels.width)) × \(Int(pixels.height))")
     }
 
     /// Whether the focused control in the frontmost app is a password field. Standard

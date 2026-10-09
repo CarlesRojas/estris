@@ -4,10 +4,11 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 
 ## Usage
 
-- Copy text as usual. PasteRing records every new text entry, most recent first, along with the app it was copied from (shown as its icon).
+- Copy as usual. PasteRing records text, rich text, images and files, most recent first, along with the app they were copied from (shown as its icon). Pasting an entry gives back exactly what was copied. Copies that arrive from your other Apple devices through Universal Clipboard are recorded too, marked as coming from another device.
 - Hold `⌘⇧` and press `V` to open the overlay in the middle of the screen. The highlighted entry is what will be pasted.
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
+- With the modifiers held, `1` to `9` paste the first nine entries straight away.
 - `⌘⇧Esc` closes the overlay without pasting. `⌘⇧Delete` removes the selected entry from the history.
 - While holding `⌘⇧`, click any entry to paste it, click its trash icon to delete it, or click outside to close. Releasing always pastes the selected entry, not the one under the mouse.
 
@@ -21,10 +22,10 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
 - **Language** (English for now), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
 - **About**: version and a short description.
 
-**Clipboard Manager** starts with its on/off switch (off stops recording and frees its shortcuts), then two tabs:
+**Clipboard Manager** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
 - **Settings**:
   - *Shortcuts*: the shortcut that opens the overlay (default `⌘⇧V`) and any alternatives. Click one and press a new combination; it needs `⌘`, `⌥` or `⌃`.
-  - *History*: how many entries to keep (5 to 500, default 50), and three switches, all on by default:
+  - *History*: how many entries to keep (5 to 500, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and three switches, all on by default:
     - **Ignore passwords**: skips text copied from password fields and password managers.
     - **Remove duplicates**: copying something already in the history moves it to the top instead of adding it again.
     - **Move pasted entry to the top**: when off, the history keeps copy order and `⌘V` keeps pasting the last copied text after you paste an older entry.
@@ -34,9 +35,10 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
     - *Carousel*: Cover Flow style, neighbours tilted away on either side. Card width and height are adjustable (default 260 by 260).
     - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling slides the front card down and fades it out while the next one comes forward; going back plays the same motion in reverse. Card width and height are adjustable (default 520 by 170).
     - *Ring menu*: the most recent entries (3 to 12, default 12) spread around a ring (an ellipse as tight as the chips allow) that turns to bring the selected one to the top. Chip width and height are adjustable (default 280 by 56); the ring grows to fit.
-  - **Show when entries were copied** and **Show delete button** turn those off in the overlay (the History tab always has both).
+  - **Show when entries were copied**, **Show delete button** and **Show quick-pick keys** turn those off in the overlay (the History tab always has them).
   - *Surface*: frosted material with **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16) and **Dim screen** (50%, fades in and out with the overlay). **Reset Style and Surface to Defaults** resets this section and the style.
-- **History**: every saved entry with when it was copied. The trash button deletes one, **Clear All** deletes everything.
+- **History**: every saved entry with where and when it was copied and its quick-pick key, with a search field. The trash button deletes one, **Clear All** deletes everything.
+- **Excluded Apps**: every installed app with a switch, all on. Switch an app off and nothing copied in it is recorded.
 
 Every entry in the overlay shows when it was copied next to its trash icon, in the date and time format chosen in General.
 

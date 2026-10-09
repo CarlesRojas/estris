@@ -11,12 +11,17 @@ struct Shortcut: Codable, Hashable, Identifiable {
     var id: String { "\(keyCode)-\(modifiers)" }
 
     var displayString: String {
+        modifierSymbols + keyLabel
+    }
+
+    /// The modifiers alone, in the standard order, such as "⇧⌘".
+    var modifierSymbols: String {
         var text = ""
         if modifiers & UInt32(controlKey) != 0 { text += "⌃" }
         if modifiers & UInt32(optionKey) != 0 { text += "⌥" }
         if modifiers & UInt32(shiftKey) != 0 { text += "⇧" }
         if modifiers & UInt32(cmdKey) != 0 { text += "⌘" }
-        return text + keyLabel
+        return text
     }
 
     /// The same modifiers as AppKit flags, for checking which keys are held.

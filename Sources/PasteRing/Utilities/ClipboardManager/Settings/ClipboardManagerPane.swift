@@ -1,11 +1,13 @@
 import AppKit
 import SwiftUI
 
-/// The Clipboard Manager's settings pane: the on/off switch, then Settings and History tabs.
+/// The Clipboard Manager's settings pane: the on/off switch, then Settings, History and
+/// Excluded Apps tabs.
 struct ClipboardManagerPane: View {
     private enum Tab: Hashable {
         case settings
         case history
+        case excludedApps
     }
 
     @ObservedObject var clipboard: ClipboardSettings
@@ -27,6 +29,7 @@ struct ClipboardManagerPane: View {
             Picker("View", selection: $tab) {
                 Text("Settings").tag(Tab.settings)
                 Text("History").tag(Tab.history)
+                Text("Excluded Apps").tag(Tab.excludedApps)
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -37,7 +40,9 @@ struct ClipboardManagerPane: View {
             case .settings:
                 ClipboardSettingsForm(settings: clipboard, appearance: appearance, history: history)
             case .history:
-                HistoryPreferences(history: history)
+                HistoryPreferences(history: history, settings: clipboard)
+            case .excludedApps:
+                ExcludedAppsList(settings: clipboard)
             }
         }
     }

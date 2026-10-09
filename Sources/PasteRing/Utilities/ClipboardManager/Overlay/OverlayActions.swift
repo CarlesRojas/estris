@@ -10,13 +10,17 @@ struct OverlayActions {
     var isEnabled = false
     var showsDate = true
     var showsDelete = true
+    /// The quick-pick key for an entry, such as "⇧⌘1", or nil when it has none or they are hidden.
+    var quickPickKey: (ClipItem) -> String? = { _ in nil }
+    var showsQuickPickKeys = false
 
     /// Width elements keep free in their top-right corner for the date and trash button.
     var cornerReserve: CGFloat {
         guard isEnabled else { return 0 }
         let date: CGFloat = showsDate ? 92 : 0
         let delete: CGFloat = showsDelete ? 26 : 0
-        return date + delete
+        let key: CGFloat = showsQuickPickKeys ? 34 : 0
+        return date + delete + key
     }
 }
 
@@ -58,6 +62,13 @@ private struct ClipActions: ViewModifier {
                 .onTapGesture { actions.pick(item) }
                 .overlay(alignment: .topTrailing) {
                     HStack(spacing: 2) {
+                        if let key = actions.quickPickKey(item) {
+                            Text(key)
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.tertiary)
+                                .frame(minHeight: 24)
+                                .padding(.trailing, 6)
+                        }
                         if actions.showsDate {
                             Text(dateTimeFormat.string(from: item.date))
                                 .font(.caption.monospacedDigit())

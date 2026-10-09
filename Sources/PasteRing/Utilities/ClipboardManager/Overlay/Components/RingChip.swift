@@ -9,11 +9,9 @@ struct RingChip: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            AppIconView(bundleID: item.sourceBundleID, size: 24)
+            SourceIcon(item: item, size: 24)
             // No line limit: the text fills the chip and truncates where it ends.
-            Text(item.text.singleLine)
-                .font(.body)
-                .truncationMode(.tail)
+            ClipContentView(item: item, singleLine: true)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 // Room for the date and trash button in the corner.
                 .padding(.trailing, max(0, actions.cornerReserve - 12))

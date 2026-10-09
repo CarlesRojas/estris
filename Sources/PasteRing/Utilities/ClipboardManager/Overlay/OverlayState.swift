@@ -9,6 +9,8 @@ final class OverlayState: ObservableObject {
     @Published var gridLayout: GridLayout?
 
     var actions = OverlayActions()
+    /// The shortcut that opened the overlay; its modifiers are held while it is open.
+    @Published var activeShortcut = ClipboardSettings.defaultShortcut
 
     var selected: Int {
         items.isEmpty ? 0 : (position % items.count + items.count) % items.count
