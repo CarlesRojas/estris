@@ -126,9 +126,7 @@ final class OverlayController: NSObject {
             (kVK_RightArrow, { [weak self] in self?.move(by: 1) }),
             (kVK_Delete, { [weak self] in self?.deleteSelected() }),
             (kVK_ForwardDelete, { [weak self] in self?.deleteSelected() }),
-        ] + Self.digitKeys.enumerated().map { index, keyCode -> (Int, () -> Void) in
-            (keyCode, { [weak self] in self?.quickPick(index) })
-        }
+        ]
         sessionHotKeys += bindings.map { keyCode, handler in
             HotKeyCenter.shared.register(keyCode: UInt32(keyCode), modifiers: modifiers, handler: handler)
         }
@@ -153,17 +151,6 @@ final class OverlayController: NSObject {
             guard let self, self.presentation == fadingOut else { return }
             self.panel.orderOut(nil)
         }
-    }
-
-    private static let digitKeys = [
-        kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5,
-        kVK_ANSI_6, kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9,
-    ]
-
-    /// Pastes the entry at `index` (0 for the key 1).
-    private func quickPick(_ index: Int) {
-        guard state.items.indices.contains(index) else { return }
-        commit(state.items[index])
     }
 
     private func deleteSelected() {

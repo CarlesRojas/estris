@@ -117,11 +117,6 @@ final class ClipboardSettings: ObservableObject {
         didSet { defaults.set(Array(excludedApps), forKey: Keys.excludedApps) }
     }
 
-    /// Show each entry's quick-pick key (the shortcut's modifiers plus 1 to 9) in the overlay.
-    @Published var showQuickPickKeys: Bool {
-        didSet { defaults.set(showQuickPickKeys, forKey: Keys.showQuickPickKeys) }
-    }
-
     /// Shortcuts that open the overlay. Always at least one.
     @Published var shortcuts: [Shortcut] {
         didSet { defaults.set(try? JSONEncoder().encode(shortcuts), forKey: Keys.shortcuts) }
@@ -212,7 +207,6 @@ final class ClipboardSettings: ObservableObject {
         shortcuts = savedShortcuts?.isEmpty == false ? savedShortcuts! : [Self.defaultShortcut]
         showCopyDate = defaults.bool(forKey: Keys.showCopyDate)
         showDeleteButton = defaults.bool(forKey: Keys.showDeleteButton)
-        showQuickPickKeys = defaults.bool(forKey: Keys.showQuickPickKeys)
         expiry = HistoryExpiry(rawValue: defaults.string(forKey: Keys.expiry) ?? "") ?? .never
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
         ringSize = defaults.integer(forKey: Keys.ringSize)
@@ -257,7 +251,6 @@ final class ClipboardSettings: ObservableObject {
         Keys.ringChipHeight: 256.0,
         Keys.showCopyDate: true,
         Keys.showDeleteButton: true,
-        Keys.showQuickPickKeys: true,
     ]
 
     func resetAppearance() {
@@ -279,7 +272,6 @@ final class ClipboardSettings: ObservableObject {
         ringChipHeight = defaults.double(forKey: Keys.ringChipHeight)
         showCopyDate = defaults.bool(forKey: Keys.showCopyDate)
         showDeleteButton = defaults.bool(forKey: Keys.showDeleteButton)
-        showQuickPickKeys = defaults.bool(forKey: Keys.showQuickPickKeys)
     }
 
     static let defaultShortcut = Shortcut(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | shiftKey), keyLabel: "V")
@@ -329,7 +321,6 @@ final class ClipboardSettings: ObservableObject {
         static let shortcuts = "shortcuts"
         static let showCopyDate = "showCopyDate"
         static let showDeleteButton = "showDeleteButton"
-        static let showQuickPickKeys = "showQuickPickKeys"
         static let expiry = "historyExpiry"
         static let excludedApps = "excludedApps"
         static let ringSize = "ringSize"

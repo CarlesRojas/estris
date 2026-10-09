@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// The Clipboard Manager's History tab: every saved entry, searchable, with its quick-pick
-/// key, delete and Clear All.
+/// The Clipboard Manager's History tab: every saved entry, searchable, with delete and
+/// Clear All.
 struct HistoryPreferences: View {
     @ObservedObject var history: ClipboardHistory
     @ObservedObject var settings: ClipboardSettings
@@ -12,12 +12,11 @@ struct HistoryPreferences: View {
 
     private let mutedRed = Color.red.opacity(0.88)
 
-    /// Entries matching the search, with their position in the full history.
-    private var results: [(position: Int, item: ClipItem)] {
+    /// Entries matching the search.
+    private var results: [ClipItem] {
         let query = search.trimmingCharacters(in: .whitespaces)
-        return history.items.enumerated()
-            .map { (position: $0.offset, item: $0.element) }
-            .filter { query.isEmpty || $0.item.text.localizedCaseInsensitiveContains(query) || $0.item.sourceName.localizedCaseInsensitiveContains(query) }
+        guard !query.isEmpty else { return history.items }
+        return history.items.filter { $0.text.localizedCaseInsensitiveContains(query) || $0.sourceName.localizedCaseInsensitiveContains(query) }
     }
 
     var body: some View {
@@ -34,8 +33,8 @@ struct HistoryPreferences: View {
                     } else if results.isEmpty {
                         placeholder("No entries match \u{201C}\(search)\u{201D}")
                     } else {
-                        ForEach(results, id: \.item.id) { result in
-                            row(result.item, position: result.position)
+                        ForEach(results) { item in
+                            row(item)
                         }
                     }
                 } header: {
@@ -69,7 +68,7 @@ struct HistoryPreferences: View {
             .padding(.vertical, 12)
     }
 
-    private func row(_ item: ClipItem, position: Int) -> some View {
+    private func row(_ item: ClipItem) -> some View {
         HStack(alignment: .top, spacing: 12) {
             SourceIcon(item: item, size: 28)
             VStack(alignment: .leading, spacing: 4) {
@@ -81,12 +80,6 @@ struct HistoryPreferences: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            if let key = quickPickKey(position) {
-                Text(key)
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.tertiary)
-                    .help("Quick-pick key while the overlay is open")
-            }
             Button {
                 history.remove(item)
             } label: {
@@ -99,12 +92,6 @@ struct HistoryPreferences: View {
         .padding(.vertical, 2)
     }
 
-    /// The first nine entries can be pasted from the overlay with the shortcut's modifiers
-    /// plus their number.
-    private func quickPickKey(_ position: Int) -> String? {
-        guard position < 9, let shortcut = settings.shortcuts.first else { return nil }
-        return "\(shortcut.modifierSymbols)\(position + 1)"
-    }
 }
 
 /// A native search field.

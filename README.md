@@ -8,7 +8,6 @@ A native macOS menu bar app that keeps a history of copied text and lets you pic
 - Hold `⌘⇧` and press `V` to open the overlay in the middle of the screen. The highlighted entry is what will be pasted.
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
-- With the modifiers held, `1` to `9` paste the first nine entries straight away.
 - `⌘⇧Esc` closes the overlay without pasting. `⌘⇧Delete` removes the selected entry from the history.
 - While holding `⌘⇧`, click any entry to paste it, click its trash icon to delete it, or click outside to close. Releasing always pastes the selected entry, not the one under the mouse.
 
@@ -39,10 +38,10 @@ Open **Settings…** from the menu bar icon. The sidebar (with search) has one p
       - *Carousel*: Cover Flow style, neighbours tilted away on either side. Card width and height are adjustable (default 260 by 260).
       - *Stack*: a pile of cards like the Default one; the next few peek out above the front card, smaller the further back. Cycling slides the front card down and fades it out while the next one comes forward; going back plays the same motion in reverse. Card width and height are adjustable (default 520 by 256).
       - *Ring menu*: the most recent entries (3 to 12, default 12) as cards laid out like grid tiles, spread around a ring (an ellipse as tight as the cards allow) that turns to bring the selected one to the top. Card width and height are adjustable (default 280 by 256); if the ring is bigger than the screen it is scaled down to fit.
-    - **Show when entries were copied**, **Show delete button** and **Show quick-pick keys** (the History tab always has them).
+    - **Show when entries were copied** and **Show delete button** (the History tab always has them).
     - Frosted material with **Tint** (default mid grey), **Tint strength** (20%), **Selected highlight** (30%), **Shadow** (16) and **Dim screen** (50%, fades in and out with the overlay). **Reset Appearance to Defaults** resets everything in this section.
   - *Shortcuts*: the shortcut that opens the overlay (default `⌘⇧V`) and any alternatives. Click one and press a new combination; it needs `⌘`, `⌥` or `⌃`.
-- **History**: every saved entry with where and when it was copied and its quick-pick key, with a search field. The trash button deletes one, **Clear All** deletes everything.
+- **History**: every saved entry with where and when it was copied, with a search field. The trash button deletes one, **Clear All** deletes everything.
 - **Excluded Apps**: every installed app with a switch, all on. Switch an app off and nothing copied in it is recorded.
 
 Every entry in the overlay shows when it was copied next to its trash icon, in the date and time format chosen in General.
