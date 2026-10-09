@@ -23,7 +23,7 @@ struct GeneralPane: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("PasteRing needs Accessibility access")
                                 .font(.headline)
-                            Text("macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, and Middle Click uses it to click the middle button. Without it, entries are only copied to the clipboard, and Auto Quit and the middle click do nothing.")
+                            Text("macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, and Remap uses it to change keys and buttons. Without it, entries are only copied to the clipboard, and the other utilities do nothing.")
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                             Button("Open Accessibility Settings") {

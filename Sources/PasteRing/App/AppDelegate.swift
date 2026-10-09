@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let log = AppLog()
     private lazy var autoQuit = AutoQuit(log: log)
     private lazy var middleClick = MiddleClick(log: log)
+    private lazy var remap = Remap(log: log)
     private var settingsWindow: SettingsWindowController?
     private var statusItem: NSStatusItem!
 
@@ -17,9 +18,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         clipboard.start()
         autoQuit.start()
         middleClick.start()
+        remap.start()
         setUpStatusItem()
         LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        // Key mappings set on keyboards outlive the app; take them back.
+        remap.stop()
     }
 
     private func setUpStatusItem() {
@@ -47,7 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, log: log)
         }
         settingsWindow?.show()
     }
