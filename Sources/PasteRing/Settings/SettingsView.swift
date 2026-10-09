@@ -5,6 +5,7 @@ import SwiftUI
 enum SettingsPane: String, CaseIterable, Identifiable {
     case general
     case clipboard
+    case autoQuit
 
     var id: Self { self }
 
@@ -12,6 +13,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         switch self {
         case .general: "General"
         case .clipboard: "Clipboard"
+        case .autoQuit: "Auto Quit"
         }
     }
 
@@ -19,6 +21,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         switch self {
         case .general: "gearshape"
         case .clipboard: "list.clipboard"
+        case .autoQuit: "xmark.app"
         }
     }
 
@@ -27,6 +30,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         switch self {
         case .general:
             ["login", "startup", "language", "accessibility", "permission", "date", "time", "format", "version", "about"]
+        case .autoQuit:
+            ["quit", "close", "window", "last window", "terminate", "excluded", "apps", "delay"]
         case .clipboard:
             ["history", "paste", "search", "image", "file", "rich text", "excluded", "apps", "expiry", "shortcut", "hotkey", "keyboard", "password", "duplicate", "date", "delete", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
         }
@@ -63,6 +68,7 @@ final class SettingsNavigation: ObservableObject {
 struct SettingsSidebar: View {
     @ObservedObject var navigation: SettingsNavigation
     @ObservedObject var clipboardSettings: ClipboardSettings
+    @ObservedObject var autoQuitSettings: AutoQuitSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -82,6 +88,7 @@ struct SettingsSidebar: View {
         switch pane {
         case .general: nil
         case .clipboard: clipboardSettings.isEnabled
+        case .autoQuit: autoQuitSettings.isEnabled
         }
     }
 }
@@ -92,6 +99,7 @@ struct SettingsDetail: View {
     @ObservedObject var navigation: SettingsNavigation
     @ObservedObject var general: GeneralSettings
     let clipboard: ClipboardManager
+    let autoQuit: AutoQuit
 
     var body: some View {
         GeometryReader { proxy in
@@ -101,6 +109,8 @@ struct SettingsDetail: View {
                     GeneralPane(general: general)
                 case .clipboard:
                     clipboard.settingsPane()
+                case .autoQuit:
+                    autoQuit.settingsPane()
                 }
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)

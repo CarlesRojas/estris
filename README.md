@@ -71,6 +71,15 @@ The build is ad-hoc signed by default, so macOS may forget the permission after 
 SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/build-app.sh
 ```
 
+## Auto Quit
+
+Quits an app when you close its last window, the way apps on iPad and many Windows apps behave. Off by default; turn it on in **Settings… > Auto Quit**.
+
+- **Quit**: immediately, or after 1, 5 or 30 seconds (default 1 second) with no windows.
+- **Excluded Apps**: every installed app with a switch; switch one off and it is never quit. The Finder is always kept.
+- Apps opened without a window, and apps that live in the menu bar, are left alone: an app is only quit after it was seen with a window. If an app might still have a window on another desktop, it is not quit.
+- Needs the Accessibility permission to see each app's windows.
+
 ## Project structure
 
 PasteRing is meant to grow into a set of macOS utilities, so code is grouped by area:
@@ -82,6 +91,10 @@ Sources/PasteRing/
   Settings/               the Settings window: sidebar, search, General pane
   Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons)
   Utilities/
+    AutoQuit/
+      AutoQuit.swift           owns the utility
+      Model/                   settings and the window watcher
+      Settings/                the Auto Quit settings pane
     ClipboardManager/
       ClipboardManager.swift   owns the utility; created and started by the app delegate
       Model/                   history, clipboard monitor, settings
