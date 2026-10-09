@@ -24,14 +24,23 @@ final class DragSnapper {
 
     private enum Mode { case undecided, moving, resizing }
 
-    /// A window sharing an edge with the one being resized, and which edge.
+    /// A window with edges on the lines being dragged.
     private struct Neighbour {
         let window: AXWindow
         let frame: NSRect
-        let edge: Edge
+        /// Its edges on the lines, and the line each is on.
+        let edges: [(edge: Edge, line: Line)]
     }
 
     private enum Edge { case left, right, top, bottom }
+
+    /// A vertical (x) or horizontal (y) line across the screen, where the dragged edge was.
+    private struct Line {
+        let isVertical: Bool
+        let position: CGFloat
+        /// Which edge of the dragged window lies on it.
+        let draggedEdge: Edge
+    }
 
     private let settings: WindowSnappingSettings
     private let snapper: (AXWindow, SnapAction, NSScreen, NSRect) -> Void
@@ -215,35 +224,46 @@ final class DragSnapper {
 
     // MARK: - Resizing together
 
+    /// Moves every window edge that lay on a line the resize moved, so windows tiled along
+    /// that line, on either side and anywhere along it, keep meeting there.
     private func resizeNeighbours(to frame: NSRect) {
         if neighbours == nil { neighbours = findNeighbours(movedTo: frame) }
         for neighbour in neighbours ?? [] {
             var rect = neighbour.frame
-            switch neighbour.edge {
-            case .right:
-                // The window's right edge moved; the neighbour on its right keeps its own right edge.
-                rect = NSRect(x: frame.maxX, y: rect.minY, width: neighbour.frame.maxX - frame.maxX, height: rect.height)
-            case .left:
-                rect.size.width = frame.minX - neighbour.frame.minX
-            case .top:
-                rect = NSRect(x: rect.minX, y: frame.maxY, width: rect.width, height: neighbour.frame.maxY - frame.maxY)
-            case .bottom:
-                rect.size.height = frame.minY - neighbour.frame.minY
+            for (edge, line) in neighbour.edges {
+                let position = self.position(of: line, in: frame)
+                switch edge {
+                case .left: rect = NSRect(x: position, y: rect.minY, width: rect.maxX - position, height: rect.height)
+                case .right: rect.size.width = position - rect.minX
+                case .bottom: rect = NSRect(x: rect.minX, y: position, width: rect.width, height: rect.maxY - position)
+                case .top: rect.size.height = position - rect.minY
+                }
             }
             guard rect.width >= Self.minimumNeighbourSize, rect.height >= Self.minimumNeighbourSize else { continue }
             neighbour.window.setFrame(rect)
         }
     }
 
-    /// Windows that shared each edge the resize moved, found once per drag.
+    /// Where the dragged window's edge that was on a line is now.
+    private func position(of line: Line, in frame: NSRect) -> CGFloat {
+        switch line.draggedEdge {
+        case .left: frame.minX
+        case .right: frame.maxX
+        case .bottom: frame.minY
+        case .top: frame.maxY
+        }
+    }
+
+    /// Every other window on the same screen with an edge on a line the resize moved, found
+    /// once per drag.
     private func findNeighbours(movedTo frame: NSRect) -> [Neighbour] {
         let tolerance = Self.sharedEdgeTolerance
-        var moved: [Edge] = []
-        if abs(frame.minX - startFrame.minX) > 0.5 { moved.append(.left) }
-        if abs(frame.maxX - startFrame.maxX) > 0.5 { moved.append(.right) }
-        if abs(frame.maxY - startFrame.maxY) > 0.5 { moved.append(.top) }
-        if abs(frame.minY - startFrame.minY) > 0.5 { moved.append(.bottom) }
-        guard !moved.isEmpty, let window else { return [] }
+        var lines: [Line] = []
+        if abs(frame.minX - startFrame.minX) > 0.5 { lines.append(Line(isVertical: true, position: startFrame.minX, draggedEdge: .left)) }
+        if abs(frame.maxX - startFrame.maxX) > 0.5 { lines.append(Line(isVertical: true, position: startFrame.maxX, draggedEdge: .right)) }
+        if abs(frame.minY - startFrame.minY) > 0.5 { lines.append(Line(isVertical: false, position: startFrame.minY, draggedEdge: .bottom)) }
+        if abs(frame.maxY - startFrame.maxY) > 0.5 { lines.append(Line(isVertical: false, position: startFrame.maxY, draggedEdge: .top)) }
+        guard !lines.isEmpty, let window, let screen = window.screen?.frame else { return [] }
 
         let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
         var found: [Neighbour] = []
@@ -255,19 +275,22 @@ final class DragSnapper {
             else { continue }
             let other = AXWindow.appKitRect(cgRect)
             if pid == window.pid, other == startFrame { continue }
-            let overlapsVertically = other.minY < startFrame.maxY - tolerance && other.maxY > startFrame.minY + tolerance
-            let overlapsHorizontally = other.minX < startFrame.maxX - tolerance && other.maxX > startFrame.minX + tolerance
-            for edge in moved {
-                let shares: Bool = switch edge {
-                case .right: overlapsVertically && abs(other.minX - startFrame.maxX) <= tolerance
-                case .left: overlapsVertically && abs(other.maxX - startFrame.minX) <= tolerance
-                case .top: overlapsHorizontally && abs(other.minY - startFrame.maxY) <= tolerance
-                case .bottom: overlapsHorizontally && abs(other.maxY - startFrame.minY) <= tolerance
-                }
-                if shares, let neighbour = AXWindow.of(pid: pid, matching: other) {
-                    found.append(Neighbour(window: neighbour, frame: other, edge: edge))
+            // Mostly on the same screen.
+            let shared = other.intersection(screen)
+            guard !shared.isNull, shared.width * shared.height > other.width * other.height / 2 else { continue }
+            var edges: [(edge: Edge, line: Line)] = []
+            for line in lines {
+                let near = { (value: CGFloat) in abs(value - line.position) <= tolerance }
+                if line.isVertical {
+                    if near(other.minX) { edges.append((.left, line)) }
+                    if near(other.maxX) { edges.append((.right, line)) }
+                } else {
+                    if near(other.minY) { edges.append((.bottom, line)) }
+                    if near(other.maxY) { edges.append((.top, line)) }
                 }
             }
+            guard !edges.isEmpty, let neighbour = AXWindow.of(pid: pid, matching: other) else { continue }
+            found.append(Neighbour(window: neighbour, frame: other, edges: edges))
         }
         return found
     }
@@ -287,3 +310,4 @@ private func dragSnapperCallback(
     }
     return Unmanaged.passUnretained(event)
 }
+
