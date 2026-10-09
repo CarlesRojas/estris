@@ -18,6 +18,10 @@ final class Remap {
     private var observers: Set<AnyCancellable> = []
     private var tap: CFMachPort?
     private var lastRefresh = Date.distantPast
+    /// The pointing device that last moved or clicked, for button presses that arrive without
+    /// their device (mouse utilities often resend side buttons that way).
+    private var lastPointer: InputDevice?
+    private var lastPointerCheck = Date.distantPast
 
     /// Whether the Event Viewer is on screen, so events are logged.
     var isViewing = false {
@@ -84,7 +88,7 @@ final class Remap {
     private func updateTap() {
         let needed = settings.isEnabled || isViewing || recording != nil
         if needed, tap == nil {
-            let types: [CGEventType] = [.keyDown, .keyUp, .flagsChanged, .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp]
+            let types: [CGEventType] = [.keyDown, .keyUp, .flagsChanged, .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp, .mouseMoved]
             var mask = types.reduce(CGEventMask(0)) { $0 | 1 << $1.rawValue }
             mask |= 1 << Self.systemDefined
             tap = CGEvent.tapCreate(
@@ -112,6 +116,16 @@ final class Remap {
             if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
             return true
         }
+        if type == .mouseMoved {
+            // Only to keep track of the mouse in use; checked now and then, as moves are many.
+            if Date().timeIntervalSince(lastPointerCheck) > 0.5 {
+                lastPointerCheck = Date()
+                if let sender = EventSource.sender(of: event), let device = devices.device(sender: sender) {
+                    lastPointer = device
+                }
+            }
+            return true
+        }
         guard let parsed = parse(type: type, event: event) else { return true }
 
         var device: InputDevice?
@@ -122,6 +136,13 @@ final class Remap {
                 lastRefresh = Date()
                 devices.refresh()
                 device = devices.device(sender: sender)
+            }
+        }
+        if case .mouseButton? = parsed.input {
+            if let device {
+                lastPointer = device
+            } else {
+                device = lastPointer
             }
         }
 

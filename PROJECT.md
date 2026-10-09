@@ -90,6 +90,7 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Everything else: an event tap that reads the sending device from the HID event inside each event (private `CGEventCopyIOHIDEvent` and `IOHIDEventGetSenderID`), swallows the original and posts the result.
   - Devices are identified by vendor, product and name, so mappings survive reconnects; identical devices share mappings.
   - Devices can be renamed (**Rename…** next to the Device menu); an empty name goes back to the original.
+  - Mouse buttons that arrive without their device (mouse utilities such as Logi Options+ resend side buttons that way) are credited to the pointing device that last moved or clicked.
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.
 
