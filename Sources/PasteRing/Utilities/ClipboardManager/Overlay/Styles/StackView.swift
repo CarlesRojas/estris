@@ -37,11 +37,11 @@ struct StackView: View {
             }
         }
         .frame(width: width + 120, height: height + 250)
-        // Just below the front card.
+        // Above the pile, clear of the cards peeking out behind the front one.
         .overlay {
             if let position = state.positionText {
                 PositionPill(text: position)
-                    .offset(y: height / 2 + 30)
+                    .offset(y: -height / 2 - (Self.peeks.last ?? 0) - 30)
             }
         }
         // No bounce, so the fade and slide read as one smooth motion.
