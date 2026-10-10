@@ -112,6 +112,12 @@ final class TapEngine {
 
     private static let teardown = DispatchQueue(label: "Estris.VolumeMixer.teardown", qos: .utility)
 
+    /// Whether any sound came through the tap: macOS only sends it with System Audio Recording
+    /// allowed, silence otherwise.
+    var hasHeardSound: Bool {
+        stats.pointee.peak > 0
+    }
+
     /// For the logs: the tap's format, the device's rate, and what the audio thread has seen.
     var diagnostics: String {
         var rate: Float64 = 0

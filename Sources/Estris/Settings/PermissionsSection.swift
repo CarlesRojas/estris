@@ -37,8 +37,24 @@ enum Permission {
         switch self {
         case .accessibility: AXIsProcessTrusted()
         case .screenRecording: CGPreflightScreenCaptureAccess()
-        case .systemAudioRecording: Self.privacyDatabase("kTCCServiceAudioCapture")
+        case .systemAudioRecording: Self.systemAudioRecordingGranted
         }
+    }
+
+    /// The privacy database often can't tell for System Audio Recording, even once it is
+    /// allowed in System Settings. Sound heard through a tap settles it: macOS only lets it
+    /// through when allowed.
+    private static var systemAudioRecordingGranted: Bool? {
+        let database = privacyDatabase("kTCCServiceAudioCapture")
+        if database == false { UserDefaults.standard.removeObject(forKey: heardSystemAudioKey) }
+        return database ?? (UserDefaults.standard.bool(forKey: heardSystemAudioKey) ? true : nil)
+    }
+
+    private static let heardSystemAudioKey = "heardSystemAudio"
+
+    /// Called when a tap carried sound, which proves System Audio Recording is allowed.
+    static func noteSystemAudioHeard() {
+        UserDefaults.standard.set(true, forKey: heardSystemAudioKey)
     }
 
     /// What the privacy database says, through `TCCAccessPreflight`: macOS has no public way to
@@ -125,7 +141,8 @@ struct PermissionsSection: View {
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                if use.permission.isGranted != true {
+                // Only when known to be missing: "can't tell" isn't "not allowed".
+                if use.permission.isGranted == false {
                     WarningLabel(use.without)
                 }
             }
