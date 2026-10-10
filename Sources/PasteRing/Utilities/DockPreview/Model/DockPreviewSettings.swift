@@ -43,14 +43,14 @@ final class DockPreviewSettings: ObservableObject {
         defaults.register(defaults: [
             Keys.size: Self.defaultSize,
             Keys.currentDesktopOnly: false,
-            Keys.openDelay: HoverDelay.ms100.rawValue,
+            Keys.openDelay: HoverDelay.immediately.rawValue,
             Keys.showsCloseButton: true,
             Keys.scrollSwitchesWindows: true,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         size = min(max(defaults.double(forKey: Keys.size), Self.sizes.lowerBound), Self.sizes.upperBound)
         currentDesktopOnly = defaults.bool(forKey: Keys.currentDesktopOnly)
-        openDelay = HoverDelay(rawValue: defaults.integer(forKey: Keys.openDelay)) ?? .ms100
+        openDelay = HoverDelay(rawValue: defaults.integer(forKey: Keys.openDelay)) ?? .immediately
         showsCloseButton = defaults.bool(forKey: Keys.showsCloseButton)
         scrollSwitchesWindows = defaults.bool(forKey: Keys.scrollSwitchesWindows)
     }
@@ -59,7 +59,7 @@ final class DockPreviewSettings: ObservableObject {
     func reset() {
         size = Self.defaultSize
         currentDesktopOnly = false
-        openDelay = .ms100
+        openDelay = .immediately
         showsCloseButton = true
         scrollSwitchesWindows = true
     }
