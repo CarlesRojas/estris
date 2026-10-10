@@ -56,7 +56,7 @@ Clicking the menu bar icon opens a menu below it in the clipboard overlay's defa
 
 **Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Its **Volume Mixer** section picks what the menu shows of it, all on by default: **Show System**, **Show Apps**, **Show device pickers** and **Show volume percentages**. **Reset to Defaults** goes back to PasteRing's icon and turns them all on.
 
-Device pickers are the same width everywhere (Settings and the menu), whatever the device names; long names are cut short.
+Device pickers look the same everywhere (Settings and the menu): the device's name with up-down arrows and no background until the pointer is over them, aligned to the right edge whatever the name's length, long names cut short. The System rows show a coloured tile where an app row has the app's icon (blue for Output, orange for Microphone), so it doesn't look like the mute button below it.
 
 ## Developer settings
 

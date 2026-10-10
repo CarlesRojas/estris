@@ -80,19 +80,10 @@ struct AppSoundRow: View {
                         .frame(width: 20, height: 20)
                 }
                 Text(verbatim: app.name)
-                Spacer()
+                    .lineLimit(1)
+                Spacer(minLength: 8)
                 if showsDevice {
-                    Picker("Output", selection: Binding(get: { sound.outputUID }, set: { mixer.setOutput($0, of: app) })) {
-                        Text("Same as System").tag(String?.none)
-                        ForEach(devices) { device in
-                            Text(verbatim: device.name).tag(Optional(device.uid))
-                        }
-                        if let uid = sound.outputUID, !devices.contains(where: { $0.uid == uid }) {
-                            Text("\(sound.outputName ?? uid) (not connected)").tag(Optional(uid))
-                        }
-                    }
-                    .labelsHidden()
-                    .devicePickerWidth()
+                    DeviceMenu(options: outputOptions, selection: sound.outputUID) { mixer.setOutput($0, of: app) }
                 }
             }
             HStack(spacing: 8) {
@@ -119,6 +110,16 @@ struct AppSoundRow: View {
         }
         .padding(.vertical, 2)
     }
+
+    /// The system output, each device, and the chosen one while it isn't connected.
+    private var outputOptions: [DeviceOption<String?>] {
+        var options = [DeviceOption<String?>(id: nil, name: String(localized: "Same as System"))]
+        options += devices.map { DeviceOption(id: $0.uid, name: $0.name) }
+        if let uid = sound.outputUID, !devices.contains(where: { $0.uid == uid }) {
+            options.append(DeviceOption(id: uid, name: String(localized: "\(sound.outputName ?? uid) (not connected)")))
+        }
+        return options
+    }
 }
 
 /// The Mac's output and microphone, one row each, laid out like an app's row. Used in Settings
@@ -131,7 +132,7 @@ struct SystemSoundRows: View {
 
     var body: some View {
         SystemSoundRow(
-            title: "Output", icon: "hifispeaker",
+            title: "Output", icon: "hifispeaker.fill", tint: .blue,
             devices: state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
             volume: state.outputVolume, isMuted: state.outputMuted,
             symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
@@ -139,7 +140,7 @@ struct SystemSoundRows: View {
             showsDevice: showsDevice, showsPercentage: showsPercentage
         )
         SystemSoundRow(
-            title: "Microphone", icon: "mic",
+            title: "Microphone", icon: "music.mic", tint: .orange,
             devices: state.inputDevices, selection: state.input, select: mixer.setInputDevice,
             volume: state.inputVolume, isMuted: state.inputMuted,
             symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
@@ -154,6 +155,7 @@ struct SystemSoundRows: View {
 private struct SystemSoundRow: View {
     let title: LocalizedStringKey
     let icon: String
+    let tint: Color
     let devices: [AudioDevice]
     let selection: AudioObjectID?
     let select: (AudioObjectID) -> Void
@@ -169,20 +171,20 @@ private struct SystemSoundRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
-                // Where an app row has the app's icon and name.
-                Image(systemName: icon)
-                    .font(.system(size: 14))
+                // Where an app row has the app's icon: a coloured tile, so it doesn't read as
+                // the mute button below it.
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .fill(tint.gradient)
                     .frame(width: 20, height: 20)
-                Text(title)
-                Spacer()
-                if showsDevice {
-                    Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
-                        ForEach(devices) { device in
-                            Text(verbatim: device.name).tag(device.id)
-                        }
+                    .overlay {
+                        Image(systemName: icon)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.white)
                     }
-                    .labelsHidden()
-                    .devicePickerWidth()
+                Text(title)
+                Spacer(minLength: 8)
+                if showsDevice {
+                    DeviceMenu(options: devices.map { DeviceOption(id: $0.id, name: $0.name) }, selection: selection, select: select)
                 }
             }
             HStack(spacing: 8) {
@@ -210,9 +212,57 @@ private struct SystemSoundRow: View {
     }
 }
 
-extension View {
-    /// Every device picker the same width, whatever the device names; long ones are cut short.
-    func devicePickerWidth() -> some View {
-        frame(width: 170)
+struct DeviceOption<ID: Hashable>: Identifiable {
+    let id: ID
+    let name: String
+}
+
+/// Picks a device: its name and up-down arrows with no background until the pointer is over
+/// it, hugging the right edge whatever the name's length (long names are cut short). The same
+/// in Settings and the menu bar menu.
+struct DeviceMenu<ID: Hashable>: View {
+    let options: [DeviceOption<ID>]
+    let selection: ID?
+    let select: (ID) -> Void
+    @State private var isHovered = false
+
+    var body: some View {
+        // Volume Mixer runs on macOS 14.4 or later only.
+        if #available(macOS 14, *) {
+            Menu {
+                ForEach(options) { option in
+                    Button {
+                        select(option.id)
+                    } label: {
+                        if option.id == selection {
+                            Label(option.name, systemImage: "checkmark")
+                        } else {
+                            Text(verbatim: option.name)
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text(verbatim: options.first { $0.id == selection }?.name ?? "")
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 9, weight: .semibold))
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        .fill(Color.primary.opacity(isHovered ? 0.1 : 0))
+                )
+                .contentShape(Rectangle())
+            }
+            .menuStyle(.button)
+            .buttonStyle(.plain)
+            .menuIndicator(.hidden)
+            .onHover { isHovered = $0 }
+            // At most this wide, right-aligned in it.
+            .frame(maxWidth: 200, alignment: .trailing)
+        }
     }
 }
