@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Keep Awake, Color Picker and Volume Mixer.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Focus Follows Mouse, Keep Awake, Color Picker and Volume Mixer.
 
 ## Usage
 
@@ -17,7 +17,7 @@ History is saved in `~/Library/Application Support/PasteRing` (readable by your 
 
 ## Settings
 
-Open **Settings** from the menu bar menu. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
+Open **Settings** from the menu bar menu. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
 
 Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
@@ -141,6 +141,16 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
   - If the app won't get as small as the space, the window gets the usual snap and the app's minimum is remembered, so later previews for it show the usual snap.
 - Works through the Accessibility permission (frames of other apps' windows) and a listen-only event tap, which also sees drags of PasteRing's own windows; those are moved directly. macOS's own "Drag windows to screen edges to tile" (System Settings > Desktop & Dock) does something similar and should be off to avoid both acting.
 
+## Focus Follows Mouse
+
+The window under the pointer comes to the front and its app becomes active, without clicking. Off by default; turn it on in **Settings > Focus Follows Mouse**.
+
+- **Focus after hovering for**: **Immediately**, or 100 (default), 250, 500 or 1000 ms. The delay counts while the pointer stays over the same window moving slowly or resting, without having to stop; moving fast (over **Skip windows when moving faster than**, 200 to 3000 points per second, default 800, smoothed over the last moves) or entering another window starts it again, so windows crossed on the way stay where they are. Immediately focuses a window as soon as the pointer is over it moving slowly.
+- Nothing happens while a mouse button or a modifier key is held (dragging, clicking, a shortcut), over menus, the Dock, the menu bar, the desktop or anything else that isn't a normal window (window layer 0), over PasteRing's panels (menu, overlay, pills), while a sheet or modal dialog of the app in front is open, or when switching desktops.
+- The window is raised (Accessibility `AXRaise` and `AXMain`) and its app activated. PasteRing's own titled windows (Settings) are brought forward too. The pointer is read with a listen-only event tap, which unlike a global event monitor also sees moves over PasteRing's windows. Focusing without raising would need private window server calls, so it always raises.
+- **Excluded Apps** tab: apps whose windows are never focused by hovering.
+- Each focus is logged under **Developer > Logs**.
+
 ## Keep Awake
 
 Keeps the Mac and its display awake until it has been idle for a chosen time, then starts the screen saver or puts it to sleep. Turn it on with the switch in **Settings > Keep Awake**; it stays on until turned off.
@@ -211,6 +221,10 @@ Sources/PasteRing/
       VolumeMixer.swift        owns the utility: devices, app list, one tap engine per changed app
       Model/                   settings, CoreAudio helpers and listeners, app list, tap engine
       Settings/                the Volume Mixer pane
+    FocusFollowsMouse/
+      FocusFollowsMouse.swift  owns the utility: pointer monitor, speed-aware delay, raising the window under it
+      Model/                   settings
+      Settings/                the Focus Follows Mouse pane
     KeepAwake/
       KeepAwake.swift          owns the utility: power assertion and timer
       Model/                   settings, status, power source
