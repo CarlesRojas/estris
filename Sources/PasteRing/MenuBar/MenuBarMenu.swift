@@ -84,7 +84,7 @@ struct MenuBarMenu: View {
         }
         .padding(Self.padding)
         .frame(width: Self.width)
-        // Darker than the overlay's surface, so each group's lighter box stands out.
+        // Apart from the overlay's surface, so each group's box stands out.
         .background(Self.menuShade, in: RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
         .surface(cornerRadius: Self.cornerRadius)
     }
@@ -96,12 +96,17 @@ struct MenuBarMenu: View {
     /// Concentric with the capsule buttons at the bottom, and the groups with the menu.
     private static let cornerRadius: CGFloat = buttonHeight / 2 + padding
     private static let groupRadius: CGFloat = cornerRadius - padding
-    private static let menuShade = Color.black.opacity(0.18)
-    /// White on light menus, a grey above the menu on dark ones.
+    /// Dark mode: the menu darker and its groups a lighter grey. Light mode the other way
+    /// round: the menu almost white and its groups a light grey.
+    private static let menuShade = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            ? NSColor.black.withAlphaComponent(0.18)
+            : NSColor.white.withAlphaComponent(0.8)
+    })
     private static let groupFill = Color(nsColor: NSColor(name: nil) { appearance in
         appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
             ? NSColor.white.withAlphaComponent(0.08)
-            : NSColor.white.withAlphaComponent(0.55)
+            : NSColor.black.withAlphaComponent(0.05)
     })
 
     /// One utility's part of the menu, in its own lighter box, concentric with the menu.
