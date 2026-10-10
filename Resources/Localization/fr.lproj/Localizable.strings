@@ -147,6 +147,7 @@
 "Key %@" = "Touche %@";
 "key code %@" = "code de touche %@";
 "Key code %@" = "Code de touche %@";
+"Keyboard & Mouse" = "Clavier et souris";
 "Keyboard Backlight Toggle" = "Activer ou désactiver le rétroéclairage";
 "Keyboard Brightness Down" = "Baisser la luminosité du clavier";
 "Keyboard Brightness Up" = "Augmenter la luminosité du clavier";
@@ -316,6 +317,7 @@
 "Time format" = "Format de l’heure";
 "Tint" = "Teinte";
 "Tint strength" = "Intensité de la teinte";
+"Tools" = "Outils";
 "Top edge: maximize" = "Bord supérieur : agrandir";
 "Top Half" = "Moitié supérieure";
 "Top Left" = "En haut à gauche";
@@ -339,4 +341,5 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Désactivé, l’historique garde l’ordre de copie et ⌘V continue de coller le dernier texte copié.";
 "Width" = "Largeur";
 "Window Snapping" = "Ancrage des fenêtres";
+"Windows & Apps" = "Fenêtres et apps";
 "§ (Section)" = "§ (Paragraphe)";

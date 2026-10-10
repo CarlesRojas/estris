@@ -81,6 +81,36 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     }
 }
 
+/// The sidebar's groups, in order: General (and Developer) on their own under the search
+/// field, then the utilities by what they work on.
+enum SettingsGroup: CaseIterable, Identifiable {
+    case app
+    case tools
+    case windows
+    case input
+
+    var id: Self { self }
+
+    /// Shown small and faint above the group; none for the first.
+    var title: String? {
+        switch self {
+        case .app: nil
+        case .tools: String(localized: "Tools")
+        case .windows: String(localized: "Windows & Apps")
+        case .input: String(localized: "Keyboard & Mouse")
+        }
+    }
+
+    var panes: [SettingsPane] {
+        switch self {
+        case .app: [.general, .developer]
+        case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake]
+        case .windows: [.windowSnapping, .autoQuit]
+        case .input: [.remap, .middleClick]
+        }
+    }
+}
+
 /// What the Settings window is showing, shared by the sidebar and the detail column.
 @MainActor
 final class SettingsNavigation: ObservableObject {
@@ -111,8 +141,13 @@ final class SettingsNavigation: ObservableObject {
         }
     }
 
+    /// Every pane shown, in sidebar order.
     var panes: [SettingsPane] {
-        SettingsPane.allCases.filter { pane in
+        SettingsGroup.allCases.flatMap(panes(in:))
+    }
+
+    func panes(in group: SettingsGroup) -> [SettingsPane] {
+        group.panes.filter { pane in
             (pane != .developer || general.showsDeveloperSettings)
                 && (pane != .volumeMixer || VolumeMixer.isSupported)
                 && pane.matches(search)
@@ -120,9 +155,9 @@ final class SettingsNavigation: ObservableObject {
     }
 }
 
-/// The Settings sidebar: a search field and one row per pane, each utility showing whether
-/// it is on. To add a utility, add a `SettingsPane` case, report its state in `isOn(_:)`
-/// and show its pane in `SettingsDetail`.
+/// The Settings sidebar: a search field and one row per pane, grouped, each utility showing
+/// whether it is on. To add a utility, add a `SettingsPane` case, put it in a `SettingsGroup`,
+/// report its state in `isOn(_:)` and show its pane in `SettingsDetail`.
 struct SettingsSidebar: View {
     @ObservedObject var navigation: SettingsNavigation
     @ObservedObject var clipboardSettings: ClipboardSettings
@@ -140,12 +175,34 @@ struct SettingsSidebar: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
 
-            List(navigation.panes, selection: $navigation.selection) { pane in
-                SidebarRow(pane: pane, isOn: isOn(pane), isSelected: navigation.selection == pane)
-                    // Typing a letter would otherwise jump to the pane starting with it.
-                    .background(TypeSelectDisabler())
+            List(selection: $navigation.selection) {
+                ForEach(SettingsGroup.allCases) { group in
+                    let panes = navigation.panes(in: group)
+                    if let title = group.title {
+                        // A search that hides every pane of a group hides its title too.
+                        if !panes.isEmpty {
+                            Section {
+                                rows(panes)
+                            } header: {
+                                Text(title)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    } else {
+                        rows(panes)
+                    }
+                }
             }
             .listStyle(.sidebar)
+        }
+    }
+
+    private func rows(_ panes: [SettingsPane]) -> some View {
+        ForEach(panes) { pane in
+            SidebarRow(pane: pane, isOn: isOn(pane), isSelected: navigation.selection == pane)
+                // Typing a letter would otherwise jump to the pane starting with it.
+                .background(TypeSelectDisabler())
         }
     }
 
