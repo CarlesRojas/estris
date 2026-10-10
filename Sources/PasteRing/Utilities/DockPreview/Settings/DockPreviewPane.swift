@@ -41,6 +41,7 @@ struct DockPreviewPane: View {
                     }
                     Toggle("Show only windows on the current desktop", isOn: $settings.currentDesktopOnly)
                     Toggle("Show a button to close each window", isOn: $settings.showsCloseButton)
+                    Toggle("Switch windows with the scroll wheel", isOn: $settings.scrollSwitchesWindows)
                 }
                 Section {
                     Button("Reset to Defaults") { settings.reset() }

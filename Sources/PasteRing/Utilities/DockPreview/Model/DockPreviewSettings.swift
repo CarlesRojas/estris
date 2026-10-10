@@ -28,6 +28,11 @@ final class DockPreviewSettings: ObservableObject {
         didSet { defaults.set(openDelay.rawValue, forKey: Keys.openDelay) }
     }
 
+    /// While the panel shows, the scroll wheel brings one window after another forward.
+    @Published var scrollSwitchesWindows: Bool {
+        didSet { defaults.set(scrollSwitchesWindows, forKey: Keys.scrollSwitchesWindows) }
+    }
+
     /// A × on each preview that closes its window.
     @Published var showsCloseButton: Bool {
         didSet { defaults.set(showsCloseButton, forKey: Keys.showsCloseButton) }
@@ -40,12 +45,14 @@ final class DockPreviewSettings: ObservableObject {
             Keys.currentDesktopOnly: false,
             Keys.openDelay: HoverDelay.ms100.rawValue,
             Keys.showsCloseButton: true,
+            Keys.scrollSwitchesWindows: true,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         size = min(max(defaults.double(forKey: Keys.size), Self.sizes.lowerBound), Self.sizes.upperBound)
         currentDesktopOnly = defaults.bool(forKey: Keys.currentDesktopOnly)
         openDelay = HoverDelay(rawValue: defaults.integer(forKey: Keys.openDelay)) ?? .ms100
         showsCloseButton = defaults.bool(forKey: Keys.showsCloseButton)
+        scrollSwitchesWindows = defaults.bool(forKey: Keys.scrollSwitchesWindows)
     }
 
     /// Back to the default size, delay and switches; the on/off switch stays.
@@ -54,6 +61,7 @@ final class DockPreviewSettings: ObservableObject {
         currentDesktopOnly = false
         openDelay = .ms100
         showsCloseButton = true
+        scrollSwitchesWindows = true
     }
 
     private enum Keys {
@@ -62,5 +70,6 @@ final class DockPreviewSettings: ObservableObject {
         static let currentDesktopOnly = "dockPreviewCurrentDesktopOnly"
         static let openDelay = "dockPreviewOpenDelay"
         static let showsCloseButton = "dockPreviewShowsCloseButton"
+        static let scrollSwitchesWindows = "dockPreviewScrollSwitchesWindows"
     }
 }

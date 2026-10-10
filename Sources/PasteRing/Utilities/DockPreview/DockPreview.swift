@@ -302,6 +302,8 @@ final class DockPreview {
         guard shown != nil, !state.windows.isEmpty else { return false }
         switch type {
         case .scrollWheel:
+            // Off: the scroll goes on to the app underneath.
+            guard settings.scrollSwitchesWindows else { return false }
             let isTrackpad = event.getIntegerValueField(.scrollWheelEventIsContinuous) != 0
             let vertical = event.getDoubleValueField(isTrackpad ? .scrollWheelEventPointDeltaAxis1 : .scrollWheelEventDeltaAxis1)
             let horizontal = event.getDoubleValueField(isTrackpad ? .scrollWheelEventPointDeltaAxis2 : .scrollWheelEventDeltaAxis2)
