@@ -16,6 +16,9 @@ struct ColorPickerPane: View {
             )
 
             Form {
+                PermissionsSection(uses: [
+                    PermissionUse(permission: .screenRecording, reason: "Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it."),
+                ])
                 Section("Shortcut") {
                     LabeledContent("Pick a color") {
                         ShortcutRecorder(shortcut: $settings.shortcut)

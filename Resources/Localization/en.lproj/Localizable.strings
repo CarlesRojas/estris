@@ -236,6 +236,7 @@
 "Open at login" = "Open at login";
 "Open overlay" = "Open overlay";
 "Open System Settings" = "Open System Settings";
+"Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it." = "Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it.";
 "Other" = "Other";
 "Other source" = "Other source";
 "Output" = "Output";

@@ -236,6 +236,7 @@
 "Open at login" = "Obre en iniciar la sessió";
 "Open overlay" = "Obre el tauler";
 "Open System Settings" = "Obre Configuració del Sistema";
+"Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it." = "Opcional, només per a això: mostrar el color i el seu valor sota la lupa mentre mous el punter. Triar i copiar funcionen sense.";
 "Other" = "Altres";
 "Other source" = "Una altra font";
 "Output" = "Sortida";

@@ -105,7 +105,11 @@ struct PermissionsSection: View {
                     .foregroundStyle(.green)
                     .labelStyle(.titleAndIcon)
             } else {
-                Button("Open System Settings") { NSWorkspace.shared.open(use.permission.settingsURL) }
+                Button("Open System Settings") {
+                    // macOS only lists an app under Screen Recording once it has asked.
+                    if use.permission == .screenRecording { CGRequestScreenCaptureAccess() }
+                    NSWorkspace.shared.open(use.permission.settingsURL)
+                }
             }
         }
         .padding(.vertical, 2)

@@ -236,6 +236,7 @@
 "Open at login" = "Abrir al iniciar sesión";
 "Open overlay" = "Abrir el panel";
 "Open System Settings" = "Abrir Ajustes del Sistema";
+"Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it." = "Opcional, solo para esto: mostrar el color y su valor bajo la lupa mientras mueves el puntero. Elegir y copiar funcionan sin él.";
 "Other" = "Otras";
 "Other source" = "Otra fuente";
 "Output" = "Salida";
