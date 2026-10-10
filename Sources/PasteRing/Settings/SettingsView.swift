@@ -5,6 +5,7 @@ import SwiftUI
 /// One entry in the settings sidebar: the app-wide General pane, then one per utility.
 enum SettingsPane: String, CaseIterable, Identifiable {
     case general
+    case menuBar
     case clipboard
     case autoQuit
     case middleClick
@@ -21,6 +22,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .general: String(localized: "General")
+        case .menuBar: String(localized: "Menu Bar")
         case .clipboard: String(localized: "Clipboard")
         case .autoQuit: String(localized: "Auto Quit")
         case .middleClick: String(localized: "Middle Click")
@@ -36,6 +38,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .general: "gearshape"
+        case .menuBar: "menubar.rectangle"
         case .clipboard: "list.clipboard"
         case .autoQuit: "xmark.app"
         case .middleClick: "hand.tap"
@@ -53,6 +56,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         switch self {
         case .general:
             ["login", "startup", "language", "accessibility", "permission", "date", "time", "format", "version", "about"]
+        case .menuBar:
+            ["menu bar", "icon", "status", "symbol", "quit"]
         case .developer:
             ["logs", "debug", "developer", "diagnostics"]
         case .autoQuit:
@@ -81,7 +86,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     }
 }
 
-/// The sidebar's groups, in order: General (and Developer) on their own under the search
+/// The sidebar's groups, in order: General, Menu Bar (and Developer) on their own under the search
 /// field, then the utilities by what they work on.
 enum SettingsGroup: CaseIterable, Identifiable {
     case app
@@ -103,7 +108,7 @@ enum SettingsGroup: CaseIterable, Identifiable {
 
     var panes: [SettingsPane] {
         switch self {
-        case .app: [.general, .developer]
+        case .app: [.general, .menuBar, .developer]
         case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake]
         case .windows: [.windowSnapping, .autoQuit]
         case .input: [.remap, .middleClick]
@@ -209,7 +214,7 @@ struct SettingsSidebar: View {
     /// Whether a utility is switched on; nil for panes that are not a utility.
     private func isOn(_ pane: SettingsPane) -> Bool? {
         switch pane {
-        case .general: nil
+        case .general, .menuBar: nil
         case .clipboard: clipboardSettings.isEnabled
         case .autoQuit: autoQuitSettings.isEnabled
         case .middleClick: middleClickSettings.isEnabled
@@ -244,6 +249,8 @@ struct SettingsDetail: View {
                 switch navigation.selection ?? .general {
                 case .general:
                     GeneralPane(general: general)
+                case .menuBar:
+                    MenuBarPane(general: general)
                 case .clipboard:
                     clipboard.settingsPane()
                 case .autoQuit:

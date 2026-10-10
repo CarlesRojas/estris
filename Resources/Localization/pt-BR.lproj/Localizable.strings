@@ -75,10 +75,10 @@
 "Center Third" = "Terço central";
 "Center Two Thirds" = "Dois terços centrais";
 "Change what keys and mouse buttons do, per device." = "Altere o que as teclas e os botões do mouse fazem, por dispositivo.";
+"Choose the icon PasteRing shows in the menu bar." = "Escolha o ícone que o PasteRing mostra na barra de menus.";
 "Choose…" = "Escolher…";
 "Clear" = "Limpar";
 "Clear All" = "Limpar tudo";
-"Clear Clipboard History" = "Limpar Histórico da Área de Transferência";
 "Click to change" = "Clique para alterar";
 "Clipboard" = "Área de Transferência";
 "Clipboard history is empty" = "O histórico da Área de Transferência está vazio";
@@ -133,6 +133,7 @@
 "Hide Developer Settings" = "Ocultar ajustes de desenvolvedor";
 "History" = "Histórico";
 "Home" = "Início";
+"Icon" = "Ícone";
 "Ignore passwords" = "Ignorar senhas";
 "Immediately" = "Imediatamente";
 "Inactive" = "Inativo";
@@ -177,6 +178,7 @@
 "Maximize" = "Maximizar";
 "Media" = "Mídia";
 "Menu" = "Menu";
+"Menu Bar" = "Barra de menus";
 "Microphone" = "Microfone";
 "Middle Button" = "Botão do meio";
 "Middle Click" = "Clique do meio";
@@ -235,7 +237,6 @@
 "Print Screen" = "Print Screen";
 "process %d" = "processo %d";
 "Quit" = "Encerrar";
-"Quit PasteRing" = "Encerrar PasteRing";
 "Quits an app when you close its last window." = "Encerra um app quando você fecha a última janela dele.";
 "Record from %@" = "Gravar de %@";
 "Record images" = "Guardar imagens";
@@ -276,7 +277,6 @@
 "Selected highlight" = "Destaque da seleção";
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajuste o volume e o dispositivo do som e do microfone do seu Mac, e de cada app.";
 "Settings" = "Ajustes";
-"Settings…" = "Ajustes…";
 "Shadow" = "Sombra";
 "Shortcut" = "Atalho";
 "Shortcuts" = "Atalhos";

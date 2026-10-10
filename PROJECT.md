@@ -17,7 +17,7 @@ History is saved in `~/Library/Application Support/PasteRing` (readable by your 
 
 ## Settings
 
-Open **Settings…** from the menu bar icon. The sidebar (with search) has **General** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
+Open **Settings** from the menu bar menu. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
 
 Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
@@ -50,16 +50,22 @@ Every pane but General, Remap and Developer ends with **Reset to Defaults**, whi
 
 Every entry in the overlay shows when it was copied next to its trash icon, in the date and time format chosen in General.
 
+## Menu bar
+
+Clicking the menu bar icon opens a menu below it in the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings). It shows the Volume Mixer while that is on (the same System and Apps rows as its pane), then **Settings** and **Quit** side by side at the bottom. A click outside, Esc or another click on the icon closes it.
+
+**Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. **Reset to Defaults** goes back to PasteRing's icon.
+
 ## Developer settings
 
-Click the version in **Settings… > General > About** six times to add a **Developer** pane to the sidebar:
+Click the version in **Settings > General > About** six times to add a **Developer** pane to the sidebar:
 
 - **Logs**: what the utilities noticed and decided (newest first, searchable), with **Copy All** for bug reports and **Clear**.
 - **Settings**: status details and settings regular users don't need, including **Hide Developer Settings**.
 
 ## Auto Quit
 
-Quits an app when you close its last window, the way apps on iPad and many Windows apps behave. Off by default; turn it on in **Settings… > Auto Quit**.
+Quits an app when you close its last window, the way apps on iPad and many Windows apps behave. Off by default; turn it on in **Settings > Auto Quit**.
 
 - **Quit**: immediately, or after 1, 5 or 30 seconds (default 1 second) with no windows.
 - **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: it is never quit. The Finder is always excluded.
@@ -70,7 +76,7 @@ Quits an app when you close its last window, the way apps on iPad and many Windo
 
 ## Middle Click
 
-Middle click from the trackpad, which macOS doesn't offer. Off by default; turn it on in **Settings… > Middle Click**.
+Middle click from the trackpad, which macOS doesn't offer. Off by default; turn it on in **Settings > Middle Click**.
 
 - **Tap with**: three fingers (default) or four. A quick tap with the fingers held still clicks the middle button where the pointer is.
 - **Excluded Apps**: every installed app with a switch, all off. Switch an app on to exclude it: tapping while it is in front does nothing.
@@ -79,7 +85,7 @@ Middle click from the trackpad, which macOS doesn't offer. Off by default; turn 
 
 ## Remap
 
-Changes what keys and mouse buttons do, per device. Off by default; turn it on in **Settings… > Remap**.
+Changes what keys and mouse buttons do, per device. Off by default; turn it on in **Settings > Remap**.
 
 - **Mappings**: every device (connected keyboards, mice and trackpads, and disconnected ones that still have mappings) is its own group, "<name> Mappings", all on one page; the pencil next to the title renames it. One group per physical device. Any key or button a device sends can be remapped on its entry; whether it looks like a keyboard or a mouse only picks its icon and which inputs the picker lists first. **Add Mapping** (the button at the right under each group) adds an empty row to it; rows with both sides still empty are dropped when the page is left or the app relaunches; each row's source and result are buttons that open a picker, so adding and editing work the same. A row missing either side does nothing.
   - Source: any key or mouse button except the left one. **Record** captures the next key or button pressed on that device; or pick from a searchable, sectioned list.
@@ -99,7 +105,7 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
 
 ## Window Snapping
 
-Moves the front window to halves, corners, thirds or the whole screen. Off by default; turn it on in **Settings… > Window Snapping**.
+Moves the front window to halves, corners, thirds or the whole screen. Off by default; turn it on in **Settings > Window Snapping**.
 
 - The pane is one page: Dragging, Gestures and Shortcuts sections, and **Reset to Defaults** (dragging, edge area, resizing together, filling space and gestures; not the on/off switch).
 - **Shortcuts** (all ⌃⌥, fixed, listed in the Shortcuts section): ← → ↑ ↓ halves; U, I, J, K top left, top right, bottom left, bottom right; ↩ maximize; D, F, G left, center, right third; E, R, T left, center and right two thirds; C center; ⌫ restore (the frame before the window was first snapped, or before it was last moved by hand and snapped again).
@@ -123,7 +129,7 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
 
 ## Keep Awake
 
-Keeps the Mac and its display awake until it has been idle for a chosen time, then starts the screen saver or puts it to sleep. Turn it on with the switch in **Settings… > Keep Awake**; it stays on until turned off.
+Keeps the Mac and its display awake until it has been idle for a chosen time, then starts the screen saver or puts it to sleep. Turn it on with the switch in **Settings > Keep Awake**; it stays on until turned off.
 
 - **Sleep after being idle for**, separately **On power adapter** (default Indefinitely) and **On battery** (default 1 hour): Don't keep awake, 15 or 30 minutes, 1, 2, 4 or 8 hours, or Indefinitely.
 - Idle means no mouse, keyboard or trackpad input (the system's HID idle time) and no other app keeping the display on (as video players do while playing). Any of those starts the count again.
@@ -134,7 +140,7 @@ Keeps the Mac and its display awake until it has been idle for a chosen time, th
 
 ## Color Picker
 
-Picks a color anywhere on screen with a shortcut and copies it. Off by default; turn it on in **Settings… > Color Picker**.
+Picks a color anywhere on screen with a shortcut and copies it. Off by default; turn it on in **Settings > Color Picker**.
 
 - **Shortcut** (default ⇧⌘C, which browsers also use for Inspect Element) shows macOS's color sampler (`NSColorSampler`): a loupe by the pointer with the color and pixels under it. Click picks, Esc cancels. No extra permission needed; a live value while moving would need Screen Recording, so there is none.
 - **Copy as**: Hex (`#FF8000`, with **Include # prefix**, on by default), RGB (`rgb(255, 128, 0)`), HSL (`hsl(30, 100%, 50%)`) or SwiftUI (`Color(red: 1.000, green: 0.502, blue: 0.000)`), in sRGB. An example shows the chosen format.
@@ -142,7 +148,7 @@ Picks a color anywhere on screen with a shortcut and copies it. Off by default; 
 
 ## Volume Mixer
 
-Sets the volume and device of the Mac's sound and microphone, and of each app. Needs macOS 14.4 or later; on older versions its pane is hidden and it never starts. Off by default; turn it on in **Settings… > Volume Mixer**. Everything follows changes made elsewhere (menu bar, System Settings, keyboard) live, through CoreAudio listeners.
+Sets the volume and device of the Mac's sound and microphone, and of each app. Needs macOS 14.4 or later; on older versions its pane is hidden and it never starts. Off by default; turn it on in **Settings > Volume Mixer**. Everything follows changes made elsewhere (menu bar, System Settings, keyboard) live, through CoreAudio listeners.
 
 - **System**: two rows, **Output** and **Microphone**, each with an icon and its title where an app row has the app's icon and name: the device in use (sets the system default, which every app uses unless it picked its own device) at the top right, and below it a mute button, the volume across the width and its percentage, laid out like an app row. Each control is disabled when the device doesn't support it.
 - **Apps**: every app heard playing since the mixer started, while it is running, plus any app with changed settings (helper processes, like a browser's audio process, count as their app). Each has an output device (**Same as System** by default; a device that isn't connected shows "(not connected)" and the app falls back to the system output until it is), a mute button and a volume slider from 0% to 200%. The slider starts in the middle, 100%, where the app plays as it is, and snaps there when close.
@@ -162,9 +168,10 @@ PasteRing is meant to grow into a set of macOS utilities, so code is grouped by 
 
 ```
 Sources/PasteRing/
-  App/                    entry point, app delegate (menu bar item, Settings window)
+  App/                    entry point, app delegate (creates the utilities, Settings window)
+  MenuBar/                the menu bar item: icon choices, the frosted menu and its panel
   General/                settings shared by every utility (language, date and time format)
-  Settings/               the Settings window: sidebar, search, General pane
+  Settings/               the Settings window: sidebar, search, General and Menu Bar panes
   Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher, localization, relaunch)
   Utilities/
     AutoQuit/
@@ -204,7 +211,7 @@ Sources/PasteRing/
       Settings/                the Clipboard Manager settings pane and its tabs
 ```
 
-To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting, optional `menuItems()` and a `settingsPane()` that begins with `UtilityHeader`), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
+To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting and a `settingsPane()` that begins with `UtilityHeader`), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
 
 ## Notes
 

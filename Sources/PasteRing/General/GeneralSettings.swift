@@ -101,6 +101,11 @@ final class GeneralSettings: ObservableObject {
         didSet { defaults.set(timeStyle.rawValue, forKey: Keys.timeStyle) }
     }
 
+    /// The menu bar icon, one of `MenuBarIcon.all`.
+    @Published var menuBarIcon: String {
+        didSet { defaults.set(menuBarIcon, forKey: Keys.menuBarIcon) }
+    }
+
     /// Unlocked by clicking the version in General > About six times.
     @Published var showsDeveloperSettings: Bool {
         didSet { defaults.set(showsDeveloperSettings, forKey: Keys.showsDeveloperSettings) }
@@ -114,6 +119,7 @@ final class GeneralSettings: ObservableObject {
         dateStyle = DateStyle(rawValue: defaults.string(forKey: Keys.dateStyle) ?? "") ?? .monthDay
         timeStyle = TimeStyle(rawValue: defaults.string(forKey: Keys.timeStyle) ?? "") ?? .system
         showsDeveloperSettings = defaults.bool(forKey: Keys.showsDeveloperSettings)
+        menuBarIcon = defaults.string(forKey: Keys.menuBarIcon).flatMap { MenuBarIcon.all.contains($0) ? $0 : nil } ?? MenuBarIcon.app
     }
 
     var dateTimeFormat: DateTimeFormat {
@@ -125,5 +131,6 @@ final class GeneralSettings: ObservableObject {
         static let dateStyle = "dateStyle"
         static let timeStyle = "timeStyle"
         static let showsDeveloperSettings = "showsDeveloperSettings"
+        static let menuBarIcon = "menuBarIcon"
     }
 }

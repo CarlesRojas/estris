@@ -23,20 +23,7 @@ struct VolumeMixerPane: View {
             Form {
                 if settings.isEnabled {
                     Section("System") {
-                        deviceBlock(
-                            "Output", icon: "hifispeaker",
-                            state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
-                            volume: state.outputVolume, isMuted: state.outputMuted,
-                            symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
-                            toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume
-                        )
-                        deviceBlock(
-                            "Microphone", icon: "mic",
-                            state.inputDevices, selection: state.input, select: mixer.setInputDevice,
-                            volume: state.inputVolume, isMuted: state.inputMuted,
-                            symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
-                            toggleMute: mixer.toggleInputMute, setVolume: mixer.setInputVolume
-                        )
+                        SystemSoundRows(state: state, mixer: mixer)
                     }
                     Section("Apps") {
                         if !state.failedApps.isEmpty {
@@ -62,59 +49,6 @@ struct VolumeMixerPane: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    /// Laid out like an app's row: an icon and title at the top left, the device at the top right, then mute, the volume across the
-    /// whole width and its percentage.
-    private func deviceBlock(
-        _ title: LocalizedStringKey,
-        icon: String,
-        _ devices: [AudioDevice],
-        selection: AudioObjectID?,
-        select: @escaping (AudioObjectID) -> Void,
-        volume: Float?,
-        isMuted: Bool?,
-        symbol: String,
-        mutedSymbol: String,
-        toggleMute: @escaping () -> Void,
-        setVolume: @escaping (Float) -> Void
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                // Where an app row has the app's icon and name.
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .frame(width: 20, height: 20)
-                Text(title)
-                Spacer()
-                Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
-                    ForEach(devices) { device in
-                        Text(verbatim: device.name).tag(device.id)
-                    }
-                }
-                .labelsHidden()
-                .fixedSize()
-            }
-            HStack(spacing: 8) {
-                Button(action: toggleMute) {
-                    Image(systemName: isMuted == true ? mutedSymbol : symbol)
-                        .frame(width: 20)
-                }
-                .buttonStyle(.borderless)
-                .disabled(isMuted == nil)
-                .help(isMuted == true ? Text("Unmute") : Text("Mute"))
-                // In a form, a slider keeps an empty label column at its left unless hidden.
-                Slider(value: Binding(get: { Double(volume ?? 0) }, set: { setVolume(Float($0)) }), in: 0...1)
-                    .labelsHidden()
-                    .frame(maxWidth: .infinity)
-                    .disabled(volume == nil || isMuted == true)
-                Text(verbatim: volume.map { "\(Int(($0 * 100).rounded()))%" } ?? "")
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                    .frame(width: 44, alignment: .trailing)
-            }
-        }
-        .padding(.vertical, 2)
-    }
-
     private var permissionNotice: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("PasteRing couldn't change the sound of \(state.failedApps.formatted(.list(type: .and))). Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording.")
@@ -129,7 +63,7 @@ struct VolumeMixerPane: View {
 
 /// One app: its name and output device, then mute and volume. The middle of the slider plays
 /// it as it is.
-private struct AppSoundRow: View {
+struct AppSoundRow: View {
     let app: AudioApp
     let sound: AppSound
     let devices: [AudioDevice]
@@ -172,6 +106,85 @@ private struct AppSoundRow: View {
                     .frame(maxWidth: .infinity)
                     .disabled(sound.isMuted)
                 Text(verbatim: "\(Int((sound.volume * 100).rounded()))%")
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+                    .frame(width: 44, alignment: .trailing)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
+
+/// The Mac's output and microphone, one row each, laid out like an app's row. Used in Settings
+/// and in the menu bar menu.
+struct SystemSoundRows: View {
+    @ObservedObject var state: VolumeMixerState
+    let mixer: VolumeMixer
+
+    var body: some View {
+        SystemSoundRow(
+            title: "Output", icon: "hifispeaker",
+            devices: state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
+            volume: state.outputVolume, isMuted: state.outputMuted,
+            symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
+            toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume
+        )
+        SystemSoundRow(
+            title: "Microphone", icon: "mic",
+            devices: state.inputDevices, selection: state.input, select: mixer.setInputDevice,
+            volume: state.inputVolume, isMuted: state.inputMuted,
+            symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
+            toggleMute: mixer.toggleInputMute, setVolume: mixer.setInputVolume
+        )
+    }
+}
+
+/// An icon and title at the top left, the device at the top right, then mute, the volume
+/// across the whole width and its percentage.
+private struct SystemSoundRow: View {
+    let title: LocalizedStringKey
+    let icon: String
+    let devices: [AudioDevice]
+    let selection: AudioObjectID?
+    let select: (AudioObjectID) -> Void
+    let volume: Float?
+    let isMuted: Bool?
+    let symbol: String
+    let mutedSymbol: String
+    let toggleMute: () -> Void
+    let setVolume: (Float) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                // Where an app row has the app's icon and name.
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .frame(width: 20, height: 20)
+                Text(title)
+                Spacer()
+                Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
+                    ForEach(devices) { device in
+                        Text(verbatim: device.name).tag(device.id)
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+            }
+            HStack(spacing: 8) {
+                Button(action: toggleMute) {
+                    Image(systemName: isMuted == true ? mutedSymbol : symbol)
+                        .frame(width: 20)
+                }
+                .buttonStyle(.borderless)
+                .disabled(isMuted == nil)
+                .help(isMuted == true ? Text("Unmute") : Text("Mute"))
+                // In a form, a slider keeps an empty label column at its left unless hidden.
+                Slider(value: Binding(get: { Double(volume ?? 0) }, set: { setVolume(Float($0)) }), in: 0...1)
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity)
+                    .disabled(volume == nil || isMuted == true)
+                Text(verbatim: volume.map { "\(Int(($0 * 100).rounded()))%" } ?? "")
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
                     .frame(width: 44, alignment: .trailing)

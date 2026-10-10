@@ -70,12 +70,6 @@ final class ClipboardManager: NSObject {
     }
 
     /// Entries for the menu bar menu.
-    func menuItems() -> [NSMenuItem] {
-        let clear = NSMenuItem(title: String(localized: "Clear Clipboard History"), action: #selector(clearHistory), keyEquivalent: "")
-        clear.target = self
-        return [clear]
-    }
-
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
         ClipboardManagerPane(clipboard: settings, appearance: appearance, history: history)
@@ -88,9 +82,5 @@ final class ClipboardManager: NSObject {
     private func removeExpired(_ expiry: HistoryExpiry) {
         guard let interval = expiry.interval else { return }
         history.removeEntries(olderThan: Date().addingTimeInterval(-interval))
-    }
-
-    @objc private func clearHistory() {
-        history.clear()
     }
 }

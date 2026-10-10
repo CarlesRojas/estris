@@ -75,10 +75,10 @@
 "Center Third" = "Terç central";
 "Center Two Thirds" = "Dos terços centrals";
 "Change what keys and mouse buttons do, per device." = "Canvia el que fan les tecles i els botons del ratolí, per dispositiu.";
+"Choose the icon PasteRing shows in the menu bar." = "Tria la icona que PasteRing mostra a la barra de menús.";
 "Choose…" = "Tria…";
 "Clear" = "Esborra";
 "Clear All" = "Esborra-ho tot";
-"Clear Clipboard History" = "Esborra l’historial del porta-retalls";
 "Click to change" = "Fes clic per canviar";
 "Clipboard" = "Porta-retalls";
 "Clipboard history is empty" = "L’historial del porta-retalls és buit";
@@ -133,6 +133,7 @@
 "Hide Developer Settings" = "Amaga la configuració de desenvolupador";
 "History" = "Historial";
 "Home" = "Inici";
+"Icon" = "Icona";
 "Ignore passwords" = "Ignora les contrasenyes";
 "Immediately" = "Immediatament";
 "Inactive" = "Inactiu";
@@ -177,6 +178,7 @@
 "Maximize" = "Maximitza";
 "Media" = "Multimèdia";
 "Menu" = "Menú";
+"Menu Bar" = "Barra de menús";
 "Microphone" = "Micròfon";
 "Middle Button" = "Botó central";
 "Middle Click" = "Clic central";
@@ -235,7 +237,6 @@
 "Print Screen" = "Impr Pant";
 "process %d" = "procés %d";
 "Quit" = "Surt";
-"Quit PasteRing" = "Surt de PasteRing";
 "Quits an app when you close its last window." = "Tanca una app quan en tanques l’última finestra.";
 "Record from %@" = "Enregistra des de %@";
 "Record images" = "Desa imatges";
@@ -276,7 +277,6 @@
 "Selected highlight" = "Ressaltat de la selecció";
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajusta el volum i el dispositiu del so i el micròfon del teu Mac, i de cada app.";
 "Settings" = "Configuració";
-"Settings…" = "Configuració…";
 "Shadow" = "Ombra";
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
