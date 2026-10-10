@@ -217,7 +217,6 @@
 "Paste as plain text" = "Enganxa com a text sense format";
 "PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "PasteRing no ha pogut canviar el so de %@. Permet-ho a Només gravació d'àudio del sistema, a Configuració del Sistema > Privadesa i seguretat > Gravació de pantalla i àudio del sistema.";
 "PasteRing needs Accessibility access" = "PasteRing necessita accés d’accessibilitat";
-"PasteRing switches language when it relaunches" = "El PasteRing canvia d’idioma quan es torna a obrir";
 "Pause" = "Pausa";
 "Permissions" = "Permisos";
 "Pick a color" = "Tria un color";
@@ -240,6 +239,7 @@
 "Record from %@" = "Enregistra des de %@";
 "Record images" = "Desa imatges";
 "Relaunch" = "Torna a obrir";
+"Relaunch PasteRing to change the language?" = "Vols reiniciar PasteRing per canviar l'idioma?";
 "Remap" = "Reassignar";
 "Remove duplicates" = "Elimina duplicats";
 "Remove this mapping" = "Elimina aquesta assignació";
@@ -309,6 +309,7 @@
 "Tap the trackpad with three or four fingers to middle click." = "Toca el trackpad amb tres o quatre dits per fer clic central.";
 "Tap with" = "Toca amb";
 "The Finder always keeps running" = "El Finder sempre continua obert";
+"The new language is used once PasteRing opens again." = "El nou idioma s'utilitzarà quan PasteRing es torni a obrir.";
 "Thirds" = "Terços";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Aquest botó arriba al macOS sense dir quin dispositiu l’ha enviat, així que només s’aplica l’assignació de %@.";
 "Three fingers" = "Tres dits";

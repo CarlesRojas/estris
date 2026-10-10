@@ -30,6 +30,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpStatusItem()
         LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
+        // Relaunched from Settings (to change the language): back where the user was.
+        if Relaunch.takeReopenSettings() {
+            openSettings()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {

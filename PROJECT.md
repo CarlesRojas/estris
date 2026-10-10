@@ -17,7 +17,7 @@ History is saved in `~/Library/Application Support/PasteRing` (readable by your 
 
 ## Settings
 
-Open **Settings…** from the menu bar icon. The sidebar (with search) has one pane for the whole app and one per utility; each utility shows whether it is **On** or **Off** at the right of its row, and its pane starts with a switch to turn it on or off.
+Open **Settings…** from the menu bar icon. The sidebar (with search) has one pane for the whole app and one per utility; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
 
 Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
@@ -151,7 +151,7 @@ Sets the volume and device of the Mac's sound and microphone, and of each app. N
 
 ## Languages
 
-English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching (a **Relaunch** button appears). Dates follow the chosen language.
+English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching, so choosing a language opens a dialog in the middle of the window: **Relaunch** now (Settings opens again on General), or **Cancel** to keep the current language. Dates follow the chosen language.
 
 - Translations: `Resources/Localization/<language>.lproj/Localizable.strings`, keyed by the English text (the permission prompt is in `InfoPlist.strings`); `build-app.sh` copies them into the app and `Info.plist` lists the languages.
 - `scripts/check-localization.py` finds the text the app shows and reports anything missing in a language.
