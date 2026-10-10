@@ -37,14 +37,14 @@ enum Permission {
         switch self {
         case .accessibility: AXIsProcessTrusted()
         case .screenRecording: CGPreflightScreenCaptureAccess()
-        case .systemAudioRecording: Self.systemAudioRecording
+        case .systemAudioRecording: Self.systemAudioRecordingGranted
         }
     }
 
     /// The privacy database often can't tell for System Audio Recording, even once it is
     /// allowed in System Settings. Sound heard through a tap settles it: macOS only lets it
     /// through when allowed.
-    private static var systemAudioRecording: Bool? {
+    private static var systemAudioRecordingGranted: Bool? {
         let database = privacyDatabase("kTCCServiceAudioCapture")
         if database == false { UserDefaults.standard.removeObject(forKey: heardSystemAudioKey) }
         return database ?? (UserDefaults.standard.bool(forKey: heardSystemAudioKey) ? true : nil)
