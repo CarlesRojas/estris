@@ -51,7 +51,8 @@
 "Allowed" = "Permès";
 "Already mapped above" = "Ja assignat més amunt";
 "Already mapped on %@" = "Ja assignat a %@";
-"Also used by %@. Only one of them will work." = "També la fa servir %@. Només en funcionarà una.";
+"Also set for %@, which takes priority, so this one won't work." = "També assignat a %@, que té prioritat, així que aquest no funcionarà.";
+"Also set for %@. This one takes priority." = "També assignat a %@. Aquest té prioritat.";
 "Alternative" = "Alternativa";
 "Always on" = "Sempre actiu";
 "Another device" = "Un altre dispositiu";

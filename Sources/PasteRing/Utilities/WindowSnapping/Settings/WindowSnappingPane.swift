@@ -136,12 +136,17 @@ struct WindowSnappingPane: View {
     @ViewBuilder
     private func conflicts(for id: String) -> some View {
         let code = settings.keyCode(for: id)
-        let others = SnapKeys.ids.filter { other in
-            other != id && settings.keyCode(for: other) == code && (other != SnapKeys.arrangeAllID || settings.arrangesAll)
+        // In priority order: the first one with a key gets it.
+        let sharing = SnapKeys.ids.filter { other in
+            settings.keyCode(for: other) == code && (other != SnapKeys.arrangeAllID || settings.arrangesAll)
         }
-        if !others.isEmpty {
-            let names = others.map { SnapAction(rawValue: $0)?.title ?? String(localized: "Arrange All Windows") }
-            warning(String(localized: "Also used by \(ListFormatter.localizedString(byJoining: names)). Only one of them will work."))
+        if sharing.count > 1, let first = sharing.first {
+            if first == id {
+                let names = sharing.dropFirst().map(title(for:))
+                warning(String(localized: "Also set for \(ListFormatter.localizedString(byJoining: names)). This one takes priority."))
+            } else {
+                warning(String(localized: "Also set for \(title(for: first)), which takes priority, so this one won't work."))
+            }
         }
         if let owner = systemShortcuts[CGKeyCode(code)] {
             HStack(alignment: .top, spacing: 10) {
@@ -154,6 +159,10 @@ struct WindowSnappingPane: View {
                 }
             }
         }
+    }
+
+    private func title(for id: String) -> String {
+        SnapAction(rawValue: id)?.title ?? String(localized: "Arrange All Windows")
     }
 
     private func warning(_ text: String) -> some View {

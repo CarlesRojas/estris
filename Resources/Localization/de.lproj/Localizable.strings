@@ -51,7 +51,8 @@
 "Allowed" = "Erlaubt";
 "Already mapped above" = "Bereits weiter oben belegt";
 "Already mapped on %@" = "Bereits auf %@ belegt";
-"Also used by %@. Only one of them will work." = "Auch belegt durch %@. Nur einer davon funktioniert.";
+"Also set for %@, which takes priority, so this one won't work." = "Auch belegt durch %@, der Vorrang hat, daher funktioniert dieser nicht.";
+"Also set for %@. This one takes priority." = "Auch belegt durch %@. Dieser hat Vorrang.";
 "Alternative" = "Alternative";
 "Always on" = "Immer an";
 "Another device" = "Anderes Gerät";

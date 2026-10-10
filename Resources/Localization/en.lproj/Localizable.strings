@@ -51,7 +51,8 @@
 "Allowed" = "Allowed";
 "Already mapped above" = "Already mapped above";
 "Already mapped on %@" = "Already mapped on %@";
-"Also used by %@. Only one of them will work." = "Also used by %@. Only one of them will work.";
+"Also set for %@, which takes priority, so this one won't work." = "Also set for %@, which takes priority, so this one won't work.";
+"Also set for %@. This one takes priority." = "Also set for %@. This one takes priority.";
 "Alternative" = "Alternative";
 "Always on" = "Always on";
 "Another device" = "Another device";

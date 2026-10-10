@@ -49,9 +49,10 @@ enum SnapKeys {
         return SnapAction(rawValue: id)?.defaultKeyCode ?? 0
     }
 
-    /// Every shortcut's id: the snap actions, then Arrange All.
+    /// Every shortcut's id, in priority order, the order the pane shows them in: Arrange All,
+    /// then the snap actions. When two share a key, the first one gets it.
     static var ids: [String] {
-        SnapAction.allCases.map(\.rawValue) + [arrangeAllID]
+        [arrangeAllID] + SnapAction.allCases.map(\.rawValue)
     }
 
     static let modifiers = UInt32(controlKey | optionKey)

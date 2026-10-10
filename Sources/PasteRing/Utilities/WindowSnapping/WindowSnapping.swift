@@ -51,8 +51,14 @@ final class WindowSnapping {
         }
         dragSnapper.start()
         let taken = SystemShortcuts.owners(flags: SnapKeys.systemFlags)
+        var used: Set<UInt32> = []
         for id in SnapKeys.ids where id != SnapKeys.arrangeAllID || settings.arrangesAll {
             let shortcut = settings.shortcut(for: id)
+            // Only the first with a key gets it (macOS takes one per key); the pane says which.
+            guard used.insert(shortcut.keyCode).inserted else {
+                log("\(id): \(shortcut.displayString) is already set for an earlier shortcut, which takes priority")
+                continue
+            }
             if let owner = taken[CGKeyCode(shortcut.keyCode)] {
                 log("\(id): macOS uses \(shortcut.displayString) for its shortcut \(owner); turn it off there to use it here")
             }
