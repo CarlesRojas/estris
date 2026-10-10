@@ -84,12 +84,16 @@ final class WindowSnapping {
             }
         }
         lastShortcut = nil
-        log("arrange all: \(windows.count) window(s)")
+        let names = windows.map { NSRunningApplication(processIdentifier: $0.pid)?.localizedName ?? "\($0.pid)" }
+        log("arrange all: \(windows.count) window(s): \(names.joined(separator: ", "))")
     }
 
     private func snapFocusedWindow(to action: SnapAction) {
         guard let window = AXWindow.focused(), let frame = window.frame, let screen = window.screen else {
             return log("no window to snap (needs Accessibility access)")
+        }
+        guard window.isNormalLevel else {
+            return log("not snapping a window kept in front of everything (level \(window.level ?? 0))")
         }
         var fills = settings.fillsSpace
         if fills, let last = lastShortcut, last.action == action, last.window.isSame(as: window),

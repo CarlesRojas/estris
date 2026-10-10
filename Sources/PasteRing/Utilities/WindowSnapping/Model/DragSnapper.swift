@@ -114,7 +114,8 @@ final class DragSnapper {
 
     private func mouseDown() {
         reset()
-        guard let window = AXWindow.at(NSEvent.mouseLocation), let frame = window.frame else { return }
+        // Windows kept in front of everything are left alone, and don't drag others along.
+        guard let window = AXWindow.at(NSEvent.mouseLocation), let frame = window.frame, window.isNormalLevel else { return }
         self.window = window
         startFrame = frame
         startPoint = NSEvent.mouseLocation

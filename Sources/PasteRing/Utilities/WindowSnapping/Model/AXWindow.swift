@@ -129,6 +129,33 @@ struct AXWindow {
         return CFEqual(element, otherElement)
     }
 
+    /// The window's level in the window server: 0 for normal windows; above for ones kept in
+    /// front of everything (floating video players, picture in picture, overlays). Nil when it
+    /// can't be found.
+    var level: Int? {
+        if let own { return own.level == .normal ? 0 : own.level.rawValue }
+        guard let frame else { return nil }
+        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        for info in list {
+            guard (info[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value == pid,
+                  let bounds = info[kCGWindowBounds as String] as? [String: Any],
+                  let cgRect = CGRect(dictionaryRepresentation: bounds as CFDictionary)
+            else { continue }
+            let other = Self.appKitRect(cgRect)
+            guard abs(other.minX - frame.minX) < 2, abs(other.minY - frame.minY) < 2,
+                  abs(other.width - frame.width) < 2, abs(other.height - frame.height) < 2
+            else { continue }
+            return (info[kCGWindowLayer as String] as? NSNumber)?.intValue
+        }
+        return nil
+    }
+
+    /// A normal window, not one kept in front of everything; only these are snapped, arranged
+    /// and resized together.
+    var isNormalLevel: Bool {
+        (level ?? 0) == 0
+    }
+
     /// The screen showing most of the window.
     var screen: NSScreen? {
         guard let frame else { return NSScreen.main }
