@@ -63,6 +63,8 @@ final class DockPreview {
     private var isCorridorIgnored = false
     /// Checks again a moment after the last move, as a pointer that stopped sends none.
     private var restCheck: DispatchWorkItem?
+    /// True while handling that check: the pointer hasn't moved since.
+    private var isAtRest = false
     /// Slower than this over another icon means the user wants that app.
     private static let slowSpeed: CGFloat = 150
     /// The last thumbnail of each window, shown at once the next time.
@@ -167,9 +169,9 @@ final class DockPreview {
             }
             if corridor(to: shown).contains(point) {
                 cancelHide()
+                let item = layout.isNear(point) ? DockItems.item(at: point) : nil
                 // Over another icon, slow or still: that app, not the way up.
-                if layout.isNear(point), let item = DockItems.item(at: point),
-                   item.app.processIdentifier != shown.app.processIdentifier {
+                if let item, item.app.processIdentifier != shown.app.processIdentifier {
                     if speed < Self.slowSpeed {
                         isCorridorIgnored = true
                         scheduleOpen(item, delay: min(settings.openDelay.seconds, 0.1))
@@ -180,6 +182,14 @@ final class DockPreview {
                     return
                 }
                 cancelOpen()
+                guard item == nil else { return }
+                // Stopped on the way, off the panel and every icon: not heading anywhere.
+                if isAtRest {
+                    isCorridorIgnored = true
+                    scheduleHide()
+                } else {
+                    checkAtRest()
+                }
                 return
             }
             if layout.isNear(point), let item = DockItems.item(at: point) {
@@ -235,7 +245,9 @@ final class DockPreview {
                 guard let self, self.shown != nil else { return }
                 self.speed = 0
                 self.lastMove = nil
+                self.isAtRest = true
                 self.pointerMoved(NSEvent.mouseLocation)
+                self.isAtRest = false
             }
         }
         restCheck = work
