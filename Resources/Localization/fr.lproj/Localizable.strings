@@ -123,7 +123,7 @@
 "Excluded Apps" = "Apps exclues";
 "Fast Forward" = "Avance rapide";
 "Fill the space next to other windows" = "Remplir l’espace à côté des autres fenêtres";
-"Focus after resting for" = "Activer après un repos de";
+"Focus after hovering for" = "Activer après un survol de";
 "Focus Follows Mouse" = "Focus sous le pointeur";
 "Force Quit Applications" = "Forcer à quitter des applications";
 "Format" = "Format";
@@ -307,6 +307,7 @@
 "Show when entries were copied" = "Afficher quand les entrées ont été copiées";
 "Side edges near the bottom: bottom half" = "Bords latéraux près du bas : moitié inférieure";
 "Side edges near the top: top half" = "Bords latéraux près du haut : moitié supérieure";
+"Skip windows when moving faster than" = "Ignorer les fenêtres au-delà de";
 "Skips text copied from password fields and password managers." = "Ignore le texte copié depuis les champs de mot de passe et les gestionnaires de mots de passe.";
 "Sleep after being idle for" = "Veille après une inactivité de";
 "Sleep Display" = "Suspendre l’écran";

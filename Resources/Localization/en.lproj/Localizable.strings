@@ -123,7 +123,7 @@
 "Excluded Apps" = "Excluded Apps";
 "Fast Forward" = "Fast Forward";
 "Fill the space next to other windows" = "Fill the space next to other windows";
-"Focus after resting for" = "Focus after resting for";
+"Focus after hovering for" = "Focus after hovering for";
 "Focus Follows Mouse" = "Focus Follows Mouse";
 "Force Quit Applications" = "Force Quit Applications";
 "Format" = "Format";
@@ -307,6 +307,7 @@
 "Show when entries were copied" = "Show when entries were copied";
 "Side edges near the bottom: bottom half" = "Side edges near the bottom: bottom half";
 "Side edges near the top: top half" = "Side edges near the top: top half";
+"Skip windows when moving faster than" = "Skip windows when moving faster than";
 "Skips text copied from password fields and password managers." = "Skips text copied from password fields and password managers.";
 "Sleep after being idle for" = "Sleep after being idle for";
 "Sleep Display" = "Sleep Display";

@@ -30,9 +30,19 @@ struct FocusFollowsMousePane: View {
     private var form: some View {
         Form {
             Section("General") {
-                Picker("Focus after resting for", selection: $settings.delay) {
+                Picker("Focus after hovering for", selection: $settings.delay) {
                     ForEach(FocusDelay.allCases) { delay in
                         Text(verbatim: delay.title).tag(delay)
+                    }
+                }
+                LabeledContent("Skip windows when moving faster than") {
+                    HStack(spacing: 8) {
+                        Slider(value: $settings.passThroughSpeed, in: FocusFollowsMouseSettings.passThroughSpeeds, step: 100)
+                            .labelsHidden()
+                        Text(verbatim: "\(Int(settings.passThroughSpeed)) pt/s")
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                            .frame(width: 72, alignment: .trailing)
                     }
                 }
             }

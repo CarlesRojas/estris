@@ -12,8 +12,6 @@ import SwiftUI
 final class FocusFollowsMouse {
     /// Accessibility calls into a busy app give up after this long instead of stalling.
     private static let messagingTimeout: Float = 0.25
-    /// Faster than this (points per second) is passing through on the way somewhere else.
-    private static let fastSpeed: CGFloat = 800
 
     let settings = FocusFollowsMouseSettings()
     private let appLog: AppLog
@@ -91,7 +89,7 @@ final class FocusFollowsMouse {
             dwellStart = time
             isHandled = false
         }
-        if speed > Self.fastSpeed {
+        if speed > CGFloat(settings.passThroughSpeed) {
             dwellStart = time
         }
         guard !isHandled else { return }
