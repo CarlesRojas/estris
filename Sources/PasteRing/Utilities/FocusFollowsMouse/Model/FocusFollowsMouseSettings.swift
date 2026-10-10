@@ -2,6 +2,7 @@ import Foundation
 
 /// How long the pointer rests on a window before it is focused.
 enum FocusDelay: Int, CaseIterable, Identifiable {
+    case immediately = 0
     case ms100 = 100
     case ms250 = 250
     case ms500 = 500
@@ -11,9 +12,10 @@ enum FocusDelay: Int, CaseIterable, Identifiable {
 
     var seconds: TimeInterval { TimeInterval(rawValue) / 1000 }
 
-    /// "250 ms", in the app's language.
+    /// "Immediately", or "250 ms" in the app's language.
     var title: String {
-        Measurement(value: Double(rawValue), unit: UnitDuration.milliseconds)
+        if self == .immediately { return String(localized: "Immediately") }
+        return Measurement(value: Double(rawValue), unit: UnitDuration.milliseconds)
             .formatted(.measurement(width: .abbreviated))
     }
 }
@@ -39,13 +41,13 @@ final class FocusFollowsMouseSettings: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
-        delay = FocusDelay(rawValue: defaults.integer(forKey: Keys.delay)) ?? .ms250
+        delay = defaults.object(forKey: Keys.delay) == nil ? .immediately : FocusDelay(rawValue: defaults.integer(forKey: Keys.delay)) ?? .immediately
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
     /// Back to the default delay; the on/off switch and excluded apps stay as they are.
     func reset() {
-        delay = .ms250
+        delay = .immediately
     }
 
     private enum Keys {
