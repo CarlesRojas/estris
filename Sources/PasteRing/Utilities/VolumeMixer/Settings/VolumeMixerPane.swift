@@ -31,20 +31,15 @@ struct VolumeMixerPane: View {
                         volumeSlider(state.inputVolume, low: "mic", high: "mic.fill", set: mixer.setInputVolume)
                     }
                     Section("Apps") {
-                        if !VolumeMixer.supportsApps {
-                            Text("Per-app volume needs macOS 14.4 or later.")
+                        if !state.failedApps.isEmpty {
+                            permissionNotice
+                        }
+                        if state.apps.isEmpty {
+                            Text("No app is playing sound.")
                                 .foregroundStyle(.secondary)
-                        } else {
-                            if !state.failedApps.isEmpty {
-                                permissionNotice
-                            }
-                            if state.apps.isEmpty {
-                                Text("No app is playing sound.")
-                                    .foregroundStyle(.secondary)
-                            }
-                            ForEach(state.apps) { app in
-                                AppSoundRow(app: app, sound: settings.sound(of: app.key), devices: state.outputDevices, mixer: mixer)
-                            }
+                        }
+                        ForEach(state.apps) { app in
+                            AppSoundRow(app: app, sound: settings.sound(of: app.key), devices: state.outputDevices, mixer: mixer)
                         }
                     }
                 }

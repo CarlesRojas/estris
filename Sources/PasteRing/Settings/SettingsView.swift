@@ -113,7 +113,9 @@ final class SettingsNavigation: ObservableObject {
 
     var panes: [SettingsPane] {
         SettingsPane.allCases.filter { pane in
-            (pane != .developer || general.showsDeveloperSettings) && pane.matches(search)
+            (pane != .developer || general.showsDeveloperSettings)
+                && (pane != .volumeMixer || VolumeMixer.isSupported)
+                && pane.matches(search)
         }
     }
 }

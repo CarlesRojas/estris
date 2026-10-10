@@ -219,7 +219,6 @@
 "PasteRing needs Accessibility access" = "PasteRing braucht Zugriff auf die Bedienungshilfen";
 "PasteRing switches language when it relaunches" = "PasteRing wechselt die Sprache beim Neustart";
 "Pause" = "Pause";
-"Per-app volume needs macOS 14.4 or later." = "Lautstärke pro App erfordert macOS 14.4 oder neuer.";
 "Permissions" = "Berechtigungen";
 "Pick a color" = "Farbe aufnehmen";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Nimm per Kurzbefehl eine Farbe vom Bildschirm auf und kopiere sie.";

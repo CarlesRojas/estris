@@ -23,8 +23,9 @@ final class VolumeMixerState: ObservableObject {
 /// everything it needs, so the app only has to create it and call `start()`.
 @MainActor
 final class VolumeMixer {
-    /// Per-app sound uses process taps, which work reliably from this version.
-    static var supportsApps: Bool {
+    /// Per-app sound uses process taps, which work reliably from this version; on older
+    /// versions the utility is hidden and never starts.
+    static var isSupported: Bool {
         if #available(macOS 14.4, *) { return true }
         return false
     }
@@ -48,6 +49,7 @@ final class VolumeMixer {
     }
 
     func start() {
+        guard Self.isSupported else { return }
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
         settings.$isEnabled
