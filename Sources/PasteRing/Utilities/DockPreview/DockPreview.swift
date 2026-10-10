@@ -160,6 +160,14 @@ final class DockPreview {
         isCorridorIgnored = false
 
         if let shown {
+            // On the shown app's icon the tip follows the pointer freely, any direction; it only
+            // stays put once the pointer leaves the icon.
+            if shown.frame.contains(point) {
+                lastOnIcon = point
+                cancelHide()
+                cancelOpen()
+                return
+            }
             if contentFrame.insetBy(dx: -6, dy: -6).contains(point) {
                 cancelHide()
                 cancelOpen()
