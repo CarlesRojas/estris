@@ -41,13 +41,13 @@ final class FocusFollowsMouseSettings: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
-        delay = defaults.object(forKey: Keys.delay) == nil ? .immediately : FocusDelay(rawValue: defaults.integer(forKey: Keys.delay)) ?? .immediately
+        delay = defaults.object(forKey: Keys.delay) == nil ? .ms100 : FocusDelay(rawValue: defaults.integer(forKey: Keys.delay)) ?? .ms100
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
     /// Back to the default delay; the on/off switch and excluded apps stay as they are.
     func reset() {
-        delay = .immediately
+        delay = .ms100
     }
 
     private enum Keys {

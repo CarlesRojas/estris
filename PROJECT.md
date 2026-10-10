@@ -145,7 +145,7 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
 
 The window under the pointer comes to the front and its app becomes active, without clicking. Off by default; turn it on in **Settings > Focus Follows Mouse**.
 
-- **Focus after resting for**: **Immediately** (default), or 100, 250, 500 or 1000 ms. Immediately focuses each window the pointer enters, so windows crossed on the way come forward too; with a delay it waits for the pointer to rest, and every move starts the wait again.
+- **Focus after resting for**: **Immediately**, or 100 (default), 250, 500 or 1000 ms. Immediately focuses each window the pointer enters, so windows crossed on the way come forward too; with a delay it waits for the pointer to rest, and every move starts the wait again.
 - Nothing happens while a mouse button or a modifier key is held (dragging, clicking, a shortcut), over menus, the Dock, the menu bar, the desktop or anything else that isn't a normal window (window layer 0), over PasteRing's own windows, while a sheet or modal dialog of the app in front is open, or when switching desktops.
 - The window is raised (Accessibility `AXRaise` and `AXMain`) and its app activated. Focusing without raising would need private window server calls, so it always raises.
 - **Excluded Apps** tab: apps whose windows are never focused by hovering.
