@@ -23,7 +23,7 @@ Every utility that needs permissions starts its pane (below its on/off switch) w
 
 Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
-Every row with a setting (switch, slider, stepper, picker, color, shortcut key), the utilities' on/off switches, each Excluded Apps row and each Volume Mixer app also has a right-click menu with **Reset to Default**, which puts back just that one (`resetMenu` in `Settings/ResetMenu.swift`), greyed out while it already has its default. Each settings class keeps its defaults as constants, used by `reset()` and these menus alike. Not covered, as they have no default: Remap's mappings, the Clipboard's alternative shortcuts (greyed out), the Volume Mixer's output and microphone (the Mac's own), and history.
+Every row with a setting (switch, slider, stepper, picker, color, shortcut key), the utilities' on/off switches, each Excluded Apps row and each Volume Mixer app also has a right-click menu (anywhere on the row, its background included) with **Reset to Default**, which puts back just that one (`resetMenu` in `Settings/ResetMenu.swift`), greyed out while it already has its default. Each settings class keeps its defaults as constants, used by `reset()` and these menus alike. Not covered, as they have no default: Remap's mappings, the Clipboard's alternative shortcuts (greyed out), the Volume Mixer's output and microphone (the Mac's own), and history.
 
 **General** (applies to every utility)
 - **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.

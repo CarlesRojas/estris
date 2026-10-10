@@ -34,7 +34,7 @@ struct UtilityHeader: View {
                     .toggleStyle(.switch)
                     .labelsHidden()
                     .controlSize(.large)
-                    .resetMenu(isOn, to: defaultIsOn)
+                    .resetMenu(isOn, to: defaultIsOn, fillsRow: false)
                     .onChange(of: isOn.wrappedValue) { on in
                         if on, !missing.isEmpty { asksForPermissions = true }
                     }
