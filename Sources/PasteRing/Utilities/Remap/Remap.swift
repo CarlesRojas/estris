@@ -132,11 +132,14 @@ final class Remap {
         // the list under the pointer.
         let isLinkClick = isOverViewerLink && (type == .leftMouseDown || type == .leftMouseUp)
         // Some presses reach macOS without their device; they take the mappings of the one
-        // device whose mapping applies to them.
-        if device == nil, let input = parsed.input, parsed.phase == .down, input != .mouseButton(0) {
-            settings.noteDeviceLess(input)
+        // device whose mapping applies to them. Events posted by an app (PasteRing's own key
+        // presses included) never come from a device, so they don't count.
+        let isPosted = event.getIntegerValueField(.eventSourceUnixProcessID) != 0
+        if device == nil, !isPosted, let input = parsed.input, parsed.phase == .down,
+           input != .mouseButton(0), settings.noteDeviceLess(input) {
+            log("device-less: \(parsed.name) (\(input)), event type \(type.rawValue), sender \(sender.map { String(format: "0x%llX", $0) } ?? "none"); its mappings now apply on \(settings.activeDevice(for: input).map { settings.customNames[$0.id] ?? $0.entry.name } ?? "no device yet")")
         }
-        let target = device ?? parsed.input.flatMap { input in
+        let target = device ?? (isPosted ? nil : parsed.input).flatMap { input in
             settings.activeDevice(for: input).map { InputDevice(id: $0.id, name: $0.entry.name, kind: $0.entry.kind) }
         }
         if isViewing, !parsed.isRepeat, !isLinkClick {

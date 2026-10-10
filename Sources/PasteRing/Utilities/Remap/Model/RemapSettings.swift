@@ -114,8 +114,12 @@ final class RemapSettings: ObservableObject {
         customNames[deviceID] = trimmed.isEmpty ? nil : trimmed
     }
 
-    func noteDeviceLess(_ input: RemapInput) {
-        if !deviceLessInputs.contains(input) { deviceLessInputs.insert(input) }
+    /// Returns true when the input wasn't known to arrive without its device.
+    @discardableResult
+    func noteDeviceLess(_ input: RemapInput) -> Bool {
+        guard !deviceLessInputs.contains(input) else { return false }
+        deviceLessInputs.insert(input)
+        return true
     }
 
     /// For an input that arrives without its device: the device whose mapping applies, the
@@ -185,6 +189,7 @@ final class RemapSettings: ObservableObject {
         static let isEnabled = "remapEnabled"
         static let devices = "remapDevices"
         static let customNames = "remapDeviceNames"
-        static let deviceLessInputs = "remapDeviceLessInputs"
+        // Renamed to forget inputs wrongly noted from events posted by apps.
+        static let deviceLessInputs = "remapDeviceLessInputs2"
     }
 }
