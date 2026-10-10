@@ -36,6 +36,9 @@ struct VolumeMixerPane: View {
 
     private var form: some View {
         Form {
+            PermissionsSection(uses: [
+                PermissionUse(permission: .systemAudioRecording, reason: "Only to change an app's volume or the device it plays on. Nothing is recorded.")
+            ])
             if settings.isEnabled {
                 Section("System") {
                     SystemSoundRows(state: state, mixer: mixer)

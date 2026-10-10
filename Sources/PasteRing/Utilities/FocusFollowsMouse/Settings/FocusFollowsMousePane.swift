@@ -29,9 +29,12 @@ struct FocusFollowsMousePane: View {
 
     private var form: some View {
         Form {
+            PermissionsSection(uses: [
+                PermissionUse(permission: .accessibility, reason: "Only to bring the window under the pointer to the front.")
+            ])
             Section("General") {
                 Picker("Focus after hovering for", selection: $settings.delay) {
-                    ForEach(FocusDelay.allCases) { delay in
+                    ForEach(HoverDelay.allCases) { delay in
                         Text(verbatim: delay.title).tag(delay)
                     }
                 }

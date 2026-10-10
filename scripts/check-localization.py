@@ -19,7 +19,7 @@ LOCALIZATION = ROOT / "Resources" / "Localization"
 CALLS = [
     "String(localized: ", "Text(", "Button(", "Label(", "Toggle(", "Picker(", "Section(",
     "TextField(", "Stepper(", "LabeledContent(", "ColorPicker(", ".help(", ".alert(",
-    ".confirmationDialog(", "placeholder(", "slider(", "picker(", "summary: ", "prompt: ",
+    ".confirmationDialog(", "placeholder(", "slider(", "picker(", "summary: ", "prompt: ", "reason: ",
 ]
 # Enums whose raw values are shown translated.
 ENUMS = ["Tab", "Section", "Phase"]

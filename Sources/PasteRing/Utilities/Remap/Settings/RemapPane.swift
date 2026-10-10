@@ -59,6 +59,9 @@ private struct MappingsView: View {
     var body: some View {
         ScrollViewReader { proxy in
             Form {
+                PermissionsSection(uses: [
+                    PermissionUse(permission: .accessibility, reason: "Only to read and change the keys and buttons you map.")
+                ])
                 ForEach(listed) { device in
                     let mappings = settings.mappings(for: device.id)
                     Section {

@@ -85,6 +85,7 @@
 "Click to change" = "Click to change";
 "Clipboard" = "Clipboard";
 "Clipboard history is empty" = "Clipboard history is empty";
+"Close Window" = "Close Window";
 "Color" = "Color";
 "Color Picker" = "Color Picker";
 "Copied" = "Copied";
@@ -106,6 +107,7 @@
 "Device" = "Device";
 "Dim screen" = "Dim screen";
 "Display and Keyboard" = "Display and Keyboard";
+"Dock Preview" = "Dock Preview";
 "Don't keep awake" = "Don't keep awake";
 "Down" = "Down";
 "Down Arrow" = "Down Arrow";
@@ -199,6 +201,7 @@
 "Mute" = "Mute";
 "Name" = "Name";
 "Navigation" = "Navigation";
+"Needs no permissions." = "Needs no permissions.";
 "Never" = "Never";
 "Next Desktop" = "Next Desktop";
 "Next Track" = "Next Track";
@@ -220,7 +223,17 @@
 "On battery" = "On battery";
 "On power adapter" = "On power adapter";
 "Only the first mapping for a key or button applies." = "Only the first mapping for a key or button applies.";
+"Only to bring the window under the pointer to the front." = "Only to bring the window under the pointer to the front.";
+"Only to change an app's volume or the device it plays on. Nothing is recorded." = "Only to change an app's volume or the device it plays on. Nothing is recorded.";
+"Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick." = "Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick.";
+"Only to move and resize windows." = "Only to move and resize windows.";
+"Only to paste the entry you pick into the app you're working in." = "Only to paste the entry you pick into the app you're working in.";
+"Only to read and change the keys and buttons you map." = "Only to read and change the keys and buttons you map.";
+"Only to see when an app's last window closes." = "Only to see when an app's last window closes.";
+"Only to send the middle click." = "Only to send the middle click.";
+"Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Only to show a thumbnail of what each window shows. Nothing is saved or sent.";
 "Open Accessibility Settings" = "Open Accessibility Settings";
+"Open after hovering for" = "Open after hovering for";
 "Open at login" = "Open at login";
 "Open overlay" = "Open overlay";
 "Open System Settings" = "Open System Settings";
@@ -245,6 +258,7 @@
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Press a shortcut again for the exact size, or hold ⌘ while dragging.";
 "Press keys…" = "Press keys…";
 "Press the new shortcut, or Esc to cancel" = "Press the new shortcut, or Esc to cancel";
+"Previews" = "Previews";
 "Previous Desktop" = "Previous Desktop";
 "Previous Track" = "Previous Track";
 "Print Screen" = "Print Screen";
@@ -266,6 +280,7 @@
 "Reset Appearance to Defaults" = "Reset Appearance to Defaults";
 "Reset to Defaults" = "Reset to Defaults";
 "Resize side-by-side windows together" = "Resize side-by-side windows together";
+"Rest the pointer on an app in the Dock to see its windows, and click one to open it." = "Rest the pointer on an app in the Dock to see its windows, and click one to open it.";
 "Restore" = "Restore";
 "Return" = "Return";
 "Rewind" = "Rewind";
@@ -282,6 +297,7 @@
 "Ring menu" = "Ring menu";
 "Ring shows" = "Ring shows";
 "Same as System" = "Same as System";
+"Screen Recording" = "Screen Recording";
 "Screenshot of Screen" = "Screenshot of Screen";
 "Screenshot of Selection" = "Screenshot of Selection";
 "Screenshot Tools" = "Screenshot Tools";
@@ -294,12 +310,14 @@
 "Shadow" = "Shadow";
 "Shortcut" = "Shortcut";
 "Shortcuts" = "Shortcuts";
+"Show a button to close each window" = "Show a button to close each window";
 "Show Apps Volume" = "Show Apps Volume";
 "Show Clear History button" = "Show Clear History button";
 "Show delete button" = "Show delete button";
 "Show Desktop" = "Show Desktop";
 "Show device pickers" = "Show device pickers";
 "Show Microphone" = "Show Microphone";
+"Show only windows on the current desktop" = "Show only windows on the current desktop";
 "Show Output" = "Show Output";
 "Show Pick a Color button" = "Show Pick a Color button";
 "Show recent colors" = "Show recent colors";
@@ -309,6 +327,7 @@
 "Show when entries were copied" = "Show when entries were copied";
 "Side edges near the bottom: bottom half" = "Side edges near the bottom: bottom half";
 "Side edges near the top: top half" = "Side edges near the top: top half";
+"Size" = "Size";
 "Skip windows when moving faster than" = "Skip windows when moving faster than";
 "Skips text copied from password fields and password managers." = "Skips text copied from password fields and password managers.";
 "Sleep after being idle for" = "Sleep after being idle for";
@@ -330,6 +349,7 @@
 "Swap From and To" = "Swap From and To";
 "Symbols" = "Symbols";
 "System" = "System";
+"System Audio Recording" = "System Audio Recording";
 "System setting" = "System setting";
 "System Volume" = "System Volume";
 "Tab" = "Tab";

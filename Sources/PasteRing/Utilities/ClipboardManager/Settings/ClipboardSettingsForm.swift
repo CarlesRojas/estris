@@ -10,6 +10,9 @@ struct ClipboardSettingsForm: View {
 
     var body: some View {
         Form {
+            PermissionsSection(uses: [
+                PermissionUse(permission: .accessibility, reason: "Only to paste the entry you pick into the app you're working in.")
+            ])
             Section("General") {
                 LabeledContent("Keep up to") {
                     HStack {

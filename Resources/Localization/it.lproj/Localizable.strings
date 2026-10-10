@@ -85,6 +85,7 @@
 "Click to change" = "Fai clic per modificare";
 "Clipboard" = "Appunti";
 "Clipboard history is empty" = "La cronologia degli appunti è vuota";
+"Close Window" = "Chiudi finestra";
 "Color" = "Colore";
 "Color Picker" = "Contagocce";
 "Copied" = "Copiato";
@@ -106,6 +107,7 @@
 "Device" = "Dispositivo";
 "Dim screen" = "Oscura lo schermo";
 "Display and Keyboard" = "Schermo e tastiera";
+"Dock Preview" = "Anteprima del Dock";
 "Don't keep awake" = "Non mantenere attivo";
 "Down" = "Premuto";
 "Down Arrow" = "Freccia giù";
@@ -199,6 +201,7 @@
 "Mute" = "Silenzia";
 "Name" = "Nome";
 "Navigation" = "Navigazione";
+"Needs no permissions." = "Non richiede alcun permesso.";
 "Never" = "Mai";
 "Next Desktop" = "Scrivania successiva";
 "Next Track" = "Brano successivo";
@@ -220,7 +223,17 @@
 "On battery" = "A batteria";
 "On power adapter" = "Con alimentatore";
 "Only the first mapping for a key or button applies." = "Si applica solo la prima mappatura di un tasto o pulsante.";
+"Only to bring the window under the pointer to the front." = "Solo per portare in primo piano la finestra sotto il puntatore.";
+"Only to change an app's volume or the device it plays on. Nothing is recorded." = "Solo per cambiare il volume di un'app o il dispositivo su cui suona. Non viene registrato nulla.";
+"Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick." = "Solo per sapere quale icona del Dock è sotto il puntatore, e per portare in primo piano o chiudere la finestra scelta.";
+"Only to move and resize windows." = "Solo per spostare e ridimensionare le finestre.";
+"Only to paste the entry you pick into the app you're working in." = "Solo per incollare la voce scelta nell'app in cui stai lavorando.";
+"Only to read and change the keys and buttons you map." = "Solo per leggere e cambiare i tasti e i pulsanti che rimappi.";
+"Only to see when an app's last window closes." = "Solo per vedere quando si chiude l'ultima finestra di un'app.";
+"Only to send the middle click." = "Solo per inviare il clic centrale.";
+"Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Solo per mostrare una miniatura di ciò che mostra ogni finestra. Non viene salvato né inviato nulla.";
 "Open Accessibility Settings" = "Apri impostazioni Accessibilità";
+"Open after hovering for" = "Apri dopo un passaggio di";
 "Open at login" = "Apri al login";
 "Open overlay" = "Apri il pannello";
 "Open System Settings" = "Apri Impostazioni di Sistema";
@@ -245,6 +258,7 @@
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Premi di nuovo l’abbreviazione per la dimensione esatta, o tieni premuto ⌘ mentre trascini.";
 "Press keys…" = "Premi i tasti…";
 "Press the new shortcut, or Esc to cancel" = "Premi la nuova abbreviazione o Esc per annullare";
+"Previews" = "Anteprime";
 "Previous Desktop" = "Scrivania precedente";
 "Previous Track" = "Brano precedente";
 "Print Screen" = "Stamp";
@@ -266,6 +280,7 @@
 "Reset Appearance to Defaults" = "Ripristina l’aspetto predefinito";
 "Reset to Defaults" = "Ripristina valori predefiniti";
 "Resize side-by-side windows together" = "Ridimensiona insieme le finestre affiancate";
+"Rest the pointer on an app in the Dock to see its windows, and click one to open it." = "Lascia il puntatore su un'app nel Dock per vederne le finestre, e fai clic su una per aprirla.";
 "Restore" = "Ripristina";
 "Return" = "A capo";
 "Rewind" = "Riavvolgi";
@@ -282,6 +297,7 @@
 "Ring menu" = "Menu ad anello";
 "Ring shows" = "L’anello mostra";
 "Same as System" = "Come il sistema";
+"Screen Recording" = "Registrazione schermo";
 "Screenshot of Screen" = "Istantanea dello schermo";
 "Screenshot of Selection" = "Istantanea della selezione";
 "Screenshot Tools" = "Strumenti istantanea";
@@ -294,12 +310,14 @@
 "Shadow" = "Ombra";
 "Shortcut" = "Abbreviazione";
 "Shortcuts" = "Abbreviazioni";
+"Show a button to close each window" = "Mostra un pulsante per chiudere ogni finestra";
 "Show Apps Volume" = "Mostra Volume delle app";
 "Show Clear History button" = "Mostra il pulsante Cancella cronologia";
 "Show delete button" = "Mostra pulsante elimina";
 "Show Desktop" = "Mostra scrivania";
 "Show device pickers" = "Mostra i selettori di dispositivo";
 "Show Microphone" = "Mostra Microfono";
+"Show only windows on the current desktop" = "Mostra solo le finestre della scrivania attuale";
 "Show Output" = "Mostra Uscita";
 "Show Pick a Color button" = "Mostra il pulsante Scegli un colore";
 "Show recent colors" = "Mostra i colori recenti";
@@ -309,6 +327,7 @@
 "Show when entries were copied" = "Mostra quando sono state copiate le voci";
 "Side edges near the bottom: bottom half" = "Bordi laterali in basso: metà inferiore";
 "Side edges near the top: top half" = "Bordi laterali in alto: metà superiore";
+"Size" = "Dimensione";
 "Skip windows when moving faster than" = "Ignora le finestre oltre";
 "Skips text copied from password fields and password managers." = "Salta il testo copiato da campi password e gestori di password.";
 "Sleep after being idle for" = "Stop dopo inattività di";
@@ -330,6 +349,7 @@
 "Swap From and To" = "Scambia origine e destinazione";
 "Symbols" = "Simboli";
 "System" = "Sistema";
+"System Audio Recording" = "Registrazione audio di sistema";
 "System setting" = "Impostazione di sistema";
 "System Volume" = "Volume di sistema";
 "Tab" = "Tabulazione";

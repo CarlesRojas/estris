@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Focus Follows Mouse, Keep Awake, Color Picker and Volume Mixer.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Focus Follows Mouse, Dock Preview, Keep Awake, Color Picker and Volume Mixer.
 
 ## Usage
 
@@ -17,7 +17,9 @@ History is saved in `~/Library/Application Support/PasteRing` (readable by your 
 
 ## Settings
 
-Open **Settings** from the menu bar menu. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
+Open **Settings** from the menu bar menu. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Dock Preview, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
+
+Every utility's pane starts (below its on/off switch) with a **Permissions** section: each permission it needs with, in plain words, the one thing it is used for (for example Screen Recording: only to show a thumbnail of what each window shows), whether it is allowed, and a button to its System Settings page when it isn't; or that it needs none.
 
 Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
@@ -152,6 +154,17 @@ The window under the pointer comes to the front and its app becomes active, with
 - **Excluded Apps** tab: apps whose windows are never focused by hovering.
 - Each focus is logged under **Developer > Logs**.
 
+## Dock Preview
+
+Rest the pointer on a running app's icon in the Dock to see its windows as thumbnails, in a panel next to the icon (above a bottom Dock, beside a left or right one) in the clipboard overlay's default frosted look. Off by default; turn it on in **Settings > Dock Preview**. Needs macOS 14 or later; on older versions its pane is hidden and it never starts.
+
+- A click on a thumbnail brings its window to the front (un-minimizing it) and activates the app; a window on another desktop: the app is activated and macOS switches there. Hovering a thumbnail shows a × (**Show a button to close each window**, on) that closes the window.
+- **Size** (slider, 80 to 320 pt, default 140): the thumbnails' height; their width follows each window's shape.
+- **Open after hovering for**: Immediately, 100 (default), 250, 500 or 1000 ms. Sliding along the Dock to another app switches the panel after at most 100 ms.
+- **Show only windows on the current desktop** (on): otherwise windows on other desktops and minimized ones are listed too. At most 10 windows.
+- The panel stays while the pointer is on the icon, on the panel or on the way between them, and closes a moment after it leaves, on a click outside it (including on the Dock) or when switching desktops.
+- How: a listen-only event tap follows the pointer; only near the Dock's edge (from the Dock's own preferences: position, icon size, magnification) does it ask Accessibility for the Dock icon under it. Windows come from the window server's list; thumbnails from ScreenCaptureKit (**Screen Recording**, asked when the utility is turned on), cached so they show at once next time. Raising and closing go through Accessibility, matching windows by number.
+
 ## Keep Awake
 
 Keeps the Mac and its display awake until it has been idle for a chosen time, then starts the screen saver or puts it to sleep. Turn it on with the switch in **Settings > Keep Awake**; it stays on until turned off.
@@ -199,8 +212,8 @@ Sources/PasteRing/
   App/                    entry point, app delegate (creates the utilities, Settings window)
   MenuBar/                the menu bar item: settings, icon choices, the frosted menu and its panel
   General/                settings shared by every utility (language, date and time format)
-  Settings/               the Settings window: sidebar, search, General and Menu Bar panes
-  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher, localization, relaunch)
+  Settings/               the Settings window: sidebar, search, General and Menu Bar panes, the Permissions section
+  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher, localization, relaunch, hover delays, size reader)
   Utilities/
     AutoQuit/
       AutoQuit.swift           owns the utility
@@ -226,6 +239,10 @@ Sources/PasteRing/
       FocusFollowsMouse.swift  owns the utility: pointer monitor, speed-aware delay, raising the window under it
       Model/                   settings
       Settings/                the Focus Follows Mouse pane
+    DockPreview/
+      DockPreview.swift        owns the utility: event tap, open and hide timing, the panel
+      Model/                   settings, Dock icons, app windows and thumbnails, the panel's view
+      Settings/                the Dock Preview pane
     KeepAwake/
       KeepAwake.swift          owns the utility: power assertion and timer
       Model/                   settings, status, power source
@@ -243,7 +260,7 @@ Sources/PasteRing/
       Settings/                the Clipboard Manager settings pane and its tabs
 ```
 
-To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting and a `settingsPane()` that begins with `UtilityHeader`), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
+To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting and a `settingsPane()` that begins with `UtilityHeader`, then a `PermissionsSection` listing what it needs and why), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
 
 ## Notes
 

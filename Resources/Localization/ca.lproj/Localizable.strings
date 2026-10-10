@@ -85,6 +85,7 @@
 "Click to change" = "Fes clic per canviar";
 "Clipboard" = "Porta-retalls";
 "Clipboard history is empty" = "L’historial del porta-retalls és buit";
+"Close Window" = "Tanca la finestra";
 "Color" = "Color";
 "Color Picker" = "Selector de color";
 "Copied" = "Copiat";
@@ -106,6 +107,7 @@
 "Device" = "Dispositiu";
 "Dim screen" = "Enfosqueix la pantalla";
 "Display and Keyboard" = "Pantalla i teclat";
+"Dock Preview" = "Previsualització del Dock";
 "Don't keep awake" = "No el mantinguis despert";
 "Down" = "Premut";
 "Down Arrow" = "Fletxa avall";
@@ -199,6 +201,7 @@
 "Mute" = "Silencia";
 "Name" = "Nom";
 "Navigation" = "Navegació";
+"Needs no permissions." = "No necessita cap permís.";
 "Never" = "Mai";
 "Next Desktop" = "Escriptori següent";
 "Next Track" = "Pista següent";
@@ -220,7 +223,17 @@
 "On battery" = "Amb bateria";
 "On power adapter" = "Amb adaptador de corrent";
 "Only the first mapping for a key or button applies." = "Només s’aplica la primera assignació d’una tecla o botó.";
+"Only to bring the window under the pointer to the front." = "Només per portar al davant la finestra que hi ha sota el punter.";
+"Only to change an app's volume or the device it plays on. Nothing is recorded." = "Només per canviar el volum d'una app o el dispositiu per on sona. No es grava res.";
+"Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick." = "Només per saber quina icona del Dock hi ha sota el punter, i per portar al davant o tancar la finestra que triïs.";
+"Only to move and resize windows." = "Només per moure i canviar la mida de les finestres.";
+"Only to paste the entry you pick into the app you're working in." = "Només per enganxar l'entrada que triïs a l'app on estàs treballant.";
+"Only to read and change the keys and buttons you map." = "Només per llegir i canviar les tecles i botons que mapes.";
+"Only to see when an app's last window closes." = "Només per veure quan es tanca l'última finestra d'una app.";
+"Only to send the middle click." = "Només per enviar el clic central.";
+"Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Només per mostrar una miniatura del que es veu a cada finestra. No es desa ni s'envia res.";
 "Open Accessibility Settings" = "Obre la configuració d’accessibilitat";
+"Open after hovering for" = "Obre després de passar per sobre";
 "Open at login" = "Obre en iniciar la sessió";
 "Open overlay" = "Obre el tauler";
 "Open System Settings" = "Obre Configuració del Sistema";
@@ -245,6 +258,7 @@
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Prem la drecera un altre cop per a la mida exacta, o mantén ⌘ en arrossegar.";
 "Press keys…" = "Prem les tecles…";
 "Press the new shortcut, or Esc to cancel" = "Prem la nova drecera o Esc per cancel·lar";
+"Previews" = "Previsualitzacions";
 "Previous Desktop" = "Escriptori anterior";
 "Previous Track" = "Pista anterior";
 "Print Screen" = "Impr Pant";
@@ -266,6 +280,7 @@
 "Reset Appearance to Defaults" = "Restableix l’aparença per defecte";
 "Reset to Defaults" = "Restableix els valors per defecte";
 "Resize side-by-side windows together" = "Redimensiona juntes les finestres del costat";
+"Rest the pointer on an app in the Dock to see its windows, and click one to open it." = "Deixa el punter sobre una app del Dock per veure'n les finestres, i fes clic en una per obrir-la.";
 "Restore" = "Restaura";
 "Return" = "Retorn";
 "Rewind" = "Rebobina";
@@ -282,6 +297,7 @@
 "Ring menu" = "Menú en anell";
 "Ring shows" = "L’anell mostra";
 "Same as System" = "Igual que el sistema";
+"Screen Recording" = "Gravació de pantalla";
 "Screenshot of Screen" = "Captura de la pantalla";
 "Screenshot of Selection" = "Captura de la selecció";
 "Screenshot Tools" = "Eines de captura de pantalla";
@@ -294,12 +310,14 @@
 "Shadow" = "Ombra";
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
+"Show a button to close each window" = "Mostra un botó per tancar cada finestra";
 "Show Apps Volume" = "Mostra Volum de les apps";
 "Show Clear History button" = "Mostra el botó Esborra l'historial";
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";
 "Show device pickers" = "Mostra els selectors de dispositiu";
 "Show Microphone" = "Mostra Micròfon";
+"Show only windows on the current desktop" = "Mostra només les finestres de l'escriptori actual";
 "Show Output" = "Mostra Sortida";
 "Show Pick a Color button" = "Mostra el botó Tria un color";
 "Show recent colors" = "Mostra els colors recents";
@@ -309,6 +327,7 @@
 "Show when entries were copied" = "Mostra quan es van copiar les entrades";
 "Side edges near the bottom: bottom half" = "Vores laterals a prop de baix: meitat inferior";
 "Side edges near the top: top half" = "Vores laterals a prop de dalt: meitat superior";
+"Size" = "Mida";
 "Skip windows when moving faster than" = "Salta finestres en moure’s a més de";
 "Skips text copied from password fields and password managers." = "Omet el text copiat de camps de contrasenya i gestors de contrasenyes.";
 "Sleep after being idle for" = "Repòs després d’inactivitat de";
@@ -330,6 +349,7 @@
 "Swap From and To" = "Intercanvia origen i destinació";
 "Symbols" = "Símbols";
 "System" = "Sistema";
+"System Audio Recording" = "Gravació d'àudio del sistema";
 "System setting" = "Configuració del sistema";
 "System Volume" = "Volum del sistema";
 "Tab" = "Tabulador";
