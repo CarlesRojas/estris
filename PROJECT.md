@@ -8,6 +8,7 @@ A native macOS menu bar app with a set of utilities: Clipboard (a history of cop
 
 - Copy as usual. PasteRing records text, rich text, images and files, most recent first, along with the app they were copied from (shown as its icon). Pasting an entry gives back exactly what was copied. The overlay shows images at the card's full width and rich text with its styling (fonts, bold and italic, colours, underline). Copies that arrive from your other Apple devices through Universal Clipboard are recorded too, marked as coming from another device.
 - Hold `⌘⇧` and press `V` to open the overlay in the middle of the screen. The highlighted entry is what will be pasted.
+- Stepping through the history stays quick from the first press: the latest 30 entries are prepared ahead (app icon and name, image decoded, rich text parsed; `ClipPreviewWarmer`), one per turn of the run loop so key presses go first, shortly after each copy and again in order when the overlay opens. Cards lay out only the first 3,000 characters of a text, and date formatters are reused.
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
 - `⌘⇧Esc` closes the overlay without pasting. `⌘⇧Delete` removes the selected entry from the history.

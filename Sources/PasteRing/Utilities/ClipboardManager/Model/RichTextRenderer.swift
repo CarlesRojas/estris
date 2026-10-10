@@ -44,7 +44,9 @@ enum RichTextRenderer {
     }
 
     private static func convert(_ source: NSAttributedString, baseSize: CGFloat, singleLine: Bool) -> AttributedString {
-        let trimmed = trimmingWhitespace(source)
+        // Only the start: no card shows more, and long texts would make each step slow.
+        let start = source.attributedSubstring(from: NSRange(location: 0, length: min(source.length, ClipContentView.maxCharacters)))
+        let trimmed = trimmingWhitespace(start)
         // Scale so the first run's size becomes the card's text size; relative sizes stay.
         let firstSize = (trimmed.length > 0 ? trimmed.attribute(.font, at: 0, effectiveRange: nil) as? NSFont : nil)?.pointSize ?? baseSize
         let scale = baseSize / max(firstSize, 1)

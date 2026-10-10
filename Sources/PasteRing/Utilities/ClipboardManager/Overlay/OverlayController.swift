@@ -1,5 +1,6 @@
 import AppKit
 import Carbon.HIToolbox
+import Combine
 import SwiftUI
 
 /// Shows the overlay while the shortcut's modifiers are held (⌘⇧ for the default ⌘⇧V).
@@ -28,6 +29,10 @@ final class OverlayController: NSObject {
     private var activeShortcut: Shortcut { state.activeShortcut }
     /// Bumped on every show and hide, so a finished fade-out does not hide a newer show.
     private var presentation = 0
+    private let warmer = ClipPreviewWarmer()
+    private var historyObserver: AnyCancellable?
+    /// How many of the latest entries are kept ready before the overlay opens.
+    private static let warmedEntries = 30
 
     init(history: ClipboardHistory, monitor: ClipboardMonitor, settings: ClipboardSettings, appearance: AppearanceSettings, general: GeneralSettings) {
         self.history = history
@@ -54,6 +59,21 @@ final class OverlayController: NSObject {
         panel.contentView = hostingView
         panel.onScroll = { [weak self] event in
             self?.handleScroll(event)
+        }
+        // New entries get ready while nothing is shown, so the first open is quick too.
+        historyObserver = history.$items
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { [weak self] items in
+                guard let self, !self.isVisible else { return }
+                self.warmer.warm(Array(items.prefix(Self.warmedEntries)), baseSize: self.cardTextSize)
+            }
+    }
+
+    /// The size rich text is drawn at in the current style's cards.
+    private var cardTextSize: CGFloat {
+        switch settings.style {
+        case .simple, .stack: 15
+        case .grid, .carousel, .ring: 13
         }
     }
 
@@ -105,6 +125,8 @@ final class OverlayController: NSObject {
             panel.alphaValue = 0
             panel.present(on: screen)
         }
+        // The entries after the first, in the order the shortcut steps through them.
+        warmer.warm(Array(state.items.dropFirst()), baseSize: cardTextSize)
         NSAnimationContext.runAnimationGroup { context in
             context.duration = Self.fadeDuration
             panel.animator().alphaValue = 1
