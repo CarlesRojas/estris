@@ -67,15 +67,17 @@ final class WindowSnapping {
     }
 
     /// Shares the screen in use (the front window's, else the pointer's) evenly among all its
-    /// windows, front ones first. Each window's frame before is kept for Restore.
+    /// windows, each going to the space nearest where it is. Each window's frame before is kept
+    /// for Restore.
     private func arrangeAll() {
         let mouse = NSEvent.mouseLocation
         guard let screen = AXWindow.focused()?.screen ?? NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) else { return }
         let windows = WindowArranger.windows(on: screen)
         guard !windows.isEmpty else { return log("arrange all: no windows on this screen (needs Accessibility access)") }
-        let frames = WindowArranger.frames(count: windows.count, in: screen.visibleFrame)
-        for (window, frame) in zip(windows, frames) {
-            guard let original = window.frame else { continue }
+        let area = screen.visibleFrame
+        let current = windows.compactMap { window in window.frame.map { (window: window, frame: $0) } }
+        let frames = WindowArranger.assign(current.map(\.frame), to: WindowArranger.frames(count: current.count, in: area), in: area)
+        for ((window, original), frame) in zip(current, frames) {
             window.setFrame(frame)
             let snapped = window.frame ?? frame
             if let saved = restoreFrames.firstIndex(where: { $0.window.isSame(as: window) }) {
