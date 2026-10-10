@@ -12,6 +12,8 @@ import SwiftUI
 final class FocusFollowsMouse {
     /// Accessibility calls into a busy app give up after this long instead of stalling.
     private static let messagingTimeout: Float = 0.25
+    /// Faster than this (points per second) is passing through on the way somewhere else.
+    private static let fastSpeed: CGFloat = 800
 
     let settings = FocusFollowsMouseSettings()
     private let appLog: AppLog
@@ -19,6 +21,15 @@ final class FocusFollowsMouse {
     private var mouseMonitor: Any?
     private var spaceObserver: NSObjectProtocol?
     private var pending: DispatchWorkItem?
+    private var lastPoint: NSPoint?
+    private var lastTime: TimeInterval = 0
+    /// The pointer's speed, smoothed over the last few moves.
+    private var speed: CGFloat = 0
+    /// The window under the pointer, and since when it has been there moving slowly.
+    private var candidate = 0
+    private var dwellStart: TimeInterval = 0
+    /// Whether the candidate was already handled, so slow moves over it don't repeat the work.
+    private var isHandled = false
 
     init(log: AppLog) {
         appLog = log
@@ -46,8 +57,9 @@ final class FocusFollowsMouse {
         guard active else { return }
 
         // Moves over other apps' windows; PasteRing's own windows are never focused this way.
-        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) { [weak self] _ in
-            MainActor.assumeIsolated { self?.pointerMoved() }
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) { [weak self] event in
+            let time = event.timestamp
+            MainActor.assumeIsolated { self?.pointerMoved(at: time) }
         }
         // Switching desktops moves windows under a still pointer; that isn't the user picking one.
         spaceObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -56,28 +68,62 @@ final class FocusFollowsMouse {
             MainActor.assumeIsolated {
                 self?.pending?.cancel()
                 self?.pending = nil
+                self?.candidate = 0
             }
         }
     }
 
-    /// Waits for the pointer to rest: every move starts the wait again, so windows crossed on
-    /// the way aren't brought forward.
-    private func pointerMoved() {
+    /// Counts how long the pointer stays over the same window while moving slowly (or resting);
+    /// moving fast or entering another window starts the count again, so windows crossed on
+    /// the way aren't brought forward. Once it reaches the delay, the window is focused.
+    private func pointerMoved(at time: TimeInterval) {
+        let point = NSEvent.mouseLocation
+        if let lastPoint, time > lastTime {
+            let moved = hypot(point.x - lastPoint.x, point.y - lastPoint.y) / CGFloat(time - lastTime)
+            speed = speed * 0.6 + moved * 0.4
+        }
+        lastPoint = point
+        lastTime = time
+
+        let number = NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0)
+        if number != candidate {
+            candidate = number
+            dwellStart = time
+            isHandled = false
+        }
+        if speed > Self.fastSpeed {
+            dwellStart = time
+        }
+        guard !isHandled else { return }
+
+        let waited = time - dwellStart
         pending?.cancel()
+        pending = nil
+        if waited >= settings.delay.seconds {
+            focusWindowUnderPointer()
+            return
+        }
+        // If the pointer stops before then, no more moves arrive: finish the count anyway.
         let work = DispatchWorkItem { [weak self] in
-            MainActor.assumeIsolated { self?.focusWindowUnderPointer() }
+            MainActor.assumeIsolated {
+                guard let self, self.candidate == number, !self.isHandled else { return }
+                self.speed = 0
+                self.focusWindowUnderPointer()
+            }
         }
         pending = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + settings.delay.seconds, execute: work)
+        DispatchQueue.main.asyncAfter(deadline: .now() + settings.delay.seconds - waited, execute: work)
     }
 
     private func focusWindowUnderPointer() {
         pending = nil
         guard settings.isEnabled, AXIsProcessTrusted(),
-              // Dragging, clicking, or holding a modifier for a shortcut.
+              // Dragging, clicking, or holding a modifier for a shortcut; tried again on the
+              // next move.
               NSEvent.pressedMouseButtons == 0,
               NSEvent.modifierFlags.intersection([.command, .control, .option, .shift]).isEmpty
         else { return }
+        isHandled = true
 
         let point = NSEvent.mouseLocation
         // The window a click would reach, on top of everything; nothing to do over menus, the

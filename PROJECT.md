@@ -145,7 +145,7 @@ Moves the front window to halves, corners, thirds or the whole screen. Off by de
 
 The window under the pointer comes to the front and its app becomes active, without clicking. Off by default; turn it on in **Settings > Focus Follows Mouse**.
 
-- **Focus after resting for**: **Immediately**, or 100 (default), 250, 500 or 1000 ms. Immediately focuses each window the pointer enters, so windows crossed on the way come forward too; with a delay it waits for the pointer to rest, and every move starts the wait again.
+- **Focus after resting for**: **Immediately**, or 100 (default), 250, 500 or 1000 ms. The delay counts while the pointer stays over the same window moving slowly or resting, without having to stop; moving fast (over 800 points per second, smoothed) or entering another window starts it again, so windows crossed on the way stay where they are. Immediately focuses a window as soon as the pointer is over it moving slowly.
 - Nothing happens while a mouse button or a modifier key is held (dragging, clicking, a shortcut), over menus, the Dock, the menu bar, the desktop or anything else that isn't a normal window (window layer 0), over PasteRing's own windows, while a sheet or modal dialog of the app in front is open, or when switching desktops.
 - The window is raised (Accessibility `AXRaise` and `AXMain`) and its app activated. Focusing without raising would need private window server calls, so it always raises.
 - **Excluded Apps** tab: apps whose windows are never focused by hovering.
@@ -222,7 +222,7 @@ Sources/PasteRing/
       Model/                   settings, CoreAudio helpers and listeners, app list, tap engine
       Settings/                the Volume Mixer pane
     FocusFollowsMouse/
-      FocusFollowsMouse.swift  owns the utility: pointer monitor, rest delay, raising the window under it
+      FocusFollowsMouse.swift  owns the utility: pointer monitor, speed-aware delay, raising the window under it
       Model/                   settings
       Settings/                the Focus Follows Mouse pane
     KeepAwake/
