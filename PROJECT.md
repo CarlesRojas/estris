@@ -123,7 +123,8 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
   - Every interface of a device (keyboard, pointer, media keys, vendor extras) maps to it, since a mouse can send side buttons through any of them; only devices with a keyboard or pointer interface are listed.
   - Devices are identified by vendor, product and name, so mappings survive reconnects; identical devices share mappings.
   - Devices can be renamed (pencil next to the group title); an empty name goes back to the original.
-  - A press that reaches macOS without its device (seen while recording or pressing) is remembered as device-less (events posted by apps, Estris included, never count). It takes the oldest complete mapping for it on any device; newer mappings of it on other devices show "Already mapped on" that device, with their result disabled.
+  - A key picked from the list belongs to its device and never conflicts with other devices. Two mappings for the same key on one device do: the later shows "Already mapped above".
+  - A mapping recorded from a press that reached macOS without its device is device-less (events posted by apps, Estris included, never count). Such presses take the oldest complete device-less mapping for them on any device; newer device-less mappings of the same key on other devices show "Already mapped on" that device, with their result disabled. Picking the key from the list again, or swapping, makes it belong to its device.
   - Next and previous desktop use the Control-arrow shortcuts, which must be on in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
 - Needs the Accessibility permission.
 

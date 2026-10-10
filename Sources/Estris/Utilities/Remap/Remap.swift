@@ -28,7 +28,7 @@ final class Remap {
     var isOverViewerLink = false
 
     /// Waiting for a key or button on a device, to remap it.
-    private var recording: (deviceID: String, done: (RemapInput) -> Void)?
+    private var recording: (deviceID: String, done: (RemapInput, Bool) -> Void)?
 
     init(log: AppLog) {
         appLog = log
@@ -57,8 +57,9 @@ final class Remap {
         RemapPane(remap: self, settings: settings)
     }
 
-    /// Calls `done` with the next key or button pressed on the device, which isn't passed on.
-    func record(on deviceID: String, _ done: @escaping (RemapInput) -> Void) {
+    /// Calls `done` with the next key or button pressed on the device, which isn't passed on,
+    /// and whether it arrived without its device.
+    func record(on deviceID: String, _ done: @escaping (RemapInput, Bool) -> Void) {
         recording = (deviceID, done)
         log("recording: waiting for a key or button on \(deviceID)")
         updateTap()
@@ -131,13 +132,10 @@ final class Remap {
         // A click on Create Mapping in the Event Viewer; logging it would add a row and move
         // the list under the pointer.
         let isLinkClick = isOverViewerLink && (type == .leftMouseDown || type == .leftMouseUp)
-        // Some presses reach macOS without their device; they take the mappings of the one
-        // device whose mapping applies to them. Events posted by an app (Estris's own key
-        // presses included) never come from a device, so they don't count.
+        // Some presses reach macOS without their device; they take the device-less mapping
+        // that applies to them. Events posted by an app (Estris's own key presses included)
+        // never come from a device, so they don't count.
         let isPosted = event.getIntegerValueField(.eventSourceUnixProcessID) != 0
-        if device == nil, !isPosted, let input = parsed.input, parsed.phase == .down, input != .mouseButton(0) {
-            settings.noteDeviceLess(input)
-        }
         let target = device ?? (isPosted ? nil : parsed.input).flatMap { input in
             settings.activeDevice(for: input).map { InputDevice(id: $0.id, name: $0.entry.name, kind: $0.entry.kind) }
         }
@@ -162,7 +160,7 @@ final class Remap {
                 log("recording: \(parsed.name) from \(device?.name ?? "an unknown device")")
                 self.recording = nil
                 updateTap()
-                recording.done(input)
+                recording.done(input, device == nil)
                 return false
             }
         }

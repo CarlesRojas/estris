@@ -134,6 +134,8 @@ private struct MappingsView: View {
     /// nothing, or the left button).
     private func swapped(_ mapping: Mapping) -> Mapping? {
         var result = mapping
+        // The new input was picked from the list, so it belongs to this device.
+        result.isDeviceLess = nil
         switch mapping.output {
         case nil: result.input = nil
         case .key(let usage)?: result.input = .key(usage)
@@ -152,9 +154,10 @@ private struct MappingsView: View {
         let conflict = settings.conflict(for: mapping, on: device.id)
         return VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 10) {
-                InputButton(remap: remap, device: device, input: mapping.input) { input in
+                InputButton(remap: remap, device: device, input: mapping.input) { input, isDeviceLess in
                     var changed = mapping
                     changed.input = input
+                    changed.isDeviceLess = isDeviceLess ? true : nil
                     settings.update(changed, on: device.id)
                 }
                 Image(systemName: "arrow.right")
@@ -199,16 +202,16 @@ private struct InputButton: View {
     let remap: Remap
     let device: InputDevice
     let input: RemapInput?
-    let choose: (RemapInput) -> Void
+    let choose: (RemapInput, Bool) -> Void
     @State private var isPicking = false
 
     var body: some View {
         Button(input?.title ?? String(localized: "Choose…")) { isPicking = true }
             .frame(minWidth: 160, alignment: .leading)
             .popover(isPresented: $isPicking, arrowEdge: .bottom) {
-                InputPicker(remap: remap, device: device) { input in
+                InputPicker(remap: remap, device: device) { input, isDeviceLess in
                     isPicking = false
-                    choose(input)
+                    choose(input, isDeviceLess)
                 }
             }
     }
@@ -238,7 +241,8 @@ private struct OutputButton: View {
 private struct InputPicker: View {
     let remap: Remap
     let device: InputDevice
-    let choose: (RemapInput) -> Void
+    /// The input, and whether it was recorded from a press that arrived without its device.
+    let choose: (RemapInput, Bool) -> Void
     @State private var isRecording = false
 
     var body: some View {
@@ -263,9 +267,9 @@ private struct InputPicker: View {
                 VStack(spacing: 0) {
                     Button {
                         isRecording = true
-                        remap.record(on: device.id) { input in
+                        remap.record(on: device.id) { input, isDeviceLess in
                             isRecording = false
-                            choose(input)
+                            choose(input, isDeviceLess)
                         }
                     } label: {
                         Label("Record from \(device.name)", systemImage: "record.circle")
@@ -276,7 +280,7 @@ private struct InputPicker: View {
                     .padding([.horizontal, .top], 12)
 
                     ChoiceList(sections: Choices.inputs(for: device)) { input in
-                        choose(input)
+                        choose(input, false)
                     }
                 }
             }
