@@ -139,6 +139,7 @@ struct DeveloperPane: View {
 
             Section {
                 Toggle("Show Dock Preview's hover area", isOn: $showsDockPreviewArea)
+                    .resetMenu($showsDockPreviewArea, to: false)
             } header: {
                 Text("Debugging")
             }

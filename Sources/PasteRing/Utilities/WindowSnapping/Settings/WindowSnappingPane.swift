@@ -46,6 +46,7 @@ struct WindowSnappingPane: View {
     private var dragging: some View {
         Section("Dragging") {
             Toggle("Snap by dragging a window to a screen edge", isOn: $settings.snapsByDragging)
+                .resetMenu($settings.snapsByDragging, to: WindowSnappingSettings.defaultSnapsByDragging)
             LabeledContent("Edge area") {
                 HStack {
                     // No step: it would draw a tick mark for every point.
@@ -60,12 +61,15 @@ struct WindowSnappingPane: View {
                         .frame(width: 50, alignment: .trailing)
                 }
             }
+            .resetMenu($settings.edgeArea, to: WindowSnappingSettings.defaultEdgeArea)
             .disabled(!settings.snapsByDragging)
             Toggle("Resize side-by-side windows together", isOn: $settings.resizesTogether)
+                .resetMenu($settings.resizesTogether, to: WindowSnappingSettings.defaultResizesTogether)
             Toggle(isOn: $settings.fillsSpace) {
                 Text("Fill the space next to other windows")
                 Text("Press a shortcut again for the exact size, or hold ⌘ while dragging.")
             }
+            .resetMenu($settings.fillsSpace, to: WindowSnappingSettings.defaultFillsSpace)
         }
     }
 
@@ -78,6 +82,9 @@ struct WindowSnappingPane: View {
                         if isOn { settings.gestures.insert(gesture) } else { settings.gestures.remove(gesture) }
                     }
                 ))
+                .resetMenu(isDefault: settings.gestures.contains(gesture) == SnapGesture.defaults.contains(gesture)) {
+                    if SnapGesture.defaults.contains(gesture) { settings.gestures.insert(gesture) } else { settings.gestures.remove(gesture) }
+                }
             }
         }
         .disabled(!settings.snapsByDragging)
@@ -89,6 +96,7 @@ struct WindowSnappingPane: View {
                 Text("Place all windows side by side")
                 Text("One shortcut fits every window on the screen without overlaps, each near where it was.")
             }
+            .resetMenu($settings.arrangesAll, to: WindowSnappingSettings.defaultArrangesAll)
             shortcutRow(id: SnapKeys.arrangeAllID, title: String(localized: "Arrange All Windows")) {
                 Image(systemName: "square.grid.2x2")
             }
@@ -129,6 +137,7 @@ struct WindowSnappingPane: View {
             } label: {
                 Label { Text(title) } icon: { icon() }
             }
+            .resetMenu(isDefault: settings.keyCodes[id] == nil) { settings.keyCodes[id] = nil }
             if id != SnapKeys.arrangeAllID || settings.arrangesAll {
                 conflicts(for: id)
             }

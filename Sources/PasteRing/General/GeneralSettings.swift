@@ -81,6 +81,13 @@ enum TimeStyle: String, CaseIterable, Identifiable {
 /// Settings shared by every utility in the app, persisted in UserDefaults.
 @MainActor
 final class GeneralSettings: ObservableObject {
+    /// What each setting is at first, for each row's Reset to Default.
+    enum Default {
+        static let language = AppLanguage.system
+        static let dateStyle = DateStyle.monthDay
+        static let timeStyle = TimeStyle.system
+    }
+
     private let defaults = UserDefaults.standard
 
     @Published var language: AppLanguage {
@@ -108,11 +115,11 @@ final class GeneralSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        let language = AppLanguage(rawValue: defaults.string(forKey: Keys.language) ?? "") ?? .system
+        let language = AppLanguage(rawValue: defaults.string(forKey: Keys.language) ?? "") ?? Default.language
         self.language = language
         launchLanguage = language
-        dateStyle = DateStyle(rawValue: defaults.string(forKey: Keys.dateStyle) ?? "") ?? .monthDay
-        timeStyle = TimeStyle(rawValue: defaults.string(forKey: Keys.timeStyle) ?? "") ?? .system
+        dateStyle = DateStyle(rawValue: defaults.string(forKey: Keys.dateStyle) ?? "") ?? Default.dateStyle
+        timeStyle = TimeStyle(rawValue: defaults.string(forKey: Keys.timeStyle) ?? "") ?? Default.timeStyle
         showsDeveloperSettings = defaults.bool(forKey: Keys.showsDeveloperSettings)
     }
 

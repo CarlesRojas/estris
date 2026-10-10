@@ -10,12 +10,14 @@ where Tab: CaseIterable & Hashable & RawRepresentable, Tab.RawValue == String, T
     var isOn: Binding<Bool>?
     /// Asked for when the switch is turned on, if any isn't allowed yet.
     var permissions: [PermissionUse] = []
+    /// What the switch is at first, for its Reset to Default.
+    var defaultIsOn = false
     @Binding var tab: Tab
     @ViewBuilder let content: (Tab) -> Content
 
     var body: some View {
         VStack(spacing: 0) {
-            UtilityHeader(title: pane.title, symbol: pane.symbol, summary: summary, isOn: isOn, permissions: permissions)
+            UtilityHeader(title: pane.title, symbol: pane.symbol, summary: summary, isOn: isOn, permissions: permissions, defaultIsOn: defaultIsOn)
 
             Picker("View", selection: $tab) {
                 ForEach(Array(Tab.allCases), id: \.self) { tab in

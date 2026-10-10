@@ -18,6 +18,8 @@ enum TapFingers: Int, CaseIterable, Identifiable {
 /// Middle Click preferences, persisted in UserDefaults.
 @MainActor
 final class MiddleClickSettings: ObservableObject {
+    static let defaultFingers = TapFingers.three
+
     private let defaults = UserDefaults.standard
 
     @Published var isEnabled: Bool {
@@ -35,15 +37,15 @@ final class MiddleClickSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [Keys.isEnabled: false, Keys.fingers: TapFingers.three.rawValue])
+        defaults.register(defaults: [Keys.isEnabled: false, Keys.fingers: Self.defaultFingers.rawValue])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
-        fingers = TapFingers(rawValue: defaults.integer(forKey: Keys.fingers)) ?? .three
+        fingers = TapFingers(rawValue: defaults.integer(forKey: Keys.fingers)) ?? Self.defaultFingers
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
     /// Back to a three-finger tap; the on/off switch and excluded apps stay as they are.
     func reset() {
-        fingers = .three
+        fingers = Self.defaultFingers
     }
 
     private enum Keys {

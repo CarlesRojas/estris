@@ -291,6 +291,7 @@
 "Rename Device" = "Canvia el nom del dispositiu";
 "Rename this device" = "Canvia el nom d’aquest dispositiu";
 "Reset Appearance to Defaults" = "Restableix l’aparença per defecte";
+"Reset to Default" = "Restableix el valor per defecte";
 "Reset to Defaults" = "Restableix els valors per defecte";
 "Resize side-by-side windows together" = "Redimensiona juntes les finestres del costat";
 "Rest the pointer on an app in the Dock to see its windows, and click one to open it." = "Deixa el punter sobre una app del Dock per veure'n les finestres, i fes clic en una per obrir-la.";

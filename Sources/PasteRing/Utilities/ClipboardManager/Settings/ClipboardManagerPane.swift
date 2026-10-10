@@ -26,6 +26,7 @@ struct ClipboardManagerPane: View {
             summary: "Keeps what you copy and lets you pick what to paste with a shortcut.",
             isOn: $clipboard.isEnabled,
             permissions: Self.permissions,
+            defaultIsOn: ClipboardSettings.Default.isEnabled,
             tab: $tab
         ) { _ in
             content

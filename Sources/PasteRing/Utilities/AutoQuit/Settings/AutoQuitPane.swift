@@ -41,6 +41,7 @@ struct AutoQuitPane: View {
                         Text(delay.title).tag(delay)
                     }
                 }
+                .resetMenu($settings.delay, to: AutoQuitSettings.defaultDelay)
             } header: {
                 Text("General")
             }

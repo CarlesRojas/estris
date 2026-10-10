@@ -262,6 +262,13 @@ final class VolumeMixer {
         reconcileEngines(running)
     }
 
+    /// One app back to playing as it is: its volume, mute and device.
+    func resetSound(of app: AudioApp) {
+        settings.setSound(AppSound(), of: app.key)
+        failed[app.pid] = nil
+        reconcileEngines(running)
+    }
+
     /// Every app back to playing as it is.
     func reset() {
         settings.reset()

@@ -291,6 +291,7 @@
 "Rename Device" = "Renommer l’appareil";
 "Rename this device" = "Renommer cet appareil";
 "Reset Appearance to Defaults" = "Rétablir l’apparence par défaut";
+"Reset to Default" = "Rétablir la valeur par défaut";
 "Reset to Defaults" = "Rétablir les valeurs par défaut";
 "Resize side-by-side windows together" = "Redimensionner ensemble les fenêtres côte à côte";
 "Rest the pointer on an app in the Dock to see its windows, and click one to open it." = "Laissez le pointeur sur une app du Dock pour voir ses fenêtres, et cliquez sur l'une pour l'ouvrir.";

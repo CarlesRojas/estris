@@ -43,17 +43,20 @@ struct GeneralPane: View {
                         Text(verbatim: language.title).tag(language)
                     }
                 }
+                .resetMenu($general.language, to: GeneralSettings.Default.language)
                 Picker("Date format", selection: $general.dateStyle) {
                     ForEach(DateStyle.allCases) { style in
                         Text(DateTimeFormat(language: general.language, dateStyle: style).dateString(from: .now)).tag(style)
                     }
                 }
+                .resetMenu($general.dateStyle, to: GeneralSettings.Default.dateStyle)
                 Picker("Time format", selection: $general.timeStyle) {
                     ForEach(TimeStyle.allCases) { style in
                         let sample = DateTimeFormat(language: general.language, timeStyle: style).timeString(from: .now)
                         Text(verbatim: "\(style.title) (\(sample))").tag(style)
                     }
                 }
+                .resetMenu($general.timeStyle, to: GeneralSettings.Default.timeStyle)
             }
 
             Section("Startup") {
@@ -64,6 +67,11 @@ struct GeneralPane: View {
                         openAtLogin = LoginItem.isEnabled
                     }
                 ))
+                // Off unless turned on.
+                .resetMenu(isDefault: !openAtLogin) {
+                    LoginItem.setEnabled(false)
+                    openAtLogin = LoginItem.isEnabled
+                }
             }
 
             if accessibilityGranted {

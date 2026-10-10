@@ -67,6 +67,9 @@ enum ColorFormat: String, CaseIterable, Identifiable {
 final class ColorPickerSettings: ObservableObject {
     static let defaultShortcut = Shortcut(keyCode: UInt32(kVK_ANSI_C), modifiers: UInt32(cmdKey | shiftKey), keyLabel: "C")
 
+    static let defaultFormat = ColorFormat.hex
+    static let defaultHashPrefix = true
+
     private let defaults = UserDefaults.standard
 
     @Published var isEnabled: Bool {
@@ -96,9 +99,9 @@ final class ColorPickerSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [Keys.hashPrefix: true])
+        defaults.register(defaults: [Keys.hashPrefix: Self.defaultHashPrefix])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
-        format = ColorFormat(rawValue: defaults.string(forKey: Keys.format) ?? "") ?? .hex
+        format = ColorFormat(rawValue: defaults.string(forKey: Keys.format) ?? "") ?? Self.defaultFormat
         hashPrefix = defaults.bool(forKey: Keys.hashPrefix)
         recentColors = defaults.stringArray(forKey: Keys.recentColors) ?? []
         shortcut = defaults.data(forKey: Keys.shortcut).flatMap { try? JSONDecoder().decode(Shortcut.self, from: $0) } ?? Self.defaultShortcut
@@ -116,8 +119,8 @@ final class ColorPickerSettings: ObservableObject {
 
     /// Back to the default format and shortcut; the on/off switch and recent colors stay.
     func reset() {
-        format = .hex
-        hashPrefix = true
+        format = Self.defaultFormat
+        hashPrefix = Self.defaultHashPrefix
         shortcut = Self.defaultShortcut
     }
 

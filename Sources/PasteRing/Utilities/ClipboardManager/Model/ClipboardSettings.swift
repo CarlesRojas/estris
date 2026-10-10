@@ -71,6 +71,33 @@ final class ClipboardSettings: ObservableObject {
     static let ringChipWidthRange: ClosedRange<Double> = 160...480
     static let ringChipHeightRange: ClosedRange<Double> = 80...480
 
+    /// What each setting is at first, for Reset to Defaults and each row's Reset to Default.
+    enum Default {
+        static let isEnabled = true
+        static let maxItems = 50
+        static let ignorePasswords = true
+        static let recordImages = true
+        static let pasteAsPlainText = false
+        static let removeDuplicates = true
+        static let moveToTopOnPaste = true
+        static let expiry = HistoryExpiry.never
+        static let style = OverlayStyle.simple
+        static let ringSize = 16
+        static let gridSize = 12
+        static let gridCardWidth = 320.0
+        static let gridCardHeight = 256.0
+        static let simpleWidth = 560.0
+        static let simpleHeight = 256.0
+        static let carouselWidth = 260.0
+        static let carouselHeight = 260.0
+        static let stackWidth = 520.0
+        static let stackHeight = 256.0
+        static let ringChipWidth = 280.0
+        static let ringChipHeight = 256.0
+        static let showCopyDate = true
+        static let showDeleteButton = true
+    }
+
     private let defaults = UserDefaults.standard
 
     /// The whole utility: recording, the overlay and its shortcuts.
@@ -187,13 +214,13 @@ final class ClipboardSettings: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
-            Keys.isEnabled: true,
-            Keys.maxItems: 50,
-            Keys.ignorePasswords: true,
-            Keys.recordImages: true,
-            Keys.pasteAsPlainText: false,
-            Keys.removeDuplicates: true,
-            Keys.moveToTopOnPaste: true,
+            Keys.isEnabled: Default.isEnabled,
+            Keys.maxItems: Default.maxItems,
+            Keys.ignorePasswords: Default.ignorePasswords,
+            Keys.recordImages: Default.recordImages,
+            Keys.pasteAsPlainText: Default.pasteAsPlainText,
+            Keys.removeDuplicates: Default.removeDuplicates,
+            Keys.moveToTopOnPaste: Default.moveToTopOnPaste,
         ])
         defaults.register(defaults: Self.appearanceDefaults)
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
@@ -207,7 +234,7 @@ final class ClipboardSettings: ObservableObject {
         shortcuts = savedShortcuts?.isEmpty == false ? savedShortcuts! : [Self.defaultShortcut]
         showCopyDate = defaults.bool(forKey: Keys.showCopyDate)
         showDeleteButton = defaults.bool(forKey: Keys.showDeleteButton)
-        expiry = HistoryExpiry(rawValue: defaults.string(forKey: Keys.expiry) ?? "") ?? .never
+        expiry = HistoryExpiry(rawValue: defaults.string(forKey: Keys.expiry) ?? "") ?? Default.expiry
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
         ringSize = defaults.integer(forKey: Keys.ringSize)
         gridSize = defaults.integer(forKey: Keys.gridSize)
@@ -236,33 +263,33 @@ final class ClipboardSettings: ObservableObject {
     /// Defaults for the settings shown in the Appearance tab. Add new ones here so
     /// Reset to Defaults covers them.
     private static let appearanceDefaults: [String: Any] = [
-        Keys.style: OverlayStyle.simple.rawValue,
-        Keys.ringSize: 16,
-        Keys.gridSize: 12,
-        Keys.gridCardWidth: 320.0,
-        Keys.gridCardHeight: 256.0,
-        Keys.simpleWidth: 560.0,
-        Keys.simpleHeight: 256.0,
-        Keys.carouselWidth: 260.0,
-        Keys.carouselHeight: 260.0,
-        Keys.stackWidth: 520.0,
-        Keys.stackHeight: 256.0,
-        Keys.ringChipWidth: 280.0,
-        Keys.ringChipHeight: 256.0,
-        Keys.showCopyDate: true,
-        Keys.showDeleteButton: true,
+        Keys.style: Default.style.rawValue,
+        Keys.ringSize: Default.ringSize,
+        Keys.gridSize: Default.gridSize,
+        Keys.gridCardWidth: Default.gridCardWidth,
+        Keys.gridCardHeight: Default.gridCardHeight,
+        Keys.simpleWidth: Default.simpleWidth,
+        Keys.simpleHeight: Default.simpleHeight,
+        Keys.carouselWidth: Default.carouselWidth,
+        Keys.carouselHeight: Default.carouselHeight,
+        Keys.stackWidth: Default.stackWidth,
+        Keys.stackHeight: Default.stackHeight,
+        Keys.ringChipWidth: Default.ringChipWidth,
+        Keys.ringChipHeight: Default.ringChipHeight,
+        Keys.showCopyDate: Default.showCopyDate,
+        Keys.showDeleteButton: Default.showDeleteButton,
     ]
 
     /// Back to the default settings, appearance and shortcut; the on/off switch, excluded
     /// apps and history stay as they are.
     func reset() {
-        maxItems = 50
-        ignorePasswords = true
-        recordImages = true
-        pasteAsPlainText = false
-        removeDuplicates = true
-        moveToTopOnPaste = true
-        expiry = .never
+        maxItems = Default.maxItems
+        ignorePasswords = Default.ignorePasswords
+        recordImages = Default.recordImages
+        pasteAsPlainText = Default.pasteAsPlainText
+        removeDuplicates = Default.removeDuplicates
+        moveToTopOnPaste = Default.moveToTopOnPaste
+        expiry = Default.expiry
         shortcuts = [Self.defaultShortcut]
         resetAppearance()
     }
@@ -289,6 +316,13 @@ final class ClipboardSettings: ObservableObject {
     }
 
     static let defaultShortcut = Shortcut(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | shiftKey), keyLabel: "V")
+
+    /// The first shortcut back to ⇧⌘V; an alternative already using it is dropped.
+    func resetMainShortcut() {
+        var rest = Array(shortcuts.dropFirst())
+        rest.removeAll { $0.id == Self.defaultShortcut.id }
+        shortcuts = [Self.defaultShortcut] + rest
+    }
 
     /// Adds another shortcut, starting from one not in use; the user then records over it.
     func addAlternativeShortcut() {

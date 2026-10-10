@@ -41,6 +41,7 @@ struct MiddleClickPane: View {
                         Text(fingers.title).tag(fingers)
                     }
                 }
+                .resetMenu($settings.fingers, to: MiddleClickSettings.defaultFingers)
             } header: {
                 Text("General")
             }

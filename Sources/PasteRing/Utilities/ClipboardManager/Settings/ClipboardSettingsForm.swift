@@ -24,31 +24,38 @@ struct ClipboardSettingsForm: View {
                         Text("entries")
                     }
                 }
+                .resetMenu($settings.maxItems, to: ClipboardSettings.Default.maxItems)
                 Picker("Delete entries", selection: $settings.expiry) {
                     ForEach(HistoryExpiry.allCases) { expiry in
                         Text(expiry.title).tag(expiry)
                     }
                 }
+                .resetMenu($settings.expiry, to: ClipboardSettings.Default.expiry)
                 Toggle(isOn: $settings.ignorePasswords) {
                     Text("Ignore passwords")
                     Text("Skips text copied from password fields and password managers.")
                 }
+                .resetMenu($settings.ignorePasswords, to: ClipboardSettings.Default.ignorePasswords)
                 Toggle(isOn: $settings.recordImages) {
                     Text("Record images")
                     Text("Keeps copied images in the history alongside text and files.")
                 }
+                .resetMenu($settings.recordImages, to: ClipboardSettings.Default.recordImages)
                 Toggle(isOn: $settings.pasteAsPlainText) {
                     Text("Paste as plain text")
                     Text("Drops fonts, colours and other formatting, so pasted text matches where it goes.")
                 }
+                .resetMenu($settings.pasteAsPlainText, to: ClipboardSettings.Default.pasteAsPlainText)
                 Toggle(isOn: $settings.removeDuplicates) {
                     Text("Remove duplicates")
                     Text("Copying something already in the history moves it to the top instead of adding it again.")
                 }
+                .resetMenu($settings.removeDuplicates, to: ClipboardSettings.Default.removeDuplicates)
                 Toggle(isOn: $settings.moveToTopOnPaste) {
                     Text("Move pasted entry to the top")
                     Text("When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.")
                 }
+                .resetMenu($settings.moveToTopOnPaste, to: ClipboardSettings.Default.moveToTopOnPaste)
             }
 
             Section("Appearance") {
@@ -60,20 +67,21 @@ struct ClipboardSettingsForm: View {
                         Text(style.title).tag(style)
                     }
                 }
+                .resetMenu($settings.style, to: ClipboardSettings.Default.style)
 
                 if settings.style == .simple {
-                    slider("Width", value: $settings.simpleWidth, in: ClipboardSettings.simpleWidthRange, percent: false)
-                    slider("Height", value: $settings.simpleHeight, in: ClipboardSettings.simpleHeightRange, percent: false)
+                    slider("Width", value: $settings.simpleWidth, in: ClipboardSettings.simpleWidthRange, percent: false, default: ClipboardSettings.Default.simpleWidth)
+                    slider("Height", value: $settings.simpleHeight, in: ClipboardSettings.simpleHeightRange, percent: false, default: ClipboardSettings.Default.simpleHeight)
                 }
 
                 if settings.style == .carousel {
-                    slider("Width", value: $settings.carouselWidth, in: ClipboardSettings.carouselSizeRange, percent: false)
-                    slider("Height", value: $settings.carouselHeight, in: ClipboardSettings.carouselSizeRange, percent: false)
+                    slider("Width", value: $settings.carouselWidth, in: ClipboardSettings.carouselSizeRange, percent: false, default: ClipboardSettings.Default.carouselWidth)
+                    slider("Height", value: $settings.carouselHeight, in: ClipboardSettings.carouselSizeRange, percent: false, default: ClipboardSettings.Default.carouselHeight)
                 }
 
                 if settings.style == .stack {
-                    slider("Width", value: $settings.stackWidth, in: ClipboardSettings.stackWidthRange, percent: false)
-                    slider("Height", value: $settings.stackHeight, in: ClipboardSettings.stackHeightRange, percent: false)
+                    slider("Width", value: $settings.stackWidth, in: ClipboardSettings.stackWidthRange, percent: false, default: ClipboardSettings.Default.stackWidth)
+                    slider("Height", value: $settings.stackHeight, in: ClipboardSettings.stackHeightRange, percent: false, default: ClipboardSettings.Default.stackHeight)
                 }
 
                 if settings.style == .grid {
@@ -84,8 +92,9 @@ struct ClipboardSettingsForm: View {
                             Text("\(settings.gridSize) most recent entries")
                         }
                     }
-                    slider("Width", value: $settings.gridCardWidth, in: ClipboardSettings.gridCardWidthRange, percent: false)
-                    slider("Height", value: $settings.gridCardHeight, in: ClipboardSettings.gridCardHeightRange, percent: false)
+                    .resetMenu($settings.gridSize, to: ClipboardSettings.Default.gridSize)
+                    slider("Width", value: $settings.gridCardWidth, in: ClipboardSettings.gridCardWidthRange, percent: false, default: ClipboardSettings.Default.gridCardWidth)
+                    slider("Height", value: $settings.gridCardHeight, in: ClipboardSettings.gridCardHeightRange, percent: false, default: ClipboardSettings.Default.gridCardHeight)
                 }
 
                 if settings.style == .ring {
@@ -96,18 +105,22 @@ struct ClipboardSettingsForm: View {
                             Text("\(settings.ringSize) most recent entries")
                         }
                     }
-                    slider("Width", value: $settings.ringChipWidth, in: ClipboardSettings.ringChipWidthRange, percent: false)
-                    slider("Height", value: $settings.ringChipHeight, in: ClipboardSettings.ringChipHeightRange, percent: false)
+                    .resetMenu($settings.ringSize, to: ClipboardSettings.Default.ringSize)
+                    slider("Width", value: $settings.ringChipWidth, in: ClipboardSettings.ringChipWidthRange, percent: false, default: ClipboardSettings.Default.ringChipWidth)
+                    slider("Height", value: $settings.ringChipHeight, in: ClipboardSettings.ringChipHeightRange, percent: false, default: ClipboardSettings.Default.ringChipHeight)
                 }
 
                 Toggle("Show when entries were copied", isOn: $settings.showCopyDate)
+                    .resetMenu($settings.showCopyDate, to: ClipboardSettings.Default.showCopyDate)
                 Toggle("Show delete button", isOn: $settings.showDeleteButton)
+                    .resetMenu($settings.showDeleteButton, to: ClipboardSettings.Default.showDeleteButton)
 
                 ColorPicker("Tint", selection: $appearance.tint, supportsOpacity: false)
-                slider("Tint strength", value: $appearance.tintOpacity, in: 0...0.6)
-                slider("Selected highlight", value: $appearance.selectedTintOpacity, in: 0...0.6)
-                slider("Shadow", value: $appearance.shadowRadius, in: 0...30, percent: false)
-                slider("Dim screen", value: $appearance.backdropDim, in: 0...0.7)
+                    .resetMenu($appearance.tint, to: AppearanceSettings.defaultTint)
+                slider("Tint strength", value: $appearance.tintOpacity, in: 0...0.6, default: AppearanceSettings.defaultTintOpacity)
+                slider("Selected highlight", value: $appearance.selectedTintOpacity, in: 0...0.6, default: AppearanceSettings.defaultSelectedTintOpacity)
+                slider("Shadow", value: $appearance.shadowRadius, in: 0...30, percent: false, default: AppearanceSettings.defaultShadowRadius)
+                slider("Dim screen", value: $appearance.backdropDim, in: 0...0.7, default: AppearanceSettings.defaultBackdropDim)
                 Button("Reset Appearance to Defaults") {
                     settings.resetAppearance()
                     appearance.reset()
@@ -129,6 +142,10 @@ struct ClipboardSettingsForm: View {
                                 .help("Remove this shortcut")
                             }
                         }
+                    }
+                    // Only the first has a default; alternatives are added by hand.
+                    .resetMenu(isDefault: shortcut != settings.shortcuts.first || shortcut == ClipboardSettings.defaultShortcut) {
+                        settings.resetMainShortcut()
                     }
                 }
                 Button("Add Alternative Shortcut") {
@@ -160,7 +177,7 @@ struct ClipboardSettingsForm: View {
         return Array((history.items + samples).prefix(4))
     }
 
-    private func slider(_ title: LocalizedStringKey, value: Binding<Double>, in range: ClosedRange<Double>, percent: Bool = true) -> some View {
+    private func slider(_ title: LocalizedStringKey, value: Binding<Double>, in range: ClosedRange<Double>, percent: Bool = true, default defaultValue: Double) -> some View {
         LabeledContent(title) {
             HStack {
                 Slider(value: value, in: range)
@@ -171,5 +188,6 @@ struct ClipboardSettingsForm: View {
                     .frame(width: 40, alignment: .trailing)
             }
         }
+        .resetMenu(value, to: defaultValue)
     }
 }

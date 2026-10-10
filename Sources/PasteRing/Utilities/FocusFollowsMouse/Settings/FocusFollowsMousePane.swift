@@ -42,6 +42,7 @@ struct FocusFollowsMousePane: View {
                         Text(verbatim: delay.title).tag(delay)
                     }
                 }
+                .resetMenu($settings.delay, to: FocusFollowsMouseSettings.defaultDelay)
                 LabeledContent("Skip windows when moving faster than") {
                     HStack(spacing: 8) {
                         Slider(value: $settings.passThroughSpeed, in: FocusFollowsMouseSettings.passThroughSpeeds, step: 100)
@@ -52,6 +53,7 @@ struct FocusFollowsMousePane: View {
                             .frame(width: 72, alignment: .trailing)
                     }
                 }
+                .resetMenu($settings.passThroughSpeed, to: FocusFollowsMouseSettings.defaultPassThroughSpeed)
             }
             Section {
                 Button("Reset to Defaults") { settings.reset() }

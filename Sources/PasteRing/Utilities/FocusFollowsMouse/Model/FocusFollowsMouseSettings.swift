@@ -20,6 +20,7 @@ final class FocusFollowsMouseSettings: ObservableObject {
     }
 
     static let defaultPassThroughSpeed: Double = 800
+    static let defaultDelay = HoverDelay.ms100
     static let passThroughSpeeds: ClosedRange<Double> = 200...3000
 
     /// Bundle identifiers of apps whose windows are never focused by hovering.
@@ -30,7 +31,7 @@ final class FocusFollowsMouseSettings: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
-        delay = defaults.object(forKey: Keys.delay) == nil ? .ms100 : HoverDelay(rawValue: defaults.integer(forKey: Keys.delay)) ?? .ms100
+        delay = defaults.object(forKey: Keys.delay) == nil ? Self.defaultDelay : HoverDelay(rawValue: defaults.integer(forKey: Keys.delay)) ?? Self.defaultDelay
         passThroughSpeed = defaults.object(forKey: Keys.passThroughSpeed) == nil
             ? Self.defaultPassThroughSpeed
             : min(max(defaults.double(forKey: Keys.passThroughSpeed), Self.passThroughSpeeds.lowerBound), Self.passThroughSpeeds.upperBound)
@@ -39,7 +40,7 @@ final class FocusFollowsMouseSettings: ObservableObject {
 
     /// Back to the default delay and speed; the on/off switch and excluded apps stay as they are.
     func reset() {
-        delay = .ms100
+        delay = Self.defaultDelay
         passThroughSpeed = Self.defaultPassThroughSpeed
     }
 

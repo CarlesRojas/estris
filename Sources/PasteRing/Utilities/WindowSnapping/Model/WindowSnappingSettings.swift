@@ -67,6 +67,10 @@ final class WindowSnappingSettings: ObservableObject {
 
     static let edgeAreaRange: ClosedRange<Double> = 8...150
     static let defaultEdgeArea = 64.0
+    static let defaultSnapsByDragging = true
+    static let defaultResizesTogether = true
+    static let defaultFillsSpace = true
+    static let defaultArrangesAll = true
 
     /// A shortcut (⌃⌥Space unless changed) shares the screen evenly among all its windows.
     @Published var arrangesAll: Bool {
@@ -96,12 +100,12 @@ final class WindowSnappingSettings: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
             Keys.isEnabled: false,
-            Keys.snapsByDragging: true,
-            Keys.resizesTogether: true,
-            Keys.fillsSpace: true,
+            Keys.snapsByDragging: Self.defaultSnapsByDragging,
+            Keys.resizesTogether: Self.defaultResizesTogether,
+            Keys.fillsSpace: Self.defaultFillsSpace,
             Keys.edgeArea: Self.defaultEdgeArea,
             Keys.gestures: SnapGesture.defaults.map(\.rawValue),
-            Keys.arrangesAll: true,
+            Keys.arrangesAll: Self.defaultArrangesAll,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         snapsByDragging = defaults.bool(forKey: Keys.snapsByDragging)
@@ -116,11 +120,11 @@ final class WindowSnappingSettings: ObservableObject {
     /// Back to how dragging, resizing, gestures, Arrange All and the shortcut keys start out; the
     /// on/off switch stays.
     func reset() {
-        arrangesAll = true
+        arrangesAll = Self.defaultArrangesAll
         keyCodes = [:]
-        snapsByDragging = true
-        resizesTogether = true
-        fillsSpace = true
+        snapsByDragging = Self.defaultSnapsByDragging
+        resizesTogether = Self.defaultResizesTogether
+        fillsSpace = Self.defaultFillsSpace
         edgeArea = Self.defaultEdgeArea
         gestures = SnapGesture.defaults
     }
