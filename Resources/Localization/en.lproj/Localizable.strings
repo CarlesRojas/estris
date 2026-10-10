@@ -45,7 +45,9 @@
 "After 30 seconds" = "After 30 seconds";
 "After 5 seconds" = "After 5 seconds";
 "All Utilities" = "All Utilities";
+"Allow" = "Allow";
 "Allow System Audio Recording to change each app's sound." = "Allow System Audio Recording to change each app's sound.";
+"Allow what %@ needs?" = "Allow what %@ needs?";
 "Allowed" = "Allowed";
 "Already mapped above" = "Already mapped above";
 "Already mapped on %@" = "Already mapped on %@";
@@ -214,6 +216,7 @@
 "No events yet" = "No events yet";
 "Not granted" = "Not granted";
 "Not keeping awake" = "Not keeping awake";
+"Not Now" = "Not Now";
 "Nothing" = "Nothing";
 "Nothing copied yet." = "Nothing copied yet.";
 "Nothing logged yet." = "Nothing logged yet.";

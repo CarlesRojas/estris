@@ -3,6 +3,11 @@ import SwiftUI
 /// The Window Snapping settings pane: the on/off switch, then dragging, gestures and the
 /// shortcuts on one page.
 struct WindowSnappingPane: View {
+    /// What it needs, for its Permissions section and the prompt when it's turned on.
+    static let permissions: [PermissionUse] = [
+        PermissionUse(permission: .accessibility, reason: "Only to move and resize windows.", without: "Without it, Window Snapping can't do anything."),
+    ]
+
     @ObservedObject var settings: WindowSnappingSettings
 
     var body: some View {
@@ -11,13 +16,12 @@ struct WindowSnappingPane: View {
                 title: SettingsPane.windowSnapping.title,
                 symbol: SettingsPane.windowSnapping.symbol,
                 summary: "Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge.",
-                isOn: $settings.isEnabled
+                isOn: $settings.isEnabled,
+                permissions: Self.permissions
             )
 
             Form {
-                PermissionsSection(uses: [
-                    PermissionUse(permission: .accessibility, reason: "Only to move and resize windows.", without: "Without it, Window Snapping can't do anything.")
-                ])
+                PermissionsSection(uses: WindowSnappingPane.permissions)
                 dragging
                 gestures
                 shortcuts

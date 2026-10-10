@@ -65,10 +65,6 @@ final class DockPreview {
             thumbnailCache = [:]
             return
         }
-        // Thumbnails need it; macOS asks once.
-        if !CGPreflightScreenCaptureAccess() {
-            CGRequestScreenCaptureAccess()
-        }
         if let tap {
             CGEvent.tapEnable(tap: tap, enable: true)
         } else {

@@ -8,6 +8,9 @@ struct UtilityHeader: View {
     let symbol: String
     let summary: LocalizedStringKey
     var isOn: Binding<Bool>?
+    /// Asked for when the switch is turned on, if any isn't allowed yet.
+    var permissions: [PermissionUse] = []
+    @State private var asksForPermissions = false
 
     var body: some View {
         HStack(spacing: 14) {
@@ -29,11 +32,35 @@ struct UtilityHeader: View {
                     .toggleStyle(.switch)
                     .labelsHidden()
                     .controlSize(.large)
+                    .onChange(of: isOn.wrappedValue) { on in
+                        if on, !missing.isEmpty { asksForPermissions = true }
+                    }
+                    .alert(Text("Allow what \(title) needs?"), isPresented: $asksForPermissions) {
+                        Button("Allow") { missing.forEach { $0.permission.request() } }
+                        Button("Not Now", role: .cancel) {}
+                    } message: {
+                        permissionsMessage
+                    }
             }
         }
         // Lines up with the grouped boxes below.
         .padding(.horizontal, SettingsLayout.contentInset)
         .padding(.vertical, 14)
+    }
+}
+
+extension UtilityHeader {
+    private var missing: [PermissionUse] {
+        permissions.filter { $0.permission.isGranted != true }
+    }
+
+    /// Each missing permission and what it is for, one paragraph each.
+    private var permissionsMessage: Text {
+        missing.enumerated().reduce(Text(verbatim: "")) { text, item in
+            let (index, use) = item
+            return text + (index > 0 ? Text(verbatim: "\n\n") : Text(verbatim: ""))
+                + Text(use.permission.title).bold() + Text(verbatim: ": ") + Text(use.reason)
+        }
     }
 }
 

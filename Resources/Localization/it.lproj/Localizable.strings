@@ -45,7 +45,9 @@
 "After 30 seconds" = "Dopo 30 secondi";
 "After 5 seconds" = "Dopo 5 secondi";
 "All Utilities" = "Tutte le utility";
+"Allow" = "Consenti";
 "Allow System Audio Recording to change each app's sound." = "Consenti la Registrazione audio di sistema per cambiare l'audio di ogni app.";
+"Allow what %@ needs?" = "Consentire ciò di cui ha bisogno %@?";
 "Allowed" = "Consentito";
 "Already mapped above" = "Già mappato sopra";
 "Already mapped on %@" = "Già mappato su %@";
@@ -214,6 +216,7 @@
 "No events yet" = "Ancora nessun evento";
 "Not granted" = "Non concesso";
 "Not keeping awake" = "Non mantiene attivo";
+"Not Now" = "Non ora";
 "Nothing" = "Niente";
 "Nothing copied yet." = "Non hai ancora copiato nulla.";
 "Nothing logged yet." = "Ancora nessun registro.";

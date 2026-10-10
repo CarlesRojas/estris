@@ -2,6 +2,11 @@ import SwiftUI
 
 /// The Remap settings pane: the on/off switch, then Mappings and Event Viewer tabs.
 struct RemapPane: View {
+    /// What it needs, for its Permissions section and the prompt when it's turned on.
+    static let permissions: [PermissionUse] = [
+        PermissionUse(permission: .accessibility, reason: "Only to read and change the keys and buttons you map.", without: "Without it, key-to-key mappings still work (picked from the list); mouse buttons, system actions, recording by pressing and the Event Viewer don't."),
+    ]
+
     private enum Tab: String, CaseIterable {
         case mappings = "Mappings"
         case eventViewer = "Event Viewer"
@@ -18,6 +23,7 @@ struct RemapPane: View {
             pane: .remap,
             summary: "Change what keys and mouse buttons do, per device.",
             isOn: $settings.isEnabled,
+            permissions: Self.permissions,
             tab: $tab
         ) { tab in
             switch tab {
@@ -59,9 +65,7 @@ private struct MappingsView: View {
     var body: some View {
         ScrollViewReader { proxy in
             Form {
-                PermissionsSection(uses: [
-                    PermissionUse(permission: .accessibility, reason: "Only to read and change the keys and buttons you map.", without: "Without it, key-to-key mappings still work (picked from the list); mouse buttons, system actions, recording by pressing and the Event Viewer don't.")
-                ])
+                PermissionsSection(uses: RemapPane.permissions)
                 ForEach(listed) { device in
                     let mappings = settings.mappings(for: device.id)
                     Section {

@@ -5,6 +5,11 @@ import SwiftUI
 /// The Volume Mixer settings pane: the on/off switch, then a Mixer tab (the Mac's output and
 /// microphone, and one row per app making sound) and an Excluded Apps tab.
 struct VolumeMixerPane: View {
+    /// What it needs, for its Permissions section and the prompt when it's turned on.
+    static let permissions: [PermissionUse] = [
+        PermissionUse(permission: .systemAudioRecording, reason: "Only to change an app's volume or the device it plays on. Nothing is recorded.", without: "Without it, the output and the microphone still work, but not each app's sound."),
+    ]
+
     private enum Tab: String, CaseIterable {
         case mixer = "Mixer"
         case excludedApps = "Excluded Apps"
@@ -22,6 +27,7 @@ struct VolumeMixerPane: View {
             pane: .volumeMixer,
             summary: "Set the volume and device of your Mac's sound and microphone, and of each app.",
             isOn: $settings.isEnabled,
+            permissions: Self.permissions,
             tab: $tab
         ) { tab in
             switch tab {
@@ -36,9 +42,7 @@ struct VolumeMixerPane: View {
 
     private var form: some View {
         Form {
-            PermissionsSection(uses: [
-                PermissionUse(permission: .systemAudioRecording, reason: "Only to change an app's volume or the device it plays on. Nothing is recorded.", without: "Without it, the output and the microphone still work, but not each app's sound.")
-            ])
+            PermissionsSection(uses: VolumeMixerPane.permissions)
             if settings.isEnabled {
                 Section("System") {
                     SystemSoundRows(state: state, mixer: mixer)

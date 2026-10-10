@@ -45,7 +45,9 @@
 "After 30 seconds" = "Al cap de 30 segons";
 "After 5 seconds" = "Al cap de 5 segons";
 "All Utilities" = "Totes les utilitats";
+"Allow" = "Permet";
 "Allow System Audio Recording to change each app's sound." = "Permet la Gravació d'àudio del sistema per canviar el so de cada app.";
+"Allow what %@ needs?" = "Vols permetre el que necessita %@?";
 "Allowed" = "Permès";
 "Already mapped above" = "Ja assignat més amunt";
 "Already mapped on %@" = "Ja assignat a %@";
@@ -214,6 +216,7 @@
 "No events yet" = "Encara no hi ha cap esdeveniment";
 "Not granted" = "No concedit";
 "Not keeping awake" = "No es manté despert";
+"Not Now" = "Ara no";
 "Nothing" = "Res";
 "Nothing copied yet." = "Encara no has copiat res.";
 "Nothing logged yet." = "Encara no hi ha cap registre.";

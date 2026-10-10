@@ -2,6 +2,11 @@ import SwiftUI
 
 /// The Color Picker settings pane: the on/off switch, the shortcut and the copy format.
 struct ColorPickerPane: View {
+    /// What it needs, for its Permissions section and the prompt when it's turned on.
+    static let permissions: [PermissionUse] = [
+        PermissionUse(permission: .screenRecording, reason: "Optional, only to show the color and its value under the loupe while you move.", without: "Without it, macOS's own loupe is used, and the color shows once copied."),
+    ]
+
     @ObservedObject var settings: ColorPickerSettings
     /// Copies one of the recent colors.
     let copy: (String) -> Void
@@ -12,13 +17,12 @@ struct ColorPickerPane: View {
                 title: SettingsPane.colorPicker.title,
                 symbol: SettingsPane.colorPicker.symbol,
                 summary: "Pick a color anywhere on screen with a shortcut and copy it.",
-                isOn: $settings.isEnabled
+                isOn: $settings.isEnabled,
+                permissions: Self.permissions
             )
 
             Form {
-                PermissionsSection(uses: [
-                    PermissionUse(permission: .screenRecording, reason: "Optional, only to show the color and its value under the loupe while you move.", without: "Without it, macOS's own loupe is used, and the color shows once copied."),
-                ])
+                PermissionsSection(uses: ColorPickerPane.permissions)
                 Section("Shortcut") {
                     LabeledContent("Pick a color") {
                         ShortcutRecorder(shortcut: $settings.shortcut)

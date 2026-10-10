@@ -60,6 +60,30 @@ enum Permission {
     }()
 }
 
+extension Permission {
+    /// Asks macOS for it: its own prompt the first time, its System Settings page after that
+    /// (macOS only prompts once), and the page directly for System Audio Recording, which has
+    /// no public way to ask.
+    @MainActor
+    func request() {
+        switch self {
+        case .accessibility:
+            // macOS's prompt, with a button to the page.
+            _ = Paster.isTrusted(prompt: true)
+        case .screenRecording:
+            let key = "askedForScreenRecording"
+            if UserDefaults.standard.bool(forKey: key) {
+                NSWorkspace.shared.open(settingsURL)
+            } else {
+                UserDefaults.standard.set(true, forKey: key)
+                CGRequestScreenCaptureAccess()
+            }
+        case .systemAudioRecording:
+            NSWorkspace.shared.open(settingsURL)
+        }
+    }
+}
+
 /// A permission, in plain words the one thing it is used for, and what still works without it.
 struct PermissionUse {
     let permission: Permission
