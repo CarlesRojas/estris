@@ -323,7 +323,9 @@ final class DockPreview {
                 let point = NSEvent.mouseLocation
                 let onOwnIcon = self.layout.isNear(point)
                     && DockItems.item(at: point)?.app.processIdentifier == shown.app.processIdentifier
-                if self.contentFrame.insetBy(dx: -6, dy: -6).contains(point) || self.corridor(to: shown).contains(point) || onOwnIcon {
+                // The way up doesn't count once ignored (the pointer stopped on it).
+                let onTheWay = !self.isCorridorIgnored && self.corridor(to: shown).contains(point)
+                if self.contentFrame.insetBy(dx: -6, dy: -6).contains(point) || onTheWay || onOwnIcon {
                     return
                 }
                 self.hide()
