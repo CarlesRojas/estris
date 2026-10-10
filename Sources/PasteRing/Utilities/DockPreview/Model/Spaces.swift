@@ -172,7 +172,8 @@ final class SpaceTrip {
     }
 
     /// Calls back once the desktop showing changes, or after the time a switch takes.
-    private func wait(from before: Set<UInt64>, deadline: Date = Date().addingTimeInterval(SpaceTrip.arrivalTimeout), then done: @escaping (Bool) -> Void) {
+    private func wait(from before: Set<UInt64>, deadline: Date? = nil, then done: @escaping (Bool) -> Void) {
+        let deadline = deadline ?? Date().addingTimeInterval(Self.arrivalTimeout)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
             MainActor.assumeIsolated {
                 guard let self, !self.isCancelled else { return }
