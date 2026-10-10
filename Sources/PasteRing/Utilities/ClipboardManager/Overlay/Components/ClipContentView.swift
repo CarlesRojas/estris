@@ -43,6 +43,10 @@ struct ClipContentView: View {
     /// Where a fitted image sits in its space.
     var imageAlignment: Alignment = .center
 
+    /// More than the largest card shows; laying out a whole long text on every step through
+    /// the history would only slow it down.
+    static let maxCharacters = 3000
+
     var body: some View {
         switch item.kind {
         case .image:
@@ -70,7 +74,7 @@ struct ClipContentView: View {
                 label(item.text, symbol: "photo")
             }
         case .files:
-            label(singleLine ? item.text.singleLine : item.text, symbol: item.text.contains("\n") ? "doc.on.doc" : "doc")
+            label(singleLine ? shownText.singleLine : shownText, symbol: item.text.contains("\n") ? "doc.on.doc" : "doc")
         case .richText:
             if let attributed = RichTextRenderer.attributed(for: item, baseSize: baseSize, singleLine: singleLine) {
                 Text(attributed)
@@ -84,9 +88,14 @@ struct ClipContentView: View {
     }
 
     private var plainText: some View {
-        Text(singleLine ? item.text.singleLine : item.text.trimmingCharacters(in: .whitespacesAndNewlines))
+        Text(singleLine ? shownText.singleLine : shownText.trimmingCharacters(in: .whitespacesAndNewlines))
             .font(font)
             .truncationMode(.tail)
+    }
+
+    /// The start of the text, as much as can show.
+    private var shownText: String {
+        item.text.count > Self.maxCharacters ? String(item.text.prefix(Self.maxCharacters)) : item.text
     }
 
     private func label(_ text: String, symbol: String) -> some View {

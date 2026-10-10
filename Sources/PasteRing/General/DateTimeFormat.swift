@@ -8,25 +8,30 @@ struct DateTimeFormat: Equatable {
     var timeStyle = TimeStyle.system
 
     func string(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = language.locale
-        formatter.dateFormat = "\(dateStyle.pattern) \(timePattern)"
-        return formatter.string(from: date)
+        Self.formatter(language.locale, "\(dateStyle.pattern) \(timePattern)").string(from: date)
     }
 
     /// The date part alone, for showing the choices in Settings.
     func dateString(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = language.locale
-        formatter.dateFormat = dateStyle.pattern
-        return formatter.string(from: date)
+        Self.formatter(language.locale, dateStyle.pattern).string(from: date)
     }
 
     func timeString(from date: Date) -> String {
+        Self.formatter(language.locale, timePattern).string(from: date)
+    }
+
+    /// Formatters are slow to make and every overlay step draws a date; one per locale and
+    /// pattern is kept. `NSCache` is safe to use from any thread.
+    private static let formatters = NSCache<NSString, DateFormatter>()
+
+    private static func formatter(_ locale: Locale, _ pattern: String) -> DateFormatter {
+        let key = "\(locale.identifier)|\(pattern)" as NSString
+        if let cached = formatters.object(forKey: key) { return cached }
         let formatter = DateFormatter()
-        formatter.locale = language.locale
-        formatter.dateFormat = timePattern
-        return formatter.string(from: date)
+        formatter.locale = locale
+        formatter.dateFormat = pattern
+        formatters.setObject(formatter, forKey: key)
+        return formatter
     }
 
     private var timePattern: String {
