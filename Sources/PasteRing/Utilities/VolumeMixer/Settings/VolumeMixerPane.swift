@@ -62,7 +62,7 @@ struct VolumeMixerPane: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    /// Laid out like an app's row: the device at the top left, then mute, the volume across the
+    /// Laid out like an app's row: the device at the top right, then mute, the volume across the
     /// whole width and its percentage.
     private func deviceBlock(
         _ devices: [AudioDevice],
@@ -77,6 +77,7 @@ struct VolumeMixerPane: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
+                Spacer()
                 Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
                     ForEach(devices) { device in
                         Text(verbatim: device.name).tag(device.id)
@@ -84,7 +85,6 @@ struct VolumeMixerPane: View {
                 }
                 .labelsHidden()
                 .fixedSize()
-                Spacer()
             }
             HStack(spacing: 8) {
                 Button(action: toggleMute) {
