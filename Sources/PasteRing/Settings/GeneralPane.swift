@@ -9,6 +9,7 @@ struct GeneralPane: View {
     @State private var openAtLogin = LoginItem.isEnabled
     @State private var versionTaps: [Date] = []
     @State private var accessibilityGranted = Paster.isTrusted(prompt: false)
+    @State private var asksToRelaunch = false
 
     var body: some View {
         Form {
@@ -40,11 +41,6 @@ struct GeneralPane: View {
                 Picker("Language", selection: $general.language) {
                     ForEach(AppLanguage.allCases) { language in
                         Text(verbatim: language.title).tag(language)
-                    }
-                }
-                if general.language != general.launchLanguage {
-                    LabeledContent("PasteRing switches language when it relaunches") {
-                        Button("Relaunch") { Relaunch.now() }
                     }
                 }
                 Picker("Date format", selection: $general.dateStyle) {
@@ -101,6 +97,17 @@ struct GeneralPane: View {
         // Picks up changes made in System Settings when returning to this window.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             refreshStatus()
+        }
+        // A new language only applies after relaunching, so the change waits on a choice:
+        // relaunch now, or keep the current language.
+        .onChange(of: general.language) { language in
+            asksToRelaunch = language != general.launchLanguage
+        }
+        .alert("Relaunch PasteRing to change the language?", isPresented: $asksToRelaunch) {
+            Button("Relaunch") { Relaunch.now() }
+            Button("Cancel", role: .cancel) { general.language = general.launchLanguage }
+        } message: {
+            Text("The new language is used once PasteRing opens again.")
         }
     }
 

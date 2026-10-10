@@ -53,7 +53,8 @@ struct StatusBadge: View {
     var onSelectedRow = false
 
     var body: some View {
-        Text(isOn ? String(localized: "On") : String(localized: "Off"))
+        // The same in every language.
+        Text(verbatim: isOn ? "On" : "Off")
             .font(.caption.weight(.semibold))
             .foregroundStyle(foreground)
             .padding(.horizontal, 8)
