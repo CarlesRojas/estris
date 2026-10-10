@@ -249,10 +249,20 @@ final class VolumeMixer {
             engines[app.pid] = nil
             guard failed[app.pid] != app.objects else { continue }
             do {
-                engines[app.pid] = try TapEngine(objects: app.objects, outputUID: outputUID, gain: gain)
+                let engine = try TapEngine(objects: app.objects, outputUID: outputUID, gain: gain)
+                engines[app.pid] = engine
                 failed[app.pid] = nil
                 state.failedApps.removeAll { $0 == app.name }
-                log("\(app.name): playing at \(Int(gain * 100))% on \(outputUID)")
+                let deviceName = state.outputDevices.first { $0.uid == outputUID }?.name ?? outputUID
+                log("\(app.name): playing at \(Int(gain * 100))% on \(deviceName), \(app.objects.count) audio process(es)")
+                // How it went, once the audio has had time to flow.
+                let name = app.name
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self, weak engine] in
+                    MainActor.assumeIsolated {
+                        guard let engine else { return }
+                        self?.log("\(name) on \(deviceName) after 2 s: \(engine.diagnostics)")
+                    }
+                }
             } catch {
                 failed[app.pid] = app.objects
                 if !state.failedApps.contains(app.name) { state.failedApps.append(app.name) }

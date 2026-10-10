@@ -21,6 +21,9 @@ final class TapEngine {
     private var tapID = AudioObjectID(kAudioObjectUnknown)
     private var deviceID = AudioObjectID(kAudioObjectUnknown)
     private var ioProc: AudioDeviceIOProcID?
+    /// Written by the audio thread, read for the logs only.
+    private let stats = UnsafeMutablePointer<TapRender.Stats>.allocate(capacity: 1)
+    private var tapFormat = AudioStreamBasicDescription()
 
     var gain: Float {
         get { gainValue.pointee }
@@ -31,6 +34,7 @@ final class TapEngine {
         self.objects = objects
         self.outputUID = outputUID
         gainValue.initialize(to: min(max(gain, 0), 2))
+        stats.initialize(to: TapRender.Stats())
 
         let description = CATapDescription(stereoMixdownOfProcesses: objects)
         description.muteBehavior = .mutedWhenTapped
@@ -62,9 +66,11 @@ final class TapEngine {
         var format = AudioStreamBasicDescription()
         let tapChannels = AudioSystem.read(tapID, kAudioTapPropertyFormat, into: &format) && format.mChannelsPerFrame > 0
             ? Int(format.mChannelsPerFrame) : 2
+        tapFormat = format
         let gain = gainValue
+        let stats = stats
         status = AudioDeviceCreateIOProcIDWithBlock(&ioProc, deviceID, nil) { _, input, _, output, _ in
-            TapRender.render(input: input, output: output, tapChannels: tapChannels, gain: gain.pointee)
+            TapRender.render(input: input, output: output, tapChannels: tapChannels, gain: gain.pointee, stats: stats)
         }
         guard status == noErr else {
             ioProc = nil
@@ -106,22 +112,52 @@ final class TapEngine {
 
     private static let teardown = DispatchQueue(label: "PasteRing.VolumeMixer.teardown", qos: .utility)
 
+    /// For the logs: the tap's format, the device's rate, and what the audio thread has seen.
+    var diagnostics: String {
+        var rate: Float64 = 0
+        if deviceID != kAudioObjectUnknown {
+            AudioSystem.read(deviceID, kAudioDevicePropertyNominalSampleRate, into: &rate)
+        }
+        let seen = stats.pointee
+        return "tap \(Int(tapFormat.mSampleRate)) Hz \(tapFormat.mChannelsPerFrame) ch, device \(Int(rate)) Hz; "
+            + "\(seen.cycles) render cycles, \(seen.tapCycles) with the tap's buffer, "
+            + "inputs \(seen.inputs) (channels \(seen.inputChannels)), outputs \(seen.outputs) (channels \(seen.outputChannels)), "
+            + "loudest sample \(String(format: "%.3f", seen.peak))"
+    }
+
     deinit {
         stop()
-        // Freed after the teardown queued above, once nothing can read it.
+        // Freed after the teardown queued above, once nothing can read them.
         let gain = gainValue
-        Self.teardown.async { gain.deallocate() }
+        let stats = stats
+        Self.teardown.async {
+            gain.deallocate()
+            stats.deallocate()
+        }
     }
 }
 
 /// Copies the tapped sound to the output, scaled. Runs on the audio thread: no allocation and
 /// no locks.
 enum TapRender {
+    /// What the audio thread has seen, for the logs. Channel counts are written digit by digit,
+    /// one digit per buffer ("12" is a 1-channel buffer then a 2-channel one).
+    struct Stats {
+        var cycles = 0
+        var tapCycles = 0
+        var inputs = 0
+        var outputs = 0
+        var inputChannels = 0
+        var outputChannels = 0
+        var peak: Float = 0
+    }
+
     static func render(
         input: UnsafePointer<AudioBufferList>,
         output: UnsafeMutablePointer<AudioBufferList>,
         tapChannels: Int,
-        gain: Float
+        gain: Float,
+        stats: UnsafeMutablePointer<Stats>
     ) {
         let inputs = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: input))
         let outputs = UnsafeMutableAudioBufferListPointer(output)
@@ -141,6 +177,18 @@ enum TapRender {
         let sourceChannels = Int(source?.mNumberChannels ?? 0)
         let samples = source?.mData?.assumingMemoryBound(to: Float.self)
         let sourceFrames = sourceChannels > 0 ? Int(source?.mDataByteSize ?? 0) / (4 * sourceChannels) : 0
+
+        stats.pointee.cycles += 1
+        if source != nil { stats.pointee.tapCycles += 1 }
+        stats.pointee.inputs = inputs.count
+        stats.pointee.outputs = outputs.count
+        stats.pointee.inputChannels = inputs.reduce(0) { $0 * 10 + Int($1.mNumberChannels) }
+        stats.pointee.outputChannels = outputs.reduce(0) { $0 * 10 + Int($1.mNumberChannels) }
+        if let samples {
+            for index in 0..<(sourceFrames * sourceChannels) {
+                stats.pointee.peak = max(stats.pointee.peak, abs(samples[index]))
+            }
+        }
 
         var firstChannel = 0
         for buffer in outputs {
