@@ -43,6 +43,7 @@ final class VolumeMixer {
     private var processListeners: [AudioObjectID: [AudioListener]] = [:]
     /// A refresh asked for while one is waiting: one event fires several listeners at once.
     private var refreshQueued = false
+    private var lastListSummary = ""
     /// Apps heard playing since the mixer started; they stay listed while they're running.
     private var heard: Set<pid_t> = []
     /// One `TapEngine` per app whose sound is changed, by the app's process.
@@ -174,6 +175,7 @@ final class VolumeMixer {
         let running = AudioApps.current().filter { app in app.bundleID.map { !excluded.contains($0) } ?? true }
         for app in running where app.isPlaying { heard.insert(app.pid) }
         state.apps = running.filter { heard.contains($0.pid) || !settings.sound(of: $0.key).isUntouched }
+        logListIfChanged(running)
         heard.formIntersection(running.map(\.pid))
 
         // Starting or stopping playback changes these, not the list of processes. Every audio
@@ -191,6 +193,20 @@ final class VolumeMixer {
             ]
         }
         reconcileEngines(running)
+    }
+
+    /// For the logs, whenever it changes: the audio processes, the apps found for them, which
+    /// are playing, and which are listed.
+    @available(macOS 14.4, *)
+    private func logListIfChanged(_ running: [AudioApp]) {
+        let apps = running.map { "\($0.name)" + ($0.isPlaying ? " (playing)" : "") }
+        let unmatched = AudioApps.unmatched()
+        let summary = "\(AudioApps.processObjects().count) audio processes; apps: \(apps.joined(separator: ", ")); "
+            + "listed: \(state.apps.map(\.name).joined(separator: ", ")); "
+            + "without an app: \(unmatched.isEmpty ? "none" : unmatched.joined(separator: ", "))"
+        guard summary != lastListSummary else { return }
+        lastListSummary = summary
+        log(summary)
     }
 
     /// Refreshes once for a burst of notifications, right after it.
