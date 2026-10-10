@@ -1,0 +1,2 @@
+/* The System Audio Recording permission prompt. */
+"NSAudioCaptureUsageDescription" = "O PasteRing usa o som de um app apenas para reproduzi-lo no volume e no dispositivo que você escolher para ele no Mixer de volume. Nada é gravado.";

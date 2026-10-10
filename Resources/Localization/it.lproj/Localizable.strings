@@ -1,5 +1,6 @@
 /* PasteRing, it. Keys are the English text; %@ and %lld stand for values filled in at run time. */
 
+"%@ (not connected)" = "%@ (non collegato)";
 "%@ Mappings" = "Mappature di %@";
 "%@ Mappings (not connected)" = "Mappature di %@ (non collegato)";
 "%lld apps excluded" = "%lld app escluse";
@@ -51,6 +52,7 @@
 "Another device" = "Altro dispositivo";
 "App Windows" = "Finestre dell’app";
 "Appearance" = "Aspetto";
+"Apps" = "App";
 "Auto Quit" = "Chiusura automatica";
 "Battery" = "Batteria";
 "Bottom edge: thirds" = "Bordo inferiore: terzi";
@@ -96,6 +98,7 @@
 "Delete this entry" = "Elimina questa voce";
 "Developer" = "Sviluppatore";
 "development build" = "versione di sviluppo";
+"Device" = "Dispositivo";
 "Dim screen" = "Oscura lo schermo";
 "Display and Keyboard" = "Schermo e tastiera";
 "Don't keep awake" = "Non mantenere attivo";
@@ -173,6 +176,7 @@
 "Maximize" = "Ingrandisci";
 "Media" = "Multimedia";
 "Menu" = "Menu";
+"Microphone" = "Microfono";
 "Middle Button" = "Pulsante centrale";
 "Middle Click" = "Clic centrale";
 "Mission Control" = "Mission Control";
@@ -186,6 +190,7 @@
 "Never" = "Mai";
 "Next Desktop" = "Scrivania successiva";
 "Next Track" = "Brano successivo";
+"No app is playing sound." = "Nessuna app sta riproducendo audio.";
 "No apps excluded" = "Nessuna app esclusa";
 "No clipboard entries yet" = "Ancora nessuna voce negli appunti";
 "No entries match “%@”" = "Nessuna voce corrisponde a “%@”";
@@ -203,11 +208,14 @@
 "Open Accessibility Settings" = "Apri impostazioni Accessibilità";
 "Open at login" = "Apri al login";
 "Open overlay" = "Apri il pannello";
+"Open System Settings" = "Apri Impostazioni di Sistema";
 "Other" = "Altri";
 "Other source" = "Altra fonte";
+"Output" = "Uscita";
 "Page Down" = "Pagina giù";
 "Page Up" = "Pagina su";
 "Paste as plain text" = "Incolla come testo semplice";
+"PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "PasteRing non ha potuto modificare l'audio di %@. Consentilo in Solo registrazione audio di sistema, in Impostazioni di Sistema > Privacy e sicurezza > Registrazione schermo e audio di sistema.";
 "PasteRing needs Accessibility access" = "PasteRing richiede l’accesso Accessibilità";
 "PasteRing switches language when it relaunches" = "PasteRing cambia lingua quando si riapre";
 "Pause" = "Pausa";
@@ -215,6 +223,7 @@
 "Pick a color" = "Preleva un colore";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Preleva un colore ovunque sullo schermo con un’abbreviazione e copialo.";
 "Play or Pause" = "Riproduci o pausa";
+"Playing" = "In riproduzione";
 "Posted by %@" = "Inviato da %@";
 "Power adapter" = "Alimentatore";
 "Power source" = "Fonte di alimentazione";
@@ -265,6 +274,7 @@
 "Search apps" = "Cerca app";
 "Search logs" = "Cerca nei registri";
 "Selected highlight" = "Evidenziazione selezione";
+"Set the volume and device of your Mac's sound and microphone, and of each app." = "Imposta volume e dispositivo dell'audio e del microfono del Mac, e di ogni app.";
 "Settings" = "Impostazioni";
 "Settings…" = "Impostazioni…";
 "Shadow" = "Ombra";
@@ -312,8 +322,10 @@
 "Top left corner" = "Angolo in alto a sinistra";
 "Top Right" = "In alto a destra";
 "Top right corner" = "Angolo in alto a destra";
+"Try Again" = "Riprova";
 "Unknown app" = "App sconosciuta";
 "Unknown device %@" = "Dispositivo sconosciuto %@";
+"Unmute" = "Riattiva audio";
 "Up" = "Rilasciato";
 "Up Arrow" = "Freccia su";
 "usage %@" = "uso %@";
@@ -321,7 +333,9 @@
 "Version %@" = "Versione %@";
 "Version %@ (%@)" = "Versione %@ (%@)";
 "View" = "Vista";
+"Volume" = "Volume";
 "Volume Down" = "Abbassa volume";
+"Volume Mixer" = "Mixer del volume";
 "Volume Up" = "Alza volume";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Se disattivo, la cronologia mantiene l’ordine di copia e ⌘V continua a incollare l’ultimo testo copiato.";
 "Width" = "Larghezza";

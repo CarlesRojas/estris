@@ -1,5 +1,6 @@
 /* PasteRing, es. Keys are the English text; %@ and %lld stand for values filled in at run time. */
 
+"%@ (not connected)" = "%@ (no conectado)";
 "%@ Mappings" = "Asignaciones de %@";
 "%@ Mappings (not connected)" = "Asignaciones de %@ (no conectado)";
 "%lld apps excluded" = "%lld apps excluidas";
@@ -51,6 +52,7 @@
 "Another device" = "Otro dispositivo";
 "App Windows" = "Ventanas de la app";
 "Appearance" = "Apariencia";
+"Apps" = "Apps";
 "Auto Quit" = "Cierre automático";
 "Battery" = "Batería";
 "Bottom edge: thirds" = "Borde inferior: tercios";
@@ -96,6 +98,7 @@
 "Delete this entry" = "Eliminar esta entrada";
 "Developer" = "Desarrollador";
 "development build" = "versión de desarrollo";
+"Device" = "Dispositivo";
 "Dim screen" = "Oscurecer pantalla";
 "Display and Keyboard" = "Pantalla y teclado";
 "Don't keep awake" = "No mantener despierto";
@@ -173,6 +176,7 @@
 "Maximize" = "Maximizar";
 "Media" = "Multimedia";
 "Menu" = "Menú";
+"Microphone" = "Micrófono";
 "Middle Button" = "Botón central";
 "Middle Click" = "Clic central";
 "Mission Control" = "Mission Control";
@@ -186,6 +190,7 @@
 "Never" = "Nunca";
 "Next Desktop" = "Escritorio siguiente";
 "Next Track" = "Pista siguiente";
+"No app is playing sound." = "Ninguna app está reproduciendo sonido.";
 "No apps excluded" = "Ninguna app excluida";
 "No clipboard entries yet" = "Aún no hay entradas en el portapapeles";
 "No entries match “%@”" = "Ninguna entrada coincide con «%@»";
@@ -203,11 +208,14 @@
 "Open Accessibility Settings" = "Abrir ajustes de accesibilidad";
 "Open at login" = "Abrir al iniciar sesión";
 "Open overlay" = "Abrir el panel";
+"Open System Settings" = "Abrir Ajustes del Sistema";
 "Other" = "Otras";
 "Other source" = "Otra fuente";
+"Output" = "Salida";
 "Page Down" = "Av Pág";
 "Page Up" = "Re Pág";
 "Paste as plain text" = "Pegar como texto sin formato";
+"PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "PasteRing no ha podido cambiar el sonido de %@. Permítelo en Solo grabación de audio del sistema, en Ajustes del Sistema > Privacidad y seguridad > Grabación de pantalla y audio del sistema.";
 "PasteRing needs Accessibility access" = "PasteRing necesita acceso de accesibilidad";
 "PasteRing switches language when it relaunches" = "PasteRing cambia de idioma al volver a abrirse";
 "Pause" = "Pausa";
@@ -215,6 +223,7 @@
 "Pick a color" = "Elegir un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Elige un color de cualquier parte de la pantalla con un atajo y cópialo.";
 "Play or Pause" = "Reproducir o pausar";
+"Playing" = "Reproduciendo";
 "Posted by %@" = "Enviado por %@";
 "Power adapter" = "Adaptador de corriente";
 "Power source" = "Fuente de alimentación";
@@ -265,6 +274,7 @@
 "Search apps" = "Buscar apps";
 "Search logs" = "Buscar en los registros";
 "Selected highlight" = "Resaltado de la selección";
+"Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajusta el volumen y el dispositivo del sonido y el micrófono de tu Mac, y de cada app.";
 "Settings" = "Ajustes";
 "Settings…" = "Ajustes…";
 "Shadow" = "Sombra";
@@ -312,8 +322,10 @@
 "Top left corner" = "Esquina superior izquierda";
 "Top Right" = "Arriba a la derecha";
 "Top right corner" = "Esquina superior derecha";
+"Try Again" = "Reintentar";
 "Unknown app" = "App desconocida";
 "Unknown device %@" = "Dispositivo desconocido %@";
+"Unmute" = "Activar sonido";
 "Up" = "Soltado";
 "Up Arrow" = "Flecha arriba";
 "usage %@" = "uso %@";
@@ -321,7 +333,9 @@
 "Version %@" = "Versión %@";
 "Version %@ (%@)" = "Versión %@ (%@)";
 "View" = "Vista";
+"Volume" = "Volumen";
 "Volume Down" = "Bajar volumen";
+"Volume Mixer" = "Mezclador de volumen";
 "Volume Up" = "Subir volumen";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Si está desactivado, el historial mantiene el orden en que se copiaron las cosas y ⌘V sigue pegando el último texto copiado.";
 "Width" = "Anchura";

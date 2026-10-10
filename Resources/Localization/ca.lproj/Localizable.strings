@@ -1,5 +1,6 @@
 /* PasteRing, ca. Keys are the English text; %@ and %lld stand for values filled in at run time. */
 
+"%@ (not connected)" = "%@ (no connectat)";
 "%@ Mappings" = "Assignacions de %@";
 "%@ Mappings (not connected)" = "Assignacions de %@ (no connectat)";
 "%lld apps excluded" = "%lld apps excloses";
@@ -51,6 +52,7 @@
 "Another device" = "Un altre dispositiu";
 "App Windows" = "Finestres de l’app";
 "Appearance" = "Aparença";
+"Apps" = "Apps";
 "Auto Quit" = "Tancament automàtic";
 "Battery" = "Bateria";
 "Bottom edge: thirds" = "Vora inferior: terços";
@@ -96,6 +98,7 @@
 "Delete this entry" = "Elimina aquesta entrada";
 "Developer" = "Desenvolupador";
 "development build" = "versió de desenvolupament";
+"Device" = "Dispositiu";
 "Dim screen" = "Enfosqueix la pantalla";
 "Display and Keyboard" = "Pantalla i teclat";
 "Don't keep awake" = "No el mantinguis despert";
@@ -173,6 +176,7 @@
 "Maximize" = "Maximitza";
 "Media" = "Multimèdia";
 "Menu" = "Menú";
+"Microphone" = "Micròfon";
 "Middle Button" = "Botó central";
 "Middle Click" = "Clic central";
 "Mission Control" = "Mission Control";
@@ -186,6 +190,7 @@
 "Never" = "Mai";
 "Next Desktop" = "Escriptori següent";
 "Next Track" = "Pista següent";
+"No app is playing sound." = "Cap app està reproduint so.";
 "No apps excluded" = "Cap app exclosa";
 "No clipboard entries yet" = "Encara no hi ha cap entrada al porta-retalls";
 "No entries match “%@”" = "Cap entrada coincideix amb «%@»";
@@ -203,11 +208,14 @@
 "Open Accessibility Settings" = "Obre la configuració d’accessibilitat";
 "Open at login" = "Obre en iniciar la sessió";
 "Open overlay" = "Obre el tauler";
+"Open System Settings" = "Obre Configuració del Sistema";
 "Other" = "Altres";
 "Other source" = "Una altra font";
+"Output" = "Sortida";
 "Page Down" = "Av Pàg";
 "Page Up" = "Re Pàg";
 "Paste as plain text" = "Enganxa com a text sense format";
+"PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "PasteRing no ha pogut canviar el so de %@. Permet-ho a Només gravació d'àudio del sistema, a Configuració del Sistema > Privadesa i seguretat > Gravació de pantalla i àudio del sistema.";
 "PasteRing needs Accessibility access" = "PasteRing necessita accés d’accessibilitat";
 "PasteRing switches language when it relaunches" = "El PasteRing canvia d’idioma quan es torna a obrir";
 "Pause" = "Pausa";
@@ -215,6 +223,7 @@
 "Pick a color" = "Tria un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Tria un color de qualsevol lloc de la pantalla amb una drecera i copia’l.";
 "Play or Pause" = "Reprodueix o posa en pausa";
+"Playing" = "Reproduint";
 "Posted by %@" = "Enviat per %@";
 "Power adapter" = "Adaptador de corrent";
 "Power source" = "Font d’alimentació";
@@ -265,6 +274,7 @@
 "Search apps" = "Cerca apps";
 "Search logs" = "Cerca als registres";
 "Selected highlight" = "Ressaltat de la selecció";
+"Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajusta el volum i el dispositiu del so i el micròfon del teu Mac, i de cada app.";
 "Settings" = "Configuració";
 "Settings…" = "Configuració…";
 "Shadow" = "Ombra";
@@ -312,8 +322,10 @@
 "Top left corner" = "Cantonada superior esquerra";
 "Top Right" = "A dalt a la dreta";
 "Top right corner" = "Cantonada superior dreta";
+"Try Again" = "Torna-ho a provar";
 "Unknown app" = "App desconeguda";
 "Unknown device %@" = "Dispositiu desconegut %@";
+"Unmute" = "Activa el so";
 "Up" = "Deixat anar";
 "Up Arrow" = "Fletxa amunt";
 "usage %@" = "ús %@";
@@ -321,7 +333,9 @@
 "Version %@" = "Versió %@";
 "Version %@ (%@)" = "Versió %@ (%@)";
 "View" = "Visualització";
+"Volume" = "Volum";
 "Volume Down" = "Abaixa el volum";
+"Volume Mixer" = "Mesclador de volum";
 "Volume Up" = "Apuja el volum";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Si està desactivat, l’historial manté l’ordre en què es van copiar les coses i ⌘V continua enganxant l’últim text copiat.";
 "Width" = "Amplada";

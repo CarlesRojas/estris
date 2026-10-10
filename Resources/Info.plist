@@ -32,6 +32,8 @@
     <string>13.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>PasteRing uses an app's sound only to play it at the volume and on the device you choose for it in Volume Mixer. Nothing is recorded.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

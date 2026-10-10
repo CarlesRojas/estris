@@ -12,6 +12,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case windowSnapping
     case keepAwake
     case colorPicker
+    case volumeMixer
     /// Hidden until unlocked from the version in General > About.
     case developer
 
@@ -27,6 +28,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .windowSnapping: String(localized: "Window Snapping")
         case .keepAwake: String(localized: "Keep Awake")
         case .colorPicker: String(localized: "Color Picker")
+        case .volumeMixer: String(localized: "Volume Mixer")
         case .developer: String(localized: "Developer")
         }
     }
@@ -41,6 +43,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .windowSnapping: "rectangle.split.2x1"
         case .keepAwake: "cup.and.saucer"
         case .colorPicker: "eyedropper"
+        case .volumeMixer: "speaker.wave.2"
         case .developer: "hammer"
         }
     }
@@ -54,6 +57,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["logs", "debug", "developer", "diagnostics"]
         case .autoQuit:
             ["quit", "close", "window", "last window", "terminate", "excluded", "apps", "delay"]
+        case .volumeMixer:
+            ["volume", "sound", "audio", "mixer", "output", "speakers", "headphones", "microphone", "input", "mute", "apps"]
         case .colorPicker:
             ["color", "colour", "picker", "eyedropper", "hex", "rgb", "hsl", "swiftui", "sample"]
         case .keepAwake:
@@ -108,7 +113,9 @@ final class SettingsNavigation: ObservableObject {
 
     var panes: [SettingsPane] {
         SettingsPane.allCases.filter { pane in
-            (pane != .developer || general.showsDeveloperSettings) && pane.matches(search)
+            (pane != .developer || general.showsDeveloperSettings)
+                && (pane != .volumeMixer || VolumeMixer.isSupported)
+                && pane.matches(search)
         }
     }
 }
@@ -125,6 +132,7 @@ struct SettingsSidebar: View {
     @ObservedObject var windowSnappingSettings: WindowSnappingSettings
     @ObservedObject var keepAwakeSettings: KeepAwakeSettings
     @ObservedObject var colorPickerSettings: ColorPickerSettings
+    @ObservedObject var volumeMixerSettings: VolumeMixerSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -152,6 +160,7 @@ struct SettingsSidebar: View {
         case .windowSnapping: windowSnappingSettings.isEnabled
         case .keepAwake: keepAwakeSettings.isEnabled
         case .colorPicker: colorPickerSettings.isEnabled
+        case .volumeMixer: volumeMixerSettings.isEnabled
         case .developer: nil
         }
     }
@@ -169,6 +178,7 @@ struct SettingsDetail: View {
     let windowSnapping: WindowSnapping
     let keepAwake: KeepAwake
     let colorPicker: ScreenColorPicker
+    let volumeMixer: VolumeMixer
     let log: AppLog
 
     var body: some View {
@@ -191,6 +201,8 @@ struct SettingsDetail: View {
                     keepAwake.settingsPane()
                 case .colorPicker:
                     colorPicker.settingsPane()
+                case .volumeMixer:
+                    volumeMixer.settingsPane()
                 case .developer:
                     DeveloperPane(general: general, log: log)
                 }
