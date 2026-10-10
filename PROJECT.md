@@ -56,15 +56,15 @@ Clicking the menu bar icon opens a menu below it in the clipboard overlay's defa
 
 - **Volume Mixer**: the same rows as its pane, titled **System Volume** and **Apps Volume**.
 - **Clipboard**: the most recent entries (off by default), each with its source app and one line of it; a click pastes it into the app in front, as the overlay does. A **Clear History** button (on by default) empties the history.
-- **Color Picker**: a **Pick a Color** button (on by default) that starts picking.
+- **Color Picker**: the recent colors (on by default), a click copies one; a **Pick a Color** button (on by default) that starts picking.
 
 Then **Settings** and **Quit** side by side at the bottom, as capsules. The menu hangs a little below the menu bar; its background is a shade darker than the overlay's surface, its corners are concentric with the capsule buttons, and each part (System Volume, Apps Volume, Clipboard, Color Picker) sits in its own lighter rounded box, concentric with the menu; no separator lines. A click outside, Esc or another click on the icon closes it.
 
-**Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Then a section per utility picks what the menu shows of it:
+**Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Then a section per utility picks what the menu shows of it: Under the grid, **Custom color** (off) draws the icon in a chosen colour instead of the menu bar's own (it starts from white), with a colour well to pick it; the grid shows the icons in it too.
 
 - **Volume Mixer**: **Show System Volume**, with **Show Output** and **Show Microphone** under it (they do nothing while it is off), **Show Apps Volume**, **Show device pickers** (all on) and **Show volume percentages** (off).
 - **Clipboard**: **Show recent entries** (off) and how many (**Entries**, 1 to 10, default 5), **Show Clear History button** (on).
-- **Color Picker**: **Show Pick a Color button** (on).
+- **Color Picker**: **Show Pick a Color button** and **Show recent colors** (both on).
 
 **Reset to Defaults** puts the icon and all of these back.
 
@@ -159,6 +159,7 @@ Picks a color anywhere on screen with a shortcut and copies it. Off by default; 
 - **Shortcut** (default ⇧⌘C, which browsers also use for Inspect Element) shows macOS's color sampler (`NSColorSampler`): a loupe by the pointer with the color and pixels under it. Click picks, Esc cancels. No extra permission needed; a live value while moving would need Screen Recording, so there is none.
 - **Copy as**: Hex (`#FF8000`, with **Include # prefix**, on by default), RGB (`rgb(255, 128, 0)`), HSL (`hsl(30, 100%, 50%)`) or SwiftUI (`Color(red: 1.000, green: 0.502, blue: 0.000)`), in sRGB. An example shows the chosen format.
 - After picking, a pill by the pointer shows the color and the copied value with "Copied", and fades out after a moment. It uses the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings): a capsule with the color in a circle at the left, concentric with its end, and the text centred to its right.
+- **Recent Colors**: the last 16 colors picked, most recent first, as swatches (hover shows the value). A click copies one in the chosen format, with the same pill. **Clear** empties them; Reset to Defaults keeps them. The menu bar menu can show the first 8.
 
 ## Volume Mixer
 

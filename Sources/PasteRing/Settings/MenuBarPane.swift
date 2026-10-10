@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The Menu Bar pane: which icon PasteRing shows in the menu bar, all in view to click, and
@@ -23,6 +24,10 @@ struct MenuBarPane: View {
                         }
                     }
                     .padding(.vertical, 4)
+                    Toggle("Custom color", isOn: hasCustomColor)
+                    if settings.iconColor != nil {
+                        ColorPicker("Color", selection: customColor, supportsOpacity: false)
+                    }
                 }
                 Section("Volume Mixer") {
                     Toggle("Show System Volume", isOn: $settings.showsSystem)
@@ -49,6 +54,7 @@ struct MenuBarPane: View {
                 }
                 Section("Color Picker") {
                     Toggle("Show Pick a Color button", isOn: $settings.showsColorPicker)
+                    Toggle("Show recent colors", isOn: $settings.showsRecentColors)
                 }
                 Section {
                     Button("Reset to Defaults") { settings.reset() }
@@ -61,6 +67,21 @@ struct MenuBarPane: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
+    /// Off draws the icon in the menu bar's own colour; on starts from white.
+    private var hasCustomColor: Binding<Bool> {
+        Binding(
+            get: { settings.iconColor != nil },
+            set: { settings.iconColor = $0 ? "FFFFFF" : nil }
+        )
+    }
+
+    private var customColor: Binding<Color> {
+        Binding(
+            get: { Color(nsColor: settings.iconColor.flatMap(NSColor.init(hex:)) ?? .white) },
+            set: { settings.iconColor = ColorFormat.hex.string(for: NSColor($0), hashPrefix: false) }
+        )
+    }
+
     private func iconButton(_ icon: String) -> some View {
         let isSelected = settings.icon == icon
         return Button {
@@ -68,7 +89,7 @@ struct MenuBarPane: View {
         } label: {
             Image(systemName: MenuBarIcon.symbol(for: icon))
                 .font(.system(size: 14))
-                .foregroundStyle(isSelected ? Color.white : Color.primary)
+                .foregroundStyle(isSelected ? Color.white : settings.iconColor.flatMap(NSColor.init(hex:)).map { Color(nsColor: $0) } ?? Color.primary)
                 .frame(maxWidth: .infinity, minHeight: 28)
                 .background(
                     RoundedRectangle(cornerRadius: 6, style: .continuous)

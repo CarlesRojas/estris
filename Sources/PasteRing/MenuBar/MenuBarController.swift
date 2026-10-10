@@ -33,8 +33,10 @@ final class MenuBarController: NSObject {
         item.button?.target = self
         item.button?.action = #selector(toggle)
         statusItem = item
-        settings.$icon
-            .sink { [weak self] icon in self?.statusItem?.button?.image = MenuBarIcon.image(for: icon) }
+        settings.$icon.combineLatest(settings.$iconColor)
+            .sink { [weak self] icon, color in
+                self?.statusItem?.button?.image = MenuBarIcon.image(for: icon, color: color.flatMap(NSColor.init(hex:)))
+            }
             .store(in: &observers)
     }
 
@@ -66,6 +68,10 @@ final class MenuBarController: NSObject {
             pickColor: { [weak self] in
                 self?.close()
                 self?.colorPicker.pick()
+            },
+            copyColor: { [weak self] hex in
+                self?.close()
+                self?.colorPicker.copy(hex: hex)
             },
             openSettings: { [weak self] in
                 self?.close()

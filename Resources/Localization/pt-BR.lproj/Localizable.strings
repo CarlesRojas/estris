@@ -84,6 +84,7 @@
 "Click to change" = "Clique para alterar";
 "Clipboard" = "Área de Transferência";
 "Clipboard history is empty" = "O histórico da Área de Transferência está vazio";
+"Color" = "Cor";
 "Color Picker" = "Seletor de cores";
 "Copied" = "Copiado";
 "Copy All" = "Copiar tudo";
@@ -91,6 +92,7 @@
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar algo que já está no histórico o move para o topo em vez de adicioná-lo novamente.";
 "Corners" = "Cantos";
 "Create Mapping" = "Criar mapeamento";
+"Custom color" = "Cor personalizada";
 "Date format" = "Formato de data";
 "Default" = "Padrão";
 "Delete" = "Apagar";
@@ -200,6 +202,7 @@
 "No app is playing sound." = "Nenhum app está reproduzindo som.";
 "No apps excluded" = "Nenhum app excluído";
 "No clipboard entries yet" = "Ainda não há itens na Área de Transferência";
+"No colors picked yet." = "Nenhuma cor escolhida ainda.";
 "No entries match “%@”" = "Nenhum item corresponde a “%@”";
 "No events yet" = "Ainda não há eventos";
 "Not granted" = "Não concedido";
@@ -244,6 +247,7 @@
 "process %d" = "processo %d";
 "Quit" = "Encerrar";
 "Quits an app when you close its last window." = "Encerra um app quando você fecha a última janela dele.";
+"Recent Colors" = "Cores recentes";
 "Record from %@" = "Gravar de %@";
 "Record images" = "Guardar imagens";
 "Relaunch" = "Reabrir";
@@ -294,6 +298,7 @@
 "Show Microphone" = "Mostrar Microfone";
 "Show Output" = "Mostrar Saída";
 "Show Pick a Color button" = "Mostrar o botão Escolher uma cor";
+"Show recent colors" = "Mostrar cores recentes";
 "Show recent entries" = "Mostrar entradas recentes";
 "Show System Volume" = "Mostrar Volume do sistema";
 "Show volume percentages" = "Mostrar porcentagens de volume";

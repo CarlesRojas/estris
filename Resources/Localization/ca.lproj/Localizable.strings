@@ -84,6 +84,7 @@
 "Click to change" = "Fes clic per canviar";
 "Clipboard" = "Porta-retalls";
 "Clipboard history is empty" = "L’historial del porta-retalls és buit";
+"Color" = "Color";
 "Color Picker" = "Selector de color";
 "Copied" = "Copiat";
 "Copy All" = "Copia-ho tot";
@@ -91,6 +92,7 @@
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar una cosa que ja és a l’historial la mou a dalt en lloc d’afegir-la de nou.";
 "Corners" = "Cantonades";
 "Create Mapping" = "Crea una assignació";
+"Custom color" = "Color personalitzat";
 "Date format" = "Format de data";
 "Default" = "Per defecte";
 "Delete" = "Suprimeix";
@@ -200,6 +202,7 @@
 "No app is playing sound." = "Cap app està reproduint so.";
 "No apps excluded" = "Cap app exclosa";
 "No clipboard entries yet" = "Encara no hi ha cap entrada al porta-retalls";
+"No colors picked yet." = "Encara no has triat cap color.";
 "No entries match “%@”" = "Cap entrada coincideix amb «%@»";
 "No events yet" = "Encara no hi ha cap esdeveniment";
 "Not granted" = "No concedit";
@@ -244,6 +247,7 @@
 "process %d" = "procés %d";
 "Quit" = "Surt";
 "Quits an app when you close its last window." = "Tanca una app quan en tanques l’última finestra.";
+"Recent Colors" = "Colors recents";
 "Record from %@" = "Enregistra des de %@";
 "Record images" = "Desa imatges";
 "Relaunch" = "Torna a obrir";
@@ -294,6 +298,7 @@
 "Show Microphone" = "Mostra Micròfon";
 "Show Output" = "Mostra Sortida";
 "Show Pick a Color button" = "Mostra el botó Tria un color";
+"Show recent colors" = "Mostra els colors recents";
 "Show recent entries" = "Mostra les entrades recents";
 "Show System Volume" = "Mostra Volum del sistema";
 "Show volume percentages" = "Mostra els percentatges de volum";

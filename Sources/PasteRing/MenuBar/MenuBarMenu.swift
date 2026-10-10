@@ -17,6 +17,7 @@ struct MenuBarMenu: View {
     let paste: (ClipItem) -> Void
     let clearHistory: () -> Void
     let pickColor: () -> Void
+    let copyColor: (String) -> Void
     let openSettings: () -> Void
     let quit: () -> Void
 
@@ -66,9 +67,14 @@ struct MenuBarMenu: View {
                     }
                 }
             }
-            if colorPickerSettings.isEnabled && settings.showsColorPicker {
+            if colorPickerSettings.isEnabled && (settings.showsColorPicker || settings.showsRecentColors) {
                 group("Color Picker") {
-                    menuButton("Pick a Color", symbol: "eyedropper", action: pickColor)
+                    if settings.showsRecentColors {
+                        RecentColors(settings: colorPickerSettings, columns: 8, copy: copyColor)
+                    }
+                    if settings.showsColorPicker {
+                        menuButton("Pick a Color", symbol: "eyedropper", action: pickColor)
+                    }
                 }
             }
             HStack(spacing: 8) {

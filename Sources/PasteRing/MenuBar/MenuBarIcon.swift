@@ -1,7 +1,8 @@
 import AppKit
 
-/// The icons to choose from for the menu bar: PasteRing's own first, then common symbols. All
-/// are template images, so macOS draws them in the menu bar's colour (white on a dark one).
+/// The icons to choose from for the menu bar: PasteRing's own first, then common symbols. They
+/// are template images, so macOS draws them in the menu bar's colour (white on a dark one),
+/// unless a colour is chosen for them.
 enum MenuBarIcon {
     /// PasteRing's own icon, the default.
     static let app = "app"
@@ -25,10 +26,16 @@ enum MenuBarIcon {
         icon == app ? "doc.on.clipboard" : icon
     }
 
-    static func image(for icon: String) -> NSImage? {
-        let image = NSImage(systemSymbolName: symbol(for: icon), accessibilityDescription: "PasteRing")
+    /// In the menu bar's own colour, or in `color` when one is chosen.
+    static func image(for icon: String, color: NSColor? = nil) -> NSImage? {
+        var image = NSImage(systemSymbolName: symbol(for: icon), accessibilityDescription: "PasteRing")
             ?? NSImage(systemSymbolName: symbol(for: app), accessibilityDescription: "PasteRing")
-        image?.isTemplate = true
+        if let color {
+            image = image?.withSymbolConfiguration(NSImage.SymbolConfiguration(paletteColors: [color]))
+            image?.isTemplate = false
+        } else {
+            image?.isTemplate = true
+        }
         return image
     }
 }
