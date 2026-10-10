@@ -40,7 +40,9 @@ final class VolumeMixer {
     private var observers: Set<AnyCancellable> = []
     private var systemListeners: [AudioListener] = []
     private var volumeListeners: [AudioListener] = []
-    private var processListeners: [AudioObjectID: AudioListener] = [:]
+    private var processListeners: [AudioObjectID: [AudioListener]] = [:]
+    /// A refresh asked for while one is waiting: one event fires several listeners at once.
+    private var refreshQueued = false
     /// Apps heard playing since the mixer started; they stay listed while they're running.
     private var heard: Set<pid_t> = []
     /// One `TapEngine` per app whose sound is changed, by the app's process.
@@ -85,7 +87,7 @@ final class VolumeMixer {
             ]
             if #available(macOS 14.4, *) {
                 systemListeners.append(AudioListener(system, kAudioHardwarePropertyProcessObjectList) { [weak self] in
-                    MainActor.assumeIsolated { self?.refreshApps() }
+                    MainActor.assumeIsolated { self?.queueRefreshApps() }
                 })
             }
             refreshDevices()
@@ -174,15 +176,33 @@ final class VolumeMixer {
         state.apps = running.filter { heard.contains($0.pid) || !settings.sound(of: $0.key).isUntouched }
         heard.formIntersection(running.map(\.pid))
 
-        // Starting or stopping playback changes this, not the list of processes.
-        let objects = Set(running.flatMap(\.objects))
+        // Starting or stopping playback changes these, not the list of processes. Every audio
+        // process is followed, including helpers not yet matched to an app. Some macOS versions
+        // change "running output" without telling; "running" and the devices it plays on
+        // change with it, so all three are followed.
+        let objects = Set(AudioApps.processObjects())
         processListeners = processListeners.filter { objects.contains($0.key) }
         for object in objects where processListeners[object] == nil {
-            processListeners[object] = AudioListener(object, kAudioProcessPropertyIsRunningOutput) { [weak self] in
-                MainActor.assumeIsolated { self?.refreshApps() }
-            }
+            let changed: () -> Void = { [weak self] in MainActor.assumeIsolated { self?.queueRefreshApps() } }
+            processListeners[object] = [
+                AudioListener(object, kAudioProcessPropertyIsRunningOutput, handler: changed),
+                AudioListener(object, kAudioProcessPropertyIsRunning, handler: changed),
+                AudioListener(object, kAudioProcessPropertyDevices, scope: kAudioObjectPropertyScopeOutput, handler: changed),
+            ]
         }
         reconcileEngines(running)
+    }
+
+    /// Refreshes once for a burst of notifications, right after it.
+    private func queueRefreshApps() {
+        guard !refreshQueued else { return }
+        refreshQueued = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            MainActor.assumeIsolated {
+                self?.refreshQueued = false
+                self?.refreshApps()
+            }
+        }
     }
 
     func setVolume(_ volume: Double, of app: AudioApp) {
