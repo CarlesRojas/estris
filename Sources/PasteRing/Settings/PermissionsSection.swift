@@ -32,14 +32,32 @@ enum Permission {
         }
     }
 
-    /// Nil when macOS doesn't tell (System Audio Recording).
+    /// Nil when it can't be told.
     var isGranted: Bool? {
         switch self {
         case .accessibility: AXIsProcessTrusted()
         case .screenRecording: CGPreflightScreenCaptureAccess()
-        case .systemAudioRecording: nil
+        case .systemAudioRecording: Self.privacyDatabase("kTCCServiceAudioCapture")
         }
     }
+
+    /// What the privacy database says, through `TCCAccessPreflight`: macOS has no public way to
+    /// read System Audio Recording. Looked up at run time; nil if it's missing or undecided.
+    private static func privacyDatabase(_ service: String) -> Bool? {
+        guard let preflight else { return nil }
+        switch preflight(service as CFString, nil) {
+        case 0: return true
+        case 1: return false
+        default: return nil
+        }
+    }
+
+    private static let preflight: (@convention(c) (CFString, CFDictionary?) -> Int32)? = {
+        guard let framework = dlopen("/System/Library/PrivateFrameworks/TCC.framework/Versions/A/TCC", RTLD_NOW),
+              let symbol = dlsym(framework, "TCCAccessPreflight")
+        else { return nil }
+        return unsafeBitCast(symbol, to: (@convention(c) (CFString, CFDictionary?) -> Int32).self)
+    }()
 }
 
 /// A permission and, in plain words, the one thing it is used for.
