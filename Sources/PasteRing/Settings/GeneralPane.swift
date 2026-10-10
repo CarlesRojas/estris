@@ -104,7 +104,7 @@ struct GeneralPane: View {
             asksToRelaunch = language != general.launchLanguage
         }
         .alert("Relaunch PasteRing to change the language?", isPresented: $asksToRelaunch) {
-            Button("Relaunch") { Relaunch.now() }
+            Button("Relaunch") { Relaunch.now(reopeningSettings: true) }
             Button("Cancel", role: .cancel) { general.language = general.launchLanguage }
         } message: {
             Text("The new language is used once PasteRing opens again.")

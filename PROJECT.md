@@ -151,7 +151,7 @@ Sets the volume and device of the Mac's sound and microphone, and of each app. N
 
 ## Languages
 
-English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching, so choosing a language opens a dialog in the middle of the window: **Relaunch** now, or **Cancel** to keep the current language. Dates follow the chosen language.
+English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching, so choosing a language opens a dialog in the middle of the window: **Relaunch** now (Settings opens again on General), or **Cancel** to keep the current language. Dates follow the chosen language.
 
 - Translations: `Resources/Localization/<language>.lproj/Localizable.strings`, keyed by the English text (the permission prompt is in `InfoPlist.strings`); `build-app.sh` copies them into the app and `Info.plist` lists the languages.
 - `scripts/check-localization.py` finds the text the app shows and reports anything missing in a language.
