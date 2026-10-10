@@ -340,8 +340,9 @@ private struct SidebarRowContent: View {
             } icon: {
                 Image(systemName: pane.symbol)
                     .font(.system(size: 15))
-                    // The label colour (white in dark mode), white on the highlight.
-                    .foregroundStyle(isHighlighted ? Color.white : Color.primary)
+                    // The accent color people chose in System Settings, as sidebars use; white on
+                    // the highlight.
+                    .foregroundStyle(isHighlighted ? Color.white : Color.accentColor)
                     // Centred in a fixed box: symbols sit on the text baseline by default,
                     // which pushes taller ones like the clipboard down.
                     .frame(width: 22, height: 22, alignment: .center)

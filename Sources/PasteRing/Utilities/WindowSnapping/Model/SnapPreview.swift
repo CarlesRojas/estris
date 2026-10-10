@@ -2,7 +2,7 @@ import AppKit
 
 /// The outline showing where a dragged window will snap: rounded, with a dark see-through
 /// fill. It grows out of the screen edge or corner being dragged to, and glides between
-/// areas as the pointer moves.
+/// areas as the pointer moves; with Reduce Motion, it only fades.
 @MainActor
 final class SnapPreview {
     /// Room between the outline and the area, so it reads as a preview of it.
@@ -41,10 +41,13 @@ final class SnapPreview {
             panel.orderFrontRegardless()
         }
         shown = target
+        // With Reduce Motion it doesn't grow or glide: it fades in where it lands.
+        let reducesMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        if reducesMotion { panel.setFrame(target, display: true) }
         NSAnimationContext.runAnimationGroup { context in
             context.duration = Self.duration
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            panel.animator().setFrame(target, display: true)
+            if !reducesMotion { panel.animator().setFrame(target, display: true) }
             panel.animator().alphaValue = 1
         }
     }

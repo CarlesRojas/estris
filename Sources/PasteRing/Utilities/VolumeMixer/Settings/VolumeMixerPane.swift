@@ -52,8 +52,7 @@ struct VolumeMixerPane: View {
                         permissionNotice
                     }
                     if !state.canChangeApps {
-                        Text("Allow System Audio Recording to change each app's sound.")
-                            .foregroundStyle(.orange)
+                        WarningLabel("Allow System Audio Recording to change each app's sound.")
                     }
                     if state.apps.isEmpty {
                         Text("No app is playing sound.")
@@ -121,6 +120,7 @@ struct AppSoundRow: View {
                 }
                 .buttonStyle(.borderless)
                 .help(sound.isMuted ? Text("Unmute") : Text("Mute"))
+                .accessibilityLabel(sound.isMuted ? Text("Unmute") : Text("Mute"))
                 // In a form, a slider keeps an empty label column at its left unless hidden.
                 Slider(value: Binding(get: { sound.volume }, set: { mixer.setVolume($0, of: app) }), in: 0...2)
                     .labelsHidden()
@@ -230,6 +230,7 @@ private struct SystemSoundRow: View {
                 .buttonStyle(.borderless)
                 .disabled(isMuted == nil)
                 .help(isMuted == true ? Text("Unmute") : Text("Mute"))
+                .accessibilityLabel(isMuted == true ? Text("Unmute") : Text("Mute"))
                 // In a form, a slider keeps an empty label column at its left unless hidden.
                 Slider(value: Binding(get: { Double(volume ?? 0) }, set: { setVolume(Float($0)) }), in: 0...1)
                     .labelsHidden()

@@ -96,7 +96,7 @@
 "Color Picker" = "Selector de color";
 "Copied" = "Copiado";
 "Copy All" = "Copiar todo";
-"Copy as" = "Copiar como";
+"Copy As" = "Copiar como";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar algo que ya está en el historial lo sube arriba en lugar de añadirlo de nuevo.";
 "Corners" = "Esquinas";
 "Create Mapping" = "Crear asignación";
@@ -151,6 +151,7 @@
 "History" = "Historial";
 "Home" = "Inicio";
 "Icon" = "Icono";
+"Idle Time Before Sleep" = "Inactividad antes de reposo";
 "Ignore passwords" = "Ignorar contraseñas";
 "Immediately" = "Inmediatamente";
 "Inactive" = "Inactivo";
@@ -345,7 +346,6 @@
 "Size" = "Tamaño";
 "Skip windows when moving faster than" = "Saltar ventanas al moverse a más de";
 "Skips text copied from password fields and password managers." = "Omite el texto copiado de campos de contraseña y gestores de contraseñas.";
-"Sleep after being idle for" = "Reposo tras estar inactivo";
 "Sleep Display" = "Reposo de la pantalla";
 "Sleeps in" = "Reposo en";
 "Snap by dragging a window to a screen edge" = "Ajustar al arrastrar una ventana a un borde de la pantalla";

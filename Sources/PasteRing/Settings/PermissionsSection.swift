@@ -126,10 +126,7 @@ struct PermissionsSection: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 if use.permission.isGranted != true {
-                    Text(use.without)
-                        .font(.callout)
-                        .foregroundStyle(.orange)
-                        .fixedSize(horizontal: false, vertical: true)
+                    WarningLabel(use.without)
                 }
             }
             Spacer(minLength: 8)

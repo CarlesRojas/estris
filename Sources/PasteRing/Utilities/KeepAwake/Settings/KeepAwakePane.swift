@@ -16,7 +16,7 @@ struct KeepAwakePane: View {
             )
 
             Form {
-                Section("Sleep after being idle for") {
+                Section("Idle Time Before Sleep") {
                     picker("On power adapter", selection: $settings.onPower)
                         .resetMenu($settings.onPower, to: KeepAwakeSettings.defaultOnPower)
                     picker("On battery", selection: $settings.onBattery)

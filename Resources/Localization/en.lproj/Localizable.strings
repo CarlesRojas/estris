@@ -96,7 +96,7 @@
 "Color Picker" = "Color Picker";
 "Copied" = "Copied";
 "Copy All" = "Copy All";
-"Copy as" = "Copy as";
+"Copy As" = "Copy As";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copying something already in the history moves it to the top instead of adding it again.";
 "Corners" = "Corners";
 "Create Mapping" = "Create Mapping";
@@ -151,6 +151,7 @@
 "History" = "History";
 "Home" = "Home";
 "Icon" = "Icon";
+"Idle Time Before Sleep" = "Idle Time Before Sleep";
 "Ignore passwords" = "Ignore passwords";
 "Immediately" = "Immediately";
 "Inactive" = "Inactive";
@@ -345,7 +346,6 @@
 "Size" = "Size";
 "Skip windows when moving faster than" = "Skip windows when moving faster than";
 "Skips text copied from password fields and password managers." = "Skips text copied from password fields and password managers.";
-"Sleep after being idle for" = "Sleep after being idle for";
 "Sleep Display" = "Sleep Display";
 "Sleeps in" = "Sleeps in";
 "Snap by dragging a window to a screen edge" = "Snap by dragging a window to a screen edge";

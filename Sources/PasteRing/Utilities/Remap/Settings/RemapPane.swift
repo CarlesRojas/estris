@@ -126,6 +126,7 @@ private struct MappingsView: View {
             }
             .buttonStyle(.borderless)
             .help("Rename this device")
+            .accessibilityLabel(Text("Rename this device"))
         }
     }
 
@@ -174,6 +175,7 @@ private struct MappingsView: View {
                 .buttonStyle(.borderless)
                 .disabled(turned == nil)
                 .help("Swap From and To")
+                .accessibilityLabel(Text("Swap From and To"))
                 Button {
                     settings.remove(mapping, from: device.id)
                 } label: {
@@ -181,12 +183,11 @@ private struct MappingsView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Remove this mapping")
+                .accessibilityLabel(Text("Remove this mapping"))
             }
             // On a line of its own under the mapping.
             if let conflict {
-                Label(conflict.message, systemImage: "exclamationmark.triangle.fill")
-                    .font(.callout)
-                    .foregroundStyle(.orange)
+                WarningLabel(conflict.message)
                     .help(conflict.explanation)
             }
         }

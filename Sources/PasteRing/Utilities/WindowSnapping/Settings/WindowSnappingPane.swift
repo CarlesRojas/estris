@@ -178,14 +178,7 @@ struct WindowSnappingPane: View {
     }
 
     private func warning(_ text: String) -> some View {
-        HStack(alignment: .top, spacing: 6) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.orange)
-            Text(text)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
+        WarningLabel(text)
     }
 }
 

@@ -94,6 +94,7 @@ private struct ClipActions: ViewModifier {
         .buttonStyle(.plain)
         .onHover { isTrashHovered = $0 }
         .help("Delete from history")
+        .accessibilityLabel(Text("Delete from history"))
     }
 }
 

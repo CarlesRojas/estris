@@ -96,7 +96,7 @@
 "Color Picker" = "Selector de color";
 "Copied" = "Copiat";
 "Copy All" = "Copia-ho tot";
-"Copy as" = "Copia com a";
+"Copy As" = "Copia com a";
 "Copying something already in the history moves it to the top instead of adding it again." = "Copiar una cosa que ja és a l’historial la mou a dalt en lloc d’afegir-la de nou.";
 "Corners" = "Cantonades";
 "Create Mapping" = "Crea una assignació";
@@ -151,6 +151,7 @@
 "History" = "Historial";
 "Home" = "Inici";
 "Icon" = "Icona";
+"Idle Time Before Sleep" = "Inactivitat abans del repòs";
 "Ignore passwords" = "Ignora les contrasenyes";
 "Immediately" = "Immediatament";
 "Inactive" = "Inactiu";
@@ -345,7 +346,6 @@
 "Size" = "Mida";
 "Skip windows when moving faster than" = "Salta finestres en moure’s a més de";
 "Skips text copied from password fields and password managers." = "Omet el text copiat de camps de contrasenya i gestors de contrasenyes.";
-"Sleep after being idle for" = "Repòs després d’inactivitat de";
 "Sleep Display" = "Repòs de la pantalla";
 "Sleeps in" = "Repòs d’aquí a";
 "Snap by dragging a window to a screen edge" = "Ajusta en arrossegar una finestra a una vora de la pantalla";

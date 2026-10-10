@@ -89,6 +89,7 @@ struct HistoryPreferences: View {
                 .buttonStyle(.borderless)
                 .foregroundStyle(mutedRed)
                 .help("Delete this entry")
+                .accessibilityLabel(Text("Delete this entry"))
             }
 
             Group {

@@ -29,7 +29,7 @@ struct ColorPickerPane: View {
                     }
                     .resetMenu($settings.shortcut, to: ColorPickerSettings.defaultShortcut)
                 }
-                Section("Copy as") {
+                Section("Copy As") {
                     Picker("Format", selection: $settings.format) {
                         ForEach(ColorFormat.allCases) { format in
                             Text(verbatim: format.title).tag(format)

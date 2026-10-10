@@ -45,8 +45,7 @@ struct MenuBarMenu: View {
                 if settings.showsApps {
                     group("Apps Volume") {
                         if !mixerState.canChangeApps {
-                            Text("Allow System Audio Recording to change each app's sound.")
-                                .foregroundStyle(.orange)
+                            WarningLabel("Allow System Audio Recording to change each app's sound.")
                         }
                         if mixerState.apps.isEmpty {
                             Text("No app is playing sound.")

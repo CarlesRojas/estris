@@ -4,6 +4,8 @@ import SwiftUI
 struct GridView: View {
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
+    /// With Reduce Motion, the selection moves without sliding or springing.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var layout: GridLayout {
         state.gridLayout ?? GridLayout.fitting(settings, in: CGSize(width: 10_000, height: 10_000))
@@ -40,6 +42,6 @@ struct GridView: View {
             }
         }
         .padding(GridLayout.padding)
-        .animation(.spring(response: 0.25, dampingFraction: 0.85), value: state.selected)
+        .animation(reduceMotion ? nil : .spring(response: 0.25, dampingFraction: 0.85), value: state.selected)
     }
 }
