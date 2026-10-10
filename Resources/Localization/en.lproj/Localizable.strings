@@ -147,6 +147,7 @@
 "Key %@" = "Key %@";
 "key code %@" = "key code %@";
 "Key code %@" = "Key code %@";
+"Keyboard & Mouse" = "Keyboard & Mouse";
 "Keyboard Backlight Toggle" = "Keyboard Backlight Toggle";
 "Keyboard Brightness Down" = "Keyboard Brightness Down";
 "Keyboard Brightness Up" = "Keyboard Brightness Up";
@@ -316,6 +317,7 @@
 "Time format" = "Time format";
 "Tint" = "Tint";
 "Tint strength" = "Tint strength";
+"Tools" = "Tools";
 "Top edge: maximize" = "Top edge: maximize";
 "Top Half" = "Top Half";
 "Top Left" = "Top Left";
@@ -339,4 +341,5 @@
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.";
 "Width" = "Width";
 "Window Snapping" = "Window Snapping";
+"Windows & Apps" = "Windows & Apps";
 "§ (Section)" = "§ (Section)";
