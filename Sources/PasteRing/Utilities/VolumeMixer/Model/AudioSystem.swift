@@ -48,7 +48,9 @@ enum AudioSystem {
     ) -> Bool {
         var address = address(selector, scope: scope, element: element)
         var value = value
-        return AudioObjectSetPropertyData(object, &address, 0, nil, UInt32(MemoryLayout<T>.size), &value) == noErr
+        return withUnsafeMutablePointer(to: &value) { pointer in
+            AudioObjectSetPropertyData(object, &address, 0, nil, UInt32(MemoryLayout<T>.size), pointer) == noErr
+        }
     }
 
     static func isSettable(
