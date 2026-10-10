@@ -77,18 +77,18 @@ private struct PreviewCard: View {
                 if let appIcon {
                     Image(nsImage: appIcon)
                         .resizable()
-                        .frame(width: 16, height: 16)
+                        .frame(width: 22, height: 22)
                 }
                 Text(verbatim: window.title.isEmpty ? appName : window.title)
-                    .font(.caption)
+                    .font(.callout)
                     .lineLimit(1)
                     .truncationMode(.tail)
                 Spacer(minLength: 4)
                 if showsClose {
                     Button(action: close) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 10, weight: .semibold))
-                            .frame(width: 16, height: 16)
+                            .font(.system(size: 12, weight: .semibold))
+                            .frame(width: 22, height: 22)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(CloseButtonStyle())

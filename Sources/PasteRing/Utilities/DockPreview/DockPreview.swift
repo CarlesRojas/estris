@@ -166,16 +166,23 @@ final class DockPreview {
         scheduleOpen(item, delay: settings.openDelay.seconds)
     }
 
-    /// The space between the icon and the panel, crossed on the way up to it.
-    private func corridor(to item: DockItem) -> NSRect {
+    /// The way from the icon to the panel: the area between the icon's outer corners (on the
+    /// Dock's edge) and the panel's corners on that side, a trapezoid that widens toward the
+    /// panel. The pointer can cut across it diagonally, over other icons, to reach any window
+    /// without the panel switching apps or closing.
+    private func corridor(to item: DockItem) -> Corridor {
         let icon = item.frame
+        let panel = contentFrame
         switch layout.edge {
         case .bottom:
-            return NSRect(x: icon.minX, y: icon.midY, width: icon.width, height: max(0, contentFrame.minY - icon.midY))
+            return Corridor([NSPoint(x: icon.minX, y: icon.minY), NSPoint(x: icon.maxX, y: icon.minY),
+                             NSPoint(x: panel.maxX, y: panel.minY), NSPoint(x: panel.minX, y: panel.minY)])
         case .left:
-            return NSRect(x: icon.midX, y: icon.minY, width: max(0, contentFrame.minX - icon.midX), height: icon.height)
+            return Corridor([NSPoint(x: icon.minX, y: icon.minY), NSPoint(x: panel.minX, y: panel.minY),
+                             NSPoint(x: panel.minX, y: panel.maxY), NSPoint(x: icon.minX, y: icon.maxY)])
         case .right:
-            return NSRect(x: contentFrame.maxX, y: icon.minY, width: max(0, icon.midX - contentFrame.maxX), height: icon.height)
+            return Corridor([NSPoint(x: icon.maxX, y: icon.minY), NSPoint(x: icon.maxX, y: icon.maxY),
+                             NSPoint(x: panel.maxX, y: panel.maxY), NSPoint(x: panel.maxX, y: panel.minY)])
         }
     }
 
@@ -468,4 +475,30 @@ private func dockPreviewInputCallback(
     let utility = Unmanaged<DockPreview>.fromOpaque(refcon).takeUnretainedValue()
     let swallowed = MainActor.assumeIsolated { utility.handleInput(type, event) }
     return swallowed ? nil : Unmanaged.passUnretained(event)
+}
+
+/// A convex area given by its corners in order.
+private struct Corridor {
+    let corners: [NSPoint]
+
+    init(_ corners: [NSPoint]) {
+        self.corners = corners
+    }
+
+    /// On the same side of every edge (or on one).
+    func contains(_ point: NSPoint) -> Bool {
+        var sign: CGFloat = 0
+        for index in corners.indices {
+            let a = corners[index]
+            let b = corners[(index + 1) % corners.count]
+            let cross = (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x)
+            if cross == 0 { continue }
+            if sign == 0 {
+                sign = cross
+            } else if (cross > 0) != (sign > 0) {
+                return false
+            }
+        }
+        return true
+    }
 }
