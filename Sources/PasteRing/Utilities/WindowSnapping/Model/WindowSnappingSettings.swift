@@ -68,6 +68,11 @@ final class WindowSnappingSettings: ObservableObject {
     static let edgeAreaRange: ClosedRange<Double> = 8...150
     static let defaultEdgeArea = 64.0
 
+    /// ⌃⌥A shares the screen evenly among all its windows.
+    @Published var arrangesAll: Bool {
+        didSet { defaults.set(arrangesAll, forKey: Keys.arrangesAll) }
+    }
+
     /// The drag areas that snap.
     @Published var gestures: Set<SnapGesture> {
         didSet { defaults.set(gestures.map(\.rawValue), forKey: Keys.gestures) }
@@ -83,6 +88,7 @@ final class WindowSnappingSettings: ObservableObject {
             Keys.fillsSpace: true,
             Keys.edgeArea: Self.defaultEdgeArea,
             Keys.gestures: SnapGesture.defaults.map(\.rawValue),
+            Keys.arrangesAll: true,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         snapsByDragging = defaults.bool(forKey: Keys.snapsByDragging)
@@ -90,10 +96,12 @@ final class WindowSnappingSettings: ObservableObject {
         fillsSpace = defaults.bool(forKey: Keys.fillsSpace)
         edgeArea = defaults.double(forKey: Keys.edgeArea)
         gestures = Set((defaults.stringArray(forKey: Keys.gestures) ?? []).compactMap(SnapGesture.init(rawValue:)))
+        arrangesAll = defaults.bool(forKey: Keys.arrangesAll)
     }
 
-    /// Back to how dragging, resizing and gestures start out; the on/off switch stays.
+    /// Back to how dragging, resizing, gestures and Arrange All start out; the on/off switch stays.
     func reset() {
+        arrangesAll = true
         snapsByDragging = true
         resizesTogether = true
         fillsSpace = true
@@ -108,5 +116,6 @@ final class WindowSnappingSettings: ObservableObject {
         static let edgeArea = "windowSnappingEdgeArea"
         static let fillsSpace = "windowSnappingFillsSpace"
         static let gestures = "windowSnappingGestures"
+        static let arrangesAll = "windowSnappingArrangesAll"
     }
 }

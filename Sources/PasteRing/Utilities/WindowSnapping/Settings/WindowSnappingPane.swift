@@ -87,6 +87,15 @@ struct WindowSnappingPane: View {
                     Label(action.title, systemImage: action.symbol)
                 }
             }
+            Toggle(isOn: $settings.arrangesAll) {
+                HStack {
+                    Label("Arrange All Windows", systemImage: "square.grid.2x2")
+                    Spacer()
+                    Text(verbatim: WindowArranger.shortcut.displayString)
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
     }
 }

@@ -29,9 +29,10 @@ final class WindowSnapping {
     func start() {
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
-        settings.$isEnabled
+        settings.$isEnabled.map { _ in () }
+            .merge(with: settings.$arrangesAll.map { _ in () })
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in self?.apply() }
+            .sink { [weak self] in self?.apply() }
             .store(in: &observers)
     }
 
@@ -54,6 +55,36 @@ final class WindowSnapping {
                 self?.snapFocusedWindow(to: action)
             })
         }
+        if settings.arrangesAll {
+            let shortcut = WindowArranger.shortcut
+            hotKeys.append(HotKeyCenter.shared.register(keyCode: shortcut.keyCode, modifiers: shortcut.modifiers) { [weak self] in
+                self?.arrangeAll()
+            })
+        }
+    }
+
+    /// Shares the screen in use (the front window's, else the pointer's) evenly among all its
+    /// windows, front ones first. Each window's frame before is kept for Restore.
+    private func arrangeAll() {
+        let mouse = NSEvent.mouseLocation
+        guard let screen = AXWindow.focused()?.screen ?? NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) else { return }
+        let windows = WindowArranger.windows(on: screen)
+        guard !windows.isEmpty else { return log("arrange all: no windows on this screen (needs Accessibility access)") }
+        let frames = WindowArranger.frames(count: windows.count, in: screen.visibleFrame)
+        for (window, frame) in zip(windows, frames) {
+            guard let original = window.frame else { continue }
+            window.setFrame(frame)
+            let snapped = window.frame ?? frame
+            if let saved = restoreFrames.firstIndex(where: { $0.window.isSame(as: window) }) {
+                if restoreFrames[saved].snapped != original { restoreFrames[saved].original = original }
+                restoreFrames[saved].snapped = snapped
+            } else {
+                restoreFrames.append((window, original, snapped))
+                if restoreFrames.count > 100 { restoreFrames.removeFirst() }
+            }
+        }
+        lastShortcut = nil
+        log("arrange all: \(windows.count) window(s)")
     }
 
     private func snapFocusedWindow(to action: SnapAction) {

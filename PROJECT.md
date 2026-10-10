@@ -122,10 +122,11 @@ Changes what keys and mouse buttons do, per device. Off by default; turn it on i
 
 ## Window Snapping
 
-Moves the front window to halves, corners, thirds or the whole screen. Off by default; turn it on in **Settings > Window Snapping**.
+Moves the front window to halves, corners, thirds or the whole screen, or arranges all the screen's windows. Off by default; turn it on in **Settings > Window Snapping**.
 
-- The pane is one page: Dragging, Gestures and Shortcuts sections, and **Reset to Defaults** (dragging, edge area, resizing together, filling space and gestures; not the on/off switch).
+- The pane is one page: Dragging, Gestures and Shortcuts sections, and **Reset to Defaults** (dragging, edge area, resizing together, filling space, gestures and Arrange All; not the on/off switch).
 - **Shortcuts** (all ⌃⌥, fixed, listed in the Shortcuts section): ← → ↑ ↓ halves; U, I, J, K top left, top right, bottom left, bottom right; ↩ maximize; D, F, G left, center, right third; E, R, T left, center and right two thirds; C center; ⌫ restore (the frame before the window was first snapped, or before it was last moved by hand and snapped again).
+- **Arrange All Windows** (⌃⌥A, a switch in the Shortcuts section, on by default): every window on the screen in use (the front window's, else the pointer's) shares it evenly, front windows first: two side by side, three in thirds, four in quarters; from five on, about √n columns with the windows spread over them, fewer per column on the left (five is a left third plus four quarters of the rest, six is three columns of two, seven 2 + 2 + 3, and so on). Normal windows of regular apps (and PasteRing's own) mostly on that screen; minimized and hidden ones stay. Each window's frame before is kept, so Restore (⌃⌥⌫) puts the front one back.
 - **Dragging** (on by default): drag a window by its title bar to an edge of the screen the pointer is on, see an outline of where it will go, and release:
   - Corners: quarters. Top edge: maximize.
   - Left or right edge: that half; near the top or bottom end of the edge, the top or bottom half.
