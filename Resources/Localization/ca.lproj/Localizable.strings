@@ -223,7 +223,6 @@
 "Pick a color" = "Tria un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Tria un color de qualsevol lloc de la pantalla amb una drecera i copia’l.";
 "Play or Pause" = "Reprodueix o posa en pausa";
-"Playing" = "Reproduint";
 "Posted by %@" = "Enviat per %@";
 "Power adapter" = "Adaptador de corrent";
 "Power source" = "Font d’alimentació";
@@ -333,7 +332,6 @@
 "Version %@" = "Versió %@";
 "Version %@ (%@)" = "Versió %@ (%@)";
 "View" = "Visualització";
-"Volume" = "Volum";
 "Volume Down" = "Abaixa el volum";
 "Volume Mixer" = "Mesclador de volum";
 "Volume Up" = "Apuja el volum";

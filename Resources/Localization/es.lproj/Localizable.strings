@@ -223,7 +223,6 @@
 "Pick a color" = "Elegir un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Elige un color de cualquier parte de la pantalla con un atajo y cópialo.";
 "Play or Pause" = "Reproducir o pausar";
-"Playing" = "Reproduciendo";
 "Posted by %@" = "Enviado por %@";
 "Power adapter" = "Adaptador de corriente";
 "Power source" = "Fuente de alimentación";
@@ -333,7 +332,6 @@
 "Version %@" = "Versión %@";
 "Version %@ (%@)" = "Versión %@ (%@)";
 "View" = "Vista";
-"Volume" = "Volumen";
 "Volume Down" = "Bajar volumen";
 "Volume Mixer" = "Mezclador de volumen";
 "Volume Up" = "Subir volumen";

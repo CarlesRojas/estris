@@ -223,7 +223,6 @@
 "Pick a color" = "Pick a color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Pick a color anywhere on screen with a shortcut and copy it.";
 "Play or Pause" = "Play or Pause";
-"Playing" = "Playing";
 "Posted by %@" = "Posted by %@";
 "Power adapter" = "Power adapter";
 "Power source" = "Power source";
@@ -333,7 +332,6 @@
 "Version %@" = "Version %@";
 "Version %@ (%@)" = "Version %@ (%@)";
 "View" = "View";
-"Volume" = "Volume";
 "Volume Down" = "Volume Down";
 "Volume Mixer" = "Volume Mixer";
 "Volume Up" = "Volume Up";

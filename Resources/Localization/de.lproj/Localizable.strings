@@ -223,7 +223,6 @@
 "Pick a color" = "Farbe aufnehmen";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Nimm per Kurzbefehl eine Farbe vom Bildschirm auf und kopiere sie.";
 "Play or Pause" = "Wiedergabe oder Pause";
-"Playing" = "Spielt ab";
 "Posted by %@" = "Gesendet von %@";
 "Power adapter" = "Netzteil";
 "Power source" = "Stromquelle";
@@ -333,7 +332,6 @@
 "Version %@" = "Version %@";
 "Version %@ (%@)" = "Version %@ (%@)";
 "View" = "Ansicht";
-"Volume" = "Lautstärke";
 "Volume Down" = "Leiser";
 "Volume Mixer" = "Lautstärkemixer";
 "Volume Up" = "Lauter";
