@@ -90,6 +90,70 @@ struct AXWindow {
         }
     }
 
+    /// An app's window by its window server number. Accessibility's window list can miss a
+    /// window just brought over from another desktop, so that is matched by number first, then
+    /// by frame, then looked for among the app's elements one by one (how window switchers
+    /// reach windows the list leaves out).
+    static func of(pid: pid_t, number: CGWindowID, frame: NSRect) -> AXWindow? {
+        if pid == getpid() {
+            return NSApp.windows.first { $0.windowNumber == Int(number) }.map(AXWindow.init(own:))
+        }
+        let application = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(application, messagingTimeout)
+        var value: CFTypeRef?
+        let listed = AXUIElementCopyAttributeValue(application, kAXWindowsAttribute as CFString, &value) == .success
+            ? value as? [AXUIElement] ?? []
+            : []
+        if let element = listed.first(where: { Self.number(of: $0) == number }) {
+            return AXWindow(element: element)
+        }
+        if let window = of(pid: pid, matching: frame) {
+            return window
+        }
+        return hiddenElement(pid: pid, number: number).map(AXWindow.init(element:))
+    }
+
+    /// The window server's number for an Accessibility window.
+    static func number(of element: AXUIElement) -> CGWindowID? {
+        guard let getWindow else { return nil }
+        var number: CGWindowID = 0
+        return getWindow(element, &number) == .success && number != 0 ? number : nil
+    }
+
+    /// Goes through the app's element ids, building each from a remote token (the app's pid and
+    /// the id), until one is the window with that number.
+    private static func hiddenElement(pid: pid_t, number: CGWindowID) -> AXUIElement? {
+        guard let createWithToken else { return nil }
+        var token = Data(count: 20)
+        token.replaceSubrange(0..<4, with: withUnsafeBytes(of: pid) { Data($0) })
+        token.replaceSubrange(8..<12, with: withUnsafeBytes(of: UInt32(0x636f_636f)) { Data($0) }) // "coco"
+        for id in UInt64(0)..<1000 {
+            token.replaceSubrange(12..<20, with: withUnsafeBytes(of: id) { Data($0) })
+            guard let element = createWithToken(token as CFData)?.takeRetainedValue() else { continue }
+            AXUIElementSetMessagingTimeout(element, messagingTimeout)
+            if role(of: element) == kAXWindowRole as String, Self.number(of: element) == number {
+                return element
+            }
+        }
+        return nil
+    }
+
+    private static func symbol(_ name: String) -> UnsafeMutableRawPointer? {
+        dlsym(UnsafeMutableRawPointer(bitPattern: -2), name)
+    }
+
+    /// `_AXUIElementGetWindow`, looked up at run time.
+    private static let getWindow: (@convention(c) (AXUIElement, UnsafeMutablePointer<CGWindowID>) -> AXError)? = {
+        guard let symbol = symbol("_AXUIElementGetWindow") else { return nil }
+        return unsafeBitCast(symbol, to: (@convention(c) (AXUIElement, UnsafeMutablePointer<CGWindowID>) -> AXError).self)
+    }()
+
+    /// `_AXUIElementCreateWithRemoteToken`, looked up at run time.
+    private static let createWithToken: (@convention(c) (CFData) -> Unmanaged<AXUIElement>?)? = {
+        guard let symbol = symbol("_AXUIElementCreateWithRemoteToken") else { return nil }
+        return unsafeBitCast(symbol, to: (@convention(c) (CFData) -> Unmanaged<AXUIElement>?).self)
+    }()
+
     var frame: NSRect? {
         if let own { return own.frame }
         guard let element else { return nil }

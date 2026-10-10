@@ -231,6 +231,7 @@
 "On" = "On";
 "On battery" = "On battery";
 "On power adapter" = "On power adapter";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "One shortcut fits every window on the screen without overlaps, each near where it was.";
 "Only the first mapping for a key or button applies." = "Only the first mapping for a key or button applies.";
 "Only to bring the window under the pointer to the front." = "Only to bring the window under the pointer to the front.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Only to change an app's volume or the device it plays on. Nothing is recorded.";
@@ -261,6 +262,7 @@
 "Pick a color" = "Pick a color";
 "Pick a Color" = "Pick a Color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Pick a color anywhere on screen with a shortcut and copy it.";
+"Place all windows side by side" = "Place all windows side by side";
 "Play or Pause" = "Play or Pause";
 "Posted by %@" = "Posted by %@";
 "Power adapter" = "Power adapter";
@@ -319,7 +321,6 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Set the volume and device of your Mac's sound and microphone, and of each app.";
 "Settings" = "Settings";
 "Shadow" = "Shadow";
-"Share the screen evenly among all its windows with a shortcut" = "Share the screen evenly among all its windows with a shortcut";
 "Shortcut" = "Shortcut";
 "Shortcuts" = "Shortcuts";
 "Show a button to close each window" = "Show a button to close each window";

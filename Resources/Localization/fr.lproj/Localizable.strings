@@ -231,6 +231,7 @@
 "On" = "Activé";
 "On battery" = "Sur batterie";
 "On power adapter" = "Sur adaptateur secteur";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "Un raccourci fait tenir toutes les fenêtres de l’écran sans chevauchement, chacune près de sa place.";
 "Only the first mapping for a key or button applies." = "Seule la première affectation d’une touche ou d’un bouton s’applique.";
 "Only to bring the window under the pointer to the front." = "Uniquement pour mettre au premier plan la fenêtre sous le pointeur.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Uniquement pour changer le volume d'une app ou l'appareil sur lequel elle joue. Rien n'est enregistré.";
@@ -261,6 +262,7 @@
 "Pick a color" = "Prélever une couleur";
 "Pick a Color" = "Choisir une couleur";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Prélevez une couleur n’importe où à l’écran avec un raccourci et copiez-la.";
+"Place all windows side by side" = "Placer toutes les fenêtres côte à côte";
 "Play or Pause" = "Lecture ou pause";
 "Posted by %@" = "Envoyé par %@";
 "Power adapter" = "Adaptateur secteur";
@@ -319,7 +321,6 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Réglez le volume et l'appareil du son et du micro de votre Mac, et de chaque app.";
 "Settings" = "Réglages";
 "Shadow" = "Ombre";
-"Share the screen evenly among all its windows with a shortcut" = "Partager l’écran entre toutes ses fenêtres avec un raccourci";
 "Shortcut" = "Raccourci";
 "Shortcuts" = "Raccourcis";
 "Show a button to close each window" = "Afficher un bouton pour fermer chaque fenêtre";

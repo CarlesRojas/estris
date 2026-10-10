@@ -231,6 +231,7 @@
 "On" = "Activado";
 "On battery" = "Con batería";
 "On power adapter" = "Con adaptador de corriente";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "Un atajo encaja todas las ventanas de la pantalla sin que se solapen, cada una cerca de donde estaba.";
 "Only the first mapping for a key or button applies." = "Solo se aplica la primera asignación de una tecla o botón.";
 "Only to bring the window under the pointer to the front." = "Solo para traer al frente la ventana que está bajo el puntero.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Solo para cambiar el volumen de una app o el dispositivo por el que suena. No se graba nada.";
@@ -261,6 +262,7 @@
 "Pick a color" = "Elegir un color";
 "Pick a Color" = "Elegir un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Elige un color de cualquier parte de la pantalla con un atajo y cópialo.";
+"Place all windows side by side" = "Colocar todas las ventanas una al lado de otra";
 "Play or Pause" = "Reproducir o pausar";
 "Posted by %@" = "Enviado por %@";
 "Power adapter" = "Adaptador de corriente";
@@ -319,7 +321,6 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajusta el volumen y el dispositivo del sonido y el micrófono de tu Mac, y de cada app.";
 "Settings" = "Ajustes";
 "Shadow" = "Sombra";
-"Share the screen evenly among all its windows with a shortcut" = "Repartir la pantalla entre todas sus ventanas con un atajo";
 "Shortcut" = "Atajo";
 "Shortcuts" = "Atajos";
 "Show a button to close each window" = "Mostrar un botón para cerrar cada ventana";

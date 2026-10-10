@@ -11,9 +11,9 @@ enum WindowArranger {
     /// PasteRing's own), not minimized or hidden ones.
     static func windows(on screen: NSScreen) -> [AXWindow] {
         let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
-        var seen: [NSRect] = []
-        return list.compactMap { info -> AXWindow? in
+        let found = list.compactMap { info -> AXWindow? in
             guard (info[kCGWindowLayer as String] as? NSNumber)?.intValue == 0,
+                  let number = (info[kCGWindowNumber as String] as? NSNumber)?.uint32Value,
                   let pid = (info[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value,
                   NSRunningApplication(processIdentifier: pid)?.activationPolicy == .regular || pid == getpid(),
                   (info[kCGWindowAlpha as String] as? NSNumber)?.doubleValue ?? 1 > 0,
@@ -23,12 +23,13 @@ enum WindowArranger {
             else { return nil }
             let frame = AXWindow.appKitRect(cgRect)
             let shared = frame.intersection(screen.frame)
-            guard !shared.isNull, shared.width * shared.height > frame.width * frame.height / 2,
-                  !seen.contains(frame)
-            else { return nil }
-            seen.append(frame)
-            return AXWindow.of(pid: pid, matching: frame)
+            guard !shared.isNull, shared.width * shared.height > frame.width * frame.height / 2 else { return nil }
+            return AXWindow.of(pid: pid, number: number, frame: frame)
         }
+        // Matching by frame can find the same window twice.
+        return found.enumerated().filter { index, window in
+            !found[..<index].contains { $0.isSame(as: window) }
+        }.map(\.element)
     }
 
     /// Which frame each window gets: the pairing that moves them least in all, measuring

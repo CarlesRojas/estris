@@ -231,6 +231,7 @@
 "On" = "Activat";
 "On battery" = "Amb bateria";
 "On power adapter" = "Amb adaptador de corrent";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "Una drecera encaixa totes les finestres de la pantalla sense que se solapin, cadascuna a prop d’on era.";
 "Only the first mapping for a key or button applies." = "Només s’aplica la primera assignació d’una tecla o botó.";
 "Only to bring the window under the pointer to the front." = "Només per portar al davant la finestra que hi ha sota el punter.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Només per canviar el volum d'una app o el dispositiu per on sona. No es grava res.";
@@ -261,6 +262,7 @@
 "Pick a color" = "Tria un color";
 "Pick a Color" = "Tria un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Tria un color de qualsevol lloc de la pantalla amb una drecera i copia’l.";
+"Place all windows side by side" = "Col·locar totes les finestres una al costat de l’altra";
 "Play or Pause" = "Reprodueix o posa en pausa";
 "Posted by %@" = "Enviat per %@";
 "Power adapter" = "Adaptador de corrent";
@@ -319,7 +321,6 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajusta el volum i el dispositiu del so i el micròfon del teu Mac, i de cada app.";
 "Settings" = "Configuració";
 "Shadow" = "Ombra";
-"Share the screen evenly among all its windows with a shortcut" = "Repartir la pantalla entre totes les finestres amb una drecera";
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
 "Show a button to close each window" = "Mostra un botó per tancar cada finestra";

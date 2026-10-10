@@ -85,7 +85,10 @@ struct WindowSnappingPane: View {
 
     private var arrangeAll: some View {
         Section("Auto Arrange All Windows") {
-            Toggle("Share the screen evenly among all its windows with a shortcut", isOn: $settings.arrangesAll)
+            Toggle(isOn: $settings.arrangesAll) {
+                Text("Place all windows side by side")
+                Text("One shortcut fits every window on the screen without overlaps, each near where it was.")
+            }
             shortcutRow(id: SnapKeys.arrangeAllID, title: String(localized: "Arrange All Windows")) {
                 Image(systemName: "square.grid.2x2")
             }
