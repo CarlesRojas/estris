@@ -202,14 +202,14 @@ final class VolumeMixer {
     }
 
     /// For the logs, whenever it changes: the audio processes, the apps found for them, which
-    /// are playing, and which are listed.
+    /// are playing, which are listed, and how many processes belong to no app (system ones).
     @available(macOS 14.4, *)
     private func logListIfChanged(_ running: [AudioApp]) {
         let apps = running.map { "\($0.name)" + ($0.isPlaying ? " (playing)" : "") }
         let unmatched = AudioApps.unmatched()
         let summary = "\(AudioApps.processObjects().count) audio processes; apps: \(apps.joined(separator: ", ")); "
             + "listed: \(state.apps.map(\.name).joined(separator: ", ")); "
-            + "without an app: \(unmatched.isEmpty ? "none" : unmatched.joined(separator: ", "))"
+            + "\(unmatched.count) without an app"
         guard summary != lastListSummary else { return }
         lastListSummary = summary
         log(summary)
