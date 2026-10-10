@@ -2,7 +2,7 @@
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Keep Awake and Color Picker.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Keep Awake, Color Picker and Volume Mixer.
 
 ## Usage
 
@@ -140,11 +140,20 @@ Picks a color anywhere on screen with a shortcut and copies it. Off by default; 
 - **Copy as**: Hex (`#FF8000`, with **Include # prefix**, on by default), RGB (`rgb(255, 128, 0)`), HSL (`hsl(30, 100%, 50%)`) or SwiftUI (`Color(red: 1.000, green: 0.502, blue: 0.000)`), in sRGB. An example shows the chosen format.
 - After picking, a pill by the pointer shows the color and the copied value with "Copied", and fades out after a moment. It uses the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings): a capsule with the color in a circle at the left, concentric with its end, and the text centred to its right.
 
+## Volume Mixer
+
+Sets the volume and device of the Mac's sound and microphone, and of each app. Off by default; turn it on in **Settings… > Volume Mixer**. Everything follows changes made elsewhere (menu bar, System Settings, keyboard) live, through CoreAudio listeners.
+
+- **Output** and **Microphone**: the device in use (sets the system default) and its volume. The slider is disabled for a device whose volume can't be changed.
+- **Apps**: every app heard playing since the mixer started, while it is running, plus any app with changed settings (helper processes, like a browser's audio process, count as their app). Each has an output device (**Same as System** by default; a device that isn't connected shows "(not connected)" and the app falls back to the system output until it is), a mute button and a volume slider from 0% to 200%. The slider starts in the middle, 100%, where the app plays as it is, and snaps there when close.
+- Settings are remembered per app (bundle identifier, else name), also after it quits. **Reset to Defaults** puts every app back to 100%, unmuted, on the system output.
+- How: an app with changed settings gets a process tap (macOS 14.4 or later) that mutes its own output, and a private aggregate device of the tap and the chosen output plays it again scaled (clipped above full scale). Untouched apps aren't tapped. macOS asks once for **System Audio Recording** permission (Info.plist `NSAudioCaptureUsageDescription`, translated in `InfoPlist.strings`), the first time an app's sound is changed. If a tap fails, the pane names the app with **Open System Settings** and **Try Again**, and Developer > Logs says why.
+
 ## Languages
 
 English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **General > Language** picks one or follows the system; a change applies after relaunching (a **Relaunch** button appears). Dates follow the chosen language.
 
-- Translations: `Resources/Localization/<language>.lproj/Localizable.strings`, keyed by the English text; `build-app.sh` copies them into the app and `Info.plist` lists the languages.
+- Translations: `Resources/Localization/<language>.lproj/Localizable.strings`, keyed by the English text (the permission prompt is in `InfoPlist.strings`); `build-app.sh` copies them into the app and `Info.plist` lists the languages.
 - `scripts/check-localization.py` finds the text the app shows and reports anything missing in a language.
 
 ## Project structure
@@ -174,6 +183,10 @@ Sources/PasteRing/
       ScreenColorPicker.swift  owns the utility (named so it doesn't hide SwiftUI's ColorPicker)
       Model/                   settings and formats, the Copied pill
       Settings/                the Color Picker pane
+    VolumeMixer/
+      VolumeMixer.swift        owns the utility: devices, app list, one tap engine per changed app
+      Model/                   settings, CoreAudio helpers and listeners, app list, tap engine
+      Settings/                the Volume Mixer pane
     KeepAwake/
       KeepAwake.swift          owns the utility: power assertion and timer
       Model/                   settings, status, power source

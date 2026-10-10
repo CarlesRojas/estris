@@ -1,5 +1,6 @@
 /* PasteRing, en. Keys are the English text; %@ and %lld stand for values filled in at run time. */
 
+"%@ (not connected)" = "%@ (not connected)";
 "%@ Mappings" = "%@ Mappings";
 "%@ Mappings (not connected)" = "%@ Mappings (not connected)";
 "%lld apps excluded" = "%lld apps excluded";
@@ -51,6 +52,7 @@
 "Another device" = "Another device";
 "App Windows" = "App Windows";
 "Appearance" = "Appearance";
+"Apps" = "Apps";
 "Auto Quit" = "Auto Quit";
 "Battery" = "Battery";
 "Bottom edge: thirds" = "Bottom edge: thirds";
@@ -96,6 +98,7 @@
 "Delete this entry" = "Delete this entry";
 "Developer" = "Developer";
 "development build" = "development build";
+"Device" = "Device";
 "Dim screen" = "Dim screen";
 "Display and Keyboard" = "Display and Keyboard";
 "Don't keep awake" = "Don't keep awake";
@@ -173,6 +176,7 @@
 "Maximize" = "Maximize";
 "Media" = "Media";
 "Menu" = "Menu";
+"Microphone" = "Microphone";
 "Middle Button" = "Middle Button";
 "Middle Click" = "Middle Click";
 "Mission Control" = "Mission Control";
@@ -186,6 +190,7 @@
 "Never" = "Never";
 "Next Desktop" = "Next Desktop";
 "Next Track" = "Next Track";
+"No app is playing sound." = "No app is playing sound.";
 "No apps excluded" = "No apps excluded";
 "No clipboard entries yet" = "No clipboard entries yet";
 "No entries match “%@”" = "No entries match “%@”";
@@ -203,18 +208,23 @@
 "Open Accessibility Settings" = "Open Accessibility Settings";
 "Open at login" = "Open at login";
 "Open overlay" = "Open overlay";
+"Open System Settings" = "Open System Settings";
 "Other" = "Other";
 "Other source" = "Other source";
+"Output" = "Output";
 "Page Down" = "Page Down";
 "Page Up" = "Page Up";
 "Paste as plain text" = "Paste as plain text";
+"PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording.";
 "PasteRing needs Accessibility access" = "PasteRing needs Accessibility access";
 "PasteRing switches language when it relaunches" = "PasteRing switches language when it relaunches";
 "Pause" = "Pause";
+"Per-app volume needs macOS 14.4 or later." = "Per-app volume needs macOS 14.4 or later.";
 "Permissions" = "Permissions";
 "Pick a color" = "Pick a color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Pick a color anywhere on screen with a shortcut and copy it.";
 "Play or Pause" = "Play or Pause";
+"Playing" = "Playing";
 "Posted by %@" = "Posted by %@";
 "Power adapter" = "Power adapter";
 "Power source" = "Power source";
@@ -265,6 +275,7 @@
 "Search apps" = "Search apps";
 "Search logs" = "Search logs";
 "Selected highlight" = "Selected highlight";
+"Set the volume and device of your Mac's sound and microphone, and of each app." = "Set the volume and device of your Mac's sound and microphone, and of each app.";
 "Settings" = "Settings";
 "Settings…" = "Settings…";
 "Shadow" = "Shadow";
@@ -312,8 +323,10 @@
 "Top left corner" = "Top left corner";
 "Top Right" = "Top Right";
 "Top right corner" = "Top right corner";
+"Try Again" = "Try Again";
 "Unknown app" = "Unknown app";
 "Unknown device %@" = "Unknown device %@";
+"Unmute" = "Unmute";
 "Up" = "Up";
 "Up Arrow" = "Up Arrow";
 "usage %@" = "usage %@";
@@ -321,7 +334,9 @@
 "Version %@" = "Version %@";
 "Version %@ (%@)" = "Version %@ (%@)";
 "View" = "View";
+"Volume" = "Volume";
 "Volume Down" = "Volume Down";
+"Volume Mixer" = "Volume Mixer";
 "Volume Up" = "Volume Up";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.";
 "Width" = "Width";

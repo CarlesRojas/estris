@@ -1,5 +1,6 @@
 /* PasteRing, de. Keys are the English text; %@ and %lld stand for values filled in at run time. */
 
+"%@ (not connected)" = "%@ (nicht verbunden)";
 "%@ Mappings" = "Belegungen für %@";
 "%@ Mappings (not connected)" = "Belegungen für %@ (nicht verbunden)";
 "%lld apps excluded" = "%lld Apps ausgeschlossen";
@@ -51,6 +52,7 @@
 "Another device" = "Anderes Gerät";
 "App Windows" = "App-Fenster";
 "Appearance" = "Erscheinungsbild";
+"Apps" = "Apps";
 "Auto Quit" = "Automatisch beenden";
 "Battery" = "Batterie";
 "Bottom edge: thirds" = "Unterer Rand: Drittel";
@@ -96,6 +98,7 @@
 "Delete this entry" = "Diesen Eintrag löschen";
 "Developer" = "Entwickler";
 "development build" = "Entwicklungsversion";
+"Device" = "Gerät";
 "Dim screen" = "Bildschirm abdunkeln";
 "Display and Keyboard" = "Display und Tastatur";
 "Don't keep awake" = "Nicht wach halten";
@@ -173,6 +176,7 @@
 "Maximize" = "Maximieren";
 "Media" = "Medien";
 "Menu" = "Menü";
+"Microphone" = "Mikrofon";
 "Middle Button" = "Mittlere Taste";
 "Middle Click" = "Mittelklick";
 "Mission Control" = "Mission Control";
@@ -186,6 +190,7 @@
 "Never" = "Nie";
 "Next Desktop" = "Nächster Schreibtisch";
 "Next Track" = "Nächster Titel";
+"No app is playing sound." = "Keine App spielt gerade Ton ab.";
 "No apps excluded" = "Keine Apps ausgeschlossen";
 "No clipboard entries yet" = "Noch keine Einträge in der Zwischenablage";
 "No entries match “%@”" = "Keine Einträge passen zu „%@“";
@@ -203,18 +208,23 @@
 "Open Accessibility Settings" = "Bedienungshilfen-Einstellungen öffnen";
 "Open at login" = "Bei der Anmeldung öffnen";
 "Open overlay" = "Overlay öffnen";
+"Open System Settings" = "Systemeinstellungen öffnen";
 "Other" = "Andere";
 "Other source" = "Andere Quelle";
+"Output" = "Ausgabe";
 "Page Down" = "Bild ab";
 "Page Up" = "Bild auf";
 "Paste as plain text" = "Als reinen Text einsetzen";
+"PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "PasteRing konnte den Ton von %@ nicht ändern. Erlaube es unter „Nur Systemaudioaufnahme“ in Systemeinstellungen > Datenschutz & Sicherheit > Bildschirm- & Systemaudioaufnahme.";
 "PasteRing needs Accessibility access" = "PasteRing braucht Zugriff auf die Bedienungshilfen";
 "PasteRing switches language when it relaunches" = "PasteRing wechselt die Sprache beim Neustart";
 "Pause" = "Pause";
+"Per-app volume needs macOS 14.4 or later." = "Lautstärke pro App erfordert macOS 14.4 oder neuer.";
 "Permissions" = "Berechtigungen";
 "Pick a color" = "Farbe aufnehmen";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Nimm per Kurzbefehl eine Farbe vom Bildschirm auf und kopiere sie.";
 "Play or Pause" = "Wiedergabe oder Pause";
+"Playing" = "Spielt ab";
 "Posted by %@" = "Gesendet von %@";
 "Power adapter" = "Netzteil";
 "Power source" = "Stromquelle";
@@ -265,6 +275,7 @@
 "Search apps" = "Apps durchsuchen";
 "Search logs" = "Protokolle durchsuchen";
 "Selected highlight" = "Auswahlhervorhebung";
+"Set the volume and device of your Mac's sound and microphone, and of each app." = "Lege Lautstärke und Gerät für Ton und Mikrofon deines Mac fest, und für jede App.";
 "Settings" = "Einstellungen";
 "Settings…" = "Einstellungen …";
 "Shadow" = "Schatten";
@@ -312,8 +323,10 @@
 "Top left corner" = "Ecke oben links";
 "Top Right" = "Oben rechts";
 "Top right corner" = "Ecke oben rechts";
+"Try Again" = "Erneut versuchen";
 "Unknown app" = "Unbekannte App";
 "Unknown device %@" = "Unbekanntes Gerät %@";
+"Unmute" = "Ton an";
 "Up" = "Losgelassen";
 "Up Arrow" = "Pfeil nach oben";
 "usage %@" = "Usage %@";
@@ -321,7 +334,9 @@
 "Version %@" = "Version %@";
 "Version %@ (%@)" = "Version %@ (%@)";
 "View" = "Ansicht";
+"Volume" = "Lautstärke";
 "Volume Down" = "Leiser";
+"Volume Mixer" = "Lautstärkemixer";
 "Volume Up" = "Lauter";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Wenn aus, behält der Verlauf die Reihenfolge des Kopierens, und ⌘V setzt weiter den zuletzt kopierten Text ein.";
 "Width" = "Breite";
