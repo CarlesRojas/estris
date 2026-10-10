@@ -213,6 +213,8 @@ final class DockPreview {
         cancelHide()
         captureTask?.cancel()
 
+        // Taken away since: no window contents at all, not even remembered ones.
+        if !CGPreflightScreenCaptureAccess() { thumbnailCache = [:] }
         shown = item
         state.app = item.app
         state.windows = windows
