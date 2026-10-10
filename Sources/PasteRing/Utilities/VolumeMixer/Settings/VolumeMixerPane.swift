@@ -22,16 +22,16 @@ struct VolumeMixerPane: View {
 
             Form {
                 if settings.isEnabled {
-                    Section("Output") {
+                    Section("System") {
                         deviceBlock(
+                            "Output", icon: "hifispeaker",
                             state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
                             volume: state.outputVolume, isMuted: state.outputMuted,
                             symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
                             toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume
                         )
-                    }
-                    Section("Microphone") {
                         deviceBlock(
+                            "Microphone", icon: "mic",
                             state.inputDevices, selection: state.input, select: mixer.setInputDevice,
                             volume: state.inputVolume, isMuted: state.inputMuted,
                             symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
@@ -62,9 +62,11 @@ struct VolumeMixerPane: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    /// Laid out like an app's row: the device at the top right, then mute, the volume across the
+    /// Laid out like an app's row: an icon and title at the top left, the device at the top right, then mute, the volume across the
     /// whole width and its percentage.
     private func deviceBlock(
+        _ title: LocalizedStringKey,
+        icon: String,
         _ devices: [AudioDevice],
         selection: AudioObjectID?,
         select: @escaping (AudioObjectID) -> Void,
@@ -76,7 +78,12 @@ struct VolumeMixerPane: View {
         setVolume: @escaping (Float) -> Void
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack {
+            HStack(spacing: 8) {
+                // Where an app row has the app's icon and name.
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .frame(width: 20, height: 20)
+                Text(title)
                 Spacer()
                 Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
                     ForEach(devices) { device in
