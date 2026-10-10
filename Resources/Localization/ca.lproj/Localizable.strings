@@ -123,6 +123,8 @@
 "Excluded Apps" = "Apps excloses";
 "Fast Forward" = "Avançament ràpid";
 "Fill the space next to other windows" = "Omple l’espai al costat d’altres finestres";
+"Focus after resting for" = "Enfoca després de reposar";
+"Focus Follows Mouse" = "Focus sota el punter";
 "Force Quit Applications" = "Força la sortida d’aplicacions";
 "Format" = "Format";
 "Forward Delete" = "Suprimeix cap endavant";
@@ -332,6 +334,7 @@
 "Tap with" = "Toca amb";
 "The Finder always keeps running" = "El Finder sempre continua obert";
 "The new language is used once PasteRing opens again." = "El nou idioma s'utilitzarà quan PasteRing es torni a obrir.";
+"The window under the pointer comes to the front and gets the focus." = "La finestra sota el punter passa al davant i rep el focus.";
 "Thirds" = "Terços";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Aquest botó arriba al macOS sense dir quin dispositiu l’ha enviat, així que només s’aplica l’assignació de %@.";
 "Three fingers" = "Tres dits";

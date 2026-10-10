@@ -11,6 +11,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case middleClick
     case remap
     case windowSnapping
+    case focusFollowsMouse
     case keepAwake
     case colorPicker
     case volumeMixer
@@ -28,6 +29,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .middleClick: String(localized: "Middle Click")
         case .remap: String(localized: "Remap")
         case .windowSnapping: String(localized: "Window Snapping")
+        case .focusFollowsMouse: String(localized: "Focus Follows Mouse")
         case .keepAwake: String(localized: "Keep Awake")
         case .colorPicker: String(localized: "Color Picker")
         case .volumeMixer: String(localized: "Volume Mixer")
@@ -44,6 +46,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .middleClick: "hand.tap"
         case .remap: "keyboard"
         case .windowSnapping: "rectangle.split.2x1"
+        case .focusFollowsMouse: "cursorarrow.rays"
         case .keepAwake: "cup.and.saucer"
         case .colorPicker: "eyedropper"
         case .volumeMixer: "speaker.wave.2"
@@ -68,6 +71,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["color", "colour", "picker", "eyedropper", "hex", "rgb", "hsl", "swiftui", "sample"]
         case .keepAwake:
             ["awake", "sleep", "caffeinate", "display", "battery", "power", "timer"]
+        case .focusFollowsMouse:
+            ["focus", "mouse", "pointer", "hover", "window", "raise", "activate", "excluded", "apps", "delay"]
         case .windowSnapping:
             ["window", "snap", "tile", "half", "halves", "corner", "third", "maximize", "resize", "drag", "shortcut"]
         case .remap:
@@ -110,7 +115,7 @@ enum SettingsGroup: CaseIterable, Identifiable {
         switch self {
         case .app: [.general, .menuBar, .developer]
         case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake]
-        case .windows: [.windowSnapping, .autoQuit]
+        case .windows: [.windowSnapping, .focusFollowsMouse, .autoQuit]
         case .input: [.remap, .middleClick]
         }
     }
@@ -170,6 +175,7 @@ struct SettingsSidebar: View {
     @ObservedObject var middleClickSettings: MiddleClickSettings
     @ObservedObject var remapSettings: RemapSettings
     @ObservedObject var windowSnappingSettings: WindowSnappingSettings
+    @ObservedObject var focusFollowsMouseSettings: FocusFollowsMouseSettings
     @ObservedObject var keepAwakeSettings: KeepAwakeSettings
     @ObservedObject var colorPickerSettings: ColorPickerSettings
     @ObservedObject var volumeMixerSettings: VolumeMixerSettings
@@ -220,6 +226,7 @@ struct SettingsSidebar: View {
         case .middleClick: middleClickSettings.isEnabled
         case .remap: remapSettings.isEnabled
         case .windowSnapping: windowSnappingSettings.isEnabled
+        case .focusFollowsMouse: focusFollowsMouseSettings.isEnabled
         case .keepAwake: keepAwakeSettings.isEnabled
         case .colorPicker: colorPickerSettings.isEnabled
         case .volumeMixer: volumeMixerSettings.isEnabled
@@ -238,6 +245,7 @@ struct SettingsDetail: View {
     let middleClick: MiddleClick
     let remap: Remap
     let windowSnapping: WindowSnapping
+    let focusFollowsMouse: FocusFollowsMouse
     let keepAwake: KeepAwake
     let colorPicker: ScreenColorPicker
     let volumeMixer: VolumeMixer
@@ -262,6 +270,8 @@ struct SettingsDetail: View {
                     remap.settingsPane()
                 case .windowSnapping:
                     windowSnapping.settingsPane()
+                case .focusFollowsMouse:
+                    focusFollowsMouse.settingsPane()
                 case .keepAwake:
                     keepAwake.settingsPane()
                 case .colorPicker:

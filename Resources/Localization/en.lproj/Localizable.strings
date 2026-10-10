@@ -123,6 +123,8 @@
 "Excluded Apps" = "Excluded Apps";
 "Fast Forward" = "Fast Forward";
 "Fill the space next to other windows" = "Fill the space next to other windows";
+"Focus after resting for" = "Focus after resting for";
+"Focus Follows Mouse" = "Focus Follows Mouse";
 "Force Quit Applications" = "Force Quit Applications";
 "Format" = "Format";
 "Forward Delete" = "Forward Delete";
@@ -332,6 +334,7 @@
 "Tap with" = "Tap with";
 "The Finder always keeps running" = "The Finder always keeps running";
 "The new language is used once PasteRing opens again." = "The new language is used once PasteRing opens again.";
+"The window under the pointer comes to the front and gets the focus." = "The window under the pointer comes to the front and gets the focus.";
 "Thirds" = "Thirds";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies.";
 "Three fingers" = "Three fingers";
