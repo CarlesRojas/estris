@@ -58,7 +58,7 @@ Clicking the menu bar icon opens a menu below it in the clipboard overlay's defa
 - **Clipboard**: the most recent entries (off by default), each with its source app and one line of it; a click pastes it into the app in front, as the overlay does. A **Clear History** button (on by default) empties the history.
 - **Color Picker**: a **Pick a Color** button (on by default) that starts picking.
 
-Then **Settings** and **Quit** side by side at the bottom. A click outside, Esc or another click on the icon closes it.
+Then **Settings** and **Quit** side by side at the bottom. The menu's background is a shade darker than the overlay's surface, and each part (System, Apps, Clipboard, Color Picker) sits in its own lighter rounded box, concentric with the menu; no separator lines. A click outside, Esc or another click on the icon closes it.
 
 **Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Then a section per utility picks what the menu shows of it:
 

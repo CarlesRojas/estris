@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// What clicking the menu bar icon shows, in the clipboard overlay's default frosted look: the
@@ -20,59 +21,82 @@ struct MenuBarMenu: View {
     let quit: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             if mixerSettings.isEnabled && VolumeMixer.isSupported {
                 if settings.showsSystem {
-                    header("System")
-                    SystemSoundRows(state: mixerState, mixer: mixer, showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages)
-                    Divider()
+                    group("System") {
+                        SystemSoundRows(state: mixerState, mixer: mixer, showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages)
+                    }
                 }
                 if settings.showsApps {
-                    header("Apps")
-                    if mixerState.apps.isEmpty {
-                        Text("No app is playing sound.")
-                            .foregroundStyle(.secondary)
-                    }
-                    ForEach(mixerState.apps) { app in
-                        AppSoundRow(
-                            app: app, sound: mixerSettings.sound(of: app.key), devices: mixerState.outputDevices, mixer: mixer,
-                            showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages
-                        )
-                    }
-                    Divider()
-                }
-            }
-            if clipboardSettings.isEnabled && (settings.showsClipboardHistory || settings.showsClearHistory) {
-                header("Clipboard")
-                if settings.showsClipboardHistory {
-                    if history.items.isEmpty {
-                        Text("Nothing copied yet.")
-                            .foregroundStyle(.secondary)
-                    }
-                    VStack(spacing: 0) {
-                        ForEach(history.items.prefix(settings.clipboardEntries)) { item in
-                            HistoryEntryButton(item: item) { paste(item) }
+                    group("Apps") {
+                        if mixerState.apps.isEmpty {
+                            Text("No app is playing sound.")
+                                .foregroundStyle(.secondary)
+                        }
+                        ForEach(mixerState.apps) { app in
+                            AppSoundRow(
+                                app: app, sound: mixerSettings.sound(of: app.key), devices: mixerState.outputDevices, mixer: mixer,
+                                showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages
+                            )
                         }
                     }
                 }
-                if settings.showsClearHistory {
-                    menuButton("Clear History", symbol: "trash", action: clearHistory)
-                        .disabled(history.items.isEmpty)
+            }
+            if clipboardSettings.isEnabled && (settings.showsClipboardHistory || settings.showsClearHistory) {
+                group("Clipboard") {
+                    if settings.showsClipboardHistory {
+                        if history.items.isEmpty {
+                            Text("Nothing copied yet.")
+                                .foregroundStyle(.secondary)
+                        }
+                        VStack(spacing: 0) {
+                            ForEach(history.items.prefix(settings.clipboardEntries)) { item in
+                                HistoryEntryButton(item: item) { paste(item) }
+                            }
+                        }
+                    }
+                    if settings.showsClearHistory {
+                        menuButton("Clear History", symbol: "trash", action: clearHistory)
+                            .disabled(history.items.isEmpty)
+                    }
                 }
-                Divider()
             }
             if colorPickerSettings.isEnabled && settings.showsColorPicker {
-                menuButton("Pick a Color", symbol: "eyedropper", action: pickColor)
-                Divider()
+                group("Color Picker") {
+                    menuButton("Pick a Color", symbol: "eyedropper", action: pickColor)
+                }
             }
             HStack(spacing: 8) {
                 menuButton("Settings", symbol: "gearshape", action: openSettings)
                 menuButton("Quit", symbol: "power", action: quit)
             }
         }
-        .padding(14)
+        .padding(10)
         .frame(width: Self.width)
-        .surface(cornerRadius: 18)
+        // Darker than the overlay's surface, so each group's lighter box stands out.
+        .background(Self.menuShade, in: RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
+        .surface(cornerRadius: Self.cornerRadius)
+    }
+
+    private static let cornerRadius: CGFloat = 18
+    private static let menuShade = Color.black.opacity(0.18)
+    /// White on light menus, a grey above the menu on dark ones.
+    private static let groupFill = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            ? NSColor.white.withAlphaComponent(0.08)
+            : NSColor.white.withAlphaComponent(0.55)
+    })
+
+    /// One utility's part of the menu, in its own lighter box, concentric with the menu.
+    private func group<Content: View>(_ title: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            header(title)
+            content()
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Self.groupFill, in: RoundedRectangle(cornerRadius: Self.cornerRadius - 10, style: .continuous))
     }
 
     private func header(_ title: LocalizedStringKey) -> some View {
