@@ -138,9 +138,7 @@ private struct AppSoundRow: View {
                 }
                 Text(verbatim: app.name)
                 if app.isPlaying {
-                    Image(systemName: "waveform")
-                        .foregroundStyle(.secondary)
-                        .help("Playing")
+                    PlayingBars()
                 }
                 Spacer()
                 Picker("Output", selection: Binding(get: { sound.outputUID }, set: { mixer.setOutput($0, of: app) })) {
@@ -176,5 +174,25 @@ private struct AppSoundRow: View {
             }
         }
         .padding(.vertical, 2)
+    }
+}
+
+/// Three bars whose heights change at random while an app plays, like a sound wave.
+private struct PlayingBars: View {
+    private static let step: TimeInterval = 0.2
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: Self.step)) { context in
+            HStack(spacing: 2) {
+                ForEach(0..<3, id: \.self) { _ in
+                    Capsule()
+                        .frame(width: 3, height: .random(in: 4...14))
+                }
+            }
+            .frame(height: 14)
+            .animation(.easeInOut(duration: Self.step), value: context.date)
+        }
+        .foregroundStyle(.secondary)
+        .help("Playing")
     }
 }
