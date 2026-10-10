@@ -51,6 +51,8 @@
 "Allowed" = "Permitido";
 "Already mapped above" = "Já mapeado acima";
 "Already mapped on %@" = "Já mapeado em %@";
+"Also set for %@, which takes priority, so this one won't work." = "Também atribuído a %@, que tem prioridade, então este não funcionará.";
+"Also set for %@. This one takes priority." = "Também atribuído a %@. Este tem prioridade.";
 "Alternative" = "Alternativa";
 "Always on" = "Sempre ativo";
 "Another device" = "Outro dispositivo";
@@ -58,6 +60,8 @@
 "Appearance" = "Aparência";
 "Apps" = "Apps";
 "Apps Volume" = "Volume dos apps";
+"Arrange All Windows" = "Organizar todas as janelas";
+"Auto Arrange All Windows" = "Organizar todas as janelas";
 "Auto Quit" = "Encerramento automático";
 "Battery" = "Bateria";
 "Bottom edge: thirds" = "Borda inferior: terços";
@@ -76,7 +80,6 @@
 "Cancel" = "Cancelar";
 "Caps Lock" = "Caps Lock";
 "Carousel" = "Carrossel";
-"Center" = "Centralizar";
 "Center Third" = "Terço central";
 "Center Two Thirds" = "Dois terços centrais";
 "Change what keys and mouse buttons do, per device." = "Altere o que as teclas e os botões do mouse fazem, por dispositivo.";
@@ -187,7 +190,9 @@
 "Lock Screen" = "Bloquear tela";
 "Logs" = "Registros";
 "Logs and settings for finding out what PasteRing is doing." = "Registros e ajustes para descobrir o que o PasteRing está fazendo.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "O macOS já usa este atalho. Desative-o em Atalhos de Teclado para usá-lo aqui, ou escolha outra tecla.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "O macOS só permite que apps com esta permissão digitem em outros apps. O PasteRing a usa para colar o item escolhido diretamente no app em que você está trabalhando, o Encerramento automático para ver as janelas de cada app, o Clique do meio para clicar com o botão do meio, o Remapear para alterar teclas e botões e o Encaixe de janelas para mover e redimensionar janelas. Sem ela, os itens são apenas copiados para a Área de Transferência e os outros utilitários não fazem nada.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "O macOS usa este atalho para trocar a fonte de entrada do teclado. Desative-o para usá-lo aqui: Atalhos de Teclado > Fontes de Entrada > Selecionar a próxima fonte no menu Entrada.";
 "Mappings" = "Mapeamentos";
 "Maximize" = "Maximizar";
 "Media" = "Mídia";
@@ -226,6 +231,7 @@
 "On" = "Ativado";
 "On battery" = "Na bateria";
 "On power adapter" = "No adaptador de energia";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "Um atalho encaixa todas as janelas da tela sem sobreposição, cada uma perto de onde estava.";
 "Only the first mapping for a key or button applies." = "Somente o primeiro mapeamento de uma tecla ou botão é aplicado.";
 "Only to bring the window under the pointer to the front." = "Apenas para trazer para a frente a janela sob o ponteiro.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Apenas para mudar o volume de um app ou o dispositivo em que ele toca. Nada é gravado.";
@@ -239,6 +245,7 @@
 "Open Accessibility Settings" = "Abrir Ajustes de Acessibilidade";
 "Open after hovering for" = "Abrir após passar por cima por";
 "Open at login" = "Abrir ao iniciar sessão";
+"Open Keyboard Shortcuts" = "Abrir Atalhos de Teclado";
 "Open overlay" = "Abrir o painel";
 "Open System Settings" = "Abrir Ajustes do Sistema";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, apenas para mostrar a cor e seu valor sob a lupa enquanto você move o ponteiro.";
@@ -255,6 +262,7 @@
 "Pick a color" = "Escolher uma cor";
 "Pick a Color" = "Escolher uma cor";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Escolha uma cor em qualquer lugar da tela com um atalho e copie-a.";
+"Place all windows side by side" = "Colocar todas as janelas lado a lado";
 "Play or Pause" = "Reproduzir ou pausar";
 "Posted by %@" = "Enviado por %@";
 "Power adapter" = "Adaptador de energia";

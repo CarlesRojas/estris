@@ -72,37 +72,16 @@ enum Spaces {
 
     // MARK: The user's "Move left/right a space" shortcuts
 
-    private static let hotKeyValue: (@convention(c) (Int32, UnsafeMutablePointer<UInt32>, UnsafeMutablePointer<UInt32>, UnsafeMutablePointer<UInt32>) -> CGError)? = {
-        guard let symbol = symbol("CGSGetSymbolicHotKeyValue") else { return nil }
-        return unsafeBitCast(symbol, to: (@convention(c) (Int32, UnsafeMutablePointer<UInt32>, UnsafeMutablePointer<UInt32>, UnsafeMutablePointer<UInt32>) -> CGError).self)
-    }()
-
-    private static let hotKeyEnabled: (@convention(c) (Int32) -> Bool)? = {
-        guard let symbol = symbol("CGSIsSymbolicHotKeyEnabled") else { return nil }
-        return unsafeBitCast(symbol, to: (@convention(c) (Int32) -> Bool).self)
-    }()
-
     /// Presses the shortcut set in System Settings > Keyboard > Shortcuts > Mission Control,
     /// as the user would. False when it's turned off or can't be read.
     @discardableResult
     static func pressMove(right: Bool) -> Bool {
-        let id: Int32 = right ? 81 : 79
-        guard let hotKeyValue, let hotKeyEnabled, hotKeyEnabled(id) else { return false }
-        var options: UInt32 = 0
-        var keyCode: UInt32 = 0
-        var modifiers: UInt32 = 0
-        guard hotKeyValue(id, &options, &keyCode, &modifiers) == .success, keyCode != 0,
-              let down = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(keyCode), keyDown: true),
-              let up = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(keyCode), keyDown: false)
+        guard let shortcut = SystemShortcuts.shortcut(right ? SystemShortcuts.moveRightASpace : SystemShortcuts.moveLeftASpace),
+              let down = CGEvent(keyboardEventSource: nil, virtualKey: shortcut.keyCode, keyDown: true),
+              let up = CGEvent(keyboardEventSource: nil, virtualKey: shortcut.keyCode, keyDown: false)
         else { return false }
-        var flags = CGEventFlags()
-        if modifiers & 0x20000 != 0 { flags.insert(.maskShift) }
-        if modifiers & 0x40000 != 0 { flags.insert(.maskControl) }
-        if modifiers & 0x80000 != 0 { flags.insert(.maskAlternate) }
-        if modifiers & 0x100000 != 0 { flags.insert(.maskCommand) }
-        if modifiers & 0x800000 != 0 { flags.insert(.maskSecondaryFn) }
-        down.flags = flags
-        up.flags = flags
+        down.flags = shortcut.flags
+        up.flags = shortcut.flags
         down.post(tap: .cghidEventTap)
         up.post(tap: .cghidEventTap)
         return true

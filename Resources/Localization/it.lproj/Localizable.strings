@@ -51,6 +51,8 @@
 "Allowed" = "Consentito";
 "Already mapped above" = "Già mappato sopra";
 "Already mapped on %@" = "Già mappato su %@";
+"Also set for %@, which takes priority, so this one won't work." = "Assegnato anche a %@, che ha la priorità, quindi questo non funzionerà.";
+"Also set for %@. This one takes priority." = "Assegnato anche a %@. Questo ha la priorità.";
 "Alternative" = "Alternativa";
 "Always on" = "Sempre attivo";
 "Another device" = "Altro dispositivo";
@@ -58,6 +60,8 @@
 "Appearance" = "Aspetto";
 "Apps" = "App";
 "Apps Volume" = "Volume delle app";
+"Arrange All Windows" = "Disponi tutte le finestre";
+"Auto Arrange All Windows" = "Disponi tutte le finestre";
 "Auto Quit" = "Chiusura automatica";
 "Battery" = "Batteria";
 "Bottom edge: thirds" = "Bordo inferiore: terzi";
@@ -76,7 +80,6 @@
 "Cancel" = "Annulla";
 "Caps Lock" = "Bloc Maiusc";
 "Carousel" = "Carosello";
-"Center" = "Centra";
 "Center Third" = "Terzo centrale";
 "Center Two Thirds" = "Due terzi centrali";
 "Change what keys and mouse buttons do, per device." = "Cambia cosa fanno tasti e pulsanti del mouse, per dispositivo.";
@@ -187,7 +190,9 @@
 "Lock Screen" = "Blocca schermo";
 "Logs" = "Registri";
 "Logs and settings for finding out what PasteRing is doing." = "Registri e impostazioni per capire cosa sta facendo PasteRing.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS usa già questa scorciatoia. Disattivala in Abbreviazioni da tastiera per usarla qui, oppure scegli un altro tasto.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS consente di scrivere in altre app solo alle app con questo permesso. PasteRing lo usa per incollare la voce scelta direttamente nell’app in cui stai lavorando, Chiusura automatica per vedere le finestre di ogni app, Clic centrale per fare clic con il tasto centrale, Rimappa per cambiare tasti e pulsanti e Aggancio finestre per spostare e ridimensionare le finestre. Senza, le voci vengono solo copiate negli appunti e le altre utility non fanno nulla.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS usa questa scorciatoia per cambiare la sorgente di input. Disattivala per usarla qui: Abbreviazioni da tastiera > Sorgenti di input > Seleziona la sorgente successiva nel menu Input.";
 "Mappings" = "Mappature";
 "Maximize" = "Ingrandisci";
 "Media" = "Multimedia";
@@ -226,6 +231,7 @@
 "On" = "Attivo";
 "On battery" = "A batteria";
 "On power adapter" = "Con alimentatore";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "Una scorciatoia sistema tutte le finestre dello schermo senza sovrapposizioni, ognuna vicino a dov’era.";
 "Only the first mapping for a key or button applies." = "Si applica solo la prima mappatura di un tasto o pulsante.";
 "Only to bring the window under the pointer to the front." = "Solo per portare in primo piano la finestra sotto il puntatore.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Solo per cambiare il volume di un'app o il dispositivo su cui suona. Non viene registrato nulla.";
@@ -239,6 +245,7 @@
 "Open Accessibility Settings" = "Apri impostazioni Accessibilità";
 "Open after hovering for" = "Apri dopo un passaggio di";
 "Open at login" = "Apri al login";
+"Open Keyboard Shortcuts" = "Apri Abbreviazioni da tastiera";
 "Open overlay" = "Apri il pannello";
 "Open System Settings" = "Apri Impostazioni di Sistema";
 "Optional, only to show the color and its value under the loupe while you move." = "Facoltativo, solo per mostrare il colore e il suo valore sotto la lente mentre muovi il puntatore.";
@@ -255,6 +262,7 @@
 "Pick a color" = "Preleva un colore";
 "Pick a Color" = "Scegli un colore";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Preleva un colore ovunque sullo schermo con un’abbreviazione e copialo.";
+"Place all windows side by side" = "Affianca tutte le finestre";
 "Play or Pause" = "Riproduci o pausa";
 "Posted by %@" = "Inviato da %@";
 "Power adapter" = "Alimentatore";

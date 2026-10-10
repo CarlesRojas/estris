@@ -51,6 +51,8 @@
 "Allowed" = "Allowed";
 "Already mapped above" = "Already mapped above";
 "Already mapped on %@" = "Already mapped on %@";
+"Also set for %@, which takes priority, so this one won't work." = "Also set for %@, which takes priority, so this one won't work.";
+"Also set for %@. This one takes priority." = "Also set for %@. This one takes priority.";
 "Alternative" = "Alternative";
 "Always on" = "Always on";
 "Another device" = "Another device";
@@ -58,6 +60,8 @@
 "Appearance" = "Appearance";
 "Apps" = "Apps";
 "Apps Volume" = "Apps Volume";
+"Arrange All Windows" = "Arrange All Windows";
+"Auto Arrange All Windows" = "Auto Arrange All Windows";
 "Auto Quit" = "Auto Quit";
 "Battery" = "Battery";
 "Bottom edge: thirds" = "Bottom edge: thirds";
@@ -76,7 +80,6 @@
 "Cancel" = "Cancel";
 "Caps Lock" = "Caps Lock";
 "Carousel" = "Carousel";
-"Center" = "Center";
 "Center Third" = "Center Third";
 "Center Two Thirds" = "Center Two Thirds";
 "Change what keys and mouse buttons do, per device." = "Change what keys and mouse buttons do, per device.";
@@ -187,7 +190,9 @@
 "Lock Screen" = "Lock Screen";
 "Logs" = "Logs";
 "Logs and settings for finding out what PasteRing is doing." = "Logs and settings for finding out what PasteRing is doing.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu.";
 "Mappings" = "Mappings";
 "Maximize" = "Maximize";
 "Media" = "Media";
@@ -226,6 +231,7 @@
 "On" = "On";
 "On battery" = "On battery";
 "On power adapter" = "On power adapter";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "One shortcut fits every window on the screen without overlaps, each near where it was.";
 "Only the first mapping for a key or button applies." = "Only the first mapping for a key or button applies.";
 "Only to bring the window under the pointer to the front." = "Only to bring the window under the pointer to the front.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Only to change an app's volume or the device it plays on. Nothing is recorded.";
@@ -239,6 +245,7 @@
 "Open Accessibility Settings" = "Open Accessibility Settings";
 "Open after hovering for" = "Open after hovering for";
 "Open at login" = "Open at login";
+"Open Keyboard Shortcuts" = "Open Keyboard Shortcuts";
 "Open overlay" = "Open overlay";
 "Open System Settings" = "Open System Settings";
 "Optional, only to show the color and its value under the loupe while you move." = "Optional, only to show the color and its value under the loupe while you move.";
@@ -255,6 +262,7 @@
 "Pick a color" = "Pick a color";
 "Pick a Color" = "Pick a Color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Pick a color anywhere on screen with a shortcut and copy it.";
+"Place all windows side by side" = "Place all windows side by side";
 "Play or Pause" = "Play or Pause";
 "Posted by %@" = "Posted by %@";
 "Power adapter" = "Power adapter";

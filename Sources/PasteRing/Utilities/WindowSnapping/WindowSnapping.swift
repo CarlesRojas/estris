@@ -29,9 +29,11 @@ final class WindowSnapping {
     func start() {
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
-        settings.$isEnabled
+        settings.$isEnabled.map { _ in () }
+            .merge(with: settings.$arrangesAll.map { _ in () })
+            .merge(with: settings.$keyCodes.map { _ in () })
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in self?.apply() }
+            .sink { [weak self] in self?.apply() }
             .store(in: &observers)
     }
 
@@ -48,17 +50,60 @@ final class WindowSnapping {
             return
         }
         dragSnapper.start()
-        for action in SnapAction.allCases {
-            let shortcut = action.shortcut
+        let taken = SystemShortcuts.owners(flags: SnapKeys.systemFlags)
+        var used: Set<UInt32> = []
+        for id in SnapKeys.ids where id != SnapKeys.arrangeAllID || settings.arrangesAll {
+            let shortcut = settings.shortcut(for: id)
+            // Only the first with a key gets it (macOS takes one per key); the pane says which.
+            guard used.insert(shortcut.keyCode).inserted else {
+                log("\(id): \(shortcut.displayString) is already set for an earlier shortcut, which takes priority")
+                continue
+            }
+            if let owner = taken[CGKeyCode(shortcut.keyCode)] {
+                log("\(id): macOS uses \(shortcut.displayString) for its shortcut \(owner); turn it off there to use it here")
+            }
             hotKeys.append(HotKeyCenter.shared.register(keyCode: shortcut.keyCode, modifiers: shortcut.modifiers) { [weak self] in
-                self?.snapFocusedWindow(to: action)
+                if let action = SnapAction(rawValue: id) {
+                    self?.snapFocusedWindow(to: action)
+                } else {
+                    self?.arrangeAll()
+                }
             })
         }
+    }
+
+    /// Shares the screen the pointer is on evenly among all its windows, each going to the space
+    /// nearest where it is. Each window's frame before is kept for Restore.
+    private func arrangeAll() {
+        let mouse = NSEvent.mouseLocation
+        guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? AXWindow.focused()?.screen else { return }
+        let windows = WindowArranger.windows(on: screen)
+        guard !windows.isEmpty else { return log("arrange all: no windows on this screen (needs Accessibility access)") }
+        let area = screen.visibleFrame
+        let current = windows.compactMap { window in window.frame.map { (window: window, frame: $0) } }
+        let frames = WindowArranger.assign(current.map(\.frame), to: WindowArranger.frames(count: current.count, in: area), in: area)
+        for ((window, original), frame) in zip(current, frames) {
+            window.setFrame(frame)
+            let snapped = window.frame ?? frame
+            if let saved = restoreFrames.firstIndex(where: { $0.window.isSame(as: window) }) {
+                if restoreFrames[saved].snapped != original { restoreFrames[saved].original = original }
+                restoreFrames[saved].snapped = snapped
+            } else {
+                restoreFrames.append((window, original, snapped))
+                if restoreFrames.count > 100 { restoreFrames.removeFirst() }
+            }
+        }
+        lastShortcut = nil
+        let names = windows.map { NSRunningApplication(processIdentifier: $0.pid)?.localizedName ?? "\($0.pid)" }
+        log("arrange all: \(windows.count) window(s): \(names.joined(separator: ", "))")
     }
 
     private func snapFocusedWindow(to action: SnapAction) {
         guard let window = AXWindow.focused(), let frame = window.frame, let screen = window.screen else {
             return log("no window to snap (needs Accessibility access)")
+        }
+        guard window.isNormalLevel else {
+            return log("not snapping a window kept in front of everything (level \(window.level ?? 0))")
         }
         var fills = settings.fillsSpace
         if fills, let last = lastShortcut, last.action == action, last.window.isSame(as: window),

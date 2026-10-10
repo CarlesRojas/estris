@@ -59,7 +59,7 @@ enum SpaceFiller {
 
     /// The snap's frame fitted to the tiled windows, or `usual` when nothing applies.
     static func fit(_ usual: NSRect, for action: SnapAction, on screen: NSScreen, among tiled: [NSRect], pid: pid_t) -> NSRect {
-        guard ![.maximize, .center, .restore].contains(action), !tiled.isEmpty else { return usual }
+        guard ![.maximize, .restore].contains(action), !tiled.isEmpty else { return usual }
         let area = screen.visibleFrame
         let freeLeft = usual.minX > area.minX + 1
         let freeRight = usual.maxX < area.maxX - 1

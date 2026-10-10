@@ -51,6 +51,8 @@
 "Allowed" = "Permès";
 "Already mapped above" = "Ja assignat més amunt";
 "Already mapped on %@" = "Ja assignat a %@";
+"Also set for %@, which takes priority, so this one won't work." = "També assignat a %@, que té prioritat, així que aquest no funcionarà.";
+"Also set for %@. This one takes priority." = "També assignat a %@. Aquest té prioritat.";
 "Alternative" = "Alternativa";
 "Always on" = "Sempre actiu";
 "Another device" = "Un altre dispositiu";
@@ -58,6 +60,8 @@
 "Appearance" = "Aparença";
 "Apps" = "Apps";
 "Apps Volume" = "Volum de les apps";
+"Arrange All Windows" = "Organitza totes les finestres";
+"Auto Arrange All Windows" = "Organitzar totes les finestres";
 "Auto Quit" = "Tancament automàtic";
 "Battery" = "Bateria";
 "Bottom edge: thirds" = "Vora inferior: terços";
@@ -76,7 +80,6 @@
 "Cancel" = "Cancel·la";
 "Caps Lock" = "Bloq Maj";
 "Carousel" = "Carrusel";
-"Center" = "Centra";
 "Center Third" = "Terç central";
 "Center Two Thirds" = "Dos terços centrals";
 "Change what keys and mouse buttons do, per device." = "Canvia el que fan les tecles i els botons del ratolí, per dispositiu.";
@@ -187,7 +190,9 @@
 "Lock Screen" = "Bloqueja la pantalla";
 "Logs" = "Registres";
 "Logs and settings for finding out what PasteRing is doing." = "Registres i configuració per saber què fa el PasteRing.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "El macOS ja fa servir aquesta drecera. Desactiva-la a Dreceres de teclat per fer-la servir aquí, o tria una altra tecla.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "El macOS només deixa escriure en altres apps a les apps amb aquest permís. El PasteRing l’utilitza per enganxar l’entrada que triïs directament a l’app on treballes, el Tancament automàtic per veure les finestres de cada app, el Clic central per fer clic amb el botó central, Reassignar per canviar tecles i botons, i l’Ajust de finestres per moure i redimensionar finestres. Sense ell, les entrades només es copien al porta-retalls i les altres utilitats no fan res.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "El macOS fa servir aquesta drecera per canviar la font d’entrada del teclat. Desactiva-la per fer-la servir aquí: Dreceres de teclat > Fonts d’entrada > Seleccionar la següent font al menú Entrada.";
 "Mappings" = "Assignacions";
 "Maximize" = "Maximitza";
 "Media" = "Multimèdia";
@@ -226,6 +231,7 @@
 "On" = "Activat";
 "On battery" = "Amb bateria";
 "On power adapter" = "Amb adaptador de corrent";
+"One shortcut fits every window on the screen without overlaps, each near where it was." = "Una drecera encaixa totes les finestres de la pantalla sense que se solapin, cadascuna a prop d’on era.";
 "Only the first mapping for a key or button applies." = "Només s’aplica la primera assignació d’una tecla o botó.";
 "Only to bring the window under the pointer to the front." = "Només per portar al davant la finestra que hi ha sota el punter.";
 "Only to change an app's volume or the device it plays on. Nothing is recorded." = "Només per canviar el volum d'una app o el dispositiu per on sona. No es grava res.";
@@ -239,6 +245,7 @@
 "Open Accessibility Settings" = "Obre la configuració d’accessibilitat";
 "Open after hovering for" = "Obre després de passar per sobre";
 "Open at login" = "Obre en iniciar la sessió";
+"Open Keyboard Shortcuts" = "Obre les dreceres de teclat";
 "Open overlay" = "Obre el tauler";
 "Open System Settings" = "Obre Configuració del Sistema";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, només per mostrar el color i el seu valor sota la lupa mentre mous el punter.";
@@ -255,6 +262,7 @@
 "Pick a color" = "Tria un color";
 "Pick a Color" = "Tria un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Tria un color de qualsevol lloc de la pantalla amb una drecera i copia’l.";
+"Place all windows side by side" = "Col·locar totes les finestres una al costat de l’altra";
 "Play or Pause" = "Reprodueix o posa en pausa";
 "Posted by %@" = "Enviat per %@";
 "Power adapter" = "Adaptador de corrent";
