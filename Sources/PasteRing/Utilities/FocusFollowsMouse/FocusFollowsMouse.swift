@@ -5,8 +5,8 @@ import SwiftUI
 
 /// The Focus Follows Mouse utility: when the pointer rests on another app's window for the
 /// chosen delay, with no mouse button or modifier key held, that window comes to the front
-/// and its app becomes active. Menus, the Dock, the desktop, PasteRing's own windows and
-/// excluded apps are left alone. Owns everything it needs, so the app only has to create it
+/// and its app becomes active. Menus, the Dock, the desktop, PasteRing's panels and excluded
+/// apps are left alone. Owns everything it needs, so the app only has to create it
 /// and call `start()`.
 @MainActor
 final class FocusFollowsMouse {
@@ -16,7 +16,7 @@ final class FocusFollowsMouse {
     let settings = FocusFollowsMouseSettings()
     private let appLog: AppLog
     private var observers: Set<AnyCancellable> = []
-    private var mouseMonitor: Any?
+    private var tap: CFMachPort?
     private var spaceObserver: NSObjectProtocol?
     private var pending: DispatchWorkItem?
     private var lastPoint: NSPoint?
@@ -48,16 +48,26 @@ final class FocusFollowsMouse {
     private func setActive(_ active: Bool) {
         pending?.cancel()
         pending = nil
-        if let mouseMonitor { NSEvent.removeMonitor(mouseMonitor) }
-        mouseMonitor = nil
+        if let tap { CGEvent.tapEnable(tap: tap, enable: false) }
         if let spaceObserver { NSWorkspace.shared.notificationCenter.removeObserver(spaceObserver) }
         spaceObserver = nil
         guard active else { return }
 
-        // Moves over other apps' windows; PasteRing's own windows are never focused this way.
-        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) { [weak self] event in
-            let time = event.timestamp
-            MainActor.assumeIsolated { self?.pointerMoved(at: time) }
+        // A listen-only event tap: unlike a global event monitor, it also sees moves over
+        // PasteRing's own windows (Settings).
+        if let tap {
+            CGEvent.tapEnable(tap: tap, enable: true)
+        } else {
+            tap = CGEvent.tapCreate(
+                tap: .cgSessionEventTap,
+                place: .tailAppendEventTap,
+                options: .listenOnly,
+                eventsOfInterest: CGEventMask(1 << CGEventType.mouseMoved.rawValue),
+                callback: focusFollowsMouseCallback,
+                userInfo: Unmanaged.passUnretained(self).toOpaque()
+            )
+            guard let tap else { return log("can't watch the pointer; needs Accessibility access") }
+            CFRunLoopAddSource(CFRunLoopGetMain(), CFMachPortCreateRunLoopSource(nil, tap, 0), .commonModes)
         }
         // Switching desktops moves windows under a still pointer; that isn't the user picking one.
         spaceObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -74,6 +84,17 @@ final class FocusFollowsMouse {
     /// Counts how long the pointer stays over the same window while moving slowly (or resting);
     /// moving fast or entering another window starts the count again, so windows crossed on
     /// the way aren't brought forward. Once it reaches the delay, the window is focused.
+    fileprivate func handle(_ type: CGEventType) {
+        switch type {
+        case .mouseMoved:
+            pointerMoved(at: ProcessInfo.processInfo.systemUptime)
+        case .tapDisabledByTimeout, .tapDisabledByUserInput:
+            if let tap, settings.isEnabled { CGEvent.tapEnable(tap: tap, enable: true) }
+        default:
+            break
+        }
+    }
+
     private func pointerMoved(at time: TimeInterval) {
         let point = NSEvent.mouseLocation
         if let lastPoint, time > lastTime {
@@ -127,9 +148,18 @@ final class FocusFollowsMouse {
         // The window a click would reach, on top of everything; nothing to do over menus, the
         // Dock, the menu bar or the desktop, which aren't normal windows (layer 0).
         let number = NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0)
-        guard number > 0, let info = Self.windowInfo(CGWindowID(number)),
-              info.layer == 0, info.pid != ProcessInfo.processInfo.processIdentifier,
-              let app = NSRunningApplication(processIdentifier: info.pid),
+        guard number > 0, let info = Self.windowInfo(CGWindowID(number)), info.layer == 0 else { return }
+        // PasteRing's own: only its titled windows (Settings), not its panels.
+        if info.pid == ProcessInfo.processInfo.processIdentifier {
+            if let window = NSApp.window(withWindowNumber: number), window.styleMask.contains(.titled),
+               !(NSApp.isActive && window.isKeyWindow) {
+                NSApp.activate(ignoringOtherApps: true)
+                window.makeKeyAndOrderFront(nil)
+                log("focused \(window.title)")
+            }
+            return
+        }
+        guard let app = NSRunningApplication(processIdentifier: info.pid),
               app.activationPolicy == .regular, !app.isTerminated
         else { return }
         if let bundleID = app.bundleIdentifier, settings.excludedApps.contains(bundleID) { return }
@@ -208,4 +238,19 @@ final class FocusFollowsMouse {
     private func log(_ message: String) {
         appLog.record(message, source: "Focus Follows Mouse")
     }
+}
+
+/// Plain C function for the event tap; the utility comes back through the refcon. Runs on the
+/// main run loop, where the tap is scheduled.
+private func focusFollowsMouseCallback(
+    _ proxy: CGEventTapProxy,
+    _ type: CGEventType,
+    _ event: CGEvent,
+    _ refcon: UnsafeMutableRawPointer?
+) -> Unmanaged<CGEvent>? {
+    if let refcon {
+        let utility = Unmanaged<FocusFollowsMouse>.fromOpaque(refcon).takeUnretainedValue()
+        MainActor.assumeIsolated { utility.handle(type) }
+    }
+    return Unmanaged.passUnretained(event)
 }
