@@ -6,3 +6,4 @@
   - How: add the English text as a line in every `Resources/Localization/<language>.lproj/Localizable.strings` (the key is the English text, with `%@` for interpolated strings and `%lld` for integers), translated. Literal text in SwiftUI (`Text("…")`, `Button("…")`, `.help("…")`) is translated on its own; text built in code uses `String(localized: "…")`; a key known only at run time uses `localized(_:)`. Text that must never be translated uses `Text(verbatim:)`.
   - Then run `python3 scripts/check-localization.py`; it must report 0 problems before committing.
 - Every settings pane except General, Remap and Developer ends with a **Reset to Defaults** button. When adding a setting, include it in that pane's `reset()`. Resets leave on/off switches, excluded apps, history and Open at login alone.
+- Features still to add live in `TODO.md`. When asked for the to-do list, read it; when a feature from it is implemented, remove it in the same change.
