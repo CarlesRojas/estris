@@ -3,7 +3,7 @@ import Foundation
 /// Dock Preview preferences, persisted in UserDefaults.
 @MainActor
 final class DockPreviewSettings: ObservableObject {
-    static let defaultSize: Double = 140
+    static let defaultSize: Double = 180
     /// The previews' height, in points.
     static let sizes: ClosedRange<Double> = 80...320
 

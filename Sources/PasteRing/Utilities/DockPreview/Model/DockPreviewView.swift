@@ -11,6 +11,8 @@ final class DockPreviewState: ObservableObject {
     @Published var closable: Set<CGWindowID> = []
     /// Side by side above a bottom Dock; one above the other beside a left or right one.
     @Published var isHorizontal = true
+    /// Picked with the scroll wheel, opened with Return.
+    @Published var selected: CGWindowID?
 }
 
 /// The previews in the frosted panel, in the clipboard overlay's default look. A click on one
@@ -38,6 +40,7 @@ struct DockPreviewView: View {
                     height: CGFloat(settings.size),
                     cornerRadius: Self.cardRadius,
                     showsClose: settings.showsCloseButton && state.closable.contains(window.id),
+                    isSelected: state.selected == window.id,
                     open: { open(window) },
                     close: { close(window) }
                 )
@@ -57,6 +60,7 @@ private struct PreviewCard: View {
     let height: CGFloat
     let cornerRadius: CGFloat
     let showsClose: Bool
+    let isSelected: Bool
     let open: () -> Void
     let close: () -> Void
     @State private var isHovered = false
@@ -67,7 +71,32 @@ private struct PreviewCard: View {
     }
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(alignment: .leading, spacing: 6) {
+            // The app's icon and the window's name at the top left, the × at the right.
+            HStack(spacing: 6) {
+                if let appIcon {
+                    Image(nsImage: appIcon)
+                        .resizable()
+                        .frame(width: 16, height: 16)
+                }
+                Text(verbatim: window.title.isEmpty ? appName : window.title)
+                    .font(.caption)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                Spacer(minLength: 4)
+                if showsClose {
+                    Button(action: close) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 10, weight: .semibold))
+                            .frame(width: 16, height: 16)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(CloseButtonStyle())
+                    .help("Close Window")
+                }
+            }
+            .frame(width: width)
+
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius - 4, style: .continuous)
                     .fill(Color.primary.opacity(0.08))
@@ -85,32 +114,32 @@ private struct PreviewCard: View {
             }
             .frame(width: width, height: height)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius - 4, style: .continuous))
-            Text(verbatim: window.title.isEmpty ? appName : window.title)
-                .font(.caption)
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .frame(width: width)
         }
         .padding(6)
         .background(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .fill(Color.primary.opacity(isHovered ? 0.12 : 0))
+                .fill(Color.primary.opacity(isHovered || isSelected ? 0.12 : 0))
         )
-        .overlay(alignment: .topTrailing) {
-            if showsClose && isHovered {
-                Button(action: close) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 18))
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, Color.black.opacity(0.6))
-                }
-                .buttonStyle(.plain)
-                .help("Close Window")
-                .padding(2)
-            }
-        }
         .contentShape(Rectangle())
         .onTapGesture(perform: open)
         .onHover { isHovered = $0 }
+    }
+}
+
+/// Just the ×, faint until the pointer is on it, darker while pressed.
+private struct CloseButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        CloseButtonLabel(configuration: configuration)
+    }
+
+    private struct CloseButtonLabel: View {
+        let configuration: Configuration
+        @State private var isHovered = false
+
+        var body: some View {
+            configuration.label
+                .foregroundStyle(Color.primary.opacity(configuration.isPressed ? 1 : isHovered ? 0.8 : 0.35))
+                .onHover { isHovered = $0 }
+        }
     }
 }

@@ -68,8 +68,17 @@ enum AppWindows {
     }
 
     /// Brings the window to the front (un-minimizing it) and activates its app. A window on
-    /// another desktop: the app is activated and macOS switches there.
+    /// another desktop: goes to that desktop first.
+    @MainActor
     static func open(_ window: AppWindow, of app: NSRunningApplication) {
+        if Spaces.isOnHiddenSpace(window.id) {
+            SpaceTrip.go(to: window.id, of: app) { raise(window, of: app) }
+        } else {
+            raise(window, of: app)
+        }
+    }
+
+    private static func raise(_ window: AppWindow, of app: NSRunningApplication) {
         if let element = element(for: window.id, pid: app.processIdentifier) {
             AXUIElementSetAttributeValue(element, kAXMinimizedAttribute as CFString, kCFBooleanFalse)
             AXUIElementSetAttributeValue(element, kAXMainAttribute as CFString, kCFBooleanTrue)

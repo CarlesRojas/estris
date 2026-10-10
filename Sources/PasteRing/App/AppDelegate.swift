@@ -47,6 +47,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         // Key mappings set on keyboards outlive the app; take them back.
         remap.stop()
+        // An automatically hidden Dock held showing by Dock Preview hides itself again.
+        DockHold.end()
     }
 
     private func openSettings() {

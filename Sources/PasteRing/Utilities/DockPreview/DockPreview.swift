@@ -26,6 +26,10 @@ final class DockPreview {
     private let appLog: AppLog
     private var observers: Set<AnyCancellable> = []
     private var tap: CFMachPort?
+    /// While the panel shows: the scroll wheel picks a window, Return opens it, Esc closes.
+    private var inputTap: CFMachPort?
+    /// Scroll from a trackpad, gathered until it is enough for one step.
+    private var scrolled: CGFloat = 0
     private var spaceObserver: NSObjectProtocol?
     private var layout = DockLayout.current()
     private var layoutRead = Date.distantPast
@@ -45,6 +49,8 @@ final class DockPreview {
 
     func start() {
         guard Self.isSupported else { return }
+        // PasteRing quit while it held the Dock showing: let it hide itself again.
+        DockHold.end()
         settings.$isEnabled
             .removeDuplicates()
             .sink { [weak self] enabled in self?.setActive(enabled) }
@@ -229,6 +235,11 @@ final class DockPreview {
             place(CGSize(width: fitting.width - 2 * Self.shadowRoom, height: fitting.height - 2 * Self.shadowRoom))
         }
         panel.orderFrontRegardless()
+        state.selected = nil
+        scrolled = 0
+        setInputTap(enabled: true)
+        // An automatically hidden Dock stays while the pointer is on the panel.
+        DockHold.begin()
 
         // Sharp on Retina: twice the points, and room for the widest shape.
         let maxPixels = CGFloat(settings.size) * 2 * 2
@@ -249,6 +260,74 @@ final class DockPreview {
         panel?.orderOut(nil)
         state.windows = []
         state.app = nil
+        state.selected = nil
+        setInputTap(enabled: false)
+        DockHold.end()
+    }
+
+    private func setInputTap(enabled: Bool) {
+        if inputTap == nil, enabled {
+            let types: [CGEventType] = [.scrollWheel, .keyDown]
+            inputTap = CGEvent.tapCreate(
+                tap: .cgSessionEventTap,
+                place: .headInsertEventTap,
+                options: .defaultTap,
+                eventsOfInterest: types.reduce(CGEventMask(0)) { $0 | 1 << $1.rawValue },
+                callback: dockPreviewInputCallback,
+                userInfo: Unmanaged.passUnretained(self).toOpaque()
+            )
+            guard let inputTap else { return }
+            CFRunLoopAddSource(CFRunLoopGetMain(), CFMachPortCreateRunLoopSource(nil, inputTap, 0), .commonModes)
+        }
+        if let inputTap { CGEvent.tapEnable(tap: inputTap, enable: enabled) }
+    }
+
+    /// Returns true to keep the event from reaching the app underneath.
+    fileprivate func handleInput(_ type: CGEventType, _ event: CGEvent) -> Bool {
+        if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            if let inputTap, shown != nil { CGEvent.tapEnable(tap: inputTap, enable: true) }
+            return false
+        }
+        guard shown != nil, !state.windows.isEmpty else { return false }
+        switch type {
+        case .scrollWheel:
+            let isTrackpad = event.getIntegerValueField(.scrollWheelEventIsContinuous) != 0
+            let vertical = event.getDoubleValueField(isTrackpad ? .scrollWheelEventPointDeltaAxis1 : .scrollWheelEventDeltaAxis1)
+            let horizontal = event.getDoubleValueField(isTrackpad ? .scrollWheelEventPointDeltaAxis2 : .scrollWheelEventDeltaAxis2)
+            let delta = CGFloat(abs(vertical) >= abs(horizontal) ? vertical : horizontal)
+            if isTrackpad {
+                scrolled += delta
+                guard abs(scrolled) >= 30 else { return true }
+                moveSelection(by: scrolled < 0 ? 1 : -1)
+                scrolled = 0
+            } else if delta != 0 {
+                // One notch, one window; down or right moves on.
+                moveSelection(by: delta < 0 ? 1 : -1)
+            }
+            return true
+        case .keyDown:
+            switch event.getIntegerValueField(.keyboardEventKeycode) {
+            case 36, 76: // Return, Enter
+                guard let selected = state.selected, let window = state.windows.first(where: { $0.id == selected }) else { return false }
+                open(window)
+                return true
+            case 53: // Esc
+                hide()
+                return true
+            default:
+                return false
+            }
+        default:
+            return false
+        }
+    }
+
+    private func moveSelection(by step: Int) {
+        let windows = state.windows
+        guard !windows.isEmpty else { return }
+        let index = state.selected.flatMap { id in windows.firstIndex { $0.id == id } }
+        let next = index.map { ($0 + step + windows.count) % windows.count } ?? (step > 0 ? 0 : windows.count - 1)
+        state.selected = windows[next].id
     }
 
     private func makePanel() -> NSPanel {
@@ -329,4 +408,17 @@ private func dockPreviewCallback(
         MainActor.assumeIsolated { utility.handle(type) }
     }
     return Unmanaged.passUnretained(event)
+}
+
+/// The input tap's callback: a nil return keeps the event from the app underneath.
+private func dockPreviewInputCallback(
+    _ proxy: CGEventTapProxy,
+    _ type: CGEventType,
+    _ event: CGEvent,
+    _ refcon: UnsafeMutableRawPointer?
+) -> Unmanaged<CGEvent>? {
+    guard let refcon else { return Unmanaged.passUnretained(event) }
+    let utility = Unmanaged<DockPreview>.fromOpaque(refcon).takeUnretainedValue()
+    let swallowed = MainActor.assumeIsolated { utility.handleInput(type, event) }
+    return swallowed ? nil : Unmanaged.passUnretained(event)
 }
