@@ -18,8 +18,9 @@ final class DockPreview {
     private static let shadowRoom: CGFloat = 24
     /// Between the Dock icon and the panel.
     private static let gap: CGFloat = 6
-    /// How long the pointer may be away from the icon and the panel before it closes.
-    private static let hideDelay: TimeInterval = 0.3
+    /// How long the pointer may be away from the icon and the panel before it closes: at once,
+    /// checked again on the next turn of the run loop.
+    private static let hideDelay: TimeInterval = 0
 
     let settings = DockPreviewSettings()
     private let state = DockPreviewState()
@@ -44,6 +45,9 @@ final class DockPreview {
     private var shown: DockItem?
     private var contentFrame: NSRect = .zero
     private var captureTask: Task<Void, Never>?
+    /// The app whose Dock icon was just clicked: its preview waits until the pointer leaves the
+    /// icon and comes back, so it doesn't cover the Dock's menu or a launching app.
+    private var clickedPID: pid_t?
     /// The last thumbnail of each window, shown at once the next time.
     private var thumbnailCache: [CGWindowID: CGImage] = [:]
 
@@ -107,6 +111,10 @@ final class DockPreview {
             pointerMoved(NSEvent.mouseLocation)
         case .leftMouseDown, .rightMouseDown, .otherMouseDown:
             cancelOpen()
+            let point = NSEvent.mouseLocation
+            if !contentFrame.contains(point), layout.isNear(point), let item = DockItems.item(at: point) {
+                clickedPID = item.app.processIdentifier
+            }
             // A click on the Dock or elsewhere closes it; one in the panel is the panel's.
             if shown != nil, !contentFrame.contains(NSEvent.mouseLocation) { hide() }
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
@@ -148,9 +156,13 @@ final class DockPreview {
 
         // Accessibility is only asked near the Dock, not on every move across the screen.
         guard layout.isNear(point), let item = DockItems.item(at: point) else {
+            clickedPID = nil
             cancelOpen()
             return
         }
+        // Still on the icon just clicked; leaving it ends that.
+        if item.app.processIdentifier == clickedPID { return }
+        clickedPID = nil
         scheduleOpen(item, delay: settings.openDelay.seconds)
     }
 
@@ -176,7 +188,10 @@ final class DockPreview {
                 self.pendingOpen = nil
                 // Still on that icon.
                 guard let current = DockItems.item(at: NSEvent.mouseLocation),
-                      current.app.processIdentifier == item.app.processIdentifier
+                      current.app.processIdentifier == item.app.processIdentifier,
+                      current.app.processIdentifier != self.clickedPID,
+                      // Not over the Dock's own menu (right click, or a long press).
+                      !DockItems.isMenuOpen()
                 else { return }
                 self.show(current)
             }

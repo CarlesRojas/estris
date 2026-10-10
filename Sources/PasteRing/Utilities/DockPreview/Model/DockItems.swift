@@ -68,6 +68,15 @@ enum DockItems {
         return nil
     }
 
+    /// Whether one of the Dock's menus is on screen (its icons' right-click menu).
+    static func isMenuOpen() -> Bool {
+        guard let dockPID = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first?.processIdentifier,
+              let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]]
+        else { return false }
+        let menuLayer = Int(CGWindowLevelForKey(.popUpMenuWindow))
+        return list.contains { $0[kCGWindowOwnerPID as String] as? pid_t == dockPID && $0[kCGWindowLayer as String] as? Int == menuLayer }
+    }
+
     private static func runningApp(for element: AXUIElement) -> NSRunningApplication? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, kAXURLAttribute as CFString, &value) == .success,
