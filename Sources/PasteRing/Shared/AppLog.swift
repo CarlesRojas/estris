@@ -30,6 +30,11 @@ final class AppLog: ObservableObject {
 
     /// Every entry as plain text, oldest first, for pasting into a bug report.
     var text: String {
+        Self.text(of: entries)
+    }
+
+    /// Oldest first, one line each, for bug reports.
+    static func text(of entries: [Entry]) -> String {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withTime, .withColonSeparatorInTime, .withFractionalSeconds]
         return entries.reversed()

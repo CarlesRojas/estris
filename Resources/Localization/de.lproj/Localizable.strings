@@ -44,6 +44,7 @@
 "After 30 days" = "Nach 30 Tagen";
 "After 30 seconds" = "Nach 30 Sekunden";
 "After 5 seconds" = "Nach 5 Sekunden";
+"All Utilities" = "Alle Werkzeuge";
 "Allowed" = "Erlaubt";
 "Already mapped above" = "Bereits weiter oben belegt";
 "Already mapped on %@" = "Bereits auf %@ belegt";
@@ -205,6 +206,7 @@
 "No apps excluded" = "Keine Apps ausgeschlossen";
 "No clipboard entries yet" = "Noch keine Einträge in der Zwischenablage";
 "No colors picked yet." = "Noch keine Farben ausgewählt.";
+"No entries from this utility." = "Keine Einträge von diesem Werkzeug.";
 "No entries match “%@”" = "Keine Einträge passen zu „%@“";
 "No events yet" = "Noch keine Ereignisse";
 "Not granted" = "Nicht erteilt";
@@ -357,6 +359,7 @@
 "Up Arrow" = "Pfeil nach oben";
 "usage %@" = "Usage %@";
 "Use Original Name" = "Originalnamen verwenden";
+"Utility" = "Werkzeug";
 "Version %@" = "Version %@";
 "Version %@ (%@)" = "Version %@ (%@)";
 "View" = "Ansicht";

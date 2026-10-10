@@ -44,6 +44,7 @@
 "After 30 days" = "Tras 30 días";
 "After 30 seconds" = "Tras 30 segundos";
 "After 5 seconds" = "Tras 5 segundos";
+"All Utilities" = "Todas las utilidades";
 "Allowed" = "Permitido";
 "Already mapped above" = "Ya asignado más arriba";
 "Already mapped on %@" = "Ya asignado en %@";
@@ -205,6 +206,7 @@
 "No apps excluded" = "Ninguna app excluida";
 "No clipboard entries yet" = "Aún no hay entradas en el portapapeles";
 "No colors picked yet." = "Aún no has elegido ningún color.";
+"No entries from this utility." = "No hay entradas de esta utilidad.";
 "No entries match “%@”" = "Ninguna entrada coincide con «%@»";
 "No events yet" = "Aún no hay eventos";
 "Not granted" = "No concedido";
@@ -357,6 +359,7 @@
 "Up Arrow" = "Flecha arriba";
 "usage %@" = "uso %@";
 "Use Original Name" = "Usar el nombre original";
+"Utility" = "Utilidad";
 "Version %@" = "Versión %@";
 "Version %@ (%@)" = "Versión %@ (%@)";
 "View" = "Vista";

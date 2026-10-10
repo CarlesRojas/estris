@@ -15,6 +15,8 @@ struct DeveloperPane: View {
     @Environment(\.dateTimeFormat) private var dateTimeFormat
     @State private var tab = Tab.logs
     @State private var search = ""
+    /// Only this utility's entries; nil shows every one.
+    @State private var source: String?
 
     var body: some View {
         UtilityPane(
@@ -31,21 +33,36 @@ struct DeveloperPane: View {
 
     private var results: [AppLog.Entry] {
         let query = search.trimmingCharacters(in: .whitespaces)
-        guard !query.isEmpty else { return log.entries }
-        return log.entries.filter {
-            $0.message.localizedCaseInsensitiveContains(query) || $0.source.localizedCaseInsensitiveContains(query)
+        return log.entries.filter { entry in
+            (source == nil || entry.source == source)
+                && (query.isEmpty || entry.message.localizedCaseInsensitiveContains(query) || entry.source.localizedCaseInsensitiveContains(query))
         }
+    }
+
+    /// The utilities that logged something, alphabetically.
+    private var sources: [String] {
+        Set(log.entries.map(\.source)).sorted()
     }
 
     private var logs: some View {
         VStack(spacing: 0) {
-            SearchField(text: $search, prompt: "Search logs")
-                .pinnedAboveList()
+            HStack(spacing: 8) {
+                SearchField(text: $search, prompt: "Search logs")
+                Picker("Utility", selection: $source) {
+                    Text("All Utilities").tag(String?.none)
+                    ForEach(sources, id: \.self) { source in
+                        Text(verbatim: source).tag(Optional(source))
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+            }
+            .pinnedAboveList()
 
             Form {
                 Section {
                     if results.isEmpty {
-                        Text(log.entries.isEmpty ? String(localized: "Nothing logged yet.") : String(localized: "No entries match \u{201C}\(search)\u{201D}"))
+                        Text(log.entries.isEmpty ? String(localized: "Nothing logged yet.") : search.isEmpty ? String(localized: "No entries from this utility.") : String(localized: "No entries match \u{201C}\(search)\u{201D}"))
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -69,13 +86,14 @@ struct DeveloperPane: View {
                     }
                 } header: {
                     HStack {
-                        Text(log.entries.count == 1 ? String(localized: "1 entry") : String(localized: "\(log.entries.count) entries"))
+                        Text(results.count == 1 ? String(localized: "1 entry") : String(localized: "\(results.count) entries"))
                         Spacer()
                         Button("Copy All") {
                             NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(log.text, forType: .string)
+                            // What is shown: the chosen utility and search.
+                            NSPasteboard.general.setString(AppLog.text(of: results), forType: .string)
                         }
-                        .disabled(log.entries.isEmpty)
+                        .disabled(results.isEmpty)
                         Button("Clear") { log.clear() }
                             .disabled(log.entries.isEmpty)
                     }

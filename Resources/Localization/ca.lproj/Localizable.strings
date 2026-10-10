@@ -44,6 +44,7 @@
 "After 30 days" = "Al cap de 30 dies";
 "After 30 seconds" = "Al cap de 30 segons";
 "After 5 seconds" = "Al cap de 5 segons";
+"All Utilities" = "Totes les utilitats";
 "Allowed" = "Permès";
 "Already mapped above" = "Ja assignat més amunt";
 "Already mapped on %@" = "Ja assignat a %@";
@@ -205,6 +206,7 @@
 "No apps excluded" = "Cap app exclosa";
 "No clipboard entries yet" = "Encara no hi ha cap entrada al porta-retalls";
 "No colors picked yet." = "Encara no has triat cap color.";
+"No entries from this utility." = "No hi ha entrades d'aquesta utilitat.";
 "No entries match “%@”" = "Cap entrada coincideix amb «%@»";
 "No events yet" = "Encara no hi ha cap esdeveniment";
 "Not granted" = "No concedit";
@@ -357,6 +359,7 @@
 "Up Arrow" = "Fletxa amunt";
 "usage %@" = "ús %@";
 "Use Original Name" = "Fes servir el nom original";
+"Utility" = "Utilitat";
 "Version %@" = "Versió %@";
 "Version %@ (%@)" = "Versió %@ (%@)";
 "View" = "Visualització";

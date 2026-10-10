@@ -207,7 +207,8 @@ final class AudioListener {
     private let object: AudioObjectID
     private var address: AudioObjectPropertyAddress
     private let block: AudioObjectPropertyListenerBlock
-    private var isAdded = false
+    /// Whether macOS accepted it; notifications only arrive when it did.
+    private(set) var isAdded = false
 
     init(
         _ object: AudioObjectID,

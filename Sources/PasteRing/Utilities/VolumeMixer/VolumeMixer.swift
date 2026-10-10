@@ -185,13 +185,18 @@ final class VolumeMixer {
         // change with it, so all three are followed.
         let objects = Set(AudioApps.processObjects())
         processListeners = processListeners.filter { objects.contains($0.key) }
-        for object in objects where processListeners[object] == nil {
+        let newObjects = objects.filter { processListeners[$0] == nil }
+        for object in newObjects {
             let changed: () -> Void = { [weak self] in MainActor.assumeIsolated { self?.queueRefreshApps() } }
             processListeners[object] = [
                 AudioListener(object, kAudioProcessPropertyIsRunningOutput, handler: changed),
                 AudioListener(object, kAudioProcessPropertyIsRunning, handler: changed),
                 AudioListener(object, kAudioProcessPropertyDevices, scope: kAudioObjectPropertyScopeOutput, handler: changed),
             ]
+        }
+        if !newObjects.isEmpty {
+            let listeners = processListeners.values.joined()
+            log("following \(objects.count) audio processes: \(listeners.filter(\.isAdded).count) of \(listeners.count) listeners active")
         }
         reconcileEngines(running)
     }
@@ -213,6 +218,7 @@ final class VolumeMixer {
     /// Refreshes once for a burst of notifications, right after it.
     private func queueRefreshApps() {
         guard !refreshQueued else { return }
+        log("an audio process started, stopped or changed device")
         refreshQueued = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
             MainActor.assumeIsolated {
