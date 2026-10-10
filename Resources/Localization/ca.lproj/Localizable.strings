@@ -189,6 +189,7 @@
 "Logs" = "Registres";
 "Logs and settings for finding out what PasteRing is doing." = "Registres i configuració per saber què fa el PasteRing.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "El macOS només deixa escriure en altres apps a les apps amb aquest permís. El PasteRing l’utilitza per enganxar l’entrada que triïs directament a l’app on treballes, el Tancament automàtic per veure les finestres de cada app, el Clic central per fer clic amb el botó central, Reassignar per canviar tecles i botons, i l’Ajust de finestres per moure i redimensionar finestres. Sense ell, les entrades només es copien al porta-retalls i les altres utilitats no fan res.";
+"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS fa servir ⌃⌥Espai per canviar la font d'entrada del teclat, així que Organitza totes les finestres no funcionarà fins que desactivis aquesta drecera: Dreceres de teclat > Fonts d'entrada > Selecciona la font següent del menú Entrada.";
 "Mappings" = "Assignacions";
 "Maximize" = "Maximitza";
 "Media" = "Multimèdia";
@@ -240,6 +241,7 @@
 "Open Accessibility Settings" = "Obre la configuració d’accessibilitat";
 "Open after hovering for" = "Obre després de passar per sobre";
 "Open at login" = "Obre en iniciar la sessió";
+"Open Keyboard Shortcuts" = "Obre les dreceres de teclat";
 "Open overlay" = "Obre el tauler";
 "Open System Settings" = "Obre Configuració del Sistema";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, només per mostrar el color i el seu valor sota la lupa mentre mous el punter.";

@@ -189,6 +189,7 @@
 "Logs" = "Journaux";
 "Logs and settings for finding out what PasteRing is doing." = "Journaux et réglages pour savoir ce que fait PasteRing.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS ne permet qu’aux apps disposant de cette autorisation de saisir dans d’autres apps. PasteRing l’utilise pour coller l’entrée choisie directement dans l’app où vous travaillez, Fermeture automatique pour voir les fenêtres de chaque app, Clic central pour cliquer avec le bouton central, Réaffecter pour modifier les touches et les boutons, et Ancrage des fenêtres pour déplacer et redimensionner les fenêtres. Sans elle, les entrées sont seulement copiées dans le presse-papiers et les autres utilitaires ne font rien.";
+"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS utilise ⌃⌥Espace pour changer la source de saisie du clavier ; Organiser toutes les fenêtres ne fonctionnera pas tant que ce raccourci est activé : Raccourcis clavier > Méthodes de saisie > Sélectionner la source suivante du menu Saisie.";
 "Mappings" = "Affectations";
 "Maximize" = "Agrandir";
 "Media" = "Multimédia";
@@ -240,6 +241,7 @@
 "Open Accessibility Settings" = "Ouvrir les réglages Accessibilité";
 "Open after hovering for" = "Ouvrir après un survol de";
 "Open at login" = "Ouvrir à l’ouverture de session";
+"Open Keyboard Shortcuts" = "Ouvrir les raccourcis clavier";
 "Open overlay" = "Ouvrir le panneau";
 "Open System Settings" = "Ouvrir Réglages Système";
 "Optional, only to show the color and its value under the loupe while you move." = "Facultatif, uniquement pour afficher la couleur et sa valeur sous la loupe pendant que vous bougez.";

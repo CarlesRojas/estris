@@ -1,14 +1,22 @@
 import AppKit
 import Carbon.HIToolbox
 
-/// Arrange All: every window on a screen shares it evenly. Two side by side, three in thirds,
+/// Arrange All (⌃⌥Space): every window on a screen shares it evenly. Two side by side, three in thirds,
 /// four in quarters; from five on, columns (about the square root of the count) with the
 /// windows spread over them, the fewer per column on the left, so the front windows get the
 /// bigger spaces. Five is a left third plus four quarters of the rest, six is three columns of
 /// two, seven is 2 + 2 + 3, and so on.
 enum WindowArranger {
-    /// Control, Option and A, like the other snap shortcuts.
-    static let shortcut = Shortcut(keyCode: UInt32(kVK_ANSI_A), modifiers: UInt32(controlKey | optionKey), keyLabel: "A")
+    /// Control, Option and Space, like the other snap shortcuts.
+    static var shortcut: Shortcut {
+        Shortcut(keyCode: UInt32(kVK_Space), modifiers: UInt32(controlKey | optionKey), keyLabel: String(localized: "Space"))
+    }
+
+    /// macOS uses ⌃⌥Space to switch to the next input source, and keeps it while that shortcut
+    /// is on: Arrange All only gets the keys once it's turned off.
+    static var isShortcutTaken: Bool {
+        SystemShortcuts.isTaken(keyCode: CGKeyCode(kVK_Space), flags: [.maskControl, .maskAlternate], by: SystemShortcuts.selectNextInputSource)
+    }
 
     /// The windows mostly on the screen, front to back: normal windows of regular apps (and
     /// PasteRing's own), not minimized or hidden ones.

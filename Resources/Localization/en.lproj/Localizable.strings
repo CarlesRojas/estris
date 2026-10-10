@@ -189,6 +189,7 @@
 "Logs" = "Logs";
 "Logs and settings for finding out what PasteRing is doing." = "Logs and settings for finding out what PasteRing is doing.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing.";
+"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu.";
 "Mappings" = "Mappings";
 "Maximize" = "Maximize";
 "Media" = "Media";
@@ -240,6 +241,7 @@
 "Open Accessibility Settings" = "Open Accessibility Settings";
 "Open after hovering for" = "Open after hovering for";
 "Open at login" = "Open at login";
+"Open Keyboard Shortcuts" = "Open Keyboard Shortcuts";
 "Open overlay" = "Open overlay";
 "Open System Settings" = "Open System Settings";
 "Optional, only to show the color and its value under the loupe while you move." = "Optional, only to show the color and its value under the loupe while you move.";

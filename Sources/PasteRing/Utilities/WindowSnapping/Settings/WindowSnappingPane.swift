@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The Window Snapping settings pane: the on/off switch, then dragging, gestures and the
@@ -9,6 +10,8 @@ struct WindowSnappingPane: View {
     ]
 
     @ObservedObject var settings: WindowSnappingSettings
+    /// Read again when PasteRing comes back from System Settings.
+    @State private var arrangeShortcutTaken = WindowArranger.isShortcutTaken
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,6 +33,9 @@ struct WindowSnappingPane: View {
                 }
             }
             .formStyle(.grouped)
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                arrangeShortcutTaken = WindowArranger.isShortcutTaken
+            }
             .settingsPage()
             .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
@@ -94,6 +100,18 @@ struct WindowSnappingPane: View {
                     Text(verbatim: WindowArranger.shortcut.displayString)
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
+                }
+            }
+            if settings.arrangesAll && arrangeShortcutTaken {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text("macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu.")
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    Button("Open Keyboard Shortcuts") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
+                    }
                 }
             }
         }

@@ -189,6 +189,7 @@
 "Logs" = "Protokolle";
 "Logs and settings for finding out what PasteRing is doing." = "Protokolle und Einstellungen, um zu sehen, was PasteRing tut.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS lässt nur Apps mit dieser Berechtigung in andere Apps tippen. PasteRing nutzt sie, um den gewählten Eintrag direkt in die App einzusetzen, in der du arbeitest, Automatisch beenden, um die Fenster jeder App zu sehen, Mittelklick, um mit der mittleren Taste zu klicken, Neu belegen, um Tasten zu ändern, und Fenster einrasten, um Fenster zu bewegen und zu skalieren. Ohne sie werden Einträge nur in die Zwischenablage kopiert und die anderen Werkzeuge tun nichts.";
+"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS verwendet ⌃⌥Leertaste zum Wechseln der Eingabequelle, daher funktioniert „Alle Fenster anordnen“ erst, wenn dieser Kurzbefehl deaktiviert ist: Tastaturkurzbefehle > Eingabequellen > Nächste Quelle im Eingabemenü auswählen.";
 "Mappings" = "Belegungen";
 "Maximize" = "Maximieren";
 "Media" = "Medien";
@@ -240,6 +241,7 @@
 "Open Accessibility Settings" = "Bedienungshilfen-Einstellungen öffnen";
 "Open after hovering for" = "Öffnen nach Überfahren von";
 "Open at login" = "Bei der Anmeldung öffnen";
+"Open Keyboard Shortcuts" = "Tastaturkurzbefehle öffnen";
 "Open overlay" = "Overlay öffnen";
 "Open System Settings" = "Systemeinstellungen öffnen";
 "Optional, only to show the color and its value under the loupe while you move." = "Optional, nur um die Farbe und ihren Wert unter der Lupe anzuzeigen, während du den Zeiger bewegst.";

@@ -189,6 +189,7 @@
 "Logs" = "Registros";
 "Logs and settings for finding out what PasteRing is doing." = "Registros y ajustes para saber qué está haciendo PasteRing.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS solo deja escribir en otras apps a las apps con este permiso. PasteRing lo usa para pegar la entrada que eliges directamente en la app en la que trabajas, Cierre automático para ver las ventanas de cada app, Clic central para hacer clic con el botón central, Reasignar para cambiar teclas y botones, y Ajuste de ventanas para mover y redimensionar ventanas. Sin él, las entradas solo se copian al portapapeles y las demás utilidades no hacen nada.";
+"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS usa ⌃⌥Espacio para cambiar la fuente de entrada del teclado, así que Organizar todas las ventanas no funcionará hasta que desactives ese atajo: Funciones rápidas de teclado > Fuentes de entrada > Seleccionar la siguiente fuente del menú Entrada.";
 "Mappings" = "Asignaciones";
 "Maximize" = "Maximizar";
 "Media" = "Multimedia";
@@ -240,6 +241,7 @@
 "Open Accessibility Settings" = "Abrir ajustes de accesibilidad";
 "Open after hovering for" = "Abrir tras pasar por encima";
 "Open at login" = "Abrir al iniciar sesión";
+"Open Keyboard Shortcuts" = "Abrir Funciones rápidas de teclado";
 "Open overlay" = "Abrir el panel";
 "Open System Settings" = "Abrir Ajustes del Sistema";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, solo para mostrar el color y su valor bajo la lupa mientras mueves el puntero.";

@@ -189,6 +189,7 @@
 "Logs" = "Registri";
 "Logs and settings for finding out what PasteRing is doing." = "Registri e impostazioni per capire cosa sta facendo PasteRing.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS consente di scrivere in altre app solo alle app con questo permesso. PasteRing lo usa per incollare la voce scelta direttamente nell’app in cui stai lavorando, Chiusura automatica per vedere le finestre di ogni app, Clic centrale per fare clic con il tasto centrale, Rimappa per cambiare tasti e pulsanti e Aggancio finestre per spostare e ridimensionare le finestre. Senza, le voci vengono solo copiate negli appunti e le altre utility non fanno nulla.";
+"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS usa ⌃⌥Spazio per cambiare la sorgente di input della tastiera, quindi Disponi tutte le finestre non funzionerà finché quella abbreviazione non viene disattivata: Abbreviazioni da tastiera > Sorgenti di input > Seleziona la sorgente successiva nel menu Input.";
 "Mappings" = "Mappature";
 "Maximize" = "Ingrandisci";
 "Media" = "Multimedia";
@@ -240,6 +241,7 @@
 "Open Accessibility Settings" = "Apri impostazioni Accessibilità";
 "Open after hovering for" = "Apri dopo un passaggio di";
 "Open at login" = "Apri al login";
+"Open Keyboard Shortcuts" = "Apri Abbreviazioni da tastiera";
 "Open overlay" = "Apri il pannello";
 "Open System Settings" = "Apri Impostazioni di Sistema";
 "Optional, only to show the color and its value under the loupe while you move." = "Facoltativo, solo per mostrare il colore e il suo valore sotto la lente mentre muovi il puntatore.";

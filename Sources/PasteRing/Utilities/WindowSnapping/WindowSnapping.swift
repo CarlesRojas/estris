@@ -56,6 +56,9 @@ final class WindowSnapping {
             })
         }
         if settings.arrangesAll {
+            if WindowArranger.isShortcutTaken {
+                log("arrange all: ⌃⌥Space is macOS's shortcut for the next input source; turn it off to use it here")
+            }
             let shortcut = WindowArranger.shortcut
             hotKeys.append(HotKeyCenter.shared.register(keyCode: shortcut.keyCode, modifiers: shortcut.modifiers) { [weak self] in
                 self?.arrangeAll()

@@ -189,6 +189,7 @@
 "Logs" = "Registros";
 "Logs and settings for finding out what PasteRing is doing." = "Registros e ajustes para descobrir o que o PasteRing está fazendo.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "O macOS só permite que apps com esta permissão digitem em outros apps. O PasteRing a usa para colar o item escolhido diretamente no app em que você está trabalhando, o Encerramento automático para ver as janelas de cada app, o Clique do meio para clicar com o botão do meio, o Remapear para alterar teclas e botões e o Encaixe de janelas para mover e redimensionar janelas. Sem ela, os itens são apenas copiados para a Área de Transferência e os outros utilitários não fazem nada.";
+"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "O macOS usa ⌃⌥Espaço para trocar a fonte de entrada do teclado, então Organizar todas as janelas não funcionará até que esse atalho seja desativado: Atalhos de Teclado > Fontes de Entrada > Selecionar próxima fonte no menu Entrada.";
 "Mappings" = "Mapeamentos";
 "Maximize" = "Maximizar";
 "Media" = "Mídia";
@@ -240,6 +241,7 @@
 "Open Accessibility Settings" = "Abrir Ajustes de Acessibilidade";
 "Open after hovering for" = "Abrir após passar por cima por";
 "Open at login" = "Abrir ao iniciar sessão";
+"Open Keyboard Shortcuts" = "Abrir Atalhos de Teclado";
 "Open overlay" = "Abrir o painel";
 "Open System Settings" = "Abrir Ajustes do Sistema";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, apenas para mostrar a cor e seu valor sob a lupa enquanto você move o ponteiro.";
