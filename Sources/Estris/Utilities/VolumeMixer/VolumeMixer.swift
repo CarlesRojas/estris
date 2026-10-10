@@ -321,6 +321,7 @@ final class VolumeMixer {
                     MainActor.assumeIsolated {
                         guard let engine else { return }
                         self?.log("\(name) on \(deviceName) after 2 s: \(engine.diagnostics)")
+                        if engine.hasHeardSound { Permission.noteSystemAudioHeard() }
                     }
                 }
             } catch {
