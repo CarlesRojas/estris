@@ -35,6 +35,10 @@ struct MenuBarMenu: View {
                 }
                 if settings.showsApps {
                     group("Apps Volume") {
+                        if !mixerState.canChangeApps {
+                            Text("Allow System Audio Recording to change each app's sound.")
+                                .foregroundStyle(.orange)
+                        }
                         if mixerState.apps.isEmpty {
                             Text("No app is playing sound.")
                                 .foregroundStyle(.secondary)
@@ -42,7 +46,8 @@ struct MenuBarMenu: View {
                         ForEach(mixerState.apps) { app in
                             AppSoundRow(
                                 app: app, sound: mixerSettings.sound(of: app.key), devices: mixerState.outputDevices, mixer: mixer,
-                                showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages
+                                showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages,
+                                canChange: mixerState.canChangeApps
                             )
                         }
                     }

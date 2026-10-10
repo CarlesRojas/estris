@@ -29,7 +29,7 @@ struct AutoQuitPane: View {
     private var form: some View {
         Form {
             PermissionsSection(uses: [
-                PermissionUse(permission: .accessibility, reason: "Only to see when an app's last window closes.")
+                PermissionUse(permission: .accessibility, reason: "Only to see when an app's last window closes.", without: "Without it, Auto Quit can't do anything.")
             ])
             Section {
                 Picker("Quit", selection: $settings.delay) {

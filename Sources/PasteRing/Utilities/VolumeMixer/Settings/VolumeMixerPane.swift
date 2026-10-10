@@ -37,7 +37,7 @@ struct VolumeMixerPane: View {
     private var form: some View {
         Form {
             PermissionsSection(uses: [
-                PermissionUse(permission: .systemAudioRecording, reason: "Only to change an app's volume or the device it plays on. Nothing is recorded.")
+                PermissionUse(permission: .systemAudioRecording, reason: "Only to change an app's volume or the device it plays on. Nothing is recorded.", without: "Without it, the output and the microphone still work, but not each app's sound.")
             ])
             if settings.isEnabled {
                 Section("System") {
@@ -47,12 +47,16 @@ struct VolumeMixerPane: View {
                     if !state.failedApps.isEmpty {
                         permissionNotice
                     }
+                    if !state.canChangeApps {
+                        Text("Allow System Audio Recording to change each app's sound.")
+                            .foregroundStyle(.orange)
+                    }
                     if state.apps.isEmpty {
                         Text("No app is playing sound.")
                             .foregroundStyle(.secondary)
                     }
                     ForEach(state.apps) { app in
-                        AppSoundRow(app: app, sound: settings.sound(of: app.key), devices: state.outputDevices, mixer: mixer)
+                        AppSoundRow(app: app, sound: settings.sound(of: app.key), devices: state.outputDevices, mixer: mixer, canChange: state.canChangeApps)
                     }
                 }
             }
@@ -85,6 +89,8 @@ struct AppSoundRow: View {
     let mixer: VolumeMixer
     var showsDevice = true
     var showsPercentage = true
+    /// Off while System Audio Recording is denied.
+    var canChange = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -124,6 +130,7 @@ struct AppSoundRow: View {
             }
         }
         .padding(.vertical, 2)
+        .disabled(!canChange)
     }
 
     /// The system output, each device, and the chosen one while it isn't connected.

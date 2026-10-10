@@ -30,7 +30,7 @@ struct FocusFollowsMousePane: View {
     private var form: some View {
         Form {
             PermissionsSection(uses: [
-                PermissionUse(permission: .accessibility, reason: "Only to bring the window under the pointer to the front.")
+                PermissionUse(permission: .accessibility, reason: "Only to bring the window under the pointer to the front.", without: "Without it, Focus Follows Mouse can't do anything.")
             ])
             Section("General") {
                 Picker("Focus after hovering for", selection: $settings.delay) {

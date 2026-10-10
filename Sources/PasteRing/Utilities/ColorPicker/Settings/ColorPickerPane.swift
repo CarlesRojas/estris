@@ -17,7 +17,7 @@ struct ColorPickerPane: View {
 
             Form {
                 PermissionsSection(uses: [
-                    PermissionUse(permission: .screenRecording, reason: "Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it."),
+                    PermissionUse(permission: .screenRecording, reason: "Optional, only to show the color and its value under the loupe while you move.", without: "Without it, macOS's own loupe is used, and the color shows once copied."),
                 ])
                 Section("Shortcut") {
                     LabeledContent("Pick a color") {

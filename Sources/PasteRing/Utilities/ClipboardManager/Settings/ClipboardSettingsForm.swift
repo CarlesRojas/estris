@@ -11,7 +11,7 @@ struct ClipboardSettingsForm: View {
     var body: some View {
         Form {
             PermissionsSection(uses: [
-                PermissionUse(permission: .accessibility, reason: "Only to paste the entry you pick into the app you're working in.")
+                PermissionUse(permission: .accessibility, reason: "Only to paste the entry you pick into the app you're working in.", without: "Without it, the history still records, and picking an entry copies it to paste yourself with ⌘V.")
             ])
             Section("General") {
                 LabeledContent("Keep up to") {

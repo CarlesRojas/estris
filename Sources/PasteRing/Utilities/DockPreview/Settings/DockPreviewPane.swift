@@ -16,8 +16,8 @@ struct DockPreviewPane: View {
 
             Form {
                 PermissionsSection(uses: [
-                    PermissionUse(permission: .accessibility, reason: "Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick."),
-                    PermissionUse(permission: .screenRecording, reason: "Only to show a thumbnail of what each window shows. Nothing is saved or sent."),
+                    PermissionUse(permission: .accessibility, reason: "Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick.", without: "Without it, Dock Preview can't do anything."),
+                    PermissionUse(permission: .screenRecording, reason: "Only to show a thumbnail of what each window shows. Nothing is saved or sent.", without: "Without it, each window shows its app's icon instead of a thumbnail."),
                 ])
                 Section("Previews") {
                     LabeledContent("Size") {

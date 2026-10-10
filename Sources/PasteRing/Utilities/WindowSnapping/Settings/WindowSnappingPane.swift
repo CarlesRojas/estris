@@ -16,7 +16,7 @@ struct WindowSnappingPane: View {
 
             Form {
                 PermissionsSection(uses: [
-                    PermissionUse(permission: .accessibility, reason: "Only to move and resize windows.")
+                    PermissionUse(permission: .accessibility, reason: "Only to move and resize windows.", without: "Without it, Window Snapping can't do anything.")
                 ])
                 dragging
                 gestures

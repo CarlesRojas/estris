@@ -45,6 +45,7 @@
 "After 30 seconds" = "Al cap de 30 segons";
 "After 5 seconds" = "Al cap de 5 segons";
 "All Utilities" = "Totes les utilitats";
+"Allow System Audio Recording to change each app's sound." = "Permet la Gravació d'àudio del sistema per canviar el so de cada app.";
 "Allowed" = "Permès";
 "Already mapped above" = "Ja assignat més amunt";
 "Already mapped on %@" = "Ja assignat a %@";
@@ -236,7 +237,7 @@
 "Open at login" = "Obre en iniciar la sessió";
 "Open overlay" = "Obre el tauler";
 "Open System Settings" = "Obre Configuració del Sistema";
-"Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it." = "Opcional, només per a això: mostrar el color i el seu valor sota la lupa mentre mous el punter. Triar i copiar funcionen sense.";
+"Optional, only to show the color and its value under the loupe while you move." = "Opcional, només per mostrar el color i el seu valor sota la lupa mentre mous el punter.";
 "Other" = "Altres";
 "Other source" = "Una altra font";
 "Output" = "Sortida";
@@ -390,4 +391,14 @@
 "Width" = "Amplada";
 "Window Snapping" = "Ajust de finestres";
 "Windows & Apps" = "Finestres i apps";
+"Without it, Auto Quit can't do anything." = "Sense aquest permís, Tancament automàtic no pot fer res.";
+"Without it, Dock Preview can't do anything." = "Sense aquest permís, la Previsualització del Dock no pot fer res.";
+"Without it, each window shows its app's icon instead of a thumbnail." = "Sense aquest permís, cada finestra mostra la icona de la seva app en lloc d'una miniatura.";
+"Without it, Focus Follows Mouse can't do anything." = "Sense aquest permís, Focus sota el punter no pot fer res.";
+"Without it, key-to-key mappings still work (picked from the list); mouse buttons, system actions, recording by pressing and the Event Viewer don't." = "Sense aquest permís, els mapatges de tecla a tecla continuen funcionant (triats de la llista); els botons del ratolí, les accions del sistema, gravar prement i el Visor d'esdeveniments no.";
+"Without it, macOS's own loupe is used, and the color shows once copied." = "Sense aquest permís, es fa servir la lupa de macOS, i el color es mostra un cop copiat.";
+"Without it, Middle Click can't do anything." = "Sense aquest permís, Clic central no pot fer res.";
+"Without it, the history still records, and picking an entry copies it to paste yourself with ⌘V." = "Sense aquest permís, l'historial es continua desant, i triar una entrada la copia perquè l'enganxis tu amb ⌘V.";
+"Without it, the output and the microphone still work, but not each app's sound." = "Sense aquest permís, la sortida i el micròfon continuen funcionant, però no el so de cada app.";
+"Without it, Window Snapping can't do anything." = "Sense aquest permís, Ajust de finestres no pot fer res.";
 "§ (Section)" = "§ (Secció)";

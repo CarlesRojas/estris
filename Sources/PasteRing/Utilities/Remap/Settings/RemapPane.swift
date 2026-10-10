@@ -60,7 +60,7 @@ private struct MappingsView: View {
         ScrollViewReader { proxy in
             Form {
                 PermissionsSection(uses: [
-                    PermissionUse(permission: .accessibility, reason: "Only to read and change the keys and buttons you map.")
+                    PermissionUse(permission: .accessibility, reason: "Only to read and change the keys and buttons you map.", without: "Without it, key-to-key mappings still work (picked from the list); mouse buttons, system actions, recording by pressing and the Event Viewer don't.")
                 ])
                 ForEach(listed) { device in
                     let mappings = settings.mappings(for: device.id)

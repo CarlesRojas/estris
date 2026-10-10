@@ -29,7 +29,7 @@ struct MiddleClickPane: View {
     private var form: some View {
         Form {
             PermissionsSection(uses: [
-                PermissionUse(permission: .accessibility, reason: "Only to send the middle click.")
+                PermissionUse(permission: .accessibility, reason: "Only to send the middle click.", without: "Without it, Middle Click can't do anything.")
             ])
             Section {
                 Picker("Tap with", selection: $settings.fingers) {

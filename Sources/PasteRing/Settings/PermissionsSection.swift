@@ -60,14 +60,17 @@ enum Permission {
     }()
 }
 
-/// A permission and, in plain words, the one thing it is used for.
+/// A permission, in plain words the one thing it is used for, and what still works without it.
 struct PermissionUse {
     let permission: Permission
     let reason: LocalizedStringKey
+    /// Shown while it isn't allowed.
+    let without: LocalizedStringKey
 }
 
-/// The first section of the settings of a utility that needs permissions: which, and what for.
-/// Each shows whether it is allowed, with a button to its System Settings page when it isn't.
+/// The first section of the settings of a utility that needs permissions: which, what for, and
+/// what still works without each. Each shows whether it is allowed, with a button to its System
+/// Settings page when it isn't.
 /// Utilities that need none don't show it.
 struct PermissionsSection: View {
     let uses: [PermissionUse]
@@ -98,6 +101,12 @@ struct PermissionsSection: View {
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if use.permission.isGranted != true {
+                    Text(use.without)
+                        .font(.callout)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 8)
             if use.permission.isGranted == true {

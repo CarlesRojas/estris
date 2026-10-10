@@ -45,6 +45,7 @@
 "After 30 seconds" = "Dopo 30 secondi";
 "After 5 seconds" = "Dopo 5 secondi";
 "All Utilities" = "Tutte le utility";
+"Allow System Audio Recording to change each app's sound." = "Consenti la Registrazione audio di sistema per cambiare l'audio di ogni app.";
 "Allowed" = "Consentito";
 "Already mapped above" = "Già mappato sopra";
 "Already mapped on %@" = "Già mappato su %@";
@@ -236,7 +237,7 @@
 "Open at login" = "Apri al login";
 "Open overlay" = "Apri il pannello";
 "Open System Settings" = "Apri Impostazioni di Sistema";
-"Optional, only for this: to show the color and its value under the loupe while you move. Picking and copying work without it." = "Facoltativo, solo per questo: mostrare il colore e il suo valore sotto la lente mentre muovi il puntatore. Scegliere e copiare funzionano anche senza.";
+"Optional, only to show the color and its value under the loupe while you move." = "Facoltativo, solo per mostrare il colore e il suo valore sotto la lente mentre muovi il puntatore.";
 "Other" = "Altri";
 "Other source" = "Altra fonte";
 "Output" = "Uscita";
@@ -390,4 +391,14 @@
 "Width" = "Larghezza";
 "Window Snapping" = "Aggancio finestre";
 "Windows & Apps" = "Finestre e app";
+"Without it, Auto Quit can't do anything." = "Senza, Chiusura automatica non può fare nulla.";
+"Without it, Dock Preview can't do anything." = "Senza, l'Anteprima del Dock non può fare nulla.";
+"Without it, each window shows its app's icon instead of a thumbnail." = "Senza, ogni finestra mostra l'icona della sua app invece di una miniatura.";
+"Without it, Focus Follows Mouse can't do anything." = "Senza, Focus sotto il puntatore non può fare nulla.";
+"Without it, key-to-key mappings still work (picked from the list); mouse buttons, system actions, recording by pressing and the Event Viewer don't." = "Senza, le rimappature da tasto a tasto funzionano ancora (scelte dall'elenco); pulsanti del mouse, azioni di sistema, registrazione premendo e il Visualizzatore eventi no.";
+"Without it, macOS's own loupe is used, and the color shows once copied." = "Senza, si usa la lente di macOS, e il colore appare una volta copiato.";
+"Without it, Middle Click can't do anything." = "Senza, Clic centrale non può fare nulla.";
+"Without it, the history still records, and picking an entry copies it to paste yourself with ⌘V." = "Senza, la cronologia continua a registrare, e scegliere una voce la copia per incollarla tu con ⌘V.";
+"Without it, the output and the microphone still work, but not each app's sound." = "Senza, l'uscita e il microfono funzionano ancora, ma non l'audio di ogni app.";
+"Without it, Window Snapping can't do anything." = "Senza, Aggancio finestre non può fare nulla.";
 "§ (Section)" = "§ (Paragrafo)";
