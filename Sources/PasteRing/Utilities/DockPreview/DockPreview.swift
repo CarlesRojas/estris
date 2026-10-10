@@ -48,6 +48,8 @@ final class DockPreview {
     /// The app whose Dock icon was just clicked: its preview waits until the pointer leaves the
     /// icon and comes back, so it doesn't cover the Dock's menu or a launching app.
     private var clickedPID: pid_t?
+    /// Where the pointer last was on the shown app's icon: the tip of the way up to the panel.
+    private var lastOnIcon: NSPoint?
     /// The last thumbnail of each window, shown at once the next time.
     private var thumbnailCache: [CGWindowID: CGImage] = [:]
 
@@ -142,6 +144,7 @@ final class DockPreview {
             if layout.isNear(point), let item = DockItems.item(at: point) {
                 cancelHide()
                 if item.app.processIdentifier == shown.app.processIdentifier {
+                    lastOnIcon = point
                     cancelOpen()
                 } else {
                     // Sliding along the Dock: the next app follows quickly.
@@ -166,23 +169,20 @@ final class DockPreview {
         scheduleOpen(item, delay: settings.openDelay.seconds)
     }
 
-    /// The way from the icon to the panel: the area between the icon's outer corners (on the
-    /// Dock's edge) and the panel's corners on that side, a trapezoid that widens toward the
-    /// panel. The pointer can cut across it diagonally, over other icons, to reach any window
-    /// without the panel switching apps or closing.
+    /// The way from the icon to the panel: a triangle from where the pointer last was on the
+    /// icon to the panel's corners on the Dock's side. Heading for any window, even diagonally
+    /// across other icons, stays inside it; sliding along the Dock leaves it at once, so the
+    /// next app's preview still follows.
     private func corridor(to item: DockItem) -> Corridor {
-        let icon = item.frame
+        let tip = lastOnIcon ?? NSPoint(x: item.frame.midX, y: item.frame.midY)
         let panel = contentFrame
         switch layout.edge {
         case .bottom:
-            return Corridor([NSPoint(x: icon.minX, y: icon.minY), NSPoint(x: icon.maxX, y: icon.minY),
-                             NSPoint(x: panel.maxX, y: panel.minY), NSPoint(x: panel.minX, y: panel.minY)])
+            return Corridor([tip, NSPoint(x: panel.maxX, y: panel.minY), NSPoint(x: panel.minX, y: panel.minY)])
         case .left:
-            return Corridor([NSPoint(x: icon.minX, y: icon.minY), NSPoint(x: panel.minX, y: panel.minY),
-                             NSPoint(x: panel.minX, y: panel.maxY), NSPoint(x: icon.minX, y: icon.maxY)])
+            return Corridor([tip, NSPoint(x: panel.minX, y: panel.minY), NSPoint(x: panel.minX, y: panel.maxY)])
         case .right:
-            return Corridor([NSPoint(x: icon.maxX, y: icon.minY), NSPoint(x: icon.maxX, y: icon.maxY),
-                             NSPoint(x: panel.maxX, y: panel.maxY), NSPoint(x: panel.maxX, y: panel.minY)])
+            return Corridor([tip, NSPoint(x: panel.maxX, y: panel.maxY), NSPoint(x: panel.maxX, y: panel.minY)])
         }
     }
 
@@ -252,6 +252,7 @@ final class DockPreview {
         // Taken away since: no window contents at all, not even remembered ones.
         if !CGPreflightScreenCaptureAccess() { thumbnailCache = [:] }
         shown = item
+        lastOnIcon = NSEvent.mouseLocation
         state.app = item.app
         state.windows = windows
         state.thumbnails = thumbnailCache.filter { id, _ in windows.contains { $0.id == id } }
@@ -286,6 +287,7 @@ final class DockPreview {
         captureTask?.cancel()
         captureTask = nil
         shown = nil
+        lastOnIcon = nil
         contentFrame = .zero
         panel?.orderOut(nil)
         state.windows = []
