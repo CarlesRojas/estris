@@ -30,6 +30,10 @@ final class DockPreview {
     private var inputTap: CFMachPort?
     /// Scroll from a trackpad, gathered until it is enough for one step.
     private var scrolled: CGFloat = 0
+    /// Brings the highlighted window forward once scrolling pauses.
+    private var pendingFocus: DispatchWorkItem?
+    /// Desktop changes until then come from scrolling, not the user leaving.
+    private var keepThroughDesktopChangesUntil = Date.distantPast
     private var spaceObserver: NSObjectProtocol?
     private var layout = DockLayout.current()
     private var layoutRead = Date.distantPast
@@ -89,7 +93,11 @@ final class DockPreview {
         spaceObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.hide() }
+            MainActor.assumeIsolated {
+                // Scrolling through windows travels between desktops on purpose; the panel stays.
+                guard let self, Date() >= self.keepThroughDesktopChangesUntil else { return }
+                self.hide()
+            }
         }
     }
 
@@ -261,6 +269,9 @@ final class DockPreview {
         state.windows = []
         state.app = nil
         state.selected = nil
+        pendingFocus?.cancel()
+        pendingFocus = nil
+        keepThroughDesktopChangesUntil = .distantPast
         setInputTap(enabled: false)
         DockHold.end()
     }
@@ -328,6 +339,25 @@ final class DockPreview {
         let index = state.selected.flatMap { id in windows.firstIndex { $0.id == id } }
         let next = index.map { ($0 + step + windows.count) % windows.count } ?? (step > 0 ? 0 : windows.count - 1)
         state.selected = windows[next].id
+        focusSelected()
+    }
+
+    /// Each step brings the highlighted window forward, going to its desktop if needed, with
+    /// the panel still open to keep scrolling; a fast spin only acts on where it stops.
+    private func focusSelected() {
+        pendingFocus?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                guard #available(macOS 14, *), let self, let app = self.state.app,
+                      let window = self.state.windows.first(where: { $0.id == self.state.selected })
+                else { return }
+                // Long enough for a trip across several desktops.
+                self.keepThroughDesktopChangesUntil = Date().addingTimeInterval(4)
+                AppWindows.open(window, of: app)
+            }
+        }
+        pendingFocus = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
     }
 
     private func makePanel() -> NSPanel {
