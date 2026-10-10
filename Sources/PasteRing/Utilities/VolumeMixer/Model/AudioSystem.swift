@@ -167,6 +167,30 @@ enum AudioSystem {
         }
     }
 
+    /// Whether the device is muted; nil when it can't be muted.
+    static func isMuted(_ device: AudioObjectID, input: Bool) -> Bool? {
+        let channels = muteChannels(of: device, scope: scope(input: input))
+        guard !channels.isEmpty else { return nil }
+        // Muted only when every channel is.
+        return channels.allSatisfy { channel in
+            var value: UInt32 = 0
+            return read(device, kAudioDevicePropertyMute, scope: scope(input: input), element: channel, into: &value) && value != 0
+        }
+    }
+
+    static func setMuted(_ muted: Bool, _ device: AudioObjectID, input: Bool) {
+        for channel in muteChannels(of: device, scope: scope(input: input)) {
+            write(device, kAudioDevicePropertyMute, scope: scope(input: input), element: channel, UInt32(muted ? 1 : 0))
+        }
+    }
+
+    private static func muteChannels(of device: AudioObjectID, scope: AudioObjectPropertyScope) -> [AudioObjectPropertyElement] {
+        if isSettable(device, kAudioDevicePropertyMute, scope: scope) {
+            return [kAudioObjectPropertyElementMain]
+        }
+        return [1, 2].filter { isSettable(device, kAudioDevicePropertyMute, scope: scope, element: $0) }
+    }
+
     /// Where a device without one main volume keeps it: the whole device, or each channel.
     private static func volumeChannels(of device: AudioObjectID, scope: AudioObjectPropertyScope) -> [AudioObjectPropertyElement] {
         if isSettable(device, kAudioDevicePropertyVolumeScalar, scope: scope) {

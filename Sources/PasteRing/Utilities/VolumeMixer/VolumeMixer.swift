@@ -14,6 +14,9 @@ final class VolumeMixerState: ObservableObject {
     /// Nil when the device's volume can't be changed.
     @Published var outputVolume: Float?
     @Published var inputVolume: Float?
+    /// Nil when the device can't be muted.
+    @Published var outputMuted: Bool?
+    @Published var inputMuted: Bool?
     @Published var apps: [AudioApp] = []
     /// Apps whose sound couldn't be changed, usually for a missing permission.
     @Published var failedApps: [String] = []
@@ -101,12 +104,14 @@ final class VolumeMixer {
         state.output = AudioSystem.defaultDevice(input: false)
         state.input = AudioSystem.defaultDevice(input: true)
         refreshVolumes()
-        // Follow the volume of whichever devices are in use.
-        volumeListeners = [(state.output, false), (state.input, true)].compactMap { pair -> AudioListener? in
+        // Follow the volume and mute of whichever devices are in use.
+        volumeListeners = [(state.output, false), (state.input, true)].flatMap { pair -> [AudioListener] in
             let (device, input) = pair
-            guard let device else { return nil }
-            return AudioListener(device, kAudioHardwareServiceDeviceProperty_VirtualMainVolume, scope: AudioSystem.scope(input: input)) { [weak self] in
-                MainActor.assumeIsolated { self?.refreshVolumes() }
+            guard let device else { return [] }
+            return [kAudioHardwareServiceDeviceProperty_VirtualMainVolume, kAudioDevicePropertyMute].map { selector in
+                AudioListener(device, selector, scope: AudioSystem.scope(input: input)) { [weak self] in
+                    MainActor.assumeIsolated { self?.refreshVolumes() }
+                }
             }
         }
         refreshApps()
@@ -115,6 +120,20 @@ final class VolumeMixer {
     private func refreshVolumes() {
         state.outputVolume = state.output.flatMap { AudioSystem.volume(of: $0, input: false) }
         state.inputVolume = state.input.flatMap { AudioSystem.volume(of: $0, input: true) }
+        state.outputMuted = state.output.flatMap { AudioSystem.isMuted($0, input: false) }
+        state.inputMuted = state.input.flatMap { AudioSystem.isMuted($0, input: true) }
+    }
+
+    func toggleOutputMute() {
+        guard let device = state.output, let muted = state.outputMuted else { return }
+        AudioSystem.setMuted(!muted, device, input: false)
+        state.outputMuted = !muted
+    }
+
+    func toggleInputMute() {
+        guard let device = state.input, let muted = state.inputMuted else { return }
+        AudioSystem.setMuted(!muted, device, input: true)
+        state.inputMuted = !muted
     }
 
     func setOutputVolume(_ volume: Float) {

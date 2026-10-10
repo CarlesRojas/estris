@@ -24,11 +24,11 @@ struct VolumeMixerPane: View {
                 if settings.isEnabled {
                     Section("Output") {
                         devicePicker(state.outputDevices, selection: state.output, set: mixer.setOutputDevice)
-                        volumeSlider(state.outputVolume, low: "speaker.fill", high: "speaker.wave.3.fill", set: mixer.setOutputVolume)
+                        volumeRow(state.outputVolume, isMuted: state.outputMuted, symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill", toggleMute: mixer.toggleOutputMute, set: mixer.setOutputVolume)
                     }
                     Section("Microphone") {
                         devicePicker(state.inputDevices, selection: state.input, set: mixer.setInputDevice)
-                        volumeSlider(state.inputVolume, low: "mic", high: "mic.fill", set: mixer.setInputVolume)
+                        volumeRow(state.inputVolume, isMuted: state.inputMuted, symbol: "mic.fill", mutedSymbol: "mic.slash.fill", toggleMute: mixer.toggleInputMute, set: mixer.setInputVolume)
                     }
                     Section("Apps") {
                         if !state.failedApps.isEmpty {
@@ -62,15 +62,28 @@ struct VolumeMixerPane: View {
         }
     }
 
-    private func volumeSlider(_ volume: Float?, low: String, high: String, set: @escaping (Float) -> Void) -> some View {
+    private func volumeRow(
+        _ volume: Float?,
+        isMuted: Bool?,
+        symbol: String,
+        mutedSymbol: String,
+        toggleMute: @escaping () -> Void,
+        set: @escaping (Float) -> Void
+    ) -> some View {
         LabeledContent("Volume") {
             HStack(spacing: 8) {
-                Image(systemName: low).foregroundStyle(.secondary)
+                Button(action: toggleMute) {
+                    Image(systemName: isMuted == true ? mutedSymbol : symbol)
+                        .frame(width: 20)
+                }
+                .buttonStyle(.borderless)
+                .disabled(isMuted == nil)
+                .help(isMuted == true ? Text("Unmute") : Text("Mute"))
                 Slider(value: Binding(get: { Double(volume ?? 0) }, set: { set(Float($0)) }), in: 0...1)
-                Image(systemName: high).foregroundStyle(.secondary)
+                    .labelsHidden()
+                    .disabled(volume == nil || isMuted == true)
             }
         }
-        .disabled(volume == nil)
     }
 
     private var permissionNotice: some View {
@@ -129,7 +142,10 @@ private struct AppSoundRow: View {
                 }
                 .buttonStyle(.borderless)
                 .help(sound.isMuted ? Text("Unmute") : Text("Mute"))
+                // In a form, a slider keeps an empty label column at its left unless hidden.
                 Slider(value: Binding(get: { sound.volume }, set: { mixer.setVolume($0, of: app) }), in: 0...2)
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity)
                     .disabled(sound.isMuted)
                 Text(verbatim: "\(Int((sound.volume * 100).rounded()))%")
                     .monospacedDigit()
