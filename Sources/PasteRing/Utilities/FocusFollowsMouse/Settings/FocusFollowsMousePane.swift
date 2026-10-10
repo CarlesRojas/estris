@@ -3,6 +3,11 @@ import SwiftUI
 /// The Focus Follows Mouse settings pane: the on/off switch, then Settings and Excluded Apps
 /// tabs.
 struct FocusFollowsMousePane: View {
+    /// What it needs, for its Permissions section and the prompt when it's turned on.
+    static let permissions: [PermissionUse] = [
+        PermissionUse(permission: .accessibility, reason: "Only to bring the window under the pointer to the front.", without: "Without it, Focus Follows Mouse can't do anything."),
+    ]
+
     private enum Tab: String, CaseIterable {
         case settings = "Settings"
         case excludedApps = "Excluded Apps"
@@ -16,6 +21,7 @@ struct FocusFollowsMousePane: View {
             pane: .focusFollowsMouse,
             summary: "The window under the pointer comes to the front and gets the focus.",
             isOn: $settings.isEnabled,
+            permissions: Self.permissions,
             tab: $tab
         ) { tab in
             switch tab {
@@ -29,9 +35,10 @@ struct FocusFollowsMousePane: View {
 
     private var form: some View {
         Form {
+            PermissionsSection(uses: FocusFollowsMousePane.permissions)
             Section("General") {
                 Picker("Focus after hovering for", selection: $settings.delay) {
-                    ForEach(FocusDelay.allCases) { delay in
+                    ForEach(HoverDelay.allCases) { delay in
                         Text(verbatim: delay.title).tag(delay)
                     }
                 }

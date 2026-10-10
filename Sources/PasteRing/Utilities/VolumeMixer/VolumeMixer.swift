@@ -20,6 +20,8 @@ final class VolumeMixerState: ObservableObject {
     @Published var apps: [AudioApp] = []
     /// Apps whose sound couldn't be changed, usually for a missing permission.
     @Published var failedApps: [String] = []
+    /// False while System Audio Recording is denied: each app's sound can't be changed then.
+    @Published var canChangeApps = true
 }
 
 /// The Volume Mixer utility: the volume and device of the Mac's output and microphone, and a
@@ -63,6 +65,10 @@ final class VolumeMixer {
         settings.$isEnabled
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.apply() }
+            .store(in: &observers)
+        // Back from System Settings: System Audio Recording may have changed.
+        NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in self?.refreshApps() }
             .store(in: &observers)
         // An app just excluded goes back to its own sound and leaves the list.
         settings.$excludedApps
@@ -177,6 +183,8 @@ final class VolumeMixer {
         self.running = running
         // Only what is making sound right now: a paused app leaves the list at once.
         state.apps = running.filter(\.isPlaying)
+        // Undecided still tries: macOS asks the first time.
+        state.canChangeApps = Permission.systemAudioRecording.isGranted != false
         logListIfChanged(running)
 
         // Starting or stopping playback changes these, not the list of processes. Every audio
@@ -273,6 +281,8 @@ final class VolumeMixer {
     /// through PasteRing while its sound is changed.
     private func reconcileEngines(_ apps: [AudioApp]) {
         guard #available(macOS 14.4, *) else { return }
+        // Tapping without the permission would only silence the app.
+        let apps = state.canChangeApps ? apps : []
         let systemUID = state.output.flatMap(AudioSystem.uid(of:))
         var kept: Set<pid_t> = []
         for app in apps {

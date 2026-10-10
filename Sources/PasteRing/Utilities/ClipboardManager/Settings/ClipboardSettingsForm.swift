@@ -10,6 +10,7 @@ struct ClipboardSettingsForm: View {
 
     var body: some View {
         Form {
+            PermissionsSection(uses: ClipboardManagerPane.permissions)
             Section("General") {
                 LabeledContent("Keep up to") {
                     HStack {

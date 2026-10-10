@@ -45,6 +45,9 @@
 "After 30 seconds" = "Après 30 secondes";
 "After 5 seconds" = "Après 5 secondes";
 "All Utilities" = "Tous les utilitaires";
+"Allow" = "Autoriser";
+"Allow System Audio Recording to change each app's sound." = "Autorisez l'Enregistrement audio du système pour changer le son de chaque app.";
+"Allow what %@ needs?" = "Autoriser ce dont %@ a besoin ?";
 "Allowed" = "Autorisé";
 "Already mapped above" = "Déjà affecté plus haut";
 "Already mapped on %@" = "Déjà affecté sur %@";
@@ -85,6 +88,7 @@
 "Click to change" = "Cliquez pour modifier";
 "Clipboard" = "Presse-papiers";
 "Clipboard history is empty" = "L’historique du presse-papiers est vide";
+"Close Window" = "Fermer la fenêtre";
 "Color" = "Couleur";
 "Color Picker" = "Pipette";
 "Copied" = "Copié";
@@ -95,6 +99,7 @@
 "Create Mapping" = "Créer une affectation";
 "Custom color" = "Couleur personnalisée";
 "Date format" = "Format de date";
+"Debugging" = "Débogage";
 "Default" = "Par défaut";
 "Delete" = "Supprimer";
 "Delete all clipboard entries?" = "Supprimer toutes les entrées du presse-papiers ?";
@@ -106,6 +111,7 @@
 "Device" = "Appareil";
 "Dim screen" = "Assombrir l’écran";
 "Display and Keyboard" = "Écran et clavier";
+"Dock Preview" = "Aperçu du Dock";
 "Don't keep awake" = "Ne pas garder éveillé";
 "Down" = "Enfoncé";
 "Down Arrow" = "Flèche bas";
@@ -211,6 +217,7 @@
 "No events yet" = "Aucun évènement pour l’instant";
 "Not granted" = "Non accordé";
 "Not keeping awake" = "Ne garde pas éveillé";
+"Not Now" = "Plus tard";
 "Nothing" = "Rien";
 "Nothing copied yet." = "Rien n'a encore été copié.";
 "Nothing logged yet." = "Rien n’a encore été consigné.";
@@ -220,10 +227,21 @@
 "On battery" = "Sur batterie";
 "On power adapter" = "Sur adaptateur secteur";
 "Only the first mapping for a key or button applies." = "Seule la première affectation d’une touche ou d’un bouton s’applique.";
+"Only to bring the window under the pointer to the front." = "Uniquement pour mettre au premier plan la fenêtre sous le pointeur.";
+"Only to change an app's volume or the device it plays on. Nothing is recorded." = "Uniquement pour changer le volume d'une app ou l'appareil sur lequel elle joue. Rien n'est enregistré.";
+"Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick." = "Uniquement pour savoir quelle icône du Dock est sous le pointeur, et pour mettre au premier plan ou fermer la fenêtre choisie.";
+"Only to move and resize windows." = "Uniquement pour déplacer et redimensionner les fenêtres.";
+"Only to paste the entry you pick into the app you're working in." = "Uniquement pour coller l'entrée choisie dans l'app où vous travaillez.";
+"Only to read and change the keys and buttons you map." = "Uniquement pour lire et modifier les touches et boutons que vous remappez.";
+"Only to see when an app's last window closes." = "Uniquement pour voir quand la dernière fenêtre d'une app se ferme.";
+"Only to send the middle click." = "Uniquement pour envoyer le clic du milieu.";
+"Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Uniquement pour afficher une miniature de ce que montre chaque fenêtre. Rien n'est enregistré ni envoyé.";
 "Open Accessibility Settings" = "Ouvrir les réglages Accessibilité";
+"Open after hovering for" = "Ouvrir après un survol de";
 "Open at login" = "Ouvrir à l’ouverture de session";
 "Open overlay" = "Ouvrir le panneau";
 "Open System Settings" = "Ouvrir Réglages Système";
+"Optional, only to show the color and its value under the loupe while you move." = "Facultatif, uniquement pour afficher la couleur et sa valeur sous la loupe pendant que vous bougez.";
 "Other" = "Autres";
 "Other source" = "Autre source";
 "Output" = "Sortie";
@@ -245,6 +263,7 @@
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Appuyez de nouveau sur le raccourci pour la taille exacte, ou maintenez ⌘ en faisant glisser.";
 "Press keys…" = "Appuyez sur les touches…";
 "Press the new shortcut, or Esc to cancel" = "Appuyez sur le nouveau raccourci, ou sur Échap pour annuler";
+"Previews" = "Aperçus";
 "Previous Desktop" = "Bureau précédent";
 "Previous Track" = "Piste précédente";
 "Print Screen" = "Impr. écran";
@@ -266,6 +285,7 @@
 "Reset Appearance to Defaults" = "Rétablir l’apparence par défaut";
 "Reset to Defaults" = "Rétablir les valeurs par défaut";
 "Resize side-by-side windows together" = "Redimensionner ensemble les fenêtres côte à côte";
+"Rest the pointer on an app in the Dock to see its windows, and click one to open it." = "Laissez le pointeur sur une app du Dock pour voir ses fenêtres, et cliquez sur l'une pour l'ouvrir.";
 "Restore" = "Restaurer";
 "Return" = "Retour";
 "Rewind" = "Retour rapide";
@@ -282,6 +302,7 @@
 "Ring menu" = "Menu circulaire";
 "Ring shows" = "L’anneau affiche";
 "Same as System" = "Comme le système";
+"Screen Recording" = "Enregistrement de l'écran";
 "Screenshot of Screen" = "Capture de l’écran";
 "Screenshot of Selection" = "Capture de la sélection";
 "Screenshot Tools" = "Outils de capture d’écran";
@@ -294,12 +315,15 @@
 "Shadow" = "Ombre";
 "Shortcut" = "Raccourci";
 "Shortcuts" = "Raccourcis";
+"Show a button to close each window" = "Afficher un bouton pour fermer chaque fenêtre";
 "Show Apps Volume" = "Afficher Volume des apps";
 "Show Clear History button" = "Afficher le bouton Effacer l'historique";
 "Show delete button" = "Afficher le bouton de suppression";
 "Show Desktop" = "Afficher le bureau";
 "Show device pickers" = "Afficher les sélecteurs d'appareil";
+"Show Dock Preview's hover area" = "Afficher la zone de survol de l'Aperçu du Dock";
 "Show Microphone" = "Afficher Micro";
+"Show only windows on the current desktop" = "Afficher uniquement les fenêtres du bureau actuel";
 "Show Output" = "Afficher Sortie";
 "Show Pick a Color button" = "Afficher le bouton Choisir une couleur";
 "Show recent colors" = "Afficher les couleurs récentes";
@@ -309,6 +333,7 @@
 "Show when entries were copied" = "Afficher quand les entrées ont été copiées";
 "Side edges near the bottom: bottom half" = "Bords latéraux près du bas : moitié inférieure";
 "Side edges near the top: top half" = "Bords latéraux près du haut : moitié supérieure";
+"Size" = "Taille";
 "Skip windows when moving faster than" = "Ignorer les fenêtres au-delà de";
 "Skips text copied from password fields and password managers." = "Ignore le texte copié depuis les champs de mot de passe et les gestionnaires de mots de passe.";
 "Sleep after being idle for" = "Veille après une inactivité de";
@@ -328,8 +353,10 @@
 "Stops your Mac and its display from going to sleep." = "Empêche votre Mac et son écran de se mettre en veille.";
 "Style" = "Style";
 "Swap From and To" = "Inverser la source et la cible";
+"Switch windows with the scroll wheel" = "Changer de fenêtre avec la molette";
 "Symbols" = "Symboles";
 "System" = "Système";
+"System Audio Recording" = "Enregistrement audio du système";
 "System setting" = "Réglage du système";
 "System Volume" = "Volume du système";
 "Tab" = "Tabulation";
@@ -370,4 +397,14 @@
 "Width" = "Largeur";
 "Window Snapping" = "Ancrage des fenêtres";
 "Windows & Apps" = "Fenêtres et apps";
+"Without it, Auto Quit can't do anything." = "Sans elle, Fermeture automatique ne peut rien faire.";
+"Without it, Dock Preview can't do anything." = "Sans elle, Aperçu du Dock ne peut rien faire.";
+"Without it, each window shows its app's icon instead of a thumbnail." = "Sans elle, chaque fenêtre affiche l'icône de son app au lieu d'une miniature.";
+"Without it, Focus Follows Mouse can't do anything." = "Sans elle, Focus sous le pointeur ne peut rien faire.";
+"Without it, key-to-key mappings still work (picked from the list); mouse buttons, system actions, recording by pressing and the Event Viewer don't." = "Sans elle, les remappages de touche à touche fonctionnent encore (choisis dans la liste) ; les boutons de souris, les actions système, l'enregistrement par appui et le Visualiseur d'événements non.";
+"Without it, macOS's own loupe is used, and the color shows once copied." = "Sans elle, la loupe de macOS est utilisée, et la couleur s'affiche une fois copiée.";
+"Without it, Middle Click can't do anything." = "Sans elle, Clic central ne peut rien faire.";
+"Without it, the history still records, and picking an entry copies it to paste yourself with ⌘V." = "Sans elle, l'historique est toujours enregistré, et choisir une entrée la copie pour la coller vous-même avec ⌘V.";
+"Without it, the output and the microphone still work, but not each app's sound." = "Sans elle, la sortie et le micro fonctionnent encore, mais pas le son de chaque app.";
+"Without it, Window Snapping can't do anything." = "Sans elle, Ancrage des fenêtres ne peut rien faire.";
 "§ (Section)" = "§ (Paragraphe)";

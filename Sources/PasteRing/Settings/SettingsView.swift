@@ -12,6 +12,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case remap
     case windowSnapping
     case focusFollowsMouse
+    case dockPreview
     case keepAwake
     case colorPicker
     case volumeMixer
@@ -30,6 +31,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .remap: String(localized: "Remap")
         case .windowSnapping: String(localized: "Window Snapping")
         case .focusFollowsMouse: String(localized: "Focus Follows Mouse")
+        case .dockPreview: String(localized: "Dock Preview")
         case .keepAwake: String(localized: "Keep Awake")
         case .colorPicker: String(localized: "Color Picker")
         case .volumeMixer: String(localized: "Volume Mixer")
@@ -47,6 +49,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .remap: "keyboard"
         case .windowSnapping: "rectangle.split.2x1"
         case .focusFollowsMouse: "cursorarrow.rays"
+        case .dockPreview: "dock.rectangle"
         case .keepAwake: "cup.and.saucer"
         case .colorPicker: "eyedropper"
         case .volumeMixer: "speaker.wave.2"
@@ -71,6 +74,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["color", "colour", "picker", "eyedropper", "hex", "rgb", "hsl", "swiftui", "sample"]
         case .keepAwake:
             ["awake", "sleep", "caffeinate", "display", "battery", "power", "timer"]
+        case .dockPreview:
+            ["dock", "preview", "thumbnail", "window", "hover", "close", "desktop", "screen recording"]
         case .focusFollowsMouse:
             ["focus", "mouse", "pointer", "hover", "window", "raise", "activate", "excluded", "apps", "delay"]
         case .windowSnapping:
@@ -115,7 +120,7 @@ enum SettingsGroup: CaseIterable, Identifiable {
         switch self {
         case .app: [.general, .menuBar, .developer]
         case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake]
-        case .windows: [.windowSnapping, .focusFollowsMouse, .autoQuit]
+        case .windows: [.windowSnapping, .focusFollowsMouse, .dockPreview, .autoQuit]
         case .input: [.remap, .middleClick]
         }
     }
@@ -160,6 +165,7 @@ final class SettingsNavigation: ObservableObject {
         group.panes.filter { pane in
             (pane != .developer || general.showsDeveloperSettings)
                 && (pane != .volumeMixer || VolumeMixer.isSupported)
+                && (pane != .dockPreview || DockPreview.isSupported)
                 && pane.matches(search)
         }
     }
@@ -176,6 +182,7 @@ struct SettingsSidebar: View {
     @ObservedObject var remapSettings: RemapSettings
     @ObservedObject var windowSnappingSettings: WindowSnappingSettings
     @ObservedObject var focusFollowsMouseSettings: FocusFollowsMouseSettings
+    @ObservedObject var dockPreviewSettings: DockPreviewSettings
     @ObservedObject var keepAwakeSettings: KeepAwakeSettings
     @ObservedObject var colorPickerSettings: ColorPickerSettings
     @ObservedObject var volumeMixerSettings: VolumeMixerSettings
@@ -227,6 +234,7 @@ struct SettingsSidebar: View {
         case .remap: remapSettings.isEnabled
         case .windowSnapping: windowSnappingSettings.isEnabled
         case .focusFollowsMouse: focusFollowsMouseSettings.isEnabled
+        case .dockPreview: dockPreviewSettings.isEnabled
         case .keepAwake: keepAwakeSettings.isEnabled
         case .colorPicker: colorPickerSettings.isEnabled
         case .volumeMixer: volumeMixerSettings.isEnabled
@@ -246,6 +254,7 @@ struct SettingsDetail: View {
     let remap: Remap
     let windowSnapping: WindowSnapping
     let focusFollowsMouse: FocusFollowsMouse
+    let dockPreview: DockPreview
     let keepAwake: KeepAwake
     let colorPicker: ScreenColorPicker
     let volumeMixer: VolumeMixer
@@ -272,6 +281,8 @@ struct SettingsDetail: View {
                     windowSnapping.settingsPane()
                 case .focusFollowsMouse:
                     focusFollowsMouse.settingsPane()
+                case .dockPreview:
+                    dockPreview.settingsPane()
                 case .keepAwake:
                     keepAwake.settingsPane()
                 case .colorPicker:

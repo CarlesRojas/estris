@@ -21,6 +21,15 @@ struct MenuBarMenu: View {
     let openSettings: () -> Void
     let quit: () -> Void
 
+    /// Whether any group shows above Settings and Quit.
+    private var showsAnyGroup: Bool {
+        let mixer = mixerSettings.isEnabled && VolumeMixer.isSupported
+            && ((settings.showsSystem && (settings.showsOutput || settings.showsInput)) || settings.showsApps)
+        let clipboard = clipboardSettings.isEnabled && (settings.showsClipboardHistory || settings.showsClearHistory)
+        let colorPicker = colorPickerSettings.isEnabled && (settings.showsColorPicker || settings.showsRecentColors)
+        return mixer || clipboard || colorPicker
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if mixerSettings.isEnabled && VolumeMixer.isSupported {
@@ -35,6 +44,10 @@ struct MenuBarMenu: View {
                 }
                 if settings.showsApps {
                     group("Apps Volume") {
+                        if !mixerState.canChangeApps {
+                            Text("Allow System Audio Recording to change each app's sound.")
+                                .foregroundStyle(.orange)
+                        }
                         if mixerState.apps.isEmpty {
                             Text("No app is playing sound.")
                                 .foregroundStyle(.secondary)
@@ -42,7 +55,8 @@ struct MenuBarMenu: View {
                         ForEach(mixerState.apps) { app in
                             AppSoundRow(
                                 app: app, sound: mixerSettings.sound(of: app.key), devices: mixerState.outputDevices, mixer: mixer,
-                                showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages
+                                showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages,
+                                canChange: mixerState.canChangeApps
                             )
                         }
                     }
@@ -81,6 +95,8 @@ struct MenuBarMenu: View {
                 menuButton("Settings", symbol: "gearshape", action: openSettings)
                 menuButton("Quit", symbol: "power", action: quit)
             }
+            // Set apart from the groups above: three times their gap.
+            .padding(.top, showsAnyGroup ? 16 : 0)
         }
         .padding(Self.padding)
         .frame(width: Self.width)

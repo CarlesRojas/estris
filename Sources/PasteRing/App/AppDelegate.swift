@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var remap = Remap(log: log)
     private lazy var windowSnapping = WindowSnapping(log: log)
     private lazy var focusFollowsMouse = FocusFollowsMouse(log: log)
+    private lazy var dockPreview = DockPreview(log: log)
     private lazy var keepAwake = KeepAwake(log: log)
     private let colorPicker = ScreenColorPicker()
     private lazy var volumeMixer = VolumeMixer(log: log)
@@ -30,6 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         remap.start()
         windowSnapping.start()
         focusFollowsMouse.start()
+        dockPreview.start()
         keepAwake.start()
         colorPicker.start()
         volumeMixer.start()
@@ -45,11 +47,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         // Key mappings set on keyboards outlive the app; take them back.
         remap.stop()
+        // An automatically hidden Dock held showing by Dock Preview hides itself again.
+        DockHold.end()
     }
 
     private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, keepAwake: keepAwake, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, dockPreview: dockPreview, keepAwake: keepAwake, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
         }
         settingsWindow?.show()
     }

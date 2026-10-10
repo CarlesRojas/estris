@@ -8,12 +8,14 @@ where Tab: CaseIterable & Hashable & RawRepresentable, Tab.RawValue == String, T
     let summary: LocalizedStringKey
     /// The utility's on/off switch; nil for panes without one.
     var isOn: Binding<Bool>?
+    /// Asked for when the switch is turned on, if any isn't allowed yet.
+    var permissions: [PermissionUse] = []
     @Binding var tab: Tab
     @ViewBuilder let content: (Tab) -> Content
 
     var body: some View {
         VStack(spacing: 0) {
-            UtilityHeader(title: pane.title, symbol: pane.symbol, summary: summary, isOn: isOn)
+            UtilityHeader(title: pane.title, symbol: pane.symbol, summary: summary, isOn: isOn, permissions: permissions)
 
             Picker("View", selection: $tab) {
                 ForEach(Array(Tab.allCases), id: \.self) { tab in

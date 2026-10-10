@@ -45,6 +45,9 @@
 "After 30 seconds" = "Após 30 segundos";
 "After 5 seconds" = "Após 5 segundos";
 "All Utilities" = "Todos os utilitários";
+"Allow" = "Permitir";
+"Allow System Audio Recording to change each app's sound." = "Permita a Gravação de Áudio do Sistema para mudar o som de cada app.";
+"Allow what %@ needs?" = "Permitir o que %@ precisa?";
 "Allowed" = "Permitido";
 "Already mapped above" = "Já mapeado acima";
 "Already mapped on %@" = "Já mapeado em %@";
@@ -85,6 +88,7 @@
 "Click to change" = "Clique para alterar";
 "Clipboard" = "Área de Transferência";
 "Clipboard history is empty" = "O histórico da Área de Transferência está vazio";
+"Close Window" = "Fechar janela";
 "Color" = "Cor";
 "Color Picker" = "Seletor de cores";
 "Copied" = "Copiado";
@@ -95,6 +99,7 @@
 "Create Mapping" = "Criar mapeamento";
 "Custom color" = "Cor personalizada";
 "Date format" = "Formato de data";
+"Debugging" = "Depuração";
 "Default" = "Padrão";
 "Delete" = "Apagar";
 "Delete all clipboard entries?" = "Apagar todos os itens da Área de Transferência?";
@@ -106,6 +111,7 @@
 "Device" = "Dispositivo";
 "Dim screen" = "Escurecer tela";
 "Display and Keyboard" = "Tela e teclado";
+"Dock Preview" = "Pré-visualização do Dock";
 "Don't keep awake" = "Não manter acordado";
 "Down" = "Pressionado";
 "Down Arrow" = "Seta para baixo";
@@ -211,6 +217,7 @@
 "No events yet" = "Ainda não há eventos";
 "Not granted" = "Não concedido";
 "Not keeping awake" = "Sem manter acordado";
+"Not Now" = "Agora não";
 "Nothing" = "Nada";
 "Nothing copied yet." = "Nada copiado ainda.";
 "Nothing logged yet." = "Nada registrado ainda.";
@@ -220,10 +227,21 @@
 "On battery" = "Na bateria";
 "On power adapter" = "No adaptador de energia";
 "Only the first mapping for a key or button applies." = "Somente o primeiro mapeamento de uma tecla ou botão é aplicado.";
+"Only to bring the window under the pointer to the front." = "Apenas para trazer para a frente a janela sob o ponteiro.";
+"Only to change an app's volume or the device it plays on. Nothing is recorded." = "Apenas para mudar o volume de um app ou o dispositivo em que ele toca. Nada é gravado.";
+"Only to know which Dock icon is under the pointer, and to bring forward or close the window you pick." = "Apenas para saber qual ícone do Dock está sob o ponteiro, e para trazer para a frente ou fechar a janela que você escolher.";
+"Only to move and resize windows." = "Apenas para mover e redimensionar janelas.";
+"Only to paste the entry you pick into the app you're working in." = "Apenas para colar a entrada escolhida no app em que você está trabalhando.";
+"Only to read and change the keys and buttons you map." = "Apenas para ler e mudar as teclas e botões que você mapear.";
+"Only to see when an app's last window closes." = "Apenas para ver quando a última janela de um app fecha.";
+"Only to send the middle click." = "Apenas para enviar o clique do meio.";
+"Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Apenas para mostrar uma miniatura do que cada janela mostra. Nada é salvo nem enviado.";
 "Open Accessibility Settings" = "Abrir Ajustes de Acessibilidade";
+"Open after hovering for" = "Abrir após passar por cima por";
 "Open at login" = "Abrir ao iniciar sessão";
 "Open overlay" = "Abrir o painel";
 "Open System Settings" = "Abrir Ajustes do Sistema";
+"Optional, only to show the color and its value under the loupe while you move." = "Opcional, apenas para mostrar a cor e seu valor sob a lupa enquanto você move o ponteiro.";
 "Other" = "Outras";
 "Other source" = "Outra origem";
 "Output" = "Saída";
@@ -245,6 +263,7 @@
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Pressione o atalho de novo para o tamanho exato, ou mantenha ⌘ pressionada ao arrastar.";
 "Press keys…" = "Pressione as teclas…";
 "Press the new shortcut, or Esc to cancel" = "Pressione o novo atalho, ou Esc para cancelar";
+"Previews" = "Pré-visualizações";
 "Previous Desktop" = "Mesa anterior";
 "Previous Track" = "Faixa anterior";
 "Print Screen" = "Print Screen";
@@ -266,6 +285,7 @@
 "Reset Appearance to Defaults" = "Redefinir a aparência padrão";
 "Reset to Defaults" = "Redefinir para o padrão";
 "Resize side-by-side windows together" = "Redimensionar juntas as janelas lado a lado";
+"Rest the pointer on an app in the Dock to see its windows, and click one to open it." = "Deixe o ponteiro sobre um app no Dock para ver suas janelas, e clique em uma para abri-la.";
 "Restore" = "Restaurar";
 "Return" = "Return";
 "Rewind" = "Retroceder";
@@ -282,6 +302,7 @@
 "Ring menu" = "Menu em anel";
 "Ring shows" = "O anel mostra";
 "Same as System" = "Igual ao sistema";
+"Screen Recording" = "Gravação de Tela";
 "Screenshot of Screen" = "Captura da tela";
 "Screenshot of Selection" = "Captura da seleção";
 "Screenshot Tools" = "Ferramentas de captura de tela";
@@ -294,12 +315,15 @@
 "Shadow" = "Sombra";
 "Shortcut" = "Atalho";
 "Shortcuts" = "Atalhos";
+"Show a button to close each window" = "Mostrar um botão para fechar cada janela";
 "Show Apps Volume" = "Mostrar Volume dos apps";
 "Show Clear History button" = "Mostrar o botão Limpar histórico";
 "Show delete button" = "Mostrar botão de apagar";
 "Show Desktop" = "Mostrar mesa";
 "Show device pickers" = "Mostrar seletores de dispositivo";
+"Show Dock Preview's hover area" = "Mostrar a área da Pré-visualização do Dock";
 "Show Microphone" = "Mostrar Microfone";
+"Show only windows on the current desktop" = "Mostrar apenas janelas da mesa atual";
 "Show Output" = "Mostrar Saída";
 "Show Pick a Color button" = "Mostrar o botão Escolher uma cor";
 "Show recent colors" = "Mostrar cores recentes";
@@ -309,6 +333,7 @@
 "Show when entries were copied" = "Mostrar quando os itens foram copiados";
 "Side edges near the bottom: bottom half" = "Bordas laterais perto da base: metade inferior";
 "Side edges near the top: top half" = "Bordas laterais perto do topo: metade superior";
+"Size" = "Tamanho";
 "Skip windows when moving faster than" = "Ignorar janelas ao mover mais rápido que";
 "Skips text copied from password fields and password managers." = "Ignora o texto copiado de campos de senha e gerenciadores de senhas.";
 "Sleep after being idle for" = "Repousar após inatividade de";
@@ -328,8 +353,10 @@
 "Stops your Mac and its display from going to sleep." = "Impede que o Mac e a tela entrem em repouso.";
 "Style" = "Estilo";
 "Swap From and To" = "Inverter origem e destino";
+"Switch windows with the scroll wheel" = "Trocar de janela com a roda do mouse";
 "Symbols" = "Símbolos";
 "System" = "Sistema";
+"System Audio Recording" = "Gravação de Áudio do Sistema";
 "System setting" = "Ajuste do sistema";
 "System Volume" = "Volume do sistema";
 "Tab" = "Tab";
@@ -370,4 +397,14 @@
 "Width" = "Largura";
 "Window Snapping" = "Encaixe de janelas";
 "Windows & Apps" = "Janelas e apps";
+"Without it, Auto Quit can't do anything." = "Sem ela, o Encerramento automático não pode fazer nada.";
+"Without it, Dock Preview can't do anything." = "Sem ela, a Pré-visualização do Dock não pode fazer nada.";
+"Without it, each window shows its app's icon instead of a thumbnail." = "Sem ela, cada janela mostra o ícone do app em vez de uma miniatura.";
+"Without it, Focus Follows Mouse can't do anything." = "Sem ela, o Foco sob o ponteiro não pode fazer nada.";
+"Without it, key-to-key mappings still work (picked from the list); mouse buttons, system actions, recording by pressing and the Event Viewer don't." = "Sem ela, os mapeamentos de tecla para tecla ainda funcionam (escolhidos na lista); botões do mouse, ações do sistema, gravar pressionando e o Visualizador de eventos não.";
+"Without it, macOS's own loupe is used, and the color shows once copied." = "Sem ela, é usada a lupa do macOS, e a cor aparece depois de copiada.";
+"Without it, Middle Click can't do anything." = "Sem ela, o Clique do meio não pode fazer nada.";
+"Without it, the history still records, and picking an entry copies it to paste yourself with ⌘V." = "Sem ela, o histórico continua sendo gravado, e escolher uma entrada a copia para você colar com ⌘V.";
+"Without it, the output and the microphone still work, but not each app's sound." = "Sem ela, a saída e o microfone continuam funcionando, mas não o som de cada app.";
+"Without it, Window Snapping can't do anything." = "Sem ela, o Encaixe de janelas não pode fazer nada.";
 "§ (Section)" = "§ (Seção)";
