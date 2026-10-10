@@ -55,6 +55,16 @@ final class DockPreview {
     private var lastOnIcon: NSPoint?
     /// The debugging drawing of that area, when turned on in Developer settings.
     private var areaPanel: NSPanel?
+    /// The pointer's speed, smoothed over the last few moves, in points per second.
+    private var speed: CGFloat = 0
+    private var lastMove: (point: NSPoint, time: TimeInterval)?
+    /// Whether the way up to the panel is being ignored: the pointer is slow or still over
+    /// another Dock icon, so that app's preview comes instead.
+    private var isCorridorIgnored = false
+    /// Checks again a moment after the last move, as a pointer that stopped sends none.
+    private var restCheck: DispatchWorkItem?
+    /// Slower than this over another icon means the user wants that app.
+    private static let slowSpeed: CGFloat = 150
     /// The last thumbnail of each window, shown at once the next time.
     private var thumbnailCache: [CGWindowID: CGImage] = [:]
 
@@ -141,9 +151,34 @@ final class DockPreview {
             layoutRead = Date()
         }
 
+        let now = ProcessInfo.processInfo.systemUptime
+        if let lastMove, now > lastMove.time {
+            let moved = hypot(point.x - lastMove.point.x, point.y - lastMove.point.y) / CGFloat(now - lastMove.time)
+            speed = speed * 0.6 + moved * 0.4
+        }
+        lastMove = (point, now)
+        isCorridorIgnored = false
+
         if let shown {
-            if contentFrame.insetBy(dx: -6, dy: -6).contains(point) || corridor(to: shown).contains(point) {
+            if contentFrame.insetBy(dx: -6, dy: -6).contains(point) {
                 cancelHide()
+                cancelOpen()
+                return
+            }
+            if corridor(to: shown).contains(point) {
+                cancelHide()
+                // Over another icon, slow or still: that app, not the way up.
+                if layout.isNear(point), let item = DockItems.item(at: point),
+                   item.app.processIdentifier != shown.app.processIdentifier {
+                    if speed < Self.slowSpeed {
+                        isCorridorIgnored = true
+                        scheduleOpen(item, delay: min(settings.openDelay.seconds, 0.1))
+                    } else {
+                        cancelOpen()
+                        checkAtRest()
+                    }
+                    return
+                }
                 cancelOpen()
                 return
             }
@@ -192,6 +227,21 @@ final class DockPreview {
         }
     }
 
+    /// A pointer that stops sends no more moves: treat it as still a moment after the last one.
+    private func checkAtRest() {
+        restCheck?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, self.shown != nil else { return }
+                self.speed = 0
+                self.lastMove = nil
+                self.pointerMoved(NSEvent.mouseLocation)
+            }
+        }
+        restCheck = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
+    }
+
     /// Shows the panel, the icon and the way between them, tinted, over everything and letting
     /// clicks through, while Developer > Settings asks for it.
     private func drawArea() {
@@ -218,6 +268,7 @@ final class DockPreview {
             let origin = screen.frame.origin
             let local = { (point: NSPoint) in NSPoint(x: point.x - origin.x, y: point.y - origin.y) }
             view.corridor = corridor(to: shown).corners.map(local)
+            view.isCorridorIgnored = isCorridorIgnored
             view.rects = [contentFrame.insetBy(dx: -6, dy: -6), shown.frame].map { $0.offsetBy(dx: -origin.x, dy: -origin.y) }
             view.needsDisplay = true
         }
@@ -326,6 +377,9 @@ final class DockPreview {
         captureTask = nil
         shown = nil
         lastOnIcon = nil
+        restCheck?.cancel()
+        restCheck = nil
+        isCorridorIgnored = false
         areaPanel?.orderOut(nil)
         contentFrame = .zero
         panel?.orderOut(nil)
@@ -548,6 +602,8 @@ private struct Corridor {
 /// them in orange.
 private final class AreaView: NSView {
     var corridor: [NSPoint] = []
+    /// Faded while it is being ignored (the pointer slow over another icon).
+    var isCorridorIgnored = false
     var rects: [NSRect] = []
 
     override func draw(_ dirtyRect: NSRect) {
@@ -562,9 +618,9 @@ private final class AreaView: NSView {
         path.move(to: first)
         corridor.dropFirst().forEach(path.line(to:))
         path.close()
-        NSColor.systemOrange.withAlphaComponent(0.25).setFill()
+        NSColor.systemOrange.withAlphaComponent(isCorridorIgnored ? 0.06 : 0.25).setFill()
         path.fill()
-        NSColor.systemOrange.setStroke()
+        NSColor.systemOrange.withAlphaComponent(isCorridorIgnored ? 0.3 : 1).setStroke()
         path.lineWidth = 1.5
         path.stroke()
     }
