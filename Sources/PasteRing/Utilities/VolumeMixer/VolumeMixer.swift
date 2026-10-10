@@ -44,8 +44,9 @@ final class VolumeMixer {
     /// A refresh asked for while one is waiting: one event fires several listeners at once.
     private var refreshQueued = false
     private var lastListSummary = ""
-    /// Apps heard playing since the mixer started; they stay listed while they're running.
-    private var heard: Set<pid_t> = []
+    /// Every app with an audio connection, playing or not; changed ones keep their sound even
+    /// while they aren't listed.
+    private var running: [AudioApp] = []
     /// One `TapEngine` per app whose sound is changed, by the app's process.
     private var engines: [pid_t: AnyObject] = [:]
     /// Audio objects of apps whose engine failed, so it isn't tried again on every change.
@@ -96,7 +97,7 @@ final class VolumeMixer {
             systemListeners = []
             volumeListeners = []
             processListeners = [:]
-            heard = []
+            running = []
             failed = [:]
             stopAllEngines()
             state.apps = []
@@ -173,10 +174,10 @@ final class VolumeMixer {
         guard settings.isEnabled, #available(macOS 14.4, *) else { return }
         let excluded = settings.excludedApps
         let running = AudioApps.current().filter { app in app.bundleID.map { !excluded.contains($0) } ?? true }
-        for app in running where app.isPlaying { heard.insert(app.pid) }
-        state.apps = running.filter { heard.contains($0.pid) || !settings.sound(of: $0.key).isUntouched }
+        self.running = running
+        // Only what is making sound right now: a paused app leaves the list at once.
+        state.apps = running.filter(\.isPlaying)
         logListIfChanged(running)
-        heard.formIntersection(running.map(\.pid))
 
         // Starting or stopping playback changes these, not the list of processes. Every audio
         // process is followed, including helpers not yet matched to an app. Some macOS versions
@@ -226,7 +227,7 @@ final class VolumeMixer {
         // Snaps to the middle, where the app plays as it is.
         sound.volume = abs(volume - 1) < 0.03 ? 1 : volume
         settings.setSound(sound, of: app.key)
-        reconcileEngines(state.apps)
+        reconcileEngines(running)
     }
 
     func toggleMute(of app: AudioApp) {
@@ -234,7 +235,7 @@ final class VolumeMixer {
         sound.isMuted.toggle()
         settings.setSound(sound, of: app.key)
         failed[app.pid] = nil
-        reconcileEngines(state.apps)
+        reconcileEngines(running)
     }
 
     /// Nil plays the app on the system output.
@@ -244,7 +245,7 @@ final class VolumeMixer {
         sound.outputName = uid.flatMap { uid in state.outputDevices.first { $0.uid == uid }?.name }
         settings.setSound(sound, of: app.key)
         failed[app.pid] = nil
-        reconcileEngines(state.apps)
+        reconcileEngines(running)
     }
 
     /// Every app back to playing as it is.
@@ -309,7 +310,7 @@ final class VolumeMixer {
         for (pid, engine) in engines where !kept.contains(pid) {
             (engine as? TapEngine)?.stop()
             engines[pid] = nil
-            log("\(state.apps.first { $0.pid == pid }?.name ?? "\(pid)"): back to its own sound")
+            log("\(running.first { $0.pid == pid }?.name ?? "\(pid)"): back to its own sound")
         }
     }
 
