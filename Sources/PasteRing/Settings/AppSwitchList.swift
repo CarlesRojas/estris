@@ -66,6 +66,8 @@ struct AppSwitchList: View {
             }
         }
         .toggleStyle(.switch)
+        // Not excluded is the default.
+        .resetMenu(isExcluded(app), to: false)
         .disabled(locked[app.bundleID] != nil)
     }
 

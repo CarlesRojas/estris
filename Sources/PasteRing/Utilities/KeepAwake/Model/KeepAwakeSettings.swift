@@ -45,6 +45,10 @@ enum KeepAwakeDuration: String, CaseIterable, Identifiable {
 /// Keep Awake preferences, persisted in UserDefaults.
 @MainActor
 final class KeepAwakeSettings: ObservableObject {
+    static let defaultOnPower = KeepAwakeDuration.indefinitely
+    static let defaultOnBattery = KeepAwakeDuration.oneHour
+    static let defaultStartsScreenSaver = true
+
     private let defaults = UserDefaults.standard
 
     @Published var isEnabled: Bool {
@@ -68,18 +72,18 @@ final class KeepAwakeSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        defaults.register(defaults: [Keys.startsScreenSaver: true])
+        defaults.register(defaults: [Keys.startsScreenSaver: Self.defaultStartsScreenSaver])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         startsScreenSaver = defaults.bool(forKey: Keys.startsScreenSaver)
-        onPower = KeepAwakeDuration(rawValue: defaults.string(forKey: Keys.onPower) ?? "") ?? .indefinitely
-        onBattery = KeepAwakeDuration(rawValue: defaults.string(forKey: Keys.onBattery) ?? "") ?? .oneHour
+        onPower = KeepAwakeDuration(rawValue: defaults.string(forKey: Keys.onPower) ?? "") ?? Self.defaultOnPower
+        onBattery = KeepAwakeDuration(rawValue: defaults.string(forKey: Keys.onBattery) ?? "") ?? Self.defaultOnBattery
     }
 
     /// Back to the default durations and the screen saver; the on/off switch stays.
     func reset() {
-        onPower = .indefinitely
-        onBattery = .oneHour
-        startsScreenSaver = true
+        onPower = Self.defaultOnPower
+        onBattery = Self.defaultOnBattery
+        startsScreenSaver = Self.defaultStartsScreenSaver
     }
 
     private enum Keys {

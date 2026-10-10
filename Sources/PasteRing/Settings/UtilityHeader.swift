@@ -10,6 +10,8 @@ struct UtilityHeader: View {
     var isOn: Binding<Bool>?
     /// Asked for when the switch is turned on, if any isn't allowed yet.
     var permissions: [PermissionUse] = []
+    /// What the switch is at first, for its Reset to Default.
+    var defaultIsOn = false
     @State private var asksForPermissions = false
 
     var body: some View {
@@ -32,6 +34,7 @@ struct UtilityHeader: View {
                     .toggleStyle(.switch)
                     .labelsHidden()
                     .controlSize(.large)
+                    .resetMenu(isOn, to: defaultIsOn, fillsRow: false)
                     .onChange(of: isOn.wrappedValue) { on in
                         if on, !missing.isEmpty { asksForPermissions = true }
                     }

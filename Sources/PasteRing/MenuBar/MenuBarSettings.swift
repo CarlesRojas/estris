@@ -3,6 +3,22 @@ import Foundation
 /// Menu bar preferences, persisted in UserDefaults: the icon, and what the menu shows.
 @MainActor
 final class MenuBarSettings: ObservableObject {
+    /// What each setting is at first, for Reset to Defaults and each row's Reset to Default.
+    enum Default {
+        static let icon = MenuBarIcon.app
+        static let iconColor: String? = nil
+        static let showsSystem = true
+        static let showsOutput = true
+        static let showsInput = true
+        static let showsApps = true
+        static let showsDevices = true
+        static let showsPercentages = false
+        static let showsClipboardHistory = false
+        static let showsClearHistory = true
+        static let showsColorPicker = true
+        static let showsRecentColors = true
+    }
+
     private let defaults = UserDefaults.standard
 
     /// One of `MenuBarIcon.all`.
@@ -75,18 +91,19 @@ final class MenuBarSettings: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
-            Keys.showsSystem: true,
-            Keys.showsOutput: true,
-            Keys.showsInput: true,
-            Keys.showsApps: true,
-            Keys.showsDevices: true,
-            Keys.showsPercentages: false,
+            Keys.showsSystem: Default.showsSystem,
+            Keys.showsOutput: Default.showsOutput,
+            Keys.showsInput: Default.showsInput,
+            Keys.showsApps: Default.showsApps,
+            Keys.showsDevices: Default.showsDevices,
+            Keys.showsPercentages: Default.showsPercentages,
+            Keys.showsClipboardHistory: Default.showsClipboardHistory,
             Keys.clipboardEntries: Self.defaultClipboardEntries,
-            Keys.showsClearHistory: true,
-            Keys.showsColorPicker: true,
-            Keys.showsRecentColors: true,
+            Keys.showsClearHistory: Default.showsClearHistory,
+            Keys.showsColorPicker: Default.showsColorPicker,
+            Keys.showsRecentColors: Default.showsRecentColors,
         ])
-        icon = defaults.string(forKey: Keys.icon).flatMap { MenuBarIcon.all.contains($0) ? $0 : nil } ?? MenuBarIcon.app
+        icon = defaults.string(forKey: Keys.icon).flatMap { MenuBarIcon.all.contains($0) ? $0 : nil } ?? Default.icon
         iconColor = defaults.string(forKey: Keys.iconColor)
         showsSystem = defaults.bool(forKey: Keys.showsSystem)
         showsOutput = defaults.bool(forKey: Keys.showsOutput)
@@ -103,19 +120,19 @@ final class MenuBarSettings: ObservableObject {
 
     /// PasteRing's icon, and the menu as it starts out.
     func reset() {
-        icon = MenuBarIcon.app
-        iconColor = nil
-        showsSystem = true
-        showsOutput = true
-        showsInput = true
-        showsApps = true
-        showsDevices = true
-        showsPercentages = false
-        showsClipboardHistory = false
+        icon = Default.icon
+        iconColor = Default.iconColor
+        showsSystem = Default.showsSystem
+        showsOutput = Default.showsOutput
+        showsInput = Default.showsInput
+        showsApps = Default.showsApps
+        showsDevices = Default.showsDevices
+        showsPercentages = Default.showsPercentages
+        showsClipboardHistory = Default.showsClipboardHistory
         clipboardEntries = Self.defaultClipboardEntries
-        showsClearHistory = true
-        showsColorPicker = true
-        showsRecentColors = true
+        showsClearHistory = Default.showsClearHistory
+        showsColorPicker = Default.showsColorPicker
+        showsRecentColors = Default.showsRecentColors
     }
 
     private enum Keys {

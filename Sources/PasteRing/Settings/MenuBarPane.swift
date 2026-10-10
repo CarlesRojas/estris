@@ -24,37 +24,51 @@ struct MenuBarPane: View {
                         }
                     }
                     .padding(.vertical, 4)
+                    .resetMenu($settings.icon, to: MenuBarSettings.Default.icon)
                     Toggle("Custom color", isOn: hasCustomColor)
+                        .resetMenu($settings.iconColor, to: MenuBarSettings.Default.iconColor)
                     if settings.iconColor != nil {
                         ColorPicker("Color", selection: customColor, supportsOpacity: false)
+                            .resetMenu($settings.iconColor, to: MenuBarSettings.Default.iconColor)
                     }
                 }
                 Section("Volume Mixer") {
                     Toggle("Show System Volume", isOn: $settings.showsSystem)
+                        .resetMenu($settings.showsSystem, to: MenuBarSettings.Default.showsSystem)
                     Group {
                         Toggle("Show Output", isOn: $settings.showsOutput)
+                            .resetMenu($settings.showsOutput, to: MenuBarSettings.Default.showsOutput)
                         Toggle("Show Microphone", isOn: $settings.showsInput)
+                            .resetMenu($settings.showsInput, to: MenuBarSettings.Default.showsInput)
                     }
                     .padding(.leading, 16)
                     .disabled(!settings.showsSystem)
                     Toggle("Show Apps Volume", isOn: $settings.showsApps)
+                        .resetMenu($settings.showsApps, to: MenuBarSettings.Default.showsApps)
                     Toggle("Show device pickers", isOn: $settings.showsDevices)
+                        .resetMenu($settings.showsDevices, to: MenuBarSettings.Default.showsDevices)
                     Toggle("Show volume percentages", isOn: $settings.showsPercentages)
+                        .resetMenu($settings.showsPercentages, to: MenuBarSettings.Default.showsPercentages)
                 }
                 Section("Clipboard") {
                     Toggle("Show recent entries", isOn: $settings.showsClipboardHistory)
+                        .resetMenu($settings.showsClipboardHistory, to: MenuBarSettings.Default.showsClipboardHistory)
                     Stepper(value: $settings.clipboardEntries, in: 1...MenuBarSettings.maxClipboardEntries) {
                         LabeledContent("Entries") {
                             Text(verbatim: "\(settings.clipboardEntries)")
                                 .monospacedDigit()
                         }
                     }
+                    .resetMenu($settings.clipboardEntries, to: MenuBarSettings.defaultClipboardEntries)
                     .disabled(!settings.showsClipboardHistory)
                     Toggle("Show Clear History button", isOn: $settings.showsClearHistory)
+                        .resetMenu($settings.showsClearHistory, to: MenuBarSettings.Default.showsClearHistory)
                 }
                 Section("Color Picker") {
                     Toggle("Show Pick a Color button", isOn: $settings.showsColorPicker)
+                        .resetMenu($settings.showsColorPicker, to: MenuBarSettings.Default.showsColorPicker)
                     Toggle("Show recent colors", isOn: $settings.showsRecentColors)
+                        .resetMenu($settings.showsRecentColors, to: MenuBarSettings.Default.showsRecentColors)
                 }
                 Section {
                     Button("Reset to Defaults") { settings.reset() }

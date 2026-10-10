@@ -12,6 +12,13 @@ final class AppearanceSettings: ObservableObject {
 
     private static let key = "appearance"
 
+    /// The default look, for each row's Reset to Default.
+    static let defaultTint = color(from: Stored().tint)
+    static let defaultTintOpacity = Stored().tintOpacity
+    static let defaultSelectedTintOpacity = Stored().selectedTintOpacity
+    static let defaultShadowRadius = Stored().shadowRadius
+    static let defaultBackdropDim = Stored().backdropDim
+
     private struct Stored: Codable {
         var tint: [Double] = [0.5, 0.5, 0.5]
         var tintOpacity = 0.2

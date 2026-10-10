@@ -61,6 +61,7 @@ struct VolumeMixerPane: View {
                     }
                     ForEach(state.apps) { app in
                         AppSoundRow(app: app, sound: settings.sound(of: app.key), devices: state.outputDevices, mixer: mixer, canChange: state.canChangeApps)
+                            .resetMenu(isDefault: settings.sound(of: app.key).isUntouched) { mixer.resetSound(of: app) }
                     }
                 }
             }

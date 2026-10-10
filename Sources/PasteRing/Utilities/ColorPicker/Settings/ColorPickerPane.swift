@@ -27,6 +27,7 @@ struct ColorPickerPane: View {
                     LabeledContent("Pick a color") {
                         ShortcutRecorder(shortcut: $settings.shortcut)
                     }
+                    .resetMenu($settings.shortcut, to: ColorPickerSettings.defaultShortcut)
                 }
                 Section("Copy as") {
                     Picker("Format", selection: $settings.format) {
@@ -35,8 +36,10 @@ struct ColorPickerPane: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    .resetMenu($settings.format, to: ColorPickerSettings.defaultFormat)
                     if settings.format == .hex {
                         Toggle("Include # prefix", isOn: $settings.hashPrefix)
+                            .resetMenu($settings.hashPrefix, to: ColorPickerSettings.defaultHashPrefix)
                     }
                     LabeledContent("Example") {
                         Text(verbatim: settings.format.string(red: 1, green: 0.5, blue: 0, hashPrefix: settings.hashPrefix))

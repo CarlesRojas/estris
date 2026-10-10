@@ -34,14 +34,19 @@ struct DockPreviewPane: View {
                                 .frame(width: 56, alignment: .trailing)
                         }
                     }
+                    .resetMenu($settings.size, to: DockPreviewSettings.defaultSize)
                     Picker("Open after hovering for", selection: $settings.openDelay) {
                         ForEach(HoverDelay.allCases) { delay in
                             Text(verbatim: delay.title).tag(delay)
                         }
                     }
+                    .resetMenu($settings.openDelay, to: DockPreviewSettings.defaultOpenDelay)
                     Toggle("Show only windows on the current desktop", isOn: $settings.currentDesktopOnly)
+                        .resetMenu($settings.currentDesktopOnly, to: DockPreviewSettings.defaultCurrentDesktopOnly)
                     Toggle("Show a button to close each window", isOn: $settings.showsCloseButton)
+                        .resetMenu($settings.showsCloseButton, to: DockPreviewSettings.defaultShowsCloseButton)
                     Toggle("Switch windows with the scroll wheel", isOn: $settings.scrollSwitchesWindows)
+                        .resetMenu($settings.scrollSwitchesWindows, to: DockPreviewSettings.defaultScrollSwitchesWindows)
                 }
                 Section {
                     Button("Reset to Defaults") { settings.reset() }

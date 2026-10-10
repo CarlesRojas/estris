@@ -4,6 +4,10 @@ import Foundation
 @MainActor
 final class DockPreviewSettings: ObservableObject {
     static let defaultSize: Double = 200
+    static let defaultCurrentDesktopOnly = false
+    static let defaultOpenDelay = HoverDelay.immediately
+    static let defaultShowsCloseButton = true
+    static let defaultScrollSwitchesWindows = false
     /// The previews' height, in points.
     static let sizes: ClosedRange<Double> = 80...320
 
@@ -42,15 +46,15 @@ final class DockPreviewSettings: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
             Keys.size: Self.defaultSize,
-            Keys.currentDesktopOnly: false,
-            Keys.openDelay: HoverDelay.immediately.rawValue,
-            Keys.showsCloseButton: true,
-            Keys.scrollSwitchesWindows: false,
+            Keys.currentDesktopOnly: Self.defaultCurrentDesktopOnly,
+            Keys.openDelay: Self.defaultOpenDelay.rawValue,
+            Keys.showsCloseButton: Self.defaultShowsCloseButton,
+            Keys.scrollSwitchesWindows: Self.defaultScrollSwitchesWindows,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         size = min(max(defaults.double(forKey: Keys.size), Self.sizes.lowerBound), Self.sizes.upperBound)
         currentDesktopOnly = defaults.bool(forKey: Keys.currentDesktopOnly)
-        openDelay = HoverDelay(rawValue: defaults.integer(forKey: Keys.openDelay)) ?? .immediately
+        openDelay = HoverDelay(rawValue: defaults.integer(forKey: Keys.openDelay)) ?? Self.defaultOpenDelay
         showsCloseButton = defaults.bool(forKey: Keys.showsCloseButton)
         scrollSwitchesWindows = defaults.bool(forKey: Keys.scrollSwitchesWindows)
     }
@@ -58,10 +62,10 @@ final class DockPreviewSettings: ObservableObject {
     /// Back to the default size, delay and switches; the on/off switch stays.
     func reset() {
         size = Self.defaultSize
-        currentDesktopOnly = false
-        openDelay = .immediately
-        showsCloseButton = true
-        scrollSwitchesWindows = false
+        currentDesktopOnly = Self.defaultCurrentDesktopOnly
+        openDelay = Self.defaultOpenDelay
+        showsCloseButton = Self.defaultShowsCloseButton
+        scrollSwitchesWindows = Self.defaultScrollSwitchesWindows
     }
 
     private enum Keys {

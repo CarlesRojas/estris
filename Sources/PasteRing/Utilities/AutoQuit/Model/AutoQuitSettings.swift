@@ -36,6 +36,8 @@ final class AutoQuitSettings: ObservableObject {
         "com.apple.finder": String(localized: "The Finder always keeps running"),
     ]
 
+    static let defaultDelay = QuitDelay.oneSecond
+
     private let defaults = UserDefaults.standard
 
     @Published var isEnabled: Bool {
@@ -55,15 +57,15 @@ final class AutoQuitSettings: ObservableObject {
         let defaults = UserDefaults.standard
         // Off until the user turns it on: quitting apps is not something to start doing
         // unasked.
-        defaults.register(defaults: [Keys.isEnabled: false, Keys.delay: QuitDelay.oneSecond.rawValue])
+        defaults.register(defaults: [Keys.isEnabled: false, Keys.delay: Self.defaultDelay.rawValue])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
-        delay = QuitDelay(rawValue: defaults.string(forKey: Keys.delay) ?? "") ?? .oneSecond
+        delay = QuitDelay(rawValue: defaults.string(forKey: Keys.delay) ?? "") ?? Self.defaultDelay
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
     /// Back to the default delay; the on/off switch and excluded apps stay as they are.
     func reset() {
-        delay = .oneSecond
+        delay = Self.defaultDelay
     }
 
     func keepsRunning(_ bundleID: String?) -> Bool {
