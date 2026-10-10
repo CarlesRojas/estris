@@ -18,9 +18,9 @@ final class DockPreview {
     private static let shadowRoom: CGFloat = 24
     /// Between the Dock icon and the panel.
     private static let gap: CGFloat = 6
-    /// How long the pointer may be away from the icon and the panel before it closes: at once,
-    /// checked again on the next turn of the run loop.
-    private static let hideDelay: TimeInterval = 0
+    /// How long the pointer may be away from the icon and the panel before it closes, so it
+    /// can cut a corner on the way up to the panel.
+    private static let hideDelay: TimeInterval = 0.3
 
     let settings = DockPreviewSettings()
     private let state = DockPreviewState()
