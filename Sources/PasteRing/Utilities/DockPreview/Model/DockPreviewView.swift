@@ -93,6 +93,7 @@ private struct PreviewCard: View {
                     }
                     .buttonStyle(CloseButtonStyle())
                     .help("Close Window")
+                    .accessibilityLabel(Text("Close Window"))
                 }
             }
             .frame(width: width)

@@ -11,6 +11,8 @@ struct StackView: View {
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
+    /// With Reduce Motion, the selection moves without sliding or springing.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var width: CGFloat { settings.stackWidth }
     private var height: CGFloat { settings.stackHeight }
@@ -45,6 +47,6 @@ struct StackView: View {
             }
         }
         // No bounce, so the fade and slide read as one smooth motion.
-        .animation(.spring(response: 0.45, dampingFraction: 1), value: state.position)
+        .animation(reduceMotion ? nil : .spring(response: 0.45, dampingFraction: 1), value: state.position)
     }
 }

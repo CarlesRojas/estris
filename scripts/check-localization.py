@@ -18,7 +18,7 @@ LOCALIZATION = ROOT / "Resources" / "Localization"
 # Calls whose first string literal is shown translated.
 CALLS = [
     "String(localized: ", "Text(", "Button(", "Label(", "Toggle(", "Picker(", "Section(",
-    "TextField(", "Stepper(", "LabeledContent(", "ColorPicker(", ".help(", ".alert(",
+    "TextField(", "Stepper(", "LabeledContent(", "ColorPicker(", ".help(", ".alert(", "WarningLabel(",
     ".confirmationDialog(", "placeholder(", "slider(", "picker(", "summary: ", "prompt: ", "reason: ", "without: ",
 ]
 # Enums whose raw values are shown translated.

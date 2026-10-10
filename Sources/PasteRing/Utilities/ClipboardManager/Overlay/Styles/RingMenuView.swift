@@ -11,6 +11,8 @@ struct RingMenuView: View {
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
+    /// With Reduce Motion, the selection moves without sliding or springing.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let count = state.items.count
@@ -50,7 +52,7 @@ struct RingMenuView: View {
             }
         }
         .frame(width: size.width, height: size.height)
-        .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.position)
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.85), value: state.position)
         // A ring of tall cards can be bigger than the screen: shrink it as a whole to fit.
         .scaleEffect(scale)
         .frame(width: size.width * scale, height: size.height * scale)

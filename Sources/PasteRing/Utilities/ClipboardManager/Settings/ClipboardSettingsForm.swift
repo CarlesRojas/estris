@@ -140,6 +140,7 @@ struct ClipboardSettingsForm: View {
                                 }
                                 .buttonStyle(.borderless)
                                 .help("Remove this shortcut")
+                                .accessibilityLabel(Text("Remove this shortcut"))
                             }
                         }
                     }

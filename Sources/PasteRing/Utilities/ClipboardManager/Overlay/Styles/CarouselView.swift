@@ -6,6 +6,8 @@ struct CarouselView: View {
 
     @ObservedObject var state: OverlayState
     @ObservedObject var settings: ClipboardSettings
+    /// With Reduce Motion, the selection moves without sliding or springing.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var frontGrowth: CGFloat {
         ContentCard.fittedHeight(for: state.selectedItem, width: width, height: height) - height
@@ -48,7 +50,7 @@ struct CarouselView: View {
                     .offset(y: height / 2 + max(0, frontGrowth) + 30)
             }
         }
-        .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.selected)
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.85), value: state.selected)
     }
 
     private func offset(_ distance: Int) -> CGFloat {

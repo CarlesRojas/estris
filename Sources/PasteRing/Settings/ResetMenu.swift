@@ -4,8 +4,9 @@ import SwiftUI
 private let rowInset: CGFloat = 8
 
 extension View {
-    /// A right-click menu with Reset to Default, which puts back just this setting. Greyed
-    /// out while it already has its default. As a form row (`fillsRow`), the whole row
+    /// A right-click menu with Reset to Default, which puts back just this setting. None while
+    /// it already has its default: a context menu leaves out what doesn't apply rather than
+    /// dimming it. As a form row (`fillsRow`), the whole row
     /// answers, its background and the form's padding included, not only its text and
     /// controls.
     @ViewBuilder
@@ -31,8 +32,9 @@ private struct ResetMenu: ViewModifier {
 
     func body(content: Content) -> some View {
         content.contextMenu {
-            Button("Reset to Default", action: reset)
-                .disabled(isDefault)
+            if !isDefault {
+                Button("Reset to Default", action: reset)
+            }
         }
     }
 }

@@ -1,7 +1,8 @@
 import AppKit
+import Combine
 import SwiftUI
 
-/// The Settings window, laid out like System Settings: no title, and a fixed-width sidebar
+/// The Settings window, laid out like System Settings: no visible title, and a fixed-width sidebar
 /// running to the top of the window with the close, minimize and zoom buttons inside it.
 ///
 /// The split is AppKit's own (`NSSplitViewController`): SwiftUI's `NavigationSplitView` always
@@ -14,6 +15,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     let window: NSWindow
     private let navigation: SettingsNavigation
+    private var titleObserver: AnyCancellable?
 
     init(general: GeneralSettings, clipboard: ClipboardManager, autoQuit: AutoQuit, middleClick: MiddleClick, remap: Remap, windowSnapping: WindowSnapping, focusFollowsMouse: FocusFollowsMouse, dockPreview: DockPreview, keepAwake: KeepAwake, colorPicker: ScreenColorPicker, volumeMixer: VolumeMixer, menuBarSettings: MenuBarSettings, log: AppLog) {
         let navigation = SettingsNavigation(general: general)
@@ -37,7 +39,6 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         window = NSWindow(contentViewController: split)
         super.init()
 
-        window.title = ""
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
@@ -49,6 +50,11 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         window.isReleasedWhenClosed = false
         window.delegate = self
         window.center()
+        // Not drawn (the title bar is hidden), but named after the open pane in the Window
+        // menu, Mission Control and VoiceOver.
+        titleObserver = navigation.$selection.sink { [weak window] pane in
+            window?.title = (pane ?? .general).title
+        }
     }
 
     func show() {

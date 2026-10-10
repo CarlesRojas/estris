@@ -24,9 +24,24 @@ extension View {
     }
 }
 
+/// A form row's switch at the mini size, as System Settings uses: about the height of the
+/// buttons and pop-ups in other rows, so rows keep one height. The utility's own on/off switch
+/// in the header stays large.
+struct RowSwitchStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Toggle(configuration)
+            .toggleStyle(.switch)
+            .controlSize(.mini)
+    }
+}
+
 private struct SettingsPageMargins: ViewModifier {
-    @ViewBuilder
     func body(content: Content) -> some View {
+        margins(content.toggleStyle(RowSwitchStyle()))
+    }
+
+    @ViewBuilder
+    private func margins(_ content: some View) -> some View {
         if #available(macOS 14, *) {
             content
                 .contentMargins(.horizontal, SettingsLayout.pageMargin, for: .scrollContent)
