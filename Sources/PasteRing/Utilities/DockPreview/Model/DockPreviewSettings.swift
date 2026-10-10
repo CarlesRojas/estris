@@ -45,7 +45,7 @@ final class DockPreviewSettings: ObservableObject {
             Keys.currentDesktopOnly: false,
             Keys.openDelay: HoverDelay.immediately.rawValue,
             Keys.showsCloseButton: true,
-            Keys.scrollSwitchesWindows: true,
+            Keys.scrollSwitchesWindows: false,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         size = min(max(defaults.double(forKey: Keys.size), Self.sizes.lowerBound), Self.sizes.upperBound)
@@ -61,7 +61,7 @@ final class DockPreviewSettings: ObservableObject {
         currentDesktopOnly = false
         openDelay = .immediately
         showsCloseButton = true
-        scrollSwitchesWindows = true
+        scrollSwitchesWindows = false
     }
 
     private enum Keys {
