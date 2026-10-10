@@ -1,2 +1,2 @@
 /* The System Audio Recording permission prompt. */
-"NSAudioCaptureUsageDescription" = "PasteRing usa el sonido de una app solo para reproducirlo con el volumen y en el dispositivo que elijas para ella en el Mezclador de volumen. No se graba nada.";
+"NSAudioCaptureUsageDescription" = "Estris usa el sonido de una app solo para reproducirlo con el volumen y en el dispositivo que elijas para ella en el Mezclador de volumen. No se graba nada.";

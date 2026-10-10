@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds PasteRing.app into ./build.
+# Builds Estris.app into ./build.
 # Signs with SIGN_IDENTITY, else your Apple Development certificate, else ad hoc.
 # Ad-hoc signatures change every build, so macOS forgets the Accessibility permission each
 # time; an Apple Development certificate keeps it.
@@ -10,10 +10,10 @@ cd "$(dirname "$0")/.."
 swift build -c release
 BIN_DIR="$(swift build -c release --show-bin-path)"
 
-APP="build/PasteRing.app"
+APP="build/Estris.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
-cp "$BIN_DIR/PasteRing" "$APP/Contents/MacOS/PasteRing"
+cp "$BIN_DIR/Estris" "$APP/Contents/MacOS/Estris"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 mkdir -p "$APP/Contents/Resources"
 cp -R Resources/Localization/*.lproj "$APP/Contents/Resources/"

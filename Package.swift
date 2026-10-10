@@ -2,9 +2,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "PasteRing",
+    name: "Estris",
     platforms: [.macOS(.v13)],
     targets: [
-        .executableTarget(name: "PasteRing", path: "Sources/PasteRing")
+        .executableTarget(name: "Estris", path: "Sources/Estris")
     ]
 )
