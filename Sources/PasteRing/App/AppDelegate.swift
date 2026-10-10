@@ -8,6 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let general = GeneralSettings()
     private lazy var clipboard = ClipboardManager(general: general)
     private let log = AppLog()
+    private lazy var permissionLog = PermissionLog(log: log)
     private lazy var autoQuit = AutoQuit(log: log)
     private lazy var middleClick = MiddleClick(log: log)
     private lazy var remap = Remap(log: log)
@@ -22,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        permissionLog.start()
         clipboard.start()
         autoQuit.start()
         middleClick.start()

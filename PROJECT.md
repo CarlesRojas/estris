@@ -75,6 +75,7 @@ Device pickers look the same everywhere (Settings and the menu): the device's na
 Click the version in **Settings > General > About** six times to add a **Developer** pane to the sidebar:
 
 - **Logs**: what the utilities noticed and decided (newest first, searchable, and filtered to one utility with the menu next to the search), with **Copy All** (what is shown) for bug reports and **Clear**.
+  - **Permissions** entries: what macOS says about Accessibility, Screen Recording, Input Monitoring, Post Events and System Audio Recording (the last through the private `TCCAccessPreflight`, for the log only), at launch and whenever it changes.
 - **Settings**: status details and settings regular users don't need, including **Hide Developer Settings**.
 
 ## Auto Quit
