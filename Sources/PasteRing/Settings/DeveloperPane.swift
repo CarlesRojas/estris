@@ -17,6 +17,8 @@ struct DeveloperPane: View {
     @State private var search = ""
     /// Only this utility's entries; nil shows every one.
     @State private var source: String?
+    /// The entry just copied with a click, marked for a moment.
+    @State private var copied: UUID?
 
     var body: some View {
         UtilityPane(
@@ -74,14 +76,23 @@ struct DeveloperPane: View {
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(.secondary)
                                     Spacer()
-                                    Text(dateTimeFormat.timeString(from: entry.date))
-                                        .font(.caption.monospacedDigit())
-                                        .foregroundStyle(.secondary)
+                                    if copied == entry.id {
+                                        Label("Copied", systemImage: "checkmark")
+                                            .font(.caption)
+                                            .foregroundStyle(.green)
+                                    } else {
+                                        Text(dateTimeFormat.timeString(from: entry.date))
+                                            .font(.caption.monospacedDigit())
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                                 Text(entry.message)
-                                    .textSelection(.enabled)
                             }
                             .padding(.vertical, 2)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                            // A click copies the line, as Copy All writes it.
+                            .onTapGesture { copy(entry) }
                         }
                     }
                 } header: {
@@ -101,6 +112,15 @@ struct DeveloperPane: View {
             }
             .formStyle(.grouped)
             .settingsPage()
+        }
+    }
+
+    private func copy(_ entry: AppLog.Entry) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(AppLog.text(of: [entry]), forType: .string)
+        copied = entry.id
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            if copied == entry.id { copied = nil }
         }
     }
 
