@@ -280,8 +280,12 @@
 "Shadow" = "Ombra";
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
+"Show Apps" = "Mostra Apps";
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";
+"Show device pickers" = "Mostra els selectors de dispositiu";
+"Show System" = "Mostra Sistema";
+"Show volume percentages" = "Mostra els percentatges de volum";
 "Show when entries were copied" = "Mostra quan es van copiar les entrades";
 "Side edges near the bottom: bottom half" = "Vores laterals a prop de baix: meitat inferior";
 "Side edges near the top: top half" = "Vores laterals a prop de dalt: meitat superior";

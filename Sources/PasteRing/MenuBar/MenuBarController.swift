@@ -11,7 +11,7 @@ final class MenuBarController: NSObject {
     /// Between the menu bar and the menu.
     private static let gap: CGFloat = 4
 
-    private let general: GeneralSettings
+    let settings = MenuBarSettings()
     private let volumeMixer: VolumeMixer
     private let openSettings: () -> Void
     private var statusItem: NSStatusItem?
@@ -19,8 +19,7 @@ final class MenuBarController: NSObject {
     private var observers: Set<AnyCancellable> = []
     private var clickMonitors: [Any] = []
 
-    init(general: GeneralSettings, volumeMixer: VolumeMixer, openSettings: @escaping () -> Void) {
-        self.general = general
+    init(volumeMixer: VolumeMixer, openSettings: @escaping () -> Void) {
         self.volumeMixer = volumeMixer
         self.openSettings = openSettings
     }
@@ -30,7 +29,7 @@ final class MenuBarController: NSObject {
         item.button?.target = self
         item.button?.action = #selector(toggle)
         statusItem = item
-        general.$menuBarIcon
+        settings.$icon
             .sink { [weak self] icon in self?.statusItem?.button?.image = MenuBarIcon.image(for: icon) }
             .store(in: &observers)
     }
@@ -47,6 +46,7 @@ final class MenuBarController: NSObject {
         let panel = panel ?? makePanel()
         self.panel = panel
         let menu = MenuBarMenu(
+            settings: settings,
             mixerSettings: volumeMixer.settings,
             mixerState: volumeMixer.state,
             mixer: volumeMixer,

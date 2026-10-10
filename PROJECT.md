@@ -52,9 +52,11 @@ Every entry in the overlay shows when it was copied next to its trash icon, in t
 
 ## Menu bar
 
-Clicking the menu bar icon opens a menu below it in the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings). It shows the Volume Mixer while that is on (the same System and Apps rows as its pane), then **Settings** and **Quit** side by side at the bottom. A click outside, Esc or another click on the icon closes it.
+Clicking the menu bar icon opens a menu below it in the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings). It shows the Volume Mixer while that is on (the same System and Apps rows as its pane, with the parts chosen in Settings > Menu Bar), then **Settings** and **Quit** side by side at the bottom. A click outside, Esc or another click on the icon closes it.
 
-**Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. **Reset to Defaults** goes back to PasteRing's icon.
+**Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Its **Volume Mixer** section picks what the menu shows of it, all on by default: **Show System**, **Show Apps**, **Show device pickers** and **Show volume percentages**. **Reset to Defaults** goes back to PasteRing's icon and turns them all on.
+
+Device pickers are the same width everywhere (Settings and the menu), whatever the device names; long names are cut short.
 
 ## Developer settings
 
@@ -169,7 +171,7 @@ PasteRing is meant to grow into a set of macOS utilities, so code is grouped by 
 ```
 Sources/PasteRing/
   App/                    entry point, app delegate (creates the utilities, Settings window)
-  MenuBar/                the menu bar item: icon choices, the frosted menu and its panel
+  MenuBar/                the menu bar item: settings, icon choices, the frosted menu and its panel
   General/                settings shared by every utility (language, date and time format)
   Settings/               the Settings window: sidebar, search, General and Menu Bar panes
   Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher, localization, relaunch)

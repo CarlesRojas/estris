@@ -280,8 +280,12 @@
 "Shadow" = "Sombra";
 "Shortcut" = "Atajo";
 "Shortcuts" = "Atajos";
+"Show Apps" = "Mostrar Apps";
 "Show delete button" = "Mostrar botón de eliminar";
 "Show Desktop" = "Mostrar escritorio";
+"Show device pickers" = "Mostrar selectores de dispositivo";
+"Show System" = "Mostrar Sistema";
+"Show volume percentages" = "Mostrar porcentajes de volumen";
 "Show when entries were copied" = "Mostrar cuándo se copiaron las entradas";
 "Side edges near the bottom: bottom half" = "Bordes laterales cerca de abajo: mitad inferior";
 "Side edges near the top: top half" = "Bordes laterales cerca de arriba: mitad superior";

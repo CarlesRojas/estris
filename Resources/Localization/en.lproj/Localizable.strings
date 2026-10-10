@@ -280,8 +280,12 @@
 "Shadow" = "Shadow";
 "Shortcut" = "Shortcut";
 "Shortcuts" = "Shortcuts";
+"Show Apps" = "Show Apps";
 "Show delete button" = "Show delete button";
 "Show Desktop" = "Show Desktop";
+"Show device pickers" = "Show device pickers";
+"Show System" = "Show System";
+"Show volume percentages" = "Show volume percentages";
 "Show when entries were copied" = "Show when entries were copied";
 "Side edges near the bottom: bottom half" = "Side edges near the bottom: bottom half";
 "Side edges near the top: top half" = "Side edges near the top: top half";

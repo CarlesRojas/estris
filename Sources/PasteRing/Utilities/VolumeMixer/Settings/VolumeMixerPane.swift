@@ -68,6 +68,8 @@ struct AppSoundRow: View {
     let sound: AppSound
     let devices: [AudioDevice]
     let mixer: VolumeMixer
+    var showsDevice = true
+    var showsPercentage = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -79,17 +81,19 @@ struct AppSoundRow: View {
                 }
                 Text(verbatim: app.name)
                 Spacer()
-                Picker("Output", selection: Binding(get: { sound.outputUID }, set: { mixer.setOutput($0, of: app) })) {
-                    Text("Same as System").tag(String?.none)
-                    ForEach(devices) { device in
-                        Text(verbatim: device.name).tag(Optional(device.uid))
+                if showsDevice {
+                    Picker("Output", selection: Binding(get: { sound.outputUID }, set: { mixer.setOutput($0, of: app) })) {
+                        Text("Same as System").tag(String?.none)
+                        ForEach(devices) { device in
+                            Text(verbatim: device.name).tag(Optional(device.uid))
+                        }
+                        if let uid = sound.outputUID, !devices.contains(where: { $0.uid == uid }) {
+                            Text("\(sound.outputName ?? uid) (not connected)").tag(Optional(uid))
+                        }
                     }
-                    if let uid = sound.outputUID, !devices.contains(where: { $0.uid == uid }) {
-                        Text("\(sound.outputName ?? uid) (not connected)").tag(Optional(uid))
-                    }
+                    .labelsHidden()
+                    .devicePickerWidth()
                 }
-                .labelsHidden()
-                .fixedSize()
             }
             HStack(spacing: 8) {
                 Button {
@@ -105,10 +109,12 @@ struct AppSoundRow: View {
                     .labelsHidden()
                     .frame(maxWidth: .infinity)
                     .disabled(sound.isMuted)
-                Text(verbatim: "\(Int((sound.volume * 100).rounded()))%")
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                    .frame(width: 44, alignment: .trailing)
+                if showsPercentage {
+                    Text(verbatim: "\(Int((sound.volume * 100).rounded()))%")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                        .frame(width: 44, alignment: .trailing)
+                }
             }
         }
         .padding(.vertical, 2)
@@ -120,6 +126,8 @@ struct AppSoundRow: View {
 struct SystemSoundRows: View {
     @ObservedObject var state: VolumeMixerState
     let mixer: VolumeMixer
+    var showsDevice = true
+    var showsPercentage = true
 
     var body: some View {
         SystemSoundRow(
@@ -127,14 +135,16 @@ struct SystemSoundRows: View {
             devices: state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
             volume: state.outputVolume, isMuted: state.outputMuted,
             symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
-            toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume
+            toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume,
+            showsDevice: showsDevice, showsPercentage: showsPercentage
         )
         SystemSoundRow(
             title: "Microphone", icon: "mic",
             devices: state.inputDevices, selection: state.input, select: mixer.setInputDevice,
             volume: state.inputVolume, isMuted: state.inputMuted,
             symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
-            toggleMute: mixer.toggleInputMute, setVolume: mixer.setInputVolume
+            toggleMute: mixer.toggleInputMute, setVolume: mixer.setInputVolume,
+            showsDevice: showsDevice, showsPercentage: showsPercentage
         )
     }
 }
@@ -153,6 +163,8 @@ private struct SystemSoundRow: View {
     let mutedSymbol: String
     let toggleMute: () -> Void
     let setVolume: (Float) -> Void
+    let showsDevice: Bool
+    let showsPercentage: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -163,13 +175,15 @@ private struct SystemSoundRow: View {
                     .frame(width: 20, height: 20)
                 Text(title)
                 Spacer()
-                Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
-                    ForEach(devices) { device in
-                        Text(verbatim: device.name).tag(device.id)
+                if showsDevice {
+                    Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
+                        ForEach(devices) { device in
+                            Text(verbatim: device.name).tag(device.id)
+                        }
                     }
+                    .labelsHidden()
+                    .devicePickerWidth()
                 }
-                .labelsHidden()
-                .fixedSize()
             }
             HStack(spacing: 8) {
                 Button(action: toggleMute) {
@@ -184,12 +198,21 @@ private struct SystemSoundRow: View {
                     .labelsHidden()
                     .frame(maxWidth: .infinity)
                     .disabled(volume == nil || isMuted == true)
-                Text(verbatim: volume.map { "\(Int(($0 * 100).rounded()))%" } ?? "")
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                    .frame(width: 44, alignment: .trailing)
+                if showsPercentage {
+                    Text(verbatim: volume.map { "\(Int(($0 * 100).rounded()))%" } ?? "")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                        .frame(width: 44, alignment: .trailing)
+                }
             }
         }
         .padding(.vertical, 2)
+    }
+}
+
+extension View {
+    /// Every device picker the same width, whatever the device names; long ones are cut short.
+    func devicePickerWidth() -> some View {
+        frame(width: 170)
     }
 }

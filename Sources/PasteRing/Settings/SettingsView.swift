@@ -241,6 +241,7 @@ struct SettingsDetail: View {
     let keepAwake: KeepAwake
     let colorPicker: ScreenColorPicker
     let volumeMixer: VolumeMixer
+    let menuBarSettings: MenuBarSettings
     let log: AppLog
 
     var body: some View {
@@ -250,7 +251,7 @@ struct SettingsDetail: View {
                 case .general:
                     GeneralPane(general: general)
                 case .menuBar:
-                    MenuBarPane(general: general)
+                    MenuBarPane(settings: menuBarSettings)
                 case .clipboard:
                     clipboard.settingsPane()
                 case .autoQuit:

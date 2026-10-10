@@ -1,10 +1,11 @@
 import SwiftUI
 
-/// The Menu Bar pane: which icon PasteRing shows in the menu bar, all in view to click.
+/// The Menu Bar pane: which icon PasteRing shows in the menu bar, all in view to click, and
+/// what its menu shows.
 struct MenuBarPane: View {
     private static let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 16)
 
-    @ObservedObject var general: GeneralSettings
+    @ObservedObject var settings: MenuBarSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,8 +24,14 @@ struct MenuBarPane: View {
                     }
                     .padding(.vertical, 4)
                 }
+                Section("Volume Mixer") {
+                    Toggle("Show System", isOn: $settings.showsSystem)
+                    Toggle("Show Apps", isOn: $settings.showsApps)
+                    Toggle("Show device pickers", isOn: $settings.showsDevices)
+                    Toggle("Show volume percentages", isOn: $settings.showsPercentages)
+                }
                 Section {
-                    Button("Reset to Defaults") { general.menuBarIcon = MenuBarIcon.app }
+                    Button("Reset to Defaults") { settings.reset() }
                 }
             }
             .formStyle(.grouped)
@@ -35,9 +42,9 @@ struct MenuBarPane: View {
     }
 
     private func iconButton(_ icon: String) -> some View {
-        let isSelected = general.menuBarIcon == icon
+        let isSelected = settings.icon == icon
         return Button {
-            general.menuBarIcon = icon
+            settings.icon = icon
         } label: {
             Image(systemName: MenuBarIcon.symbol(for: icon))
                 .font(.system(size: 14))

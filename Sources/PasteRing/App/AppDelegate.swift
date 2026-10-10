@@ -16,7 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let colorPicker = ScreenColorPicker()
     private lazy var volumeMixer = VolumeMixer(log: log)
     private var settingsWindow: SettingsWindowController?
-    private lazy var menuBar = MenuBarController(general: general, volumeMixer: volumeMixer) { [weak self] in
+    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer) { [weak self] in
         self?.openSettings()
     }
 
@@ -45,7 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, keepAwake: keepAwake, colorPicker: colorPicker, volumeMixer: volumeMixer, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, keepAwake: keepAwake, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
         }
         settingsWindow?.show()
     }
