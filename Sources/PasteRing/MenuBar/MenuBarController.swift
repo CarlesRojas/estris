@@ -13,14 +13,18 @@ final class MenuBarController: NSObject {
 
     let settings = MenuBarSettings()
     private let volumeMixer: VolumeMixer
+    private let clipboard: ClipboardManager
+    private let colorPicker: ScreenColorPicker
     private let openSettings: () -> Void
     private var statusItem: NSStatusItem?
     private var panel: MenuBarPanel?
     private var observers: Set<AnyCancellable> = []
     private var clickMonitors: [Any] = []
 
-    init(volumeMixer: VolumeMixer, openSettings: @escaping () -> Void) {
+    init(volumeMixer: VolumeMixer, clipboard: ClipboardManager, colorPicker: ScreenColorPicker, openSettings: @escaping () -> Void) {
         self.volumeMixer = volumeMixer
+        self.clipboard = clipboard
+        self.colorPicker = colorPicker
         self.openSettings = openSettings
     }
 
@@ -50,6 +54,19 @@ final class MenuBarController: NSObject {
             mixerSettings: volumeMixer.settings,
             mixerState: volumeMixer.state,
             mixer: volumeMixer,
+            clipboardSettings: clipboard.settings,
+            history: clipboard.history,
+            colorPickerSettings: colorPicker.settings,
+            paste: { [weak self] item in
+                // Closed first, so the paste goes to the app in front.
+                self?.close()
+                self?.clipboard.paste(item)
+            },
+            clearHistory: { [weak self] in self?.clipboard.history.clear() },
+            pickColor: { [weak self] in
+                self?.close()
+                self?.colorPicker.pick()
+            },
             openSettings: { [weak self] in
                 self?.close()
                 self?.openSettings()

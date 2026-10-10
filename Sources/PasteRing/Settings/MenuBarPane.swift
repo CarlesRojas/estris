@@ -30,6 +30,20 @@ struct MenuBarPane: View {
                     Toggle("Show device pickers", isOn: $settings.showsDevices)
                     Toggle("Show volume percentages", isOn: $settings.showsPercentages)
                 }
+                Section("Clipboard") {
+                    Toggle("Show recent entries", isOn: $settings.showsClipboardHistory)
+                    Stepper(value: $settings.clipboardEntries, in: 1...MenuBarSettings.maxClipboardEntries) {
+                        LabeledContent("Entries") {
+                            Text(verbatim: "\(settings.clipboardEntries)")
+                                .monospacedDigit()
+                        }
+                    }
+                    .disabled(!settings.showsClipboardHistory)
+                    Toggle("Show Clear History button", isOn: $settings.showsClearHistory)
+                }
+                Section("Color Picker") {
+                    Toggle("Show Pick a Color button", isOn: $settings.showsColorPicker)
+                }
                 Section {
                     Button("Reset to Defaults") { settings.reset() }
                 }

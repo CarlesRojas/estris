@@ -39,7 +39,8 @@ final class ScreenColorPicker {
         }
     }
 
-    private func pick() {
+    /// Shows the sampler; on its shortcut, or from the menu bar menu.
+    func pick() {
         guard !isPicking else { return }
         isPicking = true
         NSColorSampler().show { [weak self] color in

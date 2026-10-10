@@ -52,9 +52,21 @@ Every entry in the overlay shows when it was copied next to its trash icon, in t
 
 ## Menu bar
 
-Clicking the menu bar icon opens a menu below it in the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings). It shows the Volume Mixer while that is on (the same System and Apps rows as its pane, with the parts chosen in Settings > Menu Bar), then **Settings** and **Quit** side by side at the bottom. A click outside, Esc or another click on the icon closes it.
+Clicking the menu bar icon opens a menu below it in the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings). It shows, for each of these utilities while it is on and with the parts chosen in Settings > Menu Bar:
 
-**Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Its **Volume Mixer** section picks what the menu shows of it, all on by default: **Show System**, **Show Apps**, **Show device pickers** and **Show volume percentages**. **Reset to Defaults** goes back to PasteRing's icon and turns them all on.
+- **Volume Mixer**: the same System and Apps rows as its pane.
+- **Clipboard**: the most recent entries (off by default), each with its source app and one line of it; a click pastes it into the app in front, as the overlay does. A **Clear History** button (on by default) empties the history.
+- **Color Picker**: a **Pick a Color** button (on by default) that starts picking.
+
+Then **Settings** and **Quit** side by side at the bottom. A click outside, Esc or another click on the icon closes it.
+
+**Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Then a section per utility picks what the menu shows of it:
+
+- **Volume Mixer**: **Show System**, **Show Apps**, **Show device pickers** (on) and **Show volume percentages** (off).
+- **Clipboard**: **Show recent entries** (off) and how many (**Entries**, 1 to 10, default 5), **Show Clear History button** (on).
+- **Color Picker**: **Show Pick a Color button** (on).
+
+**Reset to Defaults** puts the icon and all of these back.
 
 Device pickers look the same everywhere (Settings and the menu): the device's name with up-down arrows and no background until the pointer is over them, aligned to the right edge whatever the name's length, long names cut short. The System rows show a coloured tile where an app row has the app's icon (blue for Output, orange for Microphone), so it doesn't look like the mute button below it.
 

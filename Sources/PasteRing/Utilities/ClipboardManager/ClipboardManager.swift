@@ -69,7 +69,11 @@ final class ClipboardManager: NSObject {
         }
     }
 
-    /// Entries for the menu bar menu.
+    /// Pastes an entry into the app in front, as picking it in the overlay does.
+    func paste(_ item: ClipItem) {
+        overlay.paste(item)
+    }
+
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
         ClipboardManagerPane(clipboard: settings, appearance: appearance, history: history)

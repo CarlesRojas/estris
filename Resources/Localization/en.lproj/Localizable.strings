@@ -79,6 +79,7 @@
 "Choose…" = "Choose…";
 "Clear" = "Clear";
 "Clear All" = "Clear All";
+"Clear History" = "Clear History";
 "Click to change" = "Click to change";
 "Clipboard" = "Clipboard";
 "Clipboard history is empty" = "Clipboard history is empty";
@@ -112,6 +113,7 @@
 "Emoji and Symbols" = "Emoji and Symbols";
 "End" = "End";
 "entries" = "entries";
+"Entries" = "Entries";
 "Escape" = "Escape";
 "Event Viewer" = "Event Viewer";
 "Example" = "Example";
@@ -201,6 +203,7 @@
 "Not granted" = "Not granted";
 "Not keeping awake" = "Not keeping awake";
 "Nothing" = "Nothing";
+"Nothing copied yet." = "Nothing copied yet.";
 "Nothing logged yet." = "Nothing logged yet.";
 "Numbers" = "Numbers";
 "Off" = "Off";
@@ -223,6 +226,7 @@
 "Pause" = "Pause";
 "Permissions" = "Permissions";
 "Pick a color" = "Pick a color";
+"Pick a Color" = "Pick a Color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Pick a color anywhere on screen with a shortcut and copy it.";
 "Play or Pause" = "Play or Pause";
 "Posted by %@" = "Posted by %@";
@@ -281,9 +285,12 @@
 "Shortcut" = "Shortcut";
 "Shortcuts" = "Shortcuts";
 "Show Apps" = "Show Apps";
+"Show Clear History button" = "Show Clear History button";
 "Show delete button" = "Show delete button";
 "Show Desktop" = "Show Desktop";
 "Show device pickers" = "Show device pickers";
+"Show Pick a Color button" = "Show Pick a Color button";
+"Show recent entries" = "Show recent entries";
 "Show System" = "Show System";
 "Show volume percentages" = "Show volume percentages";
 "Show when entries were copied" = "Show when entries were copied";

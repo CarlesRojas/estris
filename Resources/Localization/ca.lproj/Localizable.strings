@@ -79,6 +79,7 @@
 "Choose…" = "Tria…";
 "Clear" = "Esborra";
 "Clear All" = "Esborra-ho tot";
+"Clear History" = "Esborra l'historial";
 "Click to change" = "Fes clic per canviar";
 "Clipboard" = "Porta-retalls";
 "Clipboard history is empty" = "L’historial del porta-retalls és buit";
@@ -112,6 +113,7 @@
 "Emoji and Symbols" = "Emojis i símbols";
 "End" = "Final";
 "entries" = "entrades";
+"Entries" = "Entrades";
 "Escape" = "Esc";
 "Event Viewer" = "Visor d’esdeveniments";
 "Example" = "Exemple";
@@ -201,6 +203,7 @@
 "Not granted" = "No concedit";
 "Not keeping awake" = "No es manté despert";
 "Nothing" = "Res";
+"Nothing copied yet." = "Encara no has copiat res.";
 "Nothing logged yet." = "Encara no hi ha cap registre.";
 "Numbers" = "Números";
 "Off" = "Desactivat";
@@ -223,6 +226,7 @@
 "Pause" = "Pausa";
 "Permissions" = "Permisos";
 "Pick a color" = "Tria un color";
+"Pick a Color" = "Tria un color";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Tria un color de qualsevol lloc de la pantalla amb una drecera i copia’l.";
 "Play or Pause" = "Reprodueix o posa en pausa";
 "Posted by %@" = "Enviat per %@";
@@ -281,9 +285,12 @@
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
 "Show Apps" = "Mostra Apps";
+"Show Clear History button" = "Mostra el botó Esborra l'historial";
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";
 "Show device pickers" = "Mostra els selectors de dispositiu";
+"Show Pick a Color button" = "Mostra el botó Tria un color";
+"Show recent entries" = "Mostra les entrades recents";
 "Show System" = "Mostra Sistema";
 "Show volume percentages" = "Mostra els percentatges de volum";
 "Show when entries were copied" = "Mostra quan es van copiar les entrades";

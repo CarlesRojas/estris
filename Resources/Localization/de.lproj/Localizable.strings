@@ -79,6 +79,7 @@
 "Choose…" = "Auswählen …";
 "Clear" = "Löschen";
 "Clear All" = "Alle löschen";
+"Clear History" = "Verlauf löschen";
 "Click to change" = "Zum Ändern klicken";
 "Clipboard" = "Zwischenablage";
 "Clipboard history is empty" = "Der Verlauf der Zwischenablage ist leer";
@@ -112,6 +113,7 @@
 "Emoji and Symbols" = "Emoji & Symbole";
 "End" = "Ende";
 "entries" = "Einträge";
+"Entries" = "Einträge";
 "Escape" = "Escape";
 "Event Viewer" = "Ereignisanzeige";
 "Example" = "Beispiel";
@@ -201,6 +203,7 @@
 "Not granted" = "Nicht erteilt";
 "Not keeping awake" = "Hält nicht wach";
 "Nothing" = "Nichts";
+"Nothing copied yet." = "Noch nichts kopiert.";
 "Nothing logged yet." = "Noch nichts protokolliert.";
 "Numbers" = "Zahlen";
 "Off" = "Aus";
@@ -223,6 +226,7 @@
 "Pause" = "Pause";
 "Permissions" = "Berechtigungen";
 "Pick a color" = "Farbe aufnehmen";
+"Pick a Color" = "Farbe auswählen";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Nimm per Kurzbefehl eine Farbe vom Bildschirm auf und kopiere sie.";
 "Play or Pause" = "Wiedergabe oder Pause";
 "Posted by %@" = "Gesendet von %@";
@@ -281,9 +285,12 @@
 "Shortcut" = "Kurzbefehl";
 "Shortcuts" = "Kurzbefehle";
 "Show Apps" = "Apps anzeigen";
+"Show Clear History button" = "Taste „Verlauf löschen“ anzeigen";
 "Show delete button" = "Löschtaste anzeigen";
 "Show Desktop" = "Schreibtisch anzeigen";
 "Show device pickers" = "Geräteauswahl anzeigen";
+"Show Pick a Color button" = "Taste „Farbe auswählen“ anzeigen";
+"Show recent entries" = "Neueste Einträge anzeigen";
 "Show System" = "System anzeigen";
 "Show volume percentages" = "Lautstärke in Prozent anzeigen";
 "Show when entries were copied" = "Zeigen, wann Einträge kopiert wurden";

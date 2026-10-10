@@ -16,7 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let colorPicker = ScreenColorPicker()
     private lazy var volumeMixer = VolumeMixer(log: log)
     private var settingsWindow: SettingsWindowController?
-    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer) { [weak self] in
+    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer, clipboard: clipboard, colorPicker: colorPicker) { [weak self] in
         self?.openSettings()
     }
 

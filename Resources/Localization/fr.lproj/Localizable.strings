@@ -79,6 +79,7 @@
 "Choose…" = "Choisir…";
 "Clear" = "Effacer";
 "Clear All" = "Tout effacer";
+"Clear History" = "Effacer l'historique";
 "Click to change" = "Cliquez pour modifier";
 "Clipboard" = "Presse-papiers";
 "Clipboard history is empty" = "L’historique du presse-papiers est vide";
@@ -112,6 +113,7 @@
 "Emoji and Symbols" = "Emoji et symboles";
 "End" = "Fin";
 "entries" = "entrées";
+"Entries" = "Entrées";
 "Escape" = "Échappement";
 "Event Viewer" = "Visualiseur d’évènements";
 "Example" = "Exemple";
@@ -201,6 +203,7 @@
 "Not granted" = "Non accordé";
 "Not keeping awake" = "Ne garde pas éveillé";
 "Nothing" = "Rien";
+"Nothing copied yet." = "Rien n'a encore été copié.";
 "Nothing logged yet." = "Rien n’a encore été consigné.";
 "Numbers" = "Chiffres";
 "Off" = "Désactivé";
@@ -223,6 +226,7 @@
 "Pause" = "Pause";
 "Permissions" = "Autorisations";
 "Pick a color" = "Prélever une couleur";
+"Pick a Color" = "Choisir une couleur";
 "Pick a color anywhere on screen with a shortcut and copy it." = "Prélevez une couleur n’importe où à l’écran avec un raccourci et copiez-la.";
 "Play or Pause" = "Lecture ou pause";
 "Posted by %@" = "Envoyé par %@";
@@ -281,9 +285,12 @@
 "Shortcut" = "Raccourci";
 "Shortcuts" = "Raccourcis";
 "Show Apps" = "Afficher Apps";
+"Show Clear History button" = "Afficher le bouton Effacer l'historique";
 "Show delete button" = "Afficher le bouton de suppression";
 "Show Desktop" = "Afficher le bureau";
 "Show device pickers" = "Afficher les sélecteurs d'appareil";
+"Show Pick a Color button" = "Afficher le bouton Choisir une couleur";
+"Show recent entries" = "Afficher les entrées récentes";
 "Show System" = "Afficher Système";
 "Show volume percentages" = "Afficher les pourcentages de volume";
 "Show when entries were copied" = "Afficher quand les entrées ont été copiées";
