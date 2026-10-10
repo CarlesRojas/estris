@@ -23,12 +23,20 @@ struct VolumeMixerPane: View {
             Form {
                 if settings.isEnabled {
                     Section("Output") {
-                        devicePicker(state.outputDevices, selection: state.output, set: mixer.setOutputDevice)
-                        volumeRow(state.outputVolume, isMuted: state.outputMuted, symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill", toggleMute: mixer.toggleOutputMute, set: mixer.setOutputVolume)
+                        deviceBlock(
+                            state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
+                            volume: state.outputVolume, isMuted: state.outputMuted,
+                            symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
+                            toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume
+                        )
                     }
                     Section("Microphone") {
-                        devicePicker(state.inputDevices, selection: state.input, set: mixer.setInputDevice)
-                        volumeRow(state.inputVolume, isMuted: state.inputMuted, symbol: "mic.fill", mutedSymbol: "mic.slash.fill", toggleMute: mixer.toggleInputMute, set: mixer.setInputVolume)
+                        deviceBlock(
+                            state.inputDevices, selection: state.input, select: mixer.setInputDevice,
+                            volume: state.inputVolume, isMuted: state.inputMuted,
+                            symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
+                            toggleMute: mixer.toggleInputMute, setVolume: mixer.setInputVolume
+                        )
                     }
                     Section("Apps") {
                         if !state.failedApps.isEmpty {
@@ -54,23 +62,30 @@ struct VolumeMixerPane: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    private func devicePicker(_ devices: [AudioDevice], selection: AudioObjectID?, set: @escaping (AudioObjectID) -> Void) -> some View {
-        Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: set)) {
-            ForEach(devices) { device in
-                Text(verbatim: device.name).tag(device.id)
-            }
-        }
-    }
-
-    private func volumeRow(
-        _ volume: Float?,
+    /// Laid out like an app's row: the device at the top left, then mute, the volume across the
+    /// whole width and its percentage.
+    private func deviceBlock(
+        _ devices: [AudioDevice],
+        selection: AudioObjectID?,
+        select: @escaping (AudioObjectID) -> Void,
+        volume: Float?,
         isMuted: Bool?,
         symbol: String,
         mutedSymbol: String,
         toggleMute: @escaping () -> Void,
-        set: @escaping (Float) -> Void
+        setVolume: @escaping (Float) -> Void
     ) -> some View {
-        LabeledContent("Volume") {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Picker("Device", selection: Binding(get: { selection ?? AudioObjectID(kAudioObjectUnknown) }, set: select)) {
+                    ForEach(devices) { device in
+                        Text(verbatim: device.name).tag(device.id)
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+                Spacer()
+            }
             HStack(spacing: 8) {
                 Button(action: toggleMute) {
                     Image(systemName: isMuted == true ? mutedSymbol : symbol)
@@ -79,11 +94,18 @@ struct VolumeMixerPane: View {
                 .buttonStyle(.borderless)
                 .disabled(isMuted == nil)
                 .help(isMuted == true ? Text("Unmute") : Text("Mute"))
-                Slider(value: Binding(get: { Double(volume ?? 0) }, set: { set(Float($0)) }), in: 0...1)
+                // In a form, a slider keeps an empty label column at its left unless hidden.
+                Slider(value: Binding(get: { Double(volume ?? 0) }, set: { setVolume(Float($0)) }), in: 0...1)
                     .labelsHidden()
+                    .frame(maxWidth: .infinity)
                     .disabled(volume == nil || isMuted == true)
+                Text(verbatim: volume.map { "\(Int(($0 * 100).rounded()))%" } ?? "")
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+                    .frame(width: 44, alignment: .trailing)
             }
         }
+        .padding(.vertical, 2)
     }
 
     private var permissionNotice: some View {
