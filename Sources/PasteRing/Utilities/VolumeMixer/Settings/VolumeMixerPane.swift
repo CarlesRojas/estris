@@ -77,7 +77,7 @@ struct AppSoundRow: View {
                 if let icon = AppIcons.icon(for: app.bundleID) {
                     Image(nsImage: icon)
                         .resizable()
-                        .frame(width: 20, height: 20)
+                        .frame(width: 28, height: 28)
                 }
                 Text(verbatim: app.name)
                     .lineLimit(1)
@@ -173,12 +173,14 @@ private struct SystemSoundRow: View {
             HStack(spacing: 8) {
                 // Where an app row has the app's icon: a coloured tile, so it doesn't read as
                 // the mute button below it.
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
                     .fill(tint.gradient)
-                    .frame(width: 20, height: 20)
+                    .frame(width: 24, height: 24)
+                    // App icons carry a clear margin; slightly smaller looks the same size.
+                    .frame(width: 28, height: 28)
                     .overlay {
                         Image(systemName: icon)
-                            .font(.system(size: 11, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.white)
                     }
                 Text(title)
