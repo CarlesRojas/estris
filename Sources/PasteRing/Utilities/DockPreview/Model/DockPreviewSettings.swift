@@ -37,7 +37,7 @@ final class DockPreviewSettings: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
             Keys.size: Self.defaultSize,
-            Keys.currentDesktopOnly: true,
+            Keys.currentDesktopOnly: false,
             Keys.openDelay: HoverDelay.ms100.rawValue,
             Keys.showsCloseButton: true,
         ])
@@ -51,7 +51,7 @@ final class DockPreviewSettings: ObservableObject {
     /// Back to the default size, delay and switches; the on/off switch stays.
     func reset() {
         size = Self.defaultSize
-        currentDesktopOnly = true
+        currentDesktopOnly = false
         openDelay = .ms100
         showsCloseButton = true
     }
