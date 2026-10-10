@@ -1,2 +1,2 @@
 /* The System Audio Recording permission prompt. */
-"NSAudioCaptureUsageDescription" = "PasteRing nutzt den Ton einer App nur, um ihn mit der Lautstärke und auf dem Gerät abzuspielen, die du im Lautstärkemixer für sie wählst. Es wird nichts aufgenommen.";
+"NSAudioCaptureUsageDescription" = "Estris nutzt den Ton einer App nur, um ihn mit der Lautstärke und auf dem Gerät abzuspielen, die du im Lautstärkemixer für sie wählst. Es wird nichts aufgenommen.";

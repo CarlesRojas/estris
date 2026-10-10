@@ -1,4 +1,4 @@
-/* PasteRing, es. Keys are the English text; %@ and %lld stand for values filled in at run time. */
+/* Estris, es. Keys are the English text; %@ and %lld stand for values filled in at run time. */
 
 "%@ (not connected)" = "%@ (no conectado)";
 "%@ Mappings" = "Asignaciones de %@";
@@ -83,7 +83,7 @@
 "Center Third" = "Tercio central";
 "Center Two Thirds" = "Dos tercios centrales";
 "Change what keys and mouse buttons do, per device." = "Cambia lo que hacen las teclas y los botones del ratón, por dispositivo.";
-"Choose the icon PasteRing shows in the menu bar." = "Elige el icono que PasteRing muestra en la barra de menús.";
+"Choose the icon Estris shows in the menu bar." = "Elige el icono que Estris muestra en la barra de menús.";
 "Choose…" = "Elegir…";
 "Clear" = "Borrar";
 "Clear All" = "Borrar todo";
@@ -190,9 +190,9 @@
 "Letters" = "Letras";
 "Lock Screen" = "Bloquear pantalla";
 "Logs" = "Registros";
-"Logs and settings for finding out what PasteRing is doing." = "Registros y ajustes para saber qué está haciendo PasteRing.";
+"Logs and settings for finding out what Estris is doing." = "Registros y ajustes para saber qué está haciendo Estris.";
 "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS ya usa este atajo. Desactívalo en Funciones rápidas de teclado para usarlo aquí, o elige otra tecla.";
-"macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS solo deja escribir en otras apps a las apps con este permiso. PasteRing lo usa para pegar la entrada que eliges directamente en la app en la que trabajas, Cierre automático para ver las ventanas de cada app, Clic central para hacer clic con el botón central, Reasignar para cambiar teclas y botones, y Ajuste de ventanas para mover y redimensionar ventanas. Sin él, las entradas solo se copian al portapapeles y las demás utilidades no hacen nada.";
+"macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS solo deja escribir en otras apps a las apps con este permiso. Estris lo usa para pegar la entrada que eliges directamente en la app en la que trabajas, Cierre automático para ver las ventanas de cada app, Clic central para hacer clic con el botón central, Reasignar para cambiar teclas y botones, y Ajuste de ventanas para mover y redimensionar ventanas. Sin él, las entradas solo se copian al portapapeles y las demás utilidades no hacen nada.";
 "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS usa este atajo para cambiar la fuente de entrada del teclado. Desactívalo para usarlo aquí: Funciones rápidas de teclado > Fuentes de entrada > Seleccionar la siguiente fuente en el menú Entrada.";
 "Mappings" = "Asignaciones";
 "Maximize" = "Maximizar";
@@ -256,8 +256,8 @@
 "Page Down" = "Av Pág";
 "Page Up" = "Re Pág";
 "Paste as plain text" = "Pegar como texto sin formato";
-"PasteRing couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "PasteRing no ha podido cambiar el sonido de %@. Permítelo en Solo grabación de audio del sistema, en Ajustes del Sistema > Privacidad y seguridad > Grabación de pantalla y audio del sistema.";
-"PasteRing needs Accessibility access" = "PasteRing necesita acceso de accesibilidad";
+"Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris no ha podido cambiar el sonido de %@. Permítelo en Solo grabación de audio del sistema, en Ajustes del Sistema > Privacidad y seguridad > Grabación de pantalla y audio del sistema.";
+"Estris needs Accessibility access" = "Estris necesita acceso de accesibilidad";
 "Pause" = "Pausa";
 "Permissions" = "Permisos";
 "Pick a color" = "Elegir un color";
@@ -283,7 +283,7 @@
 "Record from %@" = "Grabar desde %@";
 "Record images" = "Guardar imágenes";
 "Relaunch" = "Volver a abrir";
-"Relaunch PasteRing to change the language?" = "¿Reiniciar PasteRing para cambiar el idioma?";
+"Relaunch Estris to change the language?" = "¿Reiniciar Estris para cambiar el idioma?";
 "Remap" = "Reasignar";
 "Remove duplicates" = "Eliminar duplicados";
 "Remove this mapping" = "Eliminar esta asignación";
@@ -372,7 +372,7 @@
 "Tap the trackpad with three or four fingers to middle click." = "Toca el trackpad con tres o cuatro dedos para hacer clic central.";
 "Tap with" = "Tocar con";
 "The Finder always keeps running" = "El Finder siempre sigue abierto";
-"The new language is used once PasteRing opens again." = "El nuevo idioma se usará cuando PasteRing vuelva a abrirse.";
+"The new language is used once Estris opens again." = "El nuevo idioma se usará cuando Estris vuelva a abrirse.";
 "The window under the pointer comes to the front and gets the focus." = "La ventana bajo el puntero pasa al frente y recibe el foco.";
 "Thirds" = "Tercios";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Este botón llega a macOS sin indicar qué dispositivo lo envió, así que solo se aplica la asignación de %@.";

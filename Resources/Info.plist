@@ -15,13 +15,13 @@
         <string>ca</string>
     </array>
     <key>CFBundleExecutable</key>
-    <string>PasteRing</string>
+    <string>Estris</string>
     <key>CFBundleIdentifier</key>
-    <string>com.carlesrojas.PasteRing</string>
+    <string>com.carlesrojas.Estris</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>PasteRing</string>
+    <string>Estris</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -33,7 +33,7 @@
     <key>LSUIElement</key>
     <true/>
     <key>NSAudioCaptureUsageDescription</key>
-    <string>PasteRing uses an app's sound only to play it at the volume and on the device you choose for it in Volume Mixer. Nothing is recorded.</string>
+    <string>Estris uses an app's sound only to play it at the volume and on the device you choose for it in Volume Mixer. Nothing is recorded.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

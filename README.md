@@ -1,4 +1,4 @@
-# PasteRing
+# Estris
 
 Needs an Apple Development certificate (Xcode > Settings > Accounts > Manage Certificates). The build signs with it, so macOS keeps the Accessibility permission across builds.
 
@@ -10,10 +10,10 @@ Quits the running app, builds it and opens the new build. Use it after every cha
 ```sh
 ./scripts/build-app.sh
 ```
-Only builds `build/PasteRing.app`, without opening it.
+Only builds `build/Estris.app`, without opening it.
 
 ```sh
-tccutil reset Accessibility com.carlesrojas.PasteRing
+tccutil reset Accessibility com.carlesrojas.Estris
 ```
 Run once after the signing certificate changes, then grant Accessibility again.
 
