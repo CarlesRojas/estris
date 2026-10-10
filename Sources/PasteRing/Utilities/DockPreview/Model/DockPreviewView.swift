@@ -76,10 +76,11 @@ private struct PreviewCard: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 } else if let appIcon {
-                    // Until the thumbnail arrives, or without Screen Recording.
+                    // Until the thumbnail arrives, or without Screen Recording: the same size of
+                    // card, with the app's icon in the middle.
                     Image(nsImage: appIcon)
                         .resizable()
-                        .frame(width: min(64, height / 2), height: min(64, height / 2))
+                        .frame(width: min(96, height * 0.5), height: min(96, height * 0.5))
                 }
             }
             .frame(width: width, height: height)

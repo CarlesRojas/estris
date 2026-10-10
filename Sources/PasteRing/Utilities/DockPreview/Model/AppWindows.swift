@@ -23,6 +23,9 @@ enum AppWindows {
             ? [.optionOnScreenOnly, .excludeDesktopElements]
             : [.optionAll, .excludeDesktopElements]
         guard let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]] else { return [] }
+        // Without Screen Recording the window list has no titles; Accessibility has them for
+        // the windows on this desktop and minimized ones.
+        let axTitles = CGPreflightScreenCaptureAccess() ? [:] : titles(of: pid)
         let windows = list.compactMap { entry -> AppWindow? in
             guard entry[kCGWindowOwnerPID as String] as? pid_t == pid,
                   entry[kCGWindowLayer as String] as? Int == 0,
@@ -32,7 +35,8 @@ enum AppWindows {
                   bounds.width >= 100, bounds.height >= 60,
                   (entry[kCGWindowAlpha as String] as? Double ?? 1) > 0
             else { return nil }
-            let title = entry[kCGWindowName as String] as? String ?? ""
+            let title = (entry[kCGWindowName as String] as? String).flatMap { $0.isEmpty ? nil : $0 }
+                ?? axTitles[CGWindowID(number)] ?? ""
             let isOnScreen = entry[kCGWindowIsOnscreen as String] as? Bool ?? false
             guard isOnScreen || !title.isEmpty else { return nil }
             return AppWindow(id: CGWindowID(number), title: title, aspect: bounds.width / bounds.height)
@@ -41,9 +45,11 @@ enum AppWindows {
     }
 
     /// Thumbnails, at most `maxPixels` on their longer side, handed over one by one as they're
-    /// ready. Asks for Screen Recording the first time; without it, none arrive.
+    /// ready. Only with Screen Recording allowed; without it, none.
     static func captureThumbnails(of windows: [AppWindow], maxPixels: CGFloat, onImage: @escaping @MainActor (CGWindowID, CGImage) -> Void) -> Task<Void, Never> {
         Task {
+            // Without the permission, asking ScreenCaptureKit only brings up macOS's prompt again.
+            guard CGPreflightScreenCaptureAccess() else { return }
             guard let content = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false) else { return }
             for window in windows {
                 guard !Task.isCancelled else { return }
@@ -84,6 +90,20 @@ enum AppWindows {
     /// desktop in use and minimized ones.
     static func canClose(_ window: AppWindow, of pid: pid_t) -> Bool {
         element(for: window.id, pid: pid).flatMap { AXUI.element($0, kAXCloseButtonAttribute) } != nil
+    }
+
+    /// The titles of the app's windows Accessibility reaches, by window number.
+    private static func titles(of pid: pid_t) -> [CGWindowID: String] {
+        guard let windowNumber else { return [:] }
+        let app = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(app, 0.25)
+        var titles: [CGWindowID: String] = [:]
+        for element in AXUI.elements(app, kAXWindowsAttribute) {
+            var number: CGWindowID = 0
+            guard windowNumber(element, &number) == .success, let title = AXUI.string(element, kAXTitleAttribute), !title.isEmpty else { continue }
+            titles[number] = title
+        }
+        return titles
     }
 
     /// The Accessibility window for a window server window, matched by its number.
