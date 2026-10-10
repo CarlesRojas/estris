@@ -74,7 +74,8 @@ Device pickers look the same everywhere (Settings and the menu): the device's na
 
 Click the version in **Settings > General > About** six times to add a **Developer** pane to the sidebar:
 
-- **Logs**: what the utilities noticed and decided (newest first, searchable), with **Copy All** for bug reports and **Clear**.
+- **Logs**: what the utilities noticed and decided (newest first, searchable, and filtered to one utility with the menu next to the search), with **Copy All** (what is shown) for bug reports and **Clear**. A click on an entry copies that line alone (time, utility and message), and it shows "Copied" for a moment.
+  - **Permissions** entries: what macOS says about Accessibility, Screen Recording, Input Monitoring, Post Events and System Audio Recording (the last through the private `TCCAccessPreflight`, for the log only), at launch and whenever it changes.
 - **Settings**: status details and settings regular users don't need, including **Hide Developer Settings**.
 
 ## Auto Quit
@@ -173,12 +174,12 @@ Picks a color anywhere on screen with a shortcut and copies it. Off by default; 
 
 ## Volume Mixer
 
-Sets the volume and device of the Mac's sound and microphone, and of each app. Needs macOS 14.4 or later; on older versions its pane is hidden and it never starts. Off by default; turn it on in **Settings > Volume Mixer**. Everything follows changes made elsewhere (menu bar, System Settings, keyboard) live, through CoreAudio listeners.
+Sets the volume and device of the Mac's sound and microphone, and of each app. Needs macOS 14.4 or later; on older versions its pane is hidden and it never starts. Off by default; turn it on in **Settings > Volume Mixer**. Everything follows changes made elsewhere (menu bar, System Settings, keyboard) live, through CoreAudio listeners. Every audio process is followed for starting and stopping output (running output, running, and its output devices: some macOS versions change the first without notifying), with bursts of notifications handled in one refresh.
 
 Its pane has two tabs: **Mixer** (below) and **Excluded Apps**, every installed app with a switch; an excluded app is ignored entirely: never listed (in the pane or the menu bar menu) and never changed, playing as macOS plays it.
 
 - **System**: two rows, **Output** and **Microphone**, each with an icon and its title where an app row has the app's icon and name: the device in use (sets the system default, which every app uses unless it picked its own device) at the top right, and below it a mute button, the volume across the width and its percentage, laid out like an app row. Each control is disabled when the device doesn't support it.
-- **Apps**: every app heard playing since the mixer started, while it is running, plus any app with changed settings (helper processes, like a browser's audio process, count as their app). Each has an output device (**Same as System** by default; a device that isn't connected shows "(not connected)" and the app falls back to the system output until it is), a mute button and a volume slider from 0% to 200%. The slider starts in the middle, 100%, where the app plays as it is, and snaps there when close.
+- **Apps**: only the apps making sound right now (helper processes, like a browser's audio process, count as their app); pausing one takes it off the list at once. Its settings stay and apply again as soon as it plays. Each has an output device (**Same as System** by default; a device that isn't connected shows "(not connected)" and the app falls back to the system output until it is), a mute button and a volume slider from 0% to 200%. The slider starts in the middle, 100%, where the app plays as it is, and snaps there when close.
 - Settings are remembered per app (bundle identifier, else name), also after it quits. **Reset to Defaults** puts every app back to 100%, unmuted, on the system output.
 - How: an app with changed settings gets a process tap that mutes its own output, and a private aggregate device of the tap and the chosen output plays it again scaled (clipped above full scale). Untouched apps aren't tapped. macOS asks once for **System Audio Recording** permission (Info.plist `NSAudioCaptureUsageDescription`, translated in `InfoPlist.strings`), the first time an app's sound is changed. If a tap fails, the pane names the app with **Open System Settings** and **Try Again**, and Developer > Logs says why.
 

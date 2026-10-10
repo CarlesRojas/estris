@@ -40,9 +40,13 @@ final class VolumeMixer {
     private var observers: Set<AnyCancellable> = []
     private var systemListeners: [AudioListener] = []
     private var volumeListeners: [AudioListener] = []
-    private var processListeners: [AudioObjectID: AudioListener] = [:]
-    /// Apps heard playing since the mixer started; they stay listed while they're running.
-    private var heard: Set<pid_t> = []
+    private var processListeners: [AudioObjectID: [AudioListener]] = [:]
+    /// A refresh asked for while one is waiting: one event fires several listeners at once.
+    private var refreshQueued = false
+    private var lastListSummary = ""
+    /// Every app with an audio connection, playing or not; changed ones keep their sound even
+    /// while they aren't listed.
+    private var running: [AudioApp] = []
     /// One `TapEngine` per app whose sound is changed, by the app's process.
     private var engines: [pid_t: AnyObject] = [:]
     /// Audio objects of apps whose engine failed, so it isn't tried again on every change.
@@ -85,7 +89,7 @@ final class VolumeMixer {
             ]
             if #available(macOS 14.4, *) {
                 systemListeners.append(AudioListener(system, kAudioHardwarePropertyProcessObjectList) { [weak self] in
-                    MainActor.assumeIsolated { self?.refreshApps() }
+                    MainActor.assumeIsolated { self?.queueRefreshApps() }
                 })
             }
             refreshDevices()
@@ -93,7 +97,7 @@ final class VolumeMixer {
             systemListeners = []
             volumeListeners = []
             processListeners = [:]
-            heard = []
+            running = []
             failed = [:]
             stopAllEngines()
             state.apps = []
@@ -170,19 +174,58 @@ final class VolumeMixer {
         guard settings.isEnabled, #available(macOS 14.4, *) else { return }
         let excluded = settings.excludedApps
         let running = AudioApps.current().filter { app in app.bundleID.map { !excluded.contains($0) } ?? true }
-        for app in running where app.isPlaying { heard.insert(app.pid) }
-        state.apps = running.filter { heard.contains($0.pid) || !settings.sound(of: $0.key).isUntouched }
-        heard.formIntersection(running.map(\.pid))
+        self.running = running
+        // Only what is making sound right now: a paused app leaves the list at once.
+        state.apps = running.filter(\.isPlaying)
+        logListIfChanged(running)
 
-        // Starting or stopping playback changes this, not the list of processes.
-        let objects = Set(running.flatMap(\.objects))
+        // Starting or stopping playback changes these, not the list of processes. Every audio
+        // process is followed, including helpers not yet matched to an app. Some macOS versions
+        // change "running output" without telling; "running" and the devices it plays on
+        // change with it, so all three are followed.
+        let objects = Set(AudioApps.processObjects())
         processListeners = processListeners.filter { objects.contains($0.key) }
-        for object in objects where processListeners[object] == nil {
-            processListeners[object] = AudioListener(object, kAudioProcessPropertyIsRunningOutput) { [weak self] in
-                MainActor.assumeIsolated { self?.refreshApps() }
-            }
+        let newObjects = objects.filter { processListeners[$0] == nil }
+        for object in newObjects {
+            let changed: () -> Void = { [weak self] in MainActor.assumeIsolated { self?.queueRefreshApps() } }
+            processListeners[object] = [
+                AudioListener(object, kAudioProcessPropertyIsRunningOutput, handler: changed),
+                AudioListener(object, kAudioProcessPropertyIsRunning, handler: changed),
+                AudioListener(object, kAudioProcessPropertyDevices, scope: kAudioObjectPropertyScopeOutput, handler: changed),
+            ]
+        }
+        if !newObjects.isEmpty {
+            let listeners = processListeners.values.joined()
+            log("following \(objects.count) audio processes: \(listeners.filter(\.isAdded).count) of \(listeners.count) listeners active")
         }
         reconcileEngines(running)
+    }
+
+    /// For the logs, whenever it changes: the audio processes, the apps found for them, which
+    /// are playing, which are listed, and how many processes belong to no app (system ones).
+    @available(macOS 14.4, *)
+    private func logListIfChanged(_ running: [AudioApp]) {
+        let apps = running.map { "\($0.name)" + ($0.isPlaying ? " (playing)" : "") }
+        let unmatched = AudioApps.unmatched()
+        let summary = "\(AudioApps.processObjects().count) audio processes; apps: \(apps.joined(separator: ", ")); "
+            + "listed: \(state.apps.map(\.name).joined(separator: ", ")); "
+            + "\(unmatched.count) without an app"
+        guard summary != lastListSummary else { return }
+        lastListSummary = summary
+        log(summary)
+    }
+
+    /// Refreshes once for a burst of notifications, right after it.
+    private func queueRefreshApps() {
+        guard !refreshQueued else { return }
+        log("an audio process started, stopped or changed device")
+        refreshQueued = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            MainActor.assumeIsolated {
+                self?.refreshQueued = false
+                self?.refreshApps()
+            }
+        }
     }
 
     func setVolume(_ volume: Double, of app: AudioApp) {
@@ -190,7 +233,7 @@ final class VolumeMixer {
         // Snaps to the middle, where the app plays as it is.
         sound.volume = abs(volume - 1) < 0.03 ? 1 : volume
         settings.setSound(sound, of: app.key)
-        reconcileEngines(state.apps)
+        reconcileEngines(running)
     }
 
     func toggleMute(of app: AudioApp) {
@@ -198,7 +241,7 @@ final class VolumeMixer {
         sound.isMuted.toggle()
         settings.setSound(sound, of: app.key)
         failed[app.pid] = nil
-        reconcileEngines(state.apps)
+        reconcileEngines(running)
     }
 
     /// Nil plays the app on the system output.
@@ -208,7 +251,7 @@ final class VolumeMixer {
         sound.outputName = uid.flatMap { uid in state.outputDevices.first { $0.uid == uid }?.name }
         settings.setSound(sound, of: app.key)
         failed[app.pid] = nil
-        reconcileEngines(state.apps)
+        reconcileEngines(running)
     }
 
     /// Every app back to playing as it is.
@@ -249,10 +292,20 @@ final class VolumeMixer {
             engines[app.pid] = nil
             guard failed[app.pid] != app.objects else { continue }
             do {
-                engines[app.pid] = try TapEngine(objects: app.objects, outputUID: outputUID, gain: gain)
+                let engine = try TapEngine(objects: app.objects, outputUID: outputUID, gain: gain)
+                engines[app.pid] = engine
                 failed[app.pid] = nil
                 state.failedApps.removeAll { $0 == app.name }
-                log("\(app.name): playing at \(Int(gain * 100))% on \(outputUID)")
+                let deviceName = state.outputDevices.first { $0.uid == outputUID }?.name ?? outputUID
+                log("\(app.name): playing at \(Int(gain * 100))% on \(deviceName), \(app.objects.count) audio process(es)")
+                // How it went, once the audio has had time to flow.
+                let name = app.name
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self, weak engine] in
+                    MainActor.assumeIsolated {
+                        guard let engine else { return }
+                        self?.log("\(name) on \(deviceName) after 2 s: \(engine.diagnostics)")
+                    }
+                }
             } catch {
                 failed[app.pid] = app.objects
                 if !state.failedApps.contains(app.name) { state.failedApps.append(app.name) }
@@ -263,7 +316,7 @@ final class VolumeMixer {
         for (pid, engine) in engines where !kept.contains(pid) {
             (engine as? TapEngine)?.stop()
             engines[pid] = nil
-            log("\(state.apps.first { $0.pid == pid }?.name ?? "\(pid)"): back to its own sound")
+            log("\(running.first { $0.pid == pid }?.name ?? "\(pid)"): back to its own sound")
         }
     }
 

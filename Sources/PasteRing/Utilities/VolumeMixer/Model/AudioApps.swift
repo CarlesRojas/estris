@@ -43,6 +43,18 @@ enum AudioApps {
         return apps.values.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
+    /// For the logs: audio processes no regular app was found for, as "name (pid), playing".
+    static func unmatched() -> [String] {
+        processObjects().compactMap { object in
+            var pid: pid_t = -1
+            guard AudioSystem.read(object, kAudioProcessPropertyPID, into: &pid), pid > 0, regularApp(owning: pid) == nil else { return nil }
+            var running: UInt32 = 0
+            AudioSystem.read(object, kAudioProcessPropertyIsRunningOutput, into: &running)
+            let name = NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"
+            return "\(name) (\(pid))" + (running != 0 ? ", playing" : "")
+        }
+    }
+
     static func processObjects() -> [AudioObjectID] {
         AudioSystem.objects(AudioSystem.system, kAudioHardwarePropertyProcessObjectList)
     }
