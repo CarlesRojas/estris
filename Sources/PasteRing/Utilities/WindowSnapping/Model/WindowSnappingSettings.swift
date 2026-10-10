@@ -68,9 +68,22 @@ final class WindowSnappingSettings: ObservableObject {
     static let edgeAreaRange: ClosedRange<Double> = 8...150
     static let defaultEdgeArea = 64.0
 
-    /// ⌃⌥A shares the screen evenly among all its windows.
+    /// A shortcut (⌃⌥Space unless changed) shares the screen evenly among all its windows.
     @Published var arrangesAll: Bool {
         didSet { defaults.set(arrangesAll, forKey: Keys.arrangesAll) }
+    }
+
+    /// Keys chosen for the shortcuts, by id (`SnapKeys.ids`); missing ones keep their default.
+    @Published var keyCodes: [String: UInt32] {
+        didSet { defaults.set(keyCodes.mapValues { NSNumber(value: $0) }, forKey: Keys.keyCodes) }
+    }
+
+    func keyCode(for id: String) -> UInt32 {
+        keyCodes[id] ?? SnapKeys.defaultCode(for: id)
+    }
+
+    func shortcut(for id: String) -> Shortcut {
+        SnapKeys.shortcut(code: keyCode(for: id))
     }
 
     /// The drag areas that snap.
@@ -97,11 +110,14 @@ final class WindowSnappingSettings: ObservableObject {
         edgeArea = defaults.double(forKey: Keys.edgeArea)
         gestures = Set((defaults.stringArray(forKey: Keys.gestures) ?? []).compactMap(SnapGesture.init(rawValue:)))
         arrangesAll = defaults.bool(forKey: Keys.arrangesAll)
+        keyCodes = (defaults.dictionary(forKey: Keys.keyCodes) as? [String: NSNumber] ?? [:]).mapValues(\.uint32Value)
     }
 
-    /// Back to how dragging, resizing, gestures and Arrange All start out; the on/off switch stays.
+    /// Back to how dragging, resizing, gestures, Arrange All and the shortcut keys start out; the
+    /// on/off switch stays.
     func reset() {
         arrangesAll = true
+        keyCodes = [:]
         snapsByDragging = true
         resizesTogether = true
         fillsSpace = true
@@ -117,5 +133,6 @@ final class WindowSnappingSettings: ObservableObject {
         static let fillsSpace = "windowSnappingFillsSpace"
         static let gestures = "windowSnappingGestures"
         static let arrangesAll = "windowSnappingArrangesAll"
+        static let keyCodes = "windowSnappingKeyCodes"
     }
 }

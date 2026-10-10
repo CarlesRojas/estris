@@ -51,6 +51,7 @@
 "Allowed" = "Permès";
 "Already mapped above" = "Ja assignat més amunt";
 "Already mapped on %@" = "Ja assignat a %@";
+"Also used by %@. Only one of them will work." = "També la fa servir %@. Només en funcionarà una.";
 "Alternative" = "Alternativa";
 "Always on" = "Sempre actiu";
 "Another device" = "Un altre dispositiu";
@@ -59,6 +60,7 @@
 "Apps" = "Apps";
 "Apps Volume" = "Volum de les apps";
 "Arrange All Windows" = "Organitza totes les finestres";
+"Auto Arrange All Windows" = "Organitzar totes les finestres";
 "Auto Quit" = "Tancament automàtic";
 "Battery" = "Bateria";
 "Bottom edge: thirds" = "Vora inferior: terços";
@@ -77,7 +79,6 @@
 "Cancel" = "Cancel·la";
 "Caps Lock" = "Bloq Maj";
 "Carousel" = "Carrusel";
-"Center" = "Centra";
 "Center Third" = "Terç central";
 "Center Two Thirds" = "Dos terços centrals";
 "Change what keys and mouse buttons do, per device." = "Canvia el que fan les tecles i els botons del ratolí, per dispositiu.";
@@ -188,8 +189,9 @@
 "Lock Screen" = "Bloqueja la pantalla";
 "Logs" = "Registres";
 "Logs and settings for finding out what PasteRing is doing." = "Registres i configuració per saber què fa el PasteRing.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "El macOS ja fa servir aquesta drecera. Desactiva-la a Dreceres de teclat per fer-la servir aquí, o tria una altra tecla.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "El macOS només deixa escriure en altres apps a les apps amb aquest permís. El PasteRing l’utilitza per enganxar l’entrada que triïs directament a l’app on treballes, el Tancament automàtic per veure les finestres de cada app, el Clic central per fer clic amb el botó central, Reassignar per canviar tecles i botons, i l’Ajust de finestres per moure i redimensionar finestres. Sense ell, les entrades només es copien al porta-retalls i les altres utilitats no fan res.";
-"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS fa servir ⌃⌥Espai per canviar la font d'entrada del teclat, així que Organitza totes les finestres no funcionarà fins que desactivis aquesta drecera: Dreceres de teclat > Fonts d'entrada > Selecciona la font següent del menú Entrada.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "El macOS fa servir aquesta drecera per canviar la font d’entrada del teclat. Desactiva-la per fer-la servir aquí: Dreceres de teclat > Fonts d’entrada > Seleccionar la següent font al menú Entrada.";
 "Mappings" = "Assignacions";
 "Maximize" = "Maximitza";
 "Media" = "Multimèdia";
@@ -316,6 +318,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajusta el volum i el dispositiu del so i el micròfon del teu Mac, i de cada app.";
 "Settings" = "Configuració";
 "Shadow" = "Ombra";
+"Share the screen evenly among all its windows with a shortcut" = "Repartir la pantalla entre totes les finestres amb una drecera";
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
 "Show a button to close each window" = "Mostra un botó per tancar cada finestra";

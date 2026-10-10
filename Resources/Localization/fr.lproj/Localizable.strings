@@ -51,6 +51,7 @@
 "Allowed" = "Autorisé";
 "Already mapped above" = "Déjà affecté plus haut";
 "Already mapped on %@" = "Déjà affecté sur %@";
+"Also used by %@. Only one of them will work." = "Aussi utilisé par %@. Un seul fonctionnera.";
 "Alternative" = "Alternative";
 "Always on" = "Toujours actif";
 "Another device" = "Autre appareil";
@@ -59,6 +60,7 @@
 "Apps" = "Apps";
 "Apps Volume" = "Volume des apps";
 "Arrange All Windows" = "Organiser toutes les fenêtres";
+"Auto Arrange All Windows" = "Organiser toutes les fenêtres";
 "Auto Quit" = "Fermeture automatique";
 "Battery" = "Batterie";
 "Bottom edge: thirds" = "Bord inférieur : tiers";
@@ -77,7 +79,6 @@
 "Cancel" = "Annuler";
 "Caps Lock" = "Verr. Maj";
 "Carousel" = "Carrousel";
-"Center" = "Centrer";
 "Center Third" = "Tiers central";
 "Center Two Thirds" = "Deux tiers centraux";
 "Change what keys and mouse buttons do, per device." = "Modifiez ce que font les touches et les boutons de la souris, par appareil.";
@@ -188,8 +189,9 @@
 "Lock Screen" = "Verrouiller l’écran";
 "Logs" = "Journaux";
 "Logs and settings for finding out what PasteRing is doing." = "Journaux et réglages pour savoir ce que fait PasteRing.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS utilise déjà ce raccourci. Désactivez-le dans Raccourcis clavier pour l’utiliser ici, ou choisissez une autre touche.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS ne permet qu’aux apps disposant de cette autorisation de saisir dans d’autres apps. PasteRing l’utilise pour coller l’entrée choisie directement dans l’app où vous travaillez, Fermeture automatique pour voir les fenêtres de chaque app, Clic central pour cliquer avec le bouton central, Réaffecter pour modifier les touches et les boutons, et Ancrage des fenêtres pour déplacer et redimensionner les fenêtres. Sans elle, les entrées sont seulement copiées dans le presse-papiers et les autres utilitaires ne font rien.";
-"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS utilise ⌃⌥Espace pour changer la source de saisie du clavier ; Organiser toutes les fenêtres ne fonctionnera pas tant que ce raccourci est activé : Raccourcis clavier > Méthodes de saisie > Sélectionner la source suivante du menu Saisie.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS utilise ce raccourci pour changer de source de saisie. Désactivez-le pour l’utiliser ici : Raccourcis clavier > Sources de saisie > Sélectionner la source suivante dans le menu Saisie.";
 "Mappings" = "Affectations";
 "Maximize" = "Agrandir";
 "Media" = "Multimédia";
@@ -316,6 +318,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Réglez le volume et l'appareil du son et du micro de votre Mac, et de chaque app.";
 "Settings" = "Réglages";
 "Shadow" = "Ombre";
+"Share the screen evenly among all its windows with a shortcut" = "Partager l’écran entre toutes ses fenêtres avec un raccourci";
 "Shortcut" = "Raccourci";
 "Shortcuts" = "Raccourcis";
 "Show a button to close each window" = "Afficher un bouton pour fermer chaque fenêtre";

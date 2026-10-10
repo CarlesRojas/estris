@@ -30,7 +30,8 @@ enum SystemShortcuts {
         var options: UInt32 = 0
         var keyCode: UInt32 = 0
         var modifiers: UInt32 = 0
-        guard valueFunction(id, &options, &keyCode, &modifiers) == .success, keyCode != 0, keyCode != 0xFFFF else { return nil }
+        // Unset ones read as 0xFFFF, or as 0 (A) with no modifiers.
+        guard valueFunction(id, &options, &keyCode, &modifiers) == .success, keyCode != 0xFFFF, keyCode != 0 || modifiers != 0 else { return nil }
         var flags = CGEventFlags()
         if modifiers & 0x20000 != 0 { flags.insert(.maskShift) }
         if modifiers & 0x40000 != 0 { flags.insert(.maskControl) }
@@ -45,5 +46,19 @@ enum SystemShortcuts {
         guard let shortcut = shortcut(id) else { return false }
         let modifiers: CGEventFlags = [.maskShift, .maskControl, .maskAlternate, .maskCommand]
         return shortcut.keyCode == keyCode && shortcut.flags.intersection(modifiers) == flags.intersection(modifiers)
+    }
+
+    /// The turned-on macOS shortcuts with exactly these modifiers (fn aside), by key. The first
+    /// one wins when two share a key.
+    static func owners(flags: CGEventFlags) -> [CGKeyCode: Int32] {
+        let modifiers: CGEventFlags = [.maskShift, .maskControl, .maskAlternate, .maskCommand]
+        var owners: [CGKeyCode: Int32] = [:]
+        for id in Int32(0)..<512 {
+            guard let shortcut = shortcut(id), shortcut.flags.intersection(modifiers) == flags.intersection(modifiers),
+                  owners[shortcut.keyCode] == nil
+            else { continue }
+            owners[shortcut.keyCode] = id
+        }
+        return owners
     }
 }

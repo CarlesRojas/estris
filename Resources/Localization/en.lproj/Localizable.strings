@@ -51,6 +51,7 @@
 "Allowed" = "Allowed";
 "Already mapped above" = "Already mapped above";
 "Already mapped on %@" = "Already mapped on %@";
+"Also used by %@. Only one of them will work." = "Also used by %@. Only one of them will work.";
 "Alternative" = "Alternative";
 "Always on" = "Always on";
 "Another device" = "Another device";
@@ -59,6 +60,7 @@
 "Apps" = "Apps";
 "Apps Volume" = "Apps Volume";
 "Arrange All Windows" = "Arrange All Windows";
+"Auto Arrange All Windows" = "Auto Arrange All Windows";
 "Auto Quit" = "Auto Quit";
 "Battery" = "Battery";
 "Bottom edge: thirds" = "Bottom edge: thirds";
@@ -77,7 +79,6 @@
 "Cancel" = "Cancel";
 "Caps Lock" = "Caps Lock";
 "Carousel" = "Carousel";
-"Center" = "Center";
 "Center Third" = "Center Third";
 "Center Two Thirds" = "Center Two Thirds";
 "Change what keys and mouse buttons do, per device." = "Change what keys and mouse buttons do, per device.";
@@ -188,8 +189,9 @@
 "Lock Screen" = "Lock Screen";
 "Logs" = "Logs";
 "Logs and settings for finding out what PasteRing is doing." = "Logs and settings for finding out what PasteRing is doing.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing.";
-"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu.";
 "Mappings" = "Mappings";
 "Maximize" = "Maximize";
 "Media" = "Media";
@@ -316,6 +318,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Set the volume and device of your Mac's sound and microphone, and of each app.";
 "Settings" = "Settings";
 "Shadow" = "Shadow";
+"Share the screen evenly among all its windows with a shortcut" = "Share the screen evenly among all its windows with a shortcut";
 "Shortcut" = "Shortcut";
 "Shortcuts" = "Shortcuts";
 "Show a button to close each window" = "Show a button to close each window";

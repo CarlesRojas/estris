@@ -18,7 +18,6 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
     case firstTwoThirds
     case centerTwoThirds
     case lastTwoThirds
-    case center
     case restore
 
     var id: Self { self }
@@ -41,7 +40,7 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .leftHalf, .rightHalf, .topHalf, .bottomHalf: .halves
         case .topLeft, .topRight, .bottomLeft, .bottomRight: .corners
         case .firstThird, .centerThird, .lastThird, .firstTwoThirds, .centerTwoThirds, .lastTwoThirds: .thirds
-        case .maximize, .center, .restore: .other
+        case .maximize, .restore: .other
         }
     }
 
@@ -62,7 +61,6 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .firstTwoThirds: String(localized: "Left Two Thirds")
         case .centerTwoThirds: String(localized: "Center Two Thirds")
         case .lastTwoThirds: String(localized: "Right Two Thirds")
-        case .center: String(localized: "Center")
         case .restore: String(localized: "Restore")
         }
     }
@@ -79,39 +77,37 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .bottomRight: "rectangle.inset.bottomright.filled"
         case .maximize: "rectangle.fill"
         case .firstThird: "rectangle.leadingthird.inset.filled"
-        case .centerThird: "rectangle.center.inset.filled"
+        // Drawn by `SnapActionIcon`: SF Symbols has no middle-third bar.
+        case .centerThird: "rectangle"
         case .lastThird: "rectangle.trailingthird.inset.filled"
         case .firstTwoThirds: "rectangle.split.3x1"
         case .centerTwoThirds: "rectangle.split.3x1"
         case .lastTwoThirds: "rectangle.split.3x1"
-        case .center: "dot.square"
         case .restore: "arrow.uturn.backward"
         }
     }
 
-    /// The shortcut for each: a fixed key with Control and Option.
-    var shortcut: Shortcut {
-        let modifiers = UInt32(controlKey | optionKey)
-        let key: (Int, String) = switch self {
-        case .leftHalf: (kVK_LeftArrow, "←")
-        case .rightHalf: (kVK_RightArrow, "→")
-        case .topHalf: (kVK_UpArrow, "↑")
-        case .bottomHalf: (kVK_DownArrow, "↓")
-        case .topLeft: (kVK_ANSI_U, "U")
-        case .topRight: (kVK_ANSI_I, "I")
-        case .bottomLeft: (kVK_ANSI_J, "J")
-        case .bottomRight: (kVK_ANSI_K, "K")
-        case .maximize: (kVK_Return, "↩")
-        case .firstThird: (kVK_ANSI_D, "D")
-        case .centerThird: (kVK_ANSI_F, "F")
-        case .lastThird: (kVK_ANSI_G, "G")
-        case .firstTwoThirds: (kVK_ANSI_E, "E")
-        case .centerTwoThirds: (kVK_ANSI_R, "R")
-        case .lastTwoThirds: (kVK_ANSI_T, "T")
-        case .center: (kVK_ANSI_C, "C")
-        case .restore: (kVK_Delete, "⌫")
+    /// The key each starts out with, used with Control and Option; changeable in Settings.
+    var defaultKeyCode: UInt32 {
+        let key = switch self {
+        case .leftHalf: kVK_LeftArrow
+        case .rightHalf: kVK_RightArrow
+        case .topHalf: kVK_UpArrow
+        case .bottomHalf: kVK_DownArrow
+        case .topLeft: kVK_ANSI_U
+        case .topRight: kVK_ANSI_I
+        case .bottomLeft: kVK_ANSI_J
+        case .bottomRight: kVK_ANSI_K
+        case .maximize: kVK_Return
+        case .firstThird: kVK_ANSI_D
+        case .centerThird: kVK_ANSI_F
+        case .lastThird: kVK_ANSI_G
+        case .firstTwoThirds: kVK_ANSI_E
+        case .centerTwoThirds: kVK_ANSI_R
+        case .lastTwoThirds: kVK_ANSI_T
+        case .restore: kVK_Delete
         }
-        return Shortcut(keyCode: UInt32(key.0), modifiers: modifiers, keyLabel: key.1)
+        return UInt32(key)
     }
 
     /// The frame for a window on a screen, in AppKit coordinates; nil for Restore, which
@@ -138,10 +134,6 @@ enum SnapAction: String, CaseIterable, Codable, Identifiable {
         case .firstTwoThirds: rect = NSRect(x: area.minX, y: area.minY, width: 2 * third, height: area.height)
         case .centerTwoThirds: rect = NSRect(x: area.minX + (third / 2).rounded(.down), y: area.minY, width: 2 * third, height: area.height)
         case .lastTwoThirds: rect = NSRect(x: area.minX + third, y: area.minY, width: area.width - third, height: area.height)
-        case .center:
-            let width = min(current.width, area.width)
-            let height = min(current.height, area.height)
-            rect = NSRect(x: area.midX - width / 2, y: area.midY - height / 2, width: width, height: height).integral
         case .restore: return nil
         }
         return rect

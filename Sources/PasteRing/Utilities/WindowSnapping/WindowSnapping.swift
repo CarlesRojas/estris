@@ -31,6 +31,7 @@ final class WindowSnapping {
         // the run loop reads the new ones.
         settings.$isEnabled.map { _ in () }
             .merge(with: settings.$arrangesAll.map { _ in () })
+            .merge(with: settings.$keyCodes.map { _ in () })
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.apply() }
             .store(in: &observers)
@@ -49,19 +50,18 @@ final class WindowSnapping {
             return
         }
         dragSnapper.start()
-        for action in SnapAction.allCases {
-            let shortcut = action.shortcut
-            hotKeys.append(HotKeyCenter.shared.register(keyCode: shortcut.keyCode, modifiers: shortcut.modifiers) { [weak self] in
-                self?.snapFocusedWindow(to: action)
-            })
-        }
-        if settings.arrangesAll {
-            if WindowArranger.isShortcutTaken {
-                log("arrange all: ⌃⌥Space is macOS's shortcut for the next input source; turn it off to use it here")
+        let taken = SystemShortcuts.owners(flags: SnapKeys.systemFlags)
+        for id in SnapKeys.ids where id != SnapKeys.arrangeAllID || settings.arrangesAll {
+            let shortcut = settings.shortcut(for: id)
+            if let owner = taken[CGKeyCode(shortcut.keyCode)] {
+                log("\(id): macOS uses \(shortcut.displayString) for its shortcut \(owner); turn it off there to use it here")
             }
-            let shortcut = WindowArranger.shortcut
             hotKeys.append(HotKeyCenter.shared.register(keyCode: shortcut.keyCode, modifiers: shortcut.modifiers) { [weak self] in
-                self?.arrangeAll()
+                if let action = SnapAction(rawValue: id) {
+                    self?.snapFocusedWindow(to: action)
+                } else {
+                    self?.arrangeAll()
+                }
             })
         }
     }

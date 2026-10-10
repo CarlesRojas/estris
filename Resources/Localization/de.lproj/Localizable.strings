@@ -51,6 +51,7 @@
 "Allowed" = "Erlaubt";
 "Already mapped above" = "Bereits weiter oben belegt";
 "Already mapped on %@" = "Bereits auf %@ belegt";
+"Also used by %@. Only one of them will work." = "Auch belegt durch %@. Nur einer davon funktioniert.";
 "Alternative" = "Alternative";
 "Always on" = "Immer an";
 "Another device" = "Anderes Gerät";
@@ -59,6 +60,7 @@
 "Apps" = "Apps";
 "Apps Volume" = "App-Lautstärke";
 "Arrange All Windows" = "Alle Fenster anordnen";
+"Auto Arrange All Windows" = "Alle Fenster anordnen";
 "Auto Quit" = "Automatisch beenden";
 "Battery" = "Batterie";
 "Bottom edge: thirds" = "Unterer Rand: Drittel";
@@ -77,7 +79,6 @@
 "Cancel" = "Abbrechen";
 "Caps Lock" = "Feststelltaste";
 "Carousel" = "Karussell";
-"Center" = "Zentrieren";
 "Center Third" = "Mittleres Drittel";
 "Center Two Thirds" = "Mittlere zwei Drittel";
 "Change what keys and mouse buttons do, per device." = "Lege fest, was Tasten und Maustasten tun, für jedes Gerät.";
@@ -188,8 +189,9 @@
 "Lock Screen" = "Bildschirm sperren";
 "Logs" = "Protokolle";
 "Logs and settings for finding out what PasteRing is doing." = "Protokolle und Einstellungen, um zu sehen, was PasteRing tut.";
+"macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS verwendet diesen Kurzbefehl bereits. Deaktiviere ihn unter Tastaturkurzbefehle, um ihn hier zu nutzen, oder wähle eine andere Taste.";
 "macOS only lets apps with this permission type into other apps. PasteRing uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS lässt nur Apps mit dieser Berechtigung in andere Apps tippen. PasteRing nutzt sie, um den gewählten Eintrag direkt in die App einzusetzen, in der du arbeitest, Automatisch beenden, um die Fenster jeder App zu sehen, Mittelklick, um mit der mittleren Taste zu klicken, Neu belegen, um Tasten zu ändern, und Fenster einrasten, um Fenster zu bewegen und zu skalieren. Ohne sie werden Einträge nur in die Zwischenablage kopiert und die anderen Werkzeuge tun nichts.";
-"macOS uses ⌃⌥Space to switch the keyboard's input source, so Arrange All Windows won't work until that shortcut is turned off: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS verwendet ⌃⌥Leertaste zum Wechseln der Eingabequelle, daher funktioniert „Alle Fenster anordnen“ erst, wenn dieser Kurzbefehl deaktiviert ist: Tastaturkurzbefehle > Eingabequellen > Nächste Quelle im Eingabemenü auswählen.";
+"macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS verwendet diesen Kurzbefehl, um die Eingabequelle zu wechseln. Deaktiviere ihn, um ihn hier zu nutzen: Tastaturkurzbefehle > Eingabequellen > Nächste Quelle im Eingabemenü auswählen.";
 "Mappings" = "Belegungen";
 "Maximize" = "Maximieren";
 "Media" = "Medien";
@@ -316,6 +318,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Lege Lautstärke und Gerät für Ton und Mikrofon deines Mac fest, und für jede App.";
 "Settings" = "Einstellungen";
 "Shadow" = "Schatten";
+"Share the screen evenly among all its windows with a shortcut" = "Den Bildschirm per Kurzbefehl gleichmäßig auf alle Fenster aufteilen";
 "Shortcut" = "Kurzbefehl";
 "Shortcuts" = "Kurzbefehle";
 "Show a button to close each window" = "Taste zum Schließen jedes Fensters anzeigen";
