@@ -66,9 +66,9 @@ struct PermissionUse {
     let reason: LocalizedStringKey
 }
 
-/// The first section of every utility's settings: which permissions it needs and what for, or
-/// that it needs none. Each shows whether it is allowed, with a button to its System Settings
-/// page when it isn't.
+/// The first section of the settings of a utility that needs permissions: which, and what for.
+/// Each shows whether it is allowed, with a button to its System Settings page when it isn't.
+/// Utilities that need none don't show it.
 struct PermissionsSection: View {
     let uses: [PermissionUse]
     /// Bumped to read the permissions again after returning from System Settings.
@@ -76,10 +76,6 @@ struct PermissionsSection: View {
 
     var body: some View {
         Section("Permissions") {
-            if uses.isEmpty {
-                Text("Needs no permissions.")
-                    .foregroundStyle(.secondary)
-            }
             ForEach(Array(uses.enumerated()), id: \.offset) { _, use in
                 row(use)
             }

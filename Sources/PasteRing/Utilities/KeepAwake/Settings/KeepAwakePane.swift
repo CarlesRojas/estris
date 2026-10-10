@@ -16,7 +16,6 @@ struct KeepAwakePane: View {
             )
 
             Form {
-                PermissionsSection(uses: [])
                 Section("Sleep after being idle for") {
                     picker("On power adapter", selection: $settings.onPower)
                     picker("On battery", selection: $settings.onBattery)

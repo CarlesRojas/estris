@@ -16,7 +16,6 @@ struct ColorPickerPane: View {
             )
 
             Form {
-                PermissionsSection(uses: [])
                 Section("Shortcut") {
                     LabeledContent("Pick a color") {
                         ShortcutRecorder(shortcut: $settings.shortcut)

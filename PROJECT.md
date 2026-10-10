@@ -19,7 +19,7 @@ History is saved in `~/Library/Application Support/PasteRing` (readable by your 
 
 Open **Settings** from the menu bar menu. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Dock Preview, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
 
-Every utility's pane starts (below its on/off switch) with a **Permissions** section: each permission it needs with, in plain words, the one thing it is used for (for example Screen Recording: only to show a thumbnail of what each window shows), whether it is allowed (System Audio Recording read through the private `TCCAccessPreflight`, macOS having no public way), and a button to its System Settings page when it isn't; or that it needs none.
+Every utility that needs permissions starts its pane (below its on/off switch) with a **Permissions** section: each permission it needs with, in plain words, the one thing it is used for (for example Screen Recording: only to show a thumbnail of what each window shows), whether it is allowed (System Audio Recording read through the private `TCCAccessPreflight`, macOS having no public way), and a button to its System Settings page when it isn't. Utilities that need none (Keep Awake, Color Picker) have no such section.
 
 Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
@@ -260,7 +260,7 @@ Sources/PasteRing/
       Settings/                the Clipboard Manager settings pane and its tabs
 ```
 
-To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting and a `settingsPane()` that begins with `UtilityHeader`, then a `PermissionsSection` listing what it needs and why), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
+To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting and a `settingsPane()` that begins with `UtilityHeader`, then, if it needs any, a `PermissionsSection` listing them and why), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
 
 ## Notes
 
