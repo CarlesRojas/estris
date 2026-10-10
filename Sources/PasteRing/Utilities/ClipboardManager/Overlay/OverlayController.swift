@@ -197,6 +197,11 @@ final class OverlayController: NSObject {
         }
     }
 
+    /// Pastes an entry picked outside the overlay (the menu bar menu).
+    func paste(_ item: ClipItem) {
+        commit(item)
+    }
+
     /// Pastes `item`, or the selected entry when nil.
     private func commit(_ item: ClipItem? = nil) {
         guard let item = item ?? state.selectedItem else {

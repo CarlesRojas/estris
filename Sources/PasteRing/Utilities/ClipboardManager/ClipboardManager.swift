@@ -69,11 +69,9 @@ final class ClipboardManager: NSObject {
         }
     }
 
-    /// Entries for the menu bar menu.
-    func menuItems() -> [NSMenuItem] {
-        let clear = NSMenuItem(title: String(localized: "Clear Clipboard History"), action: #selector(clearHistory), keyEquivalent: "")
-        clear.target = self
-        return [clear]
+    /// Pastes an entry into the app in front, as picking it in the overlay does.
+    func paste(_ item: ClipItem) {
+        overlay.paste(item)
     }
 
     /// The pane shown for this utility in Settings.
@@ -88,9 +86,5 @@ final class ClipboardManager: NSObject {
     private func removeExpired(_ expiry: HistoryExpiry) {
         guard let interval = expiry.interval else { return }
         history.removeEntries(olderThan: Date().addingTimeInterval(-interval))
-    }
-
-    @objc private func clearHistory() {
-        history.clear()
     }
 }

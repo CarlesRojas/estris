@@ -16,7 +16,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let colorPicker = ScreenColorPicker()
     private lazy var volumeMixer = VolumeMixer(log: log)
     private var settingsWindow: SettingsWindowController?
-    private var statusItem: NSStatusItem!
+    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer, clipboard: clipboard, colorPicker: colorPicker) { [weak self] in
+        self?.openSettings()
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         clipboard.start()
@@ -27,7 +29,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         keepAwake.start()
         colorPicker.start()
         volumeMixer.start()
-        setUpStatusItem()
+        menuBar.start()
         LoginItem.enableOnFirstLaunch()
         _ = Paster.isTrusted(prompt: true)
         // Relaunched from Settings (to change the language): back where the user was.
@@ -41,37 +43,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         remap.stop()
     }
 
-    private func setUpStatusItem() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "PasteRing")
-
-        let menu = NSMenu()
-        let title = NSMenuItem(title: "PasteRing", action: nil, keyEquivalent: "")
-        title.isEnabled = false
-        menu.addItem(title)
-        menu.addItem(.separator())
-        menu.addItem(makeItem(String(localized: "Settings…"), #selector(openSettings), key: ","))
-        menu.addItem(.separator())
-        clipboard.menuItems().forEach(menu.addItem)
-        menu.addItem(.separator())
-        menu.addItem(makeItem(String(localized: "Quit PasteRing"), #selector(quit), key: "q"))
-        statusItem.menu = menu
-    }
-
-    private func makeItem(_ title: String, _ action: Selector, key: String = "") -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
-        item.target = self
-        return item
-    }
-
-    @objc private func openSettings() {
+    private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, keepAwake: keepAwake, colorPicker: colorPicker, volumeMixer: volumeMixer, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, keepAwake: keepAwake, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
         }
         settingsWindow?.show()
-    }
-
-    @objc private func quit() {
-        NSApp.terminate(nil)
     }
 }

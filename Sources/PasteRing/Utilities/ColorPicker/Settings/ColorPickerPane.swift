@@ -3,6 +3,8 @@ import SwiftUI
 /// The Color Picker settings pane: the on/off switch, the shortcut and the copy format.
 struct ColorPickerPane: View {
     @ObservedObject var settings: ColorPickerSettings
+    /// Copies one of the recent colors.
+    let copy: (String) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,6 +36,20 @@ struct ColorPickerPane: View {
                             .font(.system(.body, design: .monospaced))
                             .foregroundStyle(.secondary)
                             .textSelection(.enabled)
+                    }
+                }
+                Section {
+                    RecentColors(settings: settings, copy: copy)
+                        .padding(.vertical, 2)
+                } header: {
+                    HStack {
+                        Text("Recent Colors")
+                        Spacer()
+                        if !settings.recentColors.isEmpty {
+                            Button("Clear") { settings.clearRecentColors() }
+                                .buttonStyle(.link)
+                                .font(.callout)
+                        }
                     }
                 }
                 Section {

@@ -60,6 +60,12 @@ final class VolumeMixer {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.apply() }
             .store(in: &observers)
+        // An app just excluded goes back to its own sound and leaves the list.
+        settings.$excludedApps
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.refreshApps() }
+            .store(in: &observers)
     }
 
     /// The pane shown for this utility in Settings.
@@ -162,7 +168,8 @@ final class VolumeMixer {
 
     private func refreshApps() {
         guard settings.isEnabled, #available(macOS 14.4, *) else { return }
-        let running = AudioApps.current()
+        let excluded = settings.excludedApps
+        let running = AudioApps.current().filter { app in app.bundleID.map { !excluded.contains($0) } ?? true }
         for app in running where app.isPlaying { heard.insert(app.pid) }
         state.apps = running.filter { heard.contains($0.pid) || !settings.sound(of: $0.key).isUntouched }
         heard.formIntersection(running.map(\.pid))

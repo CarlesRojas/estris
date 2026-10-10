@@ -86,16 +86,35 @@ final class ColorPickerSettings: ObservableObject {
         didSet { defaults.set(try? JSONEncoder().encode(shortcut), forKey: Keys.shortcut) }
     }
 
+    /// The colors picked lately, most recent first, as sRGB hex ("FF8000"). Kept by Reset to
+    /// Defaults, like other histories.
+    @Published private(set) var recentColors: [String] {
+        didSet { defaults.set(recentColors, forKey: Keys.recentColors) }
+    }
+
+    static let maxRecentColors = 16
+
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [Keys.hashPrefix: true])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         format = ColorFormat(rawValue: defaults.string(forKey: Keys.format) ?? "") ?? .hex
         hashPrefix = defaults.bool(forKey: Keys.hashPrefix)
+        recentColors = defaults.stringArray(forKey: Keys.recentColors) ?? []
         shortcut = defaults.data(forKey: Keys.shortcut).flatMap { try? JSONDecoder().decode(Shortcut.self, from: $0) } ?? Self.defaultShortcut
     }
 
-    /// Back to the default format and shortcut; the on/off switch stays.
+    /// Puts a color first among the recent ones; picking one again moves it up.
+    func remember(_ color: NSColor) {
+        let hex = ColorFormat.hex.string(for: color, hashPrefix: false)
+        recentColors = Array(([hex] + recentColors.filter { $0 != hex }).prefix(Self.maxRecentColors))
+    }
+
+    func clearRecentColors() {
+        recentColors = []
+    }
+
+    /// Back to the default format and shortcut; the on/off switch and recent colors stay.
     func reset() {
         format = .hex
         hashPrefix = true
@@ -107,5 +126,19 @@ final class ColorPickerSettings: ObservableObject {
         static let format = "colorPickerFormat"
         static let hashPrefix = "colorPickerHashPrefix"
         static let shortcut = "colorPickerShortcut"
+        static let recentColors = "colorPickerRecentColors"
+    }
+}
+
+extension NSColor {
+    /// An sRGB color from "FF8000"; nil for anything else.
+    convenience init?(hex: String) {
+        guard hex.count == 6, let value = UInt32(hex, radix: 16) else { return nil }
+        self.init(
+            srgbRed: CGFloat((value >> 16) & 0xFF) / 255,
+            green: CGFloat((value >> 8) & 0xFF) / 255,
+            blue: CGFloat(value & 0xFF) / 255,
+            alpha: 1
+        )
     }
 }

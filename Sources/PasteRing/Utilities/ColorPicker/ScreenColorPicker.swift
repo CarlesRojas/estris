@@ -26,7 +26,7 @@ final class ScreenColorPicker {
 
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
-        ColorPickerPane(settings: settings)
+        ColorPickerPane(settings: settings) { [weak self] hex in self?.copy(hex: hex) }
     }
 
     private func apply() {
@@ -39,7 +39,8 @@ final class ScreenColorPicker {
         }
     }
 
-    private func pick() {
+    /// Shows the sampler; on its shortcut, or from the menu bar menu.
+    func pick() {
         guard !isPicking else { return }
         isPicking = true
         NSColorSampler().show { [weak self] color in
@@ -50,7 +51,14 @@ final class ScreenColorPicker {
         }
     }
 
+    /// Copies one of the recent colors (from Settings or the menu bar menu) in the chosen format.
+    func copy(hex: String) {
+        guard let color = NSColor(hex: hex) else { return }
+        copy(color)
+    }
+
     private func copy(_ color: NSColor) {
+        settings.remember(color)
         let text = settings.format.string(for: color, hashPrefix: settings.hashPrefix)
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
