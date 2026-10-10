@@ -22,6 +22,9 @@ final class DockPreview {
     /// can cut a corner on the way up to the panel.
     private static let hideDelay: TimeInterval = 0.3
 
+    /// Developer > Settings: draws the area that keeps the panel open, to tune it.
+    static let showsAreaKey = "developerShowsDockPreviewArea"
+
     let settings = DockPreviewSettings()
     private let state = DockPreviewState()
     private let appLog: AppLog
@@ -50,6 +53,8 @@ final class DockPreview {
     private var clickedPID: pid_t?
     /// Where the pointer last was on the shown app's icon: the tip of the way up to the panel.
     private var lastOnIcon: NSPoint?
+    /// The debugging drawing of that area, when turned on in Developer settings.
+    private var areaPanel: NSPanel?
     /// The last thumbnail of each window, shown at once the next time.
     private var thumbnailCache: [CGWindowID: CGImage] = [:]
 
@@ -129,6 +134,7 @@ final class DockPreview {
     // MARK: Pointer
 
     private func pointerMoved(_ point: NSPoint) {
+        defer { drawArea() }
         // The user can move or resize the Dock at any moment.
         if Date().timeIntervalSince(layoutRead) > 2 {
             layout = DockLayout.current()
@@ -184,6 +190,38 @@ final class DockPreview {
         case .right:
             return Corridor([tip, NSPoint(x: panel.maxX, y: panel.maxY), NSPoint(x: panel.maxX, y: panel.minY)])
         }
+    }
+
+    /// Shows the panel, the icon and the way between them, tinted, over everything and letting
+    /// clicks through, while Developer > Settings asks for it.
+    private func drawArea() {
+        guard UserDefaults.standard.bool(forKey: Self.showsAreaKey), let shown,
+              let screen = NSScreen.screens.first(where: { $0.frame.intersects(shown.frame) })
+        else {
+            areaPanel?.orderOut(nil)
+            return
+        }
+        let panel = areaPanel ?? {
+            let panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+            panel.isOpaque = false
+            panel.backgroundColor = .clear
+            panel.hasShadow = false
+            panel.ignoresMouseEvents = true
+            panel.level = .statusBar
+            panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient, .ignoresCycle]
+            panel.contentView = AreaView()
+            return panel
+        }()
+        areaPanel = panel
+        panel.setFrame(screen.frame, display: false)
+        if let view = panel.contentView as? AreaView {
+            let origin = screen.frame.origin
+            let local = { (point: NSPoint) in NSPoint(x: point.x - origin.x, y: point.y - origin.y) }
+            view.corridor = corridor(to: shown).corners.map(local)
+            view.rects = [contentFrame.insetBy(dx: -6, dy: -6), shown.frame].map { $0.offsetBy(dx: -origin.x, dy: -origin.y) }
+            view.needsDisplay = true
+        }
+        panel.orderFrontRegardless()
     }
 
     private func scheduleOpen(_ item: DockItem, delay: TimeInterval) {
@@ -288,6 +326,7 @@ final class DockPreview {
         captureTask = nil
         shown = nil
         lastOnIcon = nil
+        areaPanel?.orderOut(nil)
         contentFrame = .zero
         panel?.orderOut(nil)
         state.windows = []
@@ -502,5 +541,31 @@ private struct Corridor {
             }
         }
         return true
+    }
+}
+
+/// Draws the area that keeps the panel open: the panel and the icon in blue, the way between
+/// them in orange.
+private final class AreaView: NSView {
+    var corridor: [NSPoint] = []
+    var rects: [NSRect] = []
+
+    override func draw(_ dirtyRect: NSRect) {
+        for rect in rects {
+            NSColor.systemBlue.withAlphaComponent(0.15).setFill()
+            rect.fill()
+            NSColor.systemBlue.setStroke()
+            NSBezierPath(rect: rect).stroke()
+        }
+        guard let first = corridor.first else { return }
+        let path = NSBezierPath()
+        path.move(to: first)
+        corridor.dropFirst().forEach(path.line(to:))
+        path.close()
+        NSColor.systemOrange.withAlphaComponent(0.25).setFill()
+        path.fill()
+        NSColor.systemOrange.setStroke()
+        path.lineWidth = 1.5
+        path.stroke()
     }
 }

@@ -99,6 +99,7 @@
 "Create Mapping" = "Crear asignación";
 "Custom color" = "Color personalizado";
 "Date format" = "Formato de fecha";
+"Debugging" = "Depuración";
 "Default" = "Predeterminado";
 "Delete" = "Eliminar";
 "Delete all clipboard entries?" = "¿Eliminar todas las entradas del portapapeles?";
@@ -320,6 +321,7 @@
 "Show delete button" = "Mostrar botón de eliminar";
 "Show Desktop" = "Mostrar escritorio";
 "Show device pickers" = "Mostrar selectores de dispositivo";
+"Show Dock Preview's hover area" = "Mostrar el área de Vista previa del Dock";
 "Show Microphone" = "Mostrar Micrófono";
 "Show only windows on the current desktop" = "Mostrar solo las ventanas del escritorio actual";
 "Show Output" = "Mostrar Salida";

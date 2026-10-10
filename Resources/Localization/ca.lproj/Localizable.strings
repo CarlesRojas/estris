@@ -99,6 +99,7 @@
 "Create Mapping" = "Crea una assignació";
 "Custom color" = "Color personalitzat";
 "Date format" = "Format de data";
+"Debugging" = "Depuració";
 "Default" = "Per defecte";
 "Delete" = "Suprimeix";
 "Delete all clipboard entries?" = "Vols eliminar totes les entrades del porta-retalls?";
@@ -320,6 +321,7 @@
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";
 "Show device pickers" = "Mostra els selectors de dispositiu";
+"Show Dock Preview's hover area" = "Mostra l'àrea de la Previsualització del Dock";
 "Show Microphone" = "Mostra Micròfon";
 "Show only windows on the current desktop" = "Mostra només les finestres de l'escriptori actual";
 "Show Output" = "Mostra Sortida";

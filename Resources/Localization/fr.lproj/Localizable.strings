@@ -99,6 +99,7 @@
 "Create Mapping" = "Créer une affectation";
 "Custom color" = "Couleur personnalisée";
 "Date format" = "Format de date";
+"Debugging" = "Débogage";
 "Default" = "Par défaut";
 "Delete" = "Supprimer";
 "Delete all clipboard entries?" = "Supprimer toutes les entrées du presse-papiers ?";
@@ -320,6 +321,7 @@
 "Show delete button" = "Afficher le bouton de suppression";
 "Show Desktop" = "Afficher le bureau";
 "Show device pickers" = "Afficher les sélecteurs d'appareil";
+"Show Dock Preview's hover area" = "Afficher la zone de survol de l'Aperçu du Dock";
 "Show Microphone" = "Afficher Micro";
 "Show only windows on the current desktop" = "Afficher uniquement les fenêtres du bureau actuel";
 "Show Output" = "Afficher Sortie";

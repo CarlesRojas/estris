@@ -99,6 +99,7 @@
 "Create Mapping" = "Create Mapping";
 "Custom color" = "Custom color";
 "Date format" = "Date format";
+"Debugging" = "Debugging";
 "Default" = "Default";
 "Delete" = "Delete";
 "Delete all clipboard entries?" = "Delete all clipboard entries?";
@@ -320,6 +321,7 @@
 "Show delete button" = "Show delete button";
 "Show Desktop" = "Show Desktop";
 "Show device pickers" = "Show device pickers";
+"Show Dock Preview's hover area" = "Show Dock Preview's hover area";
 "Show Microphone" = "Show Microphone";
 "Show only windows on the current desktop" = "Show only windows on the current desktop";
 "Show Output" = "Show Output";

@@ -15,6 +15,8 @@ struct DeveloperPane: View {
     @Environment(\.dateTimeFormat) private var dateTimeFormat
     @State private var tab = Tab.logs
     @State private var search = ""
+    /// Read by Dock Preview while its panel shows.
+    @AppStorage(DockPreview.showsAreaKey) private var showsDockPreviewArea = false
     /// Only this utility's entries; nil shows every one.
     @State private var source: String?
     /// The entry just copied with a click, marked for a moment.
@@ -133,6 +135,12 @@ struct DeveloperPane: View {
                 }
             } header: {
                 Text("Status")
+            }
+
+            Section {
+                Toggle("Show Dock Preview's hover area", isOn: $showsDockPreviewArea)
+            } header: {
+                Text("Debugging")
             }
 
             Section {

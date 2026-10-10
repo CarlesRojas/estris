@@ -99,6 +99,7 @@
 "Create Mapping" = "Belegung erstellen";
 "Custom color" = "Eigene Farbe";
 "Date format" = "Datumsformat";
+"Debugging" = "Fehlersuche";
 "Default" = "Standard";
 "Delete" = "Löschen";
 "Delete all clipboard entries?" = "Alle Einträge der Zwischenablage löschen?";
@@ -320,6 +321,7 @@
 "Show delete button" = "Löschtaste anzeigen";
 "Show Desktop" = "Schreibtisch anzeigen";
 "Show device pickers" = "Geräteauswahl anzeigen";
+"Show Dock Preview's hover area" = "Bereich der Dock-Vorschau anzeigen";
 "Show Microphone" = "Mikrofon anzeigen";
 "Show only windows on the current desktop" = "Nur Fenster auf dem aktuellen Schreibtisch anzeigen";
 "Show Output" = "Ausgabe anzeigen";

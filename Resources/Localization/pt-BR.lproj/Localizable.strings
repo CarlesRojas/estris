@@ -99,6 +99,7 @@
 "Create Mapping" = "Criar mapeamento";
 "Custom color" = "Cor personalizada";
 "Date format" = "Formato de data";
+"Debugging" = "Depuração";
 "Default" = "Padrão";
 "Delete" = "Apagar";
 "Delete all clipboard entries?" = "Apagar todos os itens da Área de Transferência?";
@@ -320,6 +321,7 @@
 "Show delete button" = "Mostrar botão de apagar";
 "Show Desktop" = "Mostrar mesa";
 "Show device pickers" = "Mostrar seletores de dispositivo";
+"Show Dock Preview's hover area" = "Mostrar a área da Pré-visualização do Dock";
 "Show Microphone" = "Mostrar Microfone";
 "Show only windows on the current desktop" = "Mostrar apenas janelas da mesa atual";
 "Show Output" = "Mostrar Saída";
