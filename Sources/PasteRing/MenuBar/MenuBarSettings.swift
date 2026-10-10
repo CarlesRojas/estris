@@ -15,6 +15,15 @@ final class MenuBarSettings: ObservableObject {
         didSet { defaults.set(showsSystem, forKey: Keys.showsSystem) }
     }
 
+    /// Within the System rows: the output, and the microphone.
+    @Published var showsOutput: Bool {
+        didSet { defaults.set(showsOutput, forKey: Keys.showsOutput) }
+    }
+
+    @Published var showsInput: Bool {
+        didSet { defaults.set(showsInput, forKey: Keys.showsInput) }
+    }
+
     /// The Volume Mixer's Apps rows.
     @Published var showsApps: Bool {
         didSet { defaults.set(showsApps, forKey: Keys.showsApps) }
@@ -57,6 +66,8 @@ final class MenuBarSettings: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
             Keys.showsSystem: true,
+            Keys.showsOutput: true,
+            Keys.showsInput: true,
             Keys.showsApps: true,
             Keys.showsDevices: true,
             Keys.showsPercentages: false,
@@ -66,6 +77,8 @@ final class MenuBarSettings: ObservableObject {
         ])
         icon = defaults.string(forKey: Keys.icon).flatMap { MenuBarIcon.all.contains($0) ? $0 : nil } ?? MenuBarIcon.app
         showsSystem = defaults.bool(forKey: Keys.showsSystem)
+        showsOutput = defaults.bool(forKey: Keys.showsOutput)
+        showsInput = defaults.bool(forKey: Keys.showsInput)
         showsApps = defaults.bool(forKey: Keys.showsApps)
         showsDevices = defaults.bool(forKey: Keys.showsDevices)
         showsPercentages = defaults.bool(forKey: Keys.showsPercentages)
@@ -79,6 +92,8 @@ final class MenuBarSettings: ObservableObject {
     func reset() {
         icon = MenuBarIcon.app
         showsSystem = true
+        showsOutput = true
+        showsInput = true
         showsApps = true
         showsDevices = true
         showsPercentages = false
@@ -91,6 +106,8 @@ final class MenuBarSettings: ObservableObject {
     private enum Keys {
         static let icon = "menuBarIcon"
         static let showsSystem = "menuBarShowsSystem"
+        static let showsOutput = "menuBarShowsOutput"
+        static let showsInput = "menuBarShowsInput"
         static let showsApps = "menuBarShowsApps"
         static let showsDevices = "menuBarShowsDevices"
         static let showsPercentages = "menuBarShowsPercentages"

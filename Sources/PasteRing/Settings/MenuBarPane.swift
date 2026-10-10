@@ -25,8 +25,14 @@ struct MenuBarPane: View {
                     .padding(.vertical, 4)
                 }
                 Section("Volume Mixer") {
-                    Toggle("Show System", isOn: $settings.showsSystem)
-                    Toggle("Show Apps", isOn: $settings.showsApps)
+                    Toggle("Show System Volume", isOn: $settings.showsSystem)
+                    Group {
+                        Toggle("Show Output", isOn: $settings.showsOutput)
+                        Toggle("Show Microphone", isOn: $settings.showsInput)
+                    }
+                    .padding(.leading, 16)
+                    .disabled(!settings.showsSystem)
+                    Toggle("Show Apps Volume", isOn: $settings.showsApps)
                     Toggle("Show device pickers", isOn: $settings.showsDevices)
                     Toggle("Show volume percentages", isOn: $settings.showsPercentages)
                 }

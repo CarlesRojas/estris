@@ -2,51 +2,63 @@ import AppKit
 import CoreAudio
 import SwiftUI
 
-/// The Volume Mixer settings pane: the on/off switch, the Mac's output and microphone, and one
-/// row per app making sound.
+/// The Volume Mixer settings pane: the on/off switch, then a Mixer tab (the Mac's output and
+/// microphone, and one row per app making sound) and an Excluded Apps tab.
 struct VolumeMixerPane: View {
+    private enum Tab: String, CaseIterable {
+        case mixer = "Mixer"
+        case excludedApps = "Excluded Apps"
+    }
+
     private static let permissionURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!
 
     @ObservedObject var settings: VolumeMixerSettings
     @ObservedObject var state: VolumeMixerState
     let mixer: VolumeMixer
+    @State private var tab = Tab.mixer
 
     var body: some View {
-        VStack(spacing: 0) {
-            UtilityHeader(
-                title: SettingsPane.volumeMixer.title,
-                symbol: SettingsPane.volumeMixer.symbol,
-                summary: "Set the volume and device of your Mac's sound and microphone, and of each app.",
-                isOn: $settings.isEnabled
-            )
+        UtilityPane(
+            pane: .volumeMixer,
+            summary: "Set the volume and device of your Mac's sound and microphone, and of each app.",
+            isOn: $settings.isEnabled,
+            tab: $tab
+        ) { tab in
+            switch tab {
+            case .mixer:
+                form
+            case .excludedApps:
+                // Left out of the mixer entirely: never listed, never changed.
+                AppSwitchList(excluded: $settings.excludedApps)
+            }
+        }
+    }
 
-            Form {
-                if settings.isEnabled {
-                    Section("System") {
-                        SystemSoundRows(state: state, mixer: mixer)
-                    }
-                    Section("Apps") {
-                        if !state.failedApps.isEmpty {
-                            permissionNotice
-                        }
-                        if state.apps.isEmpty {
-                            Text("No app is playing sound.")
-                                .foregroundStyle(.secondary)
-                        }
-                        ForEach(state.apps) { app in
-                            AppSoundRow(app: app, sound: settings.sound(of: app.key), devices: state.outputDevices, mixer: mixer)
-                        }
-                    }
+    private var form: some View {
+        Form {
+            if settings.isEnabled {
+                Section("System") {
+                    SystemSoundRows(state: state, mixer: mixer)
                 }
-                Section {
-                    Button("Reset to Defaults") { mixer.reset() }
+                Section("Apps") {
+                    if !state.failedApps.isEmpty {
+                        permissionNotice
+                    }
+                    if state.apps.isEmpty {
+                        Text("No app is playing sound.")
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(state.apps) { app in
+                        AppSoundRow(app: app, sound: settings.sound(of: app.key), devices: state.outputDevices, mixer: mixer)
+                    }
                 }
             }
-            .formStyle(.grouped)
-            .settingsPage()
-            .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            Section {
+                Button("Reset to Defaults") { mixer.reset() }
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .formStyle(.grouped)
+        .settingsPage()
     }
 
     private var permissionNotice: some View {
@@ -127,26 +139,32 @@ struct AppSoundRow: View {
 struct SystemSoundRows: View {
     @ObservedObject var state: VolumeMixerState
     let mixer: VolumeMixer
+    var showsOutput = true
+    var showsInput = true
     var showsDevice = true
     var showsPercentage = true
 
     var body: some View {
-        SystemSoundRow(
-            title: "Output", icon: "hifispeaker.fill", tint: .blue,
-            devices: state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
-            volume: state.outputVolume, isMuted: state.outputMuted,
-            symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
-            toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume,
-            showsDevice: showsDevice, showsPercentage: showsPercentage
-        )
-        SystemSoundRow(
-            title: "Microphone", icon: "music.mic", tint: .orange,
-            devices: state.inputDevices, selection: state.input, select: mixer.setInputDevice,
-            volume: state.inputVolume, isMuted: state.inputMuted,
-            symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
-            toggleMute: mixer.toggleInputMute, setVolume: mixer.setInputVolume,
-            showsDevice: showsDevice, showsPercentage: showsPercentage
-        )
+        if showsOutput {
+            SystemSoundRow(
+                title: "Output", icon: "hifispeaker.fill", tint: .blue,
+                devices: state.outputDevices, selection: state.output, select: mixer.setOutputDevice,
+                volume: state.outputVolume, isMuted: state.outputMuted,
+                symbol: "speaker.wave.2.fill", mutedSymbol: "speaker.slash.fill",
+                toggleMute: mixer.toggleOutputMute, setVolume: mixer.setOutputVolume,
+                showsDevice: showsDevice, showsPercentage: showsPercentage
+            )
+        }
+        if showsInput {
+            SystemSoundRow(
+                title: "Microphone", icon: "music.mic", tint: .orange,
+                devices: state.inputDevices, selection: state.input, select: mixer.setInputDevice,
+                volume: state.inputVolume, isMuted: state.inputMuted,
+                symbol: "mic.fill", mutedSymbol: "mic.slash.fill",
+                toggleMute: mixer.toggleInputMute, setVolume: mixer.setInputVolume,
+                showsDevice: showsDevice, showsPercentage: showsPercentage
+            )
+        }
     }
 }
 

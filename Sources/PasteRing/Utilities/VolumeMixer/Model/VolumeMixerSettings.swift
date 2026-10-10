@@ -28,9 +28,15 @@ final class VolumeMixerSettings: ObservableObject {
         didSet { defaults.set(try? JSONEncoder().encode(apps), forKey: Keys.apps) }
     }
 
+    /// Bundle identifiers of apps the mixer ignores: never listed, never changed.
+    @Published var excludedApps: Set<String> {
+        didSet { defaults.set(Array(excludedApps), forKey: Keys.excludedApps) }
+    }
+
     init() {
         let defaults = UserDefaults.standard
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
+        excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
         apps = defaults.data(forKey: Keys.apps).flatMap { try? JSONDecoder().decode([String: AppSound].self, from: $0) } ?? [:]
     }
 
@@ -42,7 +48,7 @@ final class VolumeMixerSettings: ObservableObject {
         apps[key] = sound.isUntouched ? nil : sound
     }
 
-    /// Every app back to playing as it is; the on/off switch stays.
+    /// Every app back to playing as it is; the on/off switch and excluded apps stay.
     func reset() {
         apps = [:]
     }
@@ -50,5 +56,6 @@ final class VolumeMixerSettings: ObservableObject {
     private enum Keys {
         static let isEnabled = "volumeMixerEnabled"
         static let apps = "volumeMixerApps"
+        static let excludedApps = "volumeMixerExcludedApps"
     }
 }

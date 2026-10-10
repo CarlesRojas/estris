@@ -54,15 +54,15 @@ Every entry in the overlay shows when it was copied next to its trash icon, in t
 
 Clicking the menu bar icon opens a menu below it in the clipboard overlay's default frosted look (always the defaults, whatever its Appearance settings). It shows, for each of these utilities while it is on and with the parts chosen in Settings > Menu Bar:
 
-- **Volume Mixer**: the same System and Apps rows as its pane.
+- **Volume Mixer**: the same rows as its pane, titled **System Volume** and **Apps Volume**.
 - **Clipboard**: the most recent entries (off by default), each with its source app and one line of it; a click pastes it into the app in front, as the overlay does. A **Clear History** button (on by default) empties the history.
 - **Color Picker**: a **Pick a Color** button (on by default) that starts picking.
 
-Then **Settings** and **Quit** side by side at the bottom. The menu's background is a shade darker than the overlay's surface, and each part (System, Apps, Clipboard, Color Picker) sits in its own lighter rounded box, concentric with the menu; no separator lines. A click outside, Esc or another click on the icon closes it.
+Then **Settings** and **Quit** side by side at the bottom, as capsules. The menu hangs a little below the menu bar; its background is a shade darker than the overlay's surface, its corners are concentric with the capsule buttons, and each part (System Volume, Apps Volume, Clipboard, Color Picker) sits in its own lighter rounded box, concentric with the menu; no separator lines. A click outside, Esc or another click on the icon closes it.
 
 **Menu Bar** in Settings (no on/off switch) picks the icon: 48 in a 16 by 3 grid, all in view, a click applies it at once. PasteRing's own icon comes first and is the default (a placeholder symbol until the app has its icon), then common monochrome symbols (star, heart, flame, leaf, sun, moon, cloud, bolt...). All are template images, so macOS draws them in the menu bar's colour. Then a section per utility picks what the menu shows of it:
 
-- **Volume Mixer**: **Show System**, **Show Apps**, **Show device pickers** (on) and **Show volume percentages** (off).
+- **Volume Mixer**: **Show System Volume**, with **Show Output** and **Show Microphone** under it (they do nothing while it is off), **Show Apps Volume**, **Show device pickers** (all on) and **Show volume percentages** (off).
 - **Clipboard**: **Show recent entries** (off) and how many (**Entries**, 1 to 10, default 5), **Show Clear History button** (on).
 - **Color Picker**: **Show Pick a Color button** (on).
 
@@ -163,6 +163,8 @@ Picks a color anywhere on screen with a shortcut and copies it. Off by default; 
 ## Volume Mixer
 
 Sets the volume and device of the Mac's sound and microphone, and of each app. Needs macOS 14.4 or later; on older versions its pane is hidden and it never starts. Off by default; turn it on in **Settings > Volume Mixer**. Everything follows changes made elsewhere (menu bar, System Settings, keyboard) live, through CoreAudio listeners.
+
+Its pane has two tabs: **Mixer** (below) and **Excluded Apps**, every installed app with a switch; an excluded app is ignored entirely: never listed (in the pane or the menu bar menu) and never changed, playing as macOS plays it.
 
 - **System**: two rows, **Output** and **Microphone**, each with an icon and its title where an app row has the app's icon and name: the device in use (sets the system default, which every app uses unless it picked its own device) at the top right, and below it a mute button, the volume across the width and its percentage, laid out like an app row. Each control is disabled when the device doesn't support it.
 - **Apps**: every app heard playing since the mixer started, while it is running, plus any app with changed settings (helper processes, like a browser's audio process, count as their app). Each has an output device (**Same as System** by default; a device that isn't connected shows "(not connected)" and the app falls back to the system output until it is), a mute button and a volume slider from 0% to 200%. The slider starts in the middle, 100%, where the app plays as it is, and snaps there when close.

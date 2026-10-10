@@ -23,13 +23,17 @@ struct MenuBarMenu: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if mixerSettings.isEnabled && VolumeMixer.isSupported {
-                if settings.showsSystem {
-                    group("System") {
-                        SystemSoundRows(state: mixerState, mixer: mixer, showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages)
+                if settings.showsSystem && (settings.showsOutput || settings.showsInput) {
+                    group("System Volume") {
+                        SystemSoundRows(
+                            state: mixerState, mixer: mixer,
+                            showsOutput: settings.showsOutput, showsInput: settings.showsInput,
+                            showsDevice: settings.showsDevices, showsPercentage: settings.showsPercentages
+                        )
                     }
                 }
                 if settings.showsApps {
-                    group("Apps") {
+                    group("Apps Volume") {
                         if mixerState.apps.isEmpty {
                             Text("No app is playing sound.")
                                 .foregroundStyle(.secondary)
@@ -72,14 +76,20 @@ struct MenuBarMenu: View {
                 menuButton("Quit", symbol: "power", action: quit)
             }
         }
-        .padding(10)
+        .padding(Self.padding)
         .frame(width: Self.width)
         // Darker than the overlay's surface, so each group's lighter box stands out.
         .background(Self.menuShade, in: RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
         .surface(cornerRadius: Self.cornerRadius)
     }
 
-    private static let cornerRadius: CGFloat = 18
+    /// Around the groups and the buttons.
+    private static let padding: CGFloat = 10
+    /// The Settings and Quit buttons' height: they are capsules.
+    private static let buttonHeight: CGFloat = 28
+    /// Concentric with the capsule buttons at the bottom, and the groups with the menu.
+    private static let cornerRadius: CGFloat = buttonHeight / 2 + padding
+    private static let groupRadius: CGFloat = cornerRadius - padding
     private static let menuShade = Color.black.opacity(0.18)
     /// White on light menus, a grey above the menu on dark ones.
     private static let groupFill = Color(nsColor: NSColor(name: nil) { appearance in
@@ -94,9 +104,9 @@ struct MenuBarMenu: View {
             header(title)
             content()
         }
-        .padding(10)
+        .padding(Self.padding)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Self.groupFill, in: RoundedRectangle(cornerRadius: Self.cornerRadius - 10, style: .continuous))
+        .background(Self.groupFill, in: RoundedRectangle(cornerRadius: Self.groupRadius, style: .continuous))
     }
 
     private func header(_ title: LocalizedStringKey) -> some View {
@@ -109,10 +119,11 @@ struct MenuBarMenu: View {
     private func menuButton(_ title: LocalizedStringKey, symbol: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Label(title, systemImage: symbol)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, minHeight: Self.buttonHeight)
+                .contentShape(Capsule())
         }
-        .buttonStyle(.bordered)
-        .controlSize(.large)
+        .buttonStyle(.plain)
+        .background(Color.primary.opacity(0.1), in: Capsule())
     }
 }
 

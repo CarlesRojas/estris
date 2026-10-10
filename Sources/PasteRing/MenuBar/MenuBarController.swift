@@ -9,7 +9,7 @@ final class MenuBarController: NSObject {
     /// Room around the menu for its shadow.
     private static let shadowRoom: CGFloat = 24
     /// Between the menu bar and the menu.
-    private static let gap: CGFloat = 4
+    private static let gap: CGFloat = 8
 
     let settings = MenuBarSettings()
     private let volumeMixer: VolumeMixer

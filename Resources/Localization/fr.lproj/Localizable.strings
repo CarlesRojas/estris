@@ -53,6 +53,7 @@
 "App Windows" = "Fenêtres de l’app";
 "Appearance" = "Apparence";
 "Apps" = "Apps";
+"Apps Volume" = "Volume des apps";
 "Auto Quit" = "Fermeture automatique";
 "Battery" = "Batterie";
 "Bottom edge: thirds" = "Bord inférieur : tiers";
@@ -186,6 +187,7 @@
 "Middle Click" = "Clic central";
 "Mission Control" = "Mission Control";
 "Mission Control and Desktops" = "Mission Control et bureaux";
+"Mixer" = "Mélangeur";
 "Modifiers" = "Modificateurs";
 "Mouse Buttons" = "Boutons de la souris";
 "Move pasted entry to the top" = "Placer l’entrée collée en haut";
@@ -284,14 +286,16 @@
 "Shadow" = "Ombre";
 "Shortcut" = "Raccourci";
 "Shortcuts" = "Raccourcis";
-"Show Apps" = "Afficher Apps";
+"Show Apps Volume" = "Afficher Volume des apps";
 "Show Clear History button" = "Afficher le bouton Effacer l'historique";
 "Show delete button" = "Afficher le bouton de suppression";
 "Show Desktop" = "Afficher le bureau";
 "Show device pickers" = "Afficher les sélecteurs d'appareil";
+"Show Microphone" = "Afficher Micro";
+"Show Output" = "Afficher Sortie";
 "Show Pick a Color button" = "Afficher le bouton Choisir une couleur";
 "Show recent entries" = "Afficher les entrées récentes";
-"Show System" = "Afficher Système";
+"Show System Volume" = "Afficher Volume du système";
 "Show volume percentages" = "Afficher les pourcentages de volume";
 "Show when entries were copied" = "Afficher quand les entrées ont été copiées";
 "Side edges near the bottom: bottom half" = "Bords latéraux près du bas : moitié inférieure";
@@ -317,6 +321,7 @@
 "Symbols" = "Symboles";
 "System" = "Système";
 "System setting" = "Réglage du système";
+"System Volume" = "Volume du système";
 "Tab" = "Tabulation";
 "Tap the trackpad with three or four fingers to middle click." = "Touchez le trackpad avec trois ou quatre doigts pour faire un clic central.";
 "Tap with" = "Toucher avec";

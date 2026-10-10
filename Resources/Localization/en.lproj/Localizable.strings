@@ -53,6 +53,7 @@
 "App Windows" = "App Windows";
 "Appearance" = "Appearance";
 "Apps" = "Apps";
+"Apps Volume" = "Apps Volume";
 "Auto Quit" = "Auto Quit";
 "Battery" = "Battery";
 "Bottom edge: thirds" = "Bottom edge: thirds";
@@ -186,6 +187,7 @@
 "Middle Click" = "Middle Click";
 "Mission Control" = "Mission Control";
 "Mission Control and Desktops" = "Mission Control and Desktops";
+"Mixer" = "Mixer";
 "Modifiers" = "Modifiers";
 "Mouse Buttons" = "Mouse Buttons";
 "Move pasted entry to the top" = "Move pasted entry to the top";
@@ -284,14 +286,16 @@
 "Shadow" = "Shadow";
 "Shortcut" = "Shortcut";
 "Shortcuts" = "Shortcuts";
-"Show Apps" = "Show Apps";
+"Show Apps Volume" = "Show Apps Volume";
 "Show Clear History button" = "Show Clear History button";
 "Show delete button" = "Show delete button";
 "Show Desktop" = "Show Desktop";
 "Show device pickers" = "Show device pickers";
+"Show Microphone" = "Show Microphone";
+"Show Output" = "Show Output";
 "Show Pick a Color button" = "Show Pick a Color button";
 "Show recent entries" = "Show recent entries";
-"Show System" = "Show System";
+"Show System Volume" = "Show System Volume";
 "Show volume percentages" = "Show volume percentages";
 "Show when entries were copied" = "Show when entries were copied";
 "Side edges near the bottom: bottom half" = "Side edges near the bottom: bottom half";
@@ -317,6 +321,7 @@
 "Symbols" = "Symbols";
 "System" = "System";
 "System setting" = "System setting";
+"System Volume" = "System Volume";
 "Tab" = "Tab";
 "Tap the trackpad with three or four fingers to middle click." = "Tap the trackpad with three or four fingers to middle click.";
 "Tap with" = "Tap with";

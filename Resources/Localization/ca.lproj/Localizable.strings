@@ -53,6 +53,7 @@
 "App Windows" = "Finestres de l’app";
 "Appearance" = "Aparença";
 "Apps" = "Apps";
+"Apps Volume" = "Volum de les apps";
 "Auto Quit" = "Tancament automàtic";
 "Battery" = "Bateria";
 "Bottom edge: thirds" = "Vora inferior: terços";
@@ -186,6 +187,7 @@
 "Middle Click" = "Clic central";
 "Mission Control" = "Mission Control";
 "Mission Control and Desktops" = "Mission Control i escriptoris";
+"Mixer" = "Mesclador";
 "Modifiers" = "Modificadors";
 "Mouse Buttons" = "Botons del ratolí";
 "Move pasted entry to the top" = "Mou l’entrada enganxada a dalt";
@@ -284,14 +286,16 @@
 "Shadow" = "Ombra";
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
-"Show Apps" = "Mostra Apps";
+"Show Apps Volume" = "Mostra Volum de les apps";
 "Show Clear History button" = "Mostra el botó Esborra l'historial";
 "Show delete button" = "Mostra el botó d’eliminar";
 "Show Desktop" = "Mostra l’escriptori";
 "Show device pickers" = "Mostra els selectors de dispositiu";
+"Show Microphone" = "Mostra Micròfon";
+"Show Output" = "Mostra Sortida";
 "Show Pick a Color button" = "Mostra el botó Tria un color";
 "Show recent entries" = "Mostra les entrades recents";
-"Show System" = "Mostra Sistema";
+"Show System Volume" = "Mostra Volum del sistema";
 "Show volume percentages" = "Mostra els percentatges de volum";
 "Show when entries were copied" = "Mostra quan es van copiar les entrades";
 "Side edges near the bottom: bottom half" = "Vores laterals a prop de baix: meitat inferior";
@@ -317,6 +321,7 @@
 "Symbols" = "Símbols";
 "System" = "Sistema";
 "System setting" = "Configuració del sistema";
+"System Volume" = "Volum del sistema";
 "Tab" = "Tabulador";
 "Tap the trackpad with three or four fingers to middle click." = "Toca el trackpad amb tres o quatre dits per fer clic central.";
 "Tap with" = "Toca amb";
