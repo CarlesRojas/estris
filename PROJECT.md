@@ -300,7 +300,7 @@ To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager
   1. `scripts/release.py` bumps `CFBundleShortVersionString` (and `CFBundleVersion` by one) in `Resources/Info.plist` and turns Unreleased into the new version's section, dated; those entries are the release notes. It stops if Unreleased is empty.
   2. Builds for Apple silicon and Intel (`RELEASE=1 scripts/build-app.sh`), signed with the Developer ID certificate from the secrets (hardened runtime, `Resources/Estris.entitlements`), packs `Estris.dmg` with a link to Applications (`scripts/make-dmg.sh`), and notarizes and staples it.
   3. Commits "Release X.Y.Z" to main, tags it `vX.Y.Z` and creates the GitHub release with `Estris.dmg`, which the website's Download points to.
-  - Without the signing secrets it still releases, signed ad hoc and not notarized, with a warning; macOS then makes people allow the app by hand. `publish.md` explains the secrets.
+  - Without the signing secrets it still releases, signed ad hoc and not notarized, with a warning; macOS then makes people allow the app by hand. Secrets: `DEVELOPER_ID_CERTIFICATE` (base64 .p12), `DEVELOPER_ID_CERTIFICATE_PASSWORD`, `APPLE_ID`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID`.
 
 ## Notes
 

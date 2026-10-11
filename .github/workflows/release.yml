@@ -1,6 +1,7 @@
 # Publishes a new version: bumps it, turns the changelog's Unreleased entries into its notes,
 # builds a signed and notarized Estris.dmg, commits, tags and creates the GitHub release.
-# Run it from Actions > Release > Run workflow, on main. Signing secrets: see publish.md;
+# Run it from Actions > Release > Run workflow, on main. Signing secrets: DEVELOPER_ID_CERTIFICATE
+# (base64 .p12), DEVELOPER_ID_CERTIFICATE_PASSWORD, APPLE_ID, APPLE_APP_PASSWORD, APPLE_TEAM_ID;
 # without them the app is signed ad hoc and macOS warns when opening it.
 name: Release
 

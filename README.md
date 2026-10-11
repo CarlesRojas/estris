@@ -24,7 +24,7 @@ Checks every visible string is translated in every language.
 
 ## Releases
 
-Actions > Release > Run workflow, on main, choosing patch, minor or major: bumps the version, turns the changelog's Unreleased entries into the release notes, and publishes a signed, notarized `Estris.dmg`. Setup in `publish.md`.
+Actions > Release > Run workflow, on main, choosing patch, minor or major: bumps the version, turns the changelog's Unreleased entries into the release notes, and publishes a signed, notarized `Estris.dmg`.
 
 ## Website (`web/`)
 
