@@ -1,0 +1,111 @@
+:root {
+  --bg: #fbfbfd;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --line: #d2d2d7;
+  --button: #1d1d1f;
+  --button-text: #ffffff;
+  --tab-active: #ffffff;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --text: #f5f5f7;
+    --muted: #a1a1a6;
+    --line: #2c2c2e;
+    --button: #f5f5f7;
+    --button-text: #000000;
+    --tab-active: #1c1c1e;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.47 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+h1, h2 { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif; letter-spacing: -0.02em; margin: 0; }
+
+/* Top bar: logo and name, and the download button. */
+.top {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px max(16px, calc((100vw - 1080px) / 2));
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; font-size: 19px; }
+.brand img { display: block; }
+
+.button {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: 0 24px; border-radius: 980px;
+  background: var(--button); color: var(--button-text);
+  font-weight: 600; font-size: 17px; text-decoration: none;
+  transition: opacity 0.15s;
+}
+.button:hover { opacity: 0.85; }
+.button:focus-visible, .feature-tab:focus-visible, .brand:focus-visible { outline: 3px solid #0a84ff; outline-offset: 3px; }
+.button.small { min-height: 34px; padding: 0 16px; font-size: 15px; }
+
+main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+.hero { text-align: center; padding: 72px 0 56px; display: flex; flex-direction: column; align-items: center; }
+.hero-icon { margin-bottom: 20px; }
+.hero h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.06; max-width: 13em; }
+.lead { color: var(--muted); font-size: clamp(19px, 2.2vw, 24px); line-height: 1.35; max-width: 30em; margin: 18px 0 28px; }
+.note { color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+
+/* Features: the list on one side, the playing one on the other. */
+.features { scroll-margin-top: 72px; display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: start; padding: 24px 0 64px; }
+.feature-list { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 88px; }
+.feature-tab {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  padding: 12px 14px; border: 0; border-radius: 12px; background: transparent;
+  color: var(--muted); font: inherit; font-size: 17px; font-weight: 500; text-align: left; cursor: pointer;
+}
+.feature-tab:hover { color: var(--text); }
+.feature-tab[aria-selected="true"] { color: var(--text); background: var(--tab-active); font-weight: 600; box-shadow: 0 0 0 1px var(--line); }
+.progress { display: none; width: 100%; height: 3px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: var(--text); }
+.feature-tab[aria-selected="true"] .progress { display: block; }
+.feature-tab.running .progress i { animation: progress var(--seconds) linear forwards; }
+.feature-tab[aria-selected="true"]:not(.running) .progress { display: none; }
+@keyframes progress { to { width: 100%; } }
+
+.stage { min-width: 0; }
+.feature-panel { display: grid; gap: 24px; }
+.feature-panel[hidden] { display: none; }
+.spot-frame { width: 100%; max-width: 540px; }
+.copy { max-width: 36em; }
+.copy h2 { font-size: 15px; letter-spacing: 0; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.tagline { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.12; font-weight: 700; letter-spacing: -0.02em; margin: 8px 0 12px; }
+.details { color: var(--muted); font-size: 19px; line-height: 1.42; margin: 0; }
+
+.closing { text-align: center; padding: 64px 0 96px; display: flex; flex-direction: column; align-items: center; gap: 20px; border-top: 1px solid var(--line); }
+.closing h2 { font-size: clamp(30px, 4.5vw, 48px); }
+.closing .note { margin: 0; }
+
+.foot { text-align: center; color: var(--muted); font-size: 13px; padding: 0 16px 32px; }
+
+/* Narrow screens: the features become a row to scroll, above the playing one. */
+@media (max-width: 860px) {
+  .features { grid-template-columns: 1fr; gap: 20px; }
+  .feature-list {
+    position: static; flex-direction: row; overflow-x: auto; gap: 8px; padding: 2px 2px 8px;
+    margin: 0 -16px; padding-left: 16px; padding-right: 16px; scrollbar-width: none;
+  }
+  .feature-list::-webkit-scrollbar { display: none; }
+  .feature-tab { flex: none; padding: 9px 16px; border-radius: 980px; font-size: 15px; box-shadow: 0 0 0 1px var(--line); }
+  .feature-tab .progress { display: none !important; }
+  .feature-tab[aria-selected="true"] { background: var(--button); color: var(--button-text); box-shadow: none; }
+  .hero { padding: 48px 0 40px; }
+}

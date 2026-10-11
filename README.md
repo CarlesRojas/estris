@@ -21,3 +21,17 @@ Run once after the signing certificate changes, then grant Accessibility again.
 python3 scripts/check-localization.py
 ```
 Checks every visible string is translated in every language.
+
+## Website (`web/`)
+
+```sh
+cd web && npm install && npm run dev
+```
+Runs the site locally at http://localhost:4321.
+
+```sh
+cd web && npm run build && npm run render-spots
+```
+Re-records the feature animations as transparent videos in `web/public/spots` (add `-- --mov` for ProRes too).
+
+Vercel: Add New > Project > import this repo > Root Directory `web` > Deploy.

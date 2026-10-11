@@ -1,0 +1,17 @@
+{
+  "name": "estris-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "render-spots": "node scripts/render-spots.mjs"
+  },
+  "dependencies": {
+    "astro": "5.18.2"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

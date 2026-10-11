@@ -1,0 +1,61 @@
+---
+import Win from "../Win.astro";
+import Cursor from "../Cursor.astro";
+/** Resting on an app in the Dock shows its windows; clicking one brings it forward. */
+const { d } = Astro.props;
+const tiles = ["#0a84ff", "#ff375f", "#30d158", "#ff9f0a", "#bf5af2"];
+---
+<div class="spot s-dock" style={`--d:${d}s`}>
+  <div class="screen">
+    <Win class="dock-front pink" />
+    <div class="dock-panel">
+      <div class="dock-thumb dock-t1"><Win class="pink" lines={3} /></div>
+      <div class="dock-thumb dock-t2"><Win class="pink" lines={3} /></div>
+      <div class="dock-thumb dock-t3"><Win class="pink" lines={3} /></div>
+    </div>
+    <div class="dock-bar">
+      {tiles.map((color, index) => <span class={`dock-tile dock-tile-${index}`} style={`background:${color}`}></span>)}
+    </div>
+    <Cursor class="dock-cursor" />
+  </div>
+</div>
+
+<style is:global>
+  .s-dock .dock-bar {
+    position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%); display: flex; gap: 1.6cqw;
+    padding: 1.4cqw; border-radius: 2.4cqw; background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 0.2cqw rgba(255, 255, 255, 0.12);
+  }
+  .s-dock .dock-tile { position: relative; width: 6.6cqw; height: 6.6cqw; border-radius: 1.6cqw; }
+  .s-dock .dock-tile-1::after { content: ""; position: absolute; left: 50%; bottom: -1cqw; width: 0.8cqw; height: 0.8cqw; margin-left: -0.4cqw; border-radius: 50%; background: rgba(255, 255, 255, .7); }
+  .s-dock .dock-panel {
+    position: absolute; left: 14%; top: 40%; width: 72%; height: 36%; padding: 2cqw; display: flex; gap: 2cqw; border-radius: 2.4cqw;
+    background: rgba(58, 58, 64, 0.85); box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.16), 0 2.4cqw 5cqw rgba(0, 0, 0, .45);
+    opacity: 0; transform: translateY(2cqw) scale(.96); transform-origin: 40% 100%;
+  }
+  .s-dock .dock-thumb { position: relative; flex: 1; border-radius: 1.6cqw; padding: 1cqw; }
+  .s-dock .dock-thumb .win { position: absolute; inset: 1cqw; }
+  .s-dock .dock-front { left: 18%; top: 12%; width: 64%; height: 58%; opacity: 0; transform: scale(.5) translateY(30%); }
+  .s-dock .dock-cursor { left: 70%; top: 20%; }
+
+  .s-dock.playing .dock-panel { animation: dock-panel var(--d) cubic-bezier(.3, 1.2, .5, 1) both; }
+  .s-dock.playing .dock-t2 { animation: dock-t2 var(--d) ease both; }
+  .s-dock.playing .dock-front { animation: dock-front var(--d) cubic-bezier(.3, 1.1, .5, 1) both; }
+  .s-dock.playing .dock-cursor { animation: dock-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-dock.playing .dock-tile-1 { animation: dock-tile var(--d) ease both; }
+
+  @keyframes dock-cursor {
+    0% { left: 70%; top: 20%; }
+    18%, 36% { left: 41%; top: 90%; }
+    48%, 58% { left: 50%; top: 58%; }
+    60% { left: 50%; top: 58%; transform: scale(.85); }
+    62%, 100% { left: 50%; top: 58%; transform: none; }
+  }
+  @keyframes dock-tile { 0%, 18% { transform: none; } 22%, 56% { transform: translateY(-1cqw) scale(1.1); } 60%, 100% { transform: none; } }
+  @keyframes dock-panel {
+    0%, 24% { opacity: 0; transform: translateY(2cqw) scale(.96); }
+    29%, 60% { opacity: 1; transform: none; }
+    64%, 100% { opacity: 0; transform: translateY(1cqw) scale(.98); }
+  }
+  @keyframes dock-t2 { 0%, 46% { background: transparent; } 49%, 100% { background: rgba(255, 255, 255, .14); } }
+  @keyframes dock-front { 0%, 61% { opacity: 0; transform: scale(.5) translateY(30%); } 68%, 100% { opacity: 1; transform: none; } }
+</style>

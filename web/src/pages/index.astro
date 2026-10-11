@@ -1,0 +1,156 @@
+---
+import "../styles/spot.css";
+import "../styles/site.css";
+import { features } from "../data/features";
+import { spots } from "../components/spots";
+import { DOWNLOAD_URL, MIN_MACOS } from "../config";
+
+const description = "Ten small utilities for your Mac in one quiet menu bar app: window snapping, clipboard history, a volume mixer and more. Free.";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Estris · The little tools your Mac is missing</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content="Estris" />
+    <meta property="og:description" content={description} />
+    <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="/" aria-label="Estris">
+        <img src="/icon.svg" alt="" width="32" height="32" />
+        <span>Estris</span>
+      </a>
+      <a class="button small" href={DOWNLOAD_URL}>Download</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <img class="hero-icon" src="/icon.svg" alt="" width="112" height="112" />
+        <h1>The little tools your Mac is missing.</h1>
+        <p class="lead">Ten small utilities in one quiet menu bar app. Turn on the ones you want, and forget the rest.</p>
+        <a class="button" href={DOWNLOAD_URL}>Download for Mac</a>
+        <p class="note">Free · {MIN_MACOS}</p>
+      </section>
+
+      <section class="features" aria-label="Features">
+        <nav class="feature-list" role="tablist" aria-label="Features">
+          {features.map((feature, index) => (
+            <button
+              class="feature-tab"
+              role="tab"
+              id={`tab-${feature.id}`}
+              aria-controls={`panel-${feature.id}`}
+              aria-selected={index === 0 ? "true" : "false"}
+              tabindex={index === 0 ? 0 : -1}
+              data-index={index}
+              style={`--seconds:${feature.seconds}s`}
+            >
+              <span>{feature.title}</span>
+              <span class="progress" aria-hidden="true"><i></i></span>
+            </button>
+          ))}
+        </nav>
+
+        <div class="stage">
+          {features.map((feature, index) => {
+            const Spot = spots[feature.id];
+            return (
+              <article
+                class="feature-panel"
+                role="tabpanel"
+                id={`panel-${feature.id}`}
+                aria-labelledby={`tab-${feature.id}`}
+                data-seconds={feature.seconds}
+                hidden={index !== 0}
+              >
+                <div class="copy">
+                  <h2>{feature.title}</h2>
+                  <p class="tagline">{feature.tagline}</p>
+                  <p class="details">{feature.details}</p>
+                </div>
+                <div class="spot-frame" aria-hidden="true"><Spot d={feature.seconds} /></div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section class="closing">
+        <h2>All ten, free.</h2>
+        <a class="button" href={DOWNLOAD_URL}>Download for Mac</a>
+        <p class="note">{MIN_MACOS}</p>
+      </section>
+    </main>
+
+    <footer class="foot">Estris</footer>
+
+    <script>
+      // The features play one after another, each for its animation's length. Picking one
+      // stops that: it keeps replaying until another is picked.
+      const tabs = [...document.querySelectorAll<HTMLButtonElement>(".feature-tab")];
+      const panels = [...document.querySelectorAll<HTMLElement>(".feature-panel")];
+      let current = 0;
+      let picked = false;
+      let timer: number | undefined;
+      let visible = false;
+
+      function play(index: number) {
+        current = index;
+        tabs.forEach((tab, i) => {
+          const active = i === index;
+          tab.setAttribute("aria-selected", String(active));
+          tab.tabIndex = active ? 0 : -1;
+          tab.classList.toggle("running", false);
+        });
+        panels.forEach((panel, i) => (panel.hidden = i !== index));
+        const panel = panels[index];
+        const spot = panel.querySelector<HTMLElement>(".spot");
+        // Restart its animations, and the tab's progress bar.
+        spot?.classList.remove("playing");
+        void spot?.offsetWidth;
+        spot?.classList.add("playing");
+        // On narrow screens the list scrolls sideways: keep the playing one in view.
+        const list = tabs[index].parentElement!;
+        if (list.scrollWidth > list.clientWidth) list.scrollTo({ left: tabs[index].offsetLeft - 16, behavior: "smooth" });
+        void tabs[index].offsetWidth;
+        tabs[index].classList.toggle("running", !picked);
+        window.clearTimeout(timer);
+        if (!visible) return;
+        const seconds = Number(panel.dataset.seconds) || 7;
+        timer = window.setTimeout(() => play(picked ? current : (current + 1) % panels.length), seconds * 1000 + 600);
+      }
+
+      tabs.forEach((tab, index) =>
+        tab.addEventListener("click", () => {
+          picked = true;
+          play(index);
+        }),
+      );
+
+      // Arrow keys move between tabs, as in any tab list.
+      document.querySelector(".feature-list")?.addEventListener("keydown", (event) => {
+        const key = (event as KeyboardEvent).key;
+        const step = key === "ArrowDown" || key === "ArrowRight" ? 1 : key === "ArrowUp" || key === "ArrowLeft" ? -1 : 0;
+        if (!step) return;
+        event.preventDefault();
+        picked = true;
+        const next = (current + step + tabs.length) % tabs.length;
+        play(next);
+        tabs[next].focus();
+      });
+
+      // Only plays while the section is on screen.
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) play(current);
+        else window.clearTimeout(timer);
+      }, { threshold: 0.3 }).observe(document.querySelector(".features")!);
+    </script>
+  </body>
+</html>

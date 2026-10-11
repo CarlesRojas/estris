@@ -1,0 +1,131 @@
+/* Building blocks of the feature spots: a square, transparent stage drawn in HTML and CSS,
+   sized in container units so it is sharp at any size. Each spot's own animations run while
+   its root has `.playing`, over `--d`, once. Kept dark so they read on any background. */
+
+.spot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  container-type: inline-size;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  color: #f5f5f7;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.spot * { box-sizing: border-box; }
+
+/* A Mac screen, with its menu bar. Children are placed in % of it. */
+.spot .screen {
+  position: absolute;
+  left: 6%;
+  top: 5%;
+  width: 88%;
+  height: 66%;
+  border-radius: 2.6cqw;
+  background: linear-gradient(160deg, #2c2e3a, #16171c);
+  box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.14), 0 3cqw 6cqw rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+.spot .screen::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5%;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* A window: traffic lights, then lines of content. */
+.spot .win {
+  position: absolute;
+  border-radius: 1.6cqw;
+  background: #2c2c31;
+  box-shadow: 0 0 0 0.2cqw rgba(255, 255, 255, 0.13), 0 1.5cqw 3cqw rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+.spot .win .bar {
+  height: 3.6cqw;
+  display: flex;
+  gap: 0.7cqw;
+  align-items: center;
+  padding-left: 1.4cqw;
+  background: rgba(255, 255, 255, 0.05);
+}
+.spot .win .bar i { width: 1.1cqw; height: 1.1cqw; border-radius: 50%; background: #ff5f57; }
+.spot .win .bar i:nth-child(2) { background: #febc2e; }
+.spot .win .bar i:nth-child(3) { background: #28c840; }
+.spot .win .body { padding: 1.8cqw; display: flex; flex-direction: column; gap: 1.2cqw; }
+.spot .win .body b { display: block; height: 1.2cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.14); }
+.spot .win .body b:nth-child(1) { width: 70%; }
+.spot .win .body b:nth-child(2) { width: 90%; }
+.spot .win .body b:nth-child(3) { width: 55%; }
+.spot .win .body b:nth-child(4) { width: 80%; }
+.spot .win.blue .body b:first-child { background: #0a84ff; }
+.spot .win.pink .body b:first-child { background: #ff375f; }
+.spot .win.green .body b:first-child { background: #30d158; }
+.spot .win.orange .body b:first-child { background: #ff9f0a; }
+
+/* The pointer: its tip is at the element's top left. */
+.spot .cursor {
+  position: absolute;
+  width: 4.6cqw;
+  height: 4.6cqw;
+  z-index: 50;
+  filter: drop-shadow(0 0.3cqw 0.4cqw rgba(0, 0, 0, 0.4));
+}
+.spot .cursor svg { display: block; width: 100%; height: 100%; }
+
+/* Keycaps under the screen. */
+.spot .keys {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 78%;
+  display: flex;
+  justify-content: center;
+  gap: 1.4cqw;
+}
+.spot .key {
+  min-width: 8.5cqw;
+  height: 8.5cqw;
+  padding: 0 2.2cqw;
+  border-radius: 1.8cqw;
+  background: #2c2c31;
+  box-shadow: inset 0 -0.6cqw 0 rgba(0, 0, 0, 0.35), 0 0 0 0.2cqw rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.8cqw;
+  font-weight: 600;
+  color: #f5f5f7;
+}
+
+/* A frosted label. */
+.spot .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2cqw;
+  padding: 1.2cqw 2.4cqw;
+  border-radius: 99cqw;
+  background: rgba(44, 44, 49, 0.92);
+  box-shadow: 0 0 0 0.2cqw rgba(255, 255, 255, 0.14), 0 1cqw 2cqw rgba(0, 0, 0, 0.35);
+  font-size: 3cqw;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* App icons, as rounded colour tiles with a symbol. */
+.spot .app {
+  position: absolute;
+  border-radius: 22%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 0.15cqw rgba(255, 255, 255, 0.18);
+}
+.spot .app svg { width: 58%; height: 58%; }
+
+/* With Reduce Motion, each spot shows how it ends. */
+@media (prefers-reduced-motion: reduce) {
+  .spot * { animation-duration: 1ms !important; animation-delay: 0s !important; }
+}

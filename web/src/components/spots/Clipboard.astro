@@ -1,0 +1,91 @@
+---
+import Win from "../Win.astro";
+/** Three copies go into the history; ⌘⇧V opens it and V steps through the entries; letting
+    go pastes the one showing into the document. */
+const { d } = Astro.props;
+---
+<div class="spot s-clip" style={`--d:${d}s`}>
+  <div class="screen">
+    <Win class="clip-doc orange" lines={3}><div class="clip-pasted"></div></Win>
+    <div class="clip-h clip-h1"><span class="clip-text">Meeting at 5 pm</span></div>
+    <div class="clip-h clip-h2"><span class="clip-text link">estris.app</span></div>
+    <div class="clip-h clip-h3"><span class="clip-img"></span></div>
+    <div class="clip-card">
+      <div class="clip-e clip-e1"><span>Meeting at 5 pm</span></div>
+      <div class="clip-e clip-e2"><span class="link">estris.app</span></div>
+      <div class="clip-e clip-e3"><span class="clip-img big"></span></div>
+      <div class="clip-n clip-n1 pill">1 of 3</div>
+      <div class="clip-n clip-n2 pill">2 of 3</div>
+      <div class="clip-n clip-n3 pill">3 of 3</div>
+    </div>
+  </div>
+  <div class="keys clip-keys-c"><span class="key">⌘</span><span class="key clip-c">C</span></div>
+  <div class="keys clip-keys-v"><span class="key">⌘</span><span class="key">⇧</span><span class="key clip-v">V</span></div>
+</div>
+
+<style is:global>
+  .s-clip .clip-doc { left: 5%; top: 10%; width: 54%; height: 84%; }
+  .s-clip .clip-pasted {
+    margin-top: 1cqw; height: 13cqw; border-radius: 1.2cqw;
+    background: linear-gradient(135deg, #ff9f0a, #ff375f 55%, #bf5af2); opacity: 0; transform: scale(.9);
+  }
+  .s-clip .clip-h {
+    position: absolute; left: 63%; width: 33%; height: 17%; border-radius: 1.4cqw;
+    background: #2c2c31; box-shadow: 0 0 0 0.2cqw rgba(255, 255, 255, 0.13), 0 1cqw 2cqw rgba(0, 0, 0, .35);
+    display: flex; align-items: center; padding: 0 2cqw; opacity: 0;
+  }
+  .s-clip .clip-h1 { top: 12%; } .s-clip .clip-h2 { top: 33%; } .s-clip .clip-h3 { top: 54%; }
+  .s-clip .clip-text { font-size: 2.5cqw; font-weight: 500; white-space: nowrap; }
+  .s-clip .link { color: #64b5ff; text-decoration: underline; }
+  .s-clip .clip-img { display: block; width: 100%; height: 60%; border-radius: 0.8cqw; background: linear-gradient(135deg, #ff9f0a, #ff375f 55%, #bf5af2); }
+  .s-clip .clip-img.big { width: 34cqw; height: 18cqw; border-radius: 1.4cqw; }
+  .s-clip .clip-card {
+    position: absolute; left: 14%; top: 18%; width: 72%; height: 62%; border-radius: 2.4cqw;
+    background: rgba(58, 58, 64, 0.82); backdrop-filter: blur(2cqw);
+    box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.16), 0 3cqw 6cqw rgba(0, 0, 0, .5);
+    opacity: 0; transform: scale(.94);
+  }
+  .s-clip .clip-e { position: absolute; inset: 0 0 18% 0; display: flex; align-items: center; justify-content: center; font-size: 4.4cqw; font-weight: 600; opacity: 0; }
+  .s-clip .clip-n { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); opacity: 0; }
+  .s-clip .keys { opacity: 0; }
+
+  .s-clip.playing .clip-h1 { animation: clip-h1 var(--d) ease both; }
+  .s-clip.playing .clip-h2 { animation: clip-h2 var(--d) ease both; }
+  .s-clip.playing .clip-h3 { animation: clip-h3 var(--d) ease both; }
+  .s-clip.playing .clip-card { animation: clip-card var(--d) ease both; }
+  .s-clip.playing .clip-e1, .s-clip.playing .clip-n1 { animation: clip-s1 var(--d) ease both; }
+  .s-clip.playing .clip-e2, .s-clip.playing .clip-n2 { animation: clip-s2 var(--d) ease both; }
+  .s-clip.playing .clip-e3, .s-clip.playing .clip-n3 { animation: clip-s3 var(--d) ease both; }
+  .s-clip.playing .clip-pasted { animation: clip-pasted var(--d) cubic-bezier(.3, 1.4, .5, 1) both; }
+  .s-clip.playing .clip-keys-c { animation: clip-keys-c var(--d) ease both; }
+  .s-clip.playing .clip-c { animation: clip-c var(--d) ease both; }
+  .s-clip.playing .clip-keys-v { animation: clip-keys-v var(--d) ease both; }
+  .s-clip.playing .clip-v { animation: clip-v var(--d) ease both; }
+
+  @keyframes clip-h1 { 0%, 6% { opacity: 0; transform: translateX(4cqw); } 9%, 100% { opacity: 1; transform: none; } }
+  @keyframes clip-h2 { 0%, 14% { opacity: 0; transform: translateX(4cqw); } 17%, 100% { opacity: 1; transform: none; } }
+  @keyframes clip-h3 { 0%, 22% { opacity: 0; transform: translateX(4cqw); } 25%, 100% { opacity: 1; transform: none; } }
+  @keyframes clip-card {
+    0%, 34% { opacity: 0; transform: scale(.94); }
+    37%, 70% { opacity: 1; transform: none; }
+    74%, 100% { opacity: 0; transform: scale(.97); }
+  }
+  @keyframes clip-s1 { 0%, 34% { opacity: 0; } 36%, 46% { opacity: 1; } 47%, 100% { opacity: 0; } }
+  @keyframes clip-s2 { 0%, 46% { opacity: 0; } 47%, 58% { opacity: 1; } 59%, 100% { opacity: 0; } }
+  @keyframes clip-s3 { 0%, 58% { opacity: 0; } 59%, 72% { opacity: 1; } 74%, 100% { opacity: 0; } }
+  @keyframes clip-pasted { 0%, 74% { opacity: 0; transform: scale(.9); } 79%, 100% { opacity: 1; transform: none; } }
+  @keyframes clip-keys-c { 0%, 3% { opacity: 0; } 5%, 27% { opacity: 1; } 30%, 100% { opacity: 0; } }
+  @keyframes clip-c {
+    0%, 6% { transform: none; background: #2c2c31; } 7%, 9% { transform: translateY(.5cqw); background: #0a84ff; }
+    10%, 14% { transform: none; background: #2c2c31; } 15%, 17% { transform: translateY(.5cqw); background: #0a84ff; }
+    18%, 22% { transform: none; background: #2c2c31; } 23%, 25% { transform: translateY(.5cqw); background: #0a84ff; }
+    26%, 100% { transform: none; background: #2c2c31; }
+  }
+  @keyframes clip-keys-v { 0%, 31% { opacity: 0; } 33%, 72% { opacity: 1; } 75%, 100% { opacity: 0; } }
+  @keyframes clip-v {
+    0%, 34% { transform: none; background: #2c2c31; } 35%, 37% { transform: translateY(.5cqw); background: #0a84ff; }
+    38%, 46% { transform: none; background: #2c2c31; } 47%, 49% { transform: translateY(.5cqw); background: #0a84ff; }
+    50%, 58% { transform: none; background: #2c2c31; } 59%, 61% { transform: translateY(.5cqw); background: #0a84ff; }
+    62%, 100% { transform: none; background: #2c2c31; }
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+import "../../styles/spot.css";
+import { features } from "../../data/features";
+import { spots } from "../../components/spots";
+
+/** One spot alone, on a transparent page, for recording it as a video. */
+export function getStaticPaths() {
+  return features.map((feature) => ({ params: { id: feature.id }, props: { feature } }));
+}
+const { feature } = Astro.props;
+const Spot = spots[feature.id];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>{feature.title}</title>
+    <style is:global>
+      html, body { margin: 0; background: transparent; }
+      body { width: 100vw; height: 100vh; display: grid; place-items: center; }
+      .frame { width: min(100vw, 100vh); }
+    </style>
+  </head>
+  <body>
+    <div class="frame"><Spot d={feature.seconds} /></div>
+    <script is:inline>document.querySelector(".spot").classList.add("playing");</script>
+  </body>
+</html>

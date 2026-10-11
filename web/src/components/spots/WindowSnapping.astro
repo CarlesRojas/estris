@@ -1,0 +1,89 @@
+---
+import Win from "../Win.astro";
+import Cursor from "../Cursor.astro";
+/** Dragging a window to the left edge snaps it to the left half; ⌃⌥→ sends another to the
+    right half; ⌃⌥Space shares the screen among all three. */
+const { d } = Astro.props;
+---
+<div class="spot s-snap" style={`--d:${d}s`}>
+  <div class="screen">
+    <div class="snap-preview"></div>
+    <Win class="snap-c green" lines={3} />
+    <Win class="snap-b pink" />
+    <Win class="snap-a blue" />
+    <Cursor class="snap-cursor" />
+  </div>
+  <div class="keys snap-keys-1"><span class="key">⌃</span><span class="key">⌥</span><span class="key">→</span></div>
+  <div class="keys snap-keys-2"><span class="key">⌃</span><span class="key">⌥</span><span class="key">Space</span></div>
+</div>
+
+<style is:global>
+  .s-snap .snap-a { left: 8%; top: 14%; width: 46%; height: 52%; z-index: 3; }
+  .s-snap .snap-b { left: 40%; top: 30%; width: 45%; height: 50%; z-index: 2; }
+  .s-snap .snap-c { left: 52%; top: 12%; width: 38%; height: 40%; z-index: 1; }
+  .s-snap .snap-cursor { left: 70%; top: 80%; }
+  .s-snap .snap-preview {
+    position: absolute; left: 1.2%; top: 7%; width: 48.2%; height: 91%;
+    border-radius: 1.6cqw; background: rgba(10, 132, 255, 0.25);
+    box-shadow: inset 0 0 0 0.3cqw rgba(10, 132, 255, 0.8); opacity: 0;
+  }
+  .s-snap .keys { opacity: 0; }
+
+  .s-snap.playing .snap-a { animation: snap-a var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-snap.playing .snap-b { animation: snap-b var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-snap.playing .snap-c { animation: snap-c var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-snap.playing .snap-cursor { animation: snap-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-snap.playing .snap-preview { animation: snap-preview var(--d) ease both; }
+  .s-snap.playing .snap-keys-1 { animation: snap-keys-1 var(--d) ease both; }
+  .s-snap.playing .snap-keys-2 { animation: snap-keys-2 var(--d) ease both; }
+  .s-snap.playing .snap-keys-1 .key { animation: snap-press-1 var(--d) ease both; }
+  .s-snap.playing .snap-keys-2 .key { animation: snap-press-2 var(--d) ease both; }
+
+  @keyframes snap-cursor {
+    0% { left: 70%; top: 80%; }
+    12% { left: 31%; top: 16%; }
+    28% { left: 1.5%; top: 30%; }
+    36% { left: 24%; top: 55%; }
+    100% { left: 24%; top: 55%; }
+  }
+  @keyframes snap-a {
+    0%, 12% { left: 8%; top: 14%; width: 46%; height: 52%; }
+    28% { left: -21.5%; top: 28%; width: 46%; height: 52%; }
+    33%, 62% { left: 1.2%; top: 7%; width: 48.2%; height: 91%; }
+    70%, 100% { left: 1.2%; top: 7%; width: 31.7%; height: 91%; }
+  }
+  @keyframes snap-b {
+    0%, 41% { left: 40%; top: 30%; width: 45%; height: 50%; }
+    46%, 62% { left: 50.6%; top: 7%; width: 48.2%; height: 91%; }
+    70%, 100% { left: 34.15%; top: 7%; width: 31.7%; height: 91%; }
+  }
+  @keyframes snap-c {
+    0%, 63% { left: 52%; top: 12%; width: 38%; height: 40%; }
+    71%, 100% { left: 67.1%; top: 7%; width: 31.7%; height: 91%; }
+  }
+  @keyframes snap-preview {
+    0%, 22% { opacity: 0; }
+    26%, 29% { opacity: 1; }
+    33%, 100% { opacity: 0; }
+  }
+  @keyframes snap-keys-1 {
+    0%, 35% { opacity: 0; transform: translateY(2cqw); }
+    38%, 50% { opacity: 1; transform: none; }
+    54%, 100% { opacity: 0; transform: translateY(-1cqw); }
+  }
+  @keyframes snap-press-1 {
+    0%, 40% { transform: none; background: #2c2c31; }
+    42%, 47% { transform: translateY(0.5cqw); background: #0a84ff; }
+    50%, 100% { transform: none; background: #2c2c31; }
+  }
+  @keyframes snap-keys-2 {
+    0%, 55% { opacity: 0; transform: translateY(2cqw); }
+    58%, 82% { opacity: 1; transform: none; }
+    88%, 100% { opacity: 0; transform: translateY(-1cqw); }
+  }
+  @keyframes snap-press-2 {
+    0%, 61% { transform: none; background: #2c2c31; }
+    63%, 70% { transform: translateY(0.5cqw); background: #0a84ff; }
+    73%, 100% { transform: none; background: #2c2c31; }
+  }
+</style>

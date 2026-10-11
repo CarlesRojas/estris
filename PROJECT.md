@@ -224,6 +224,15 @@ English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **Ge
 - Translations: `Resources/Localization/<language>.lproj/Localizable.strings`, keyed by the English text (the permission prompt is in `InfoPlist.strings`); `build-app.sh` copies them into the app and `Info.plist` lists the languages.
 - `scripts/check-localization.py` finds the text the app shows and reports anything missing in a language.
 
+## Website
+
+`web/` is the download site, built with Astro as a static site (for Vercel, with `web` as the project's root directory). One page: a top bar with the icon, the name and **Download**; a short intro; then the features, each with its title, a one-line pitch, up to three lines on how it works, and an animation of it. The features play one after another, each for its animation's length (a bar under the playing one shows its progress), until one is picked: it then keeps replaying. On narrow screens the list becomes a row of chips to scroll. Only plays while on screen; with Reduce Motion each animation shows how it ends.
+
+- `src/data/features.ts`: the features' texts, order and animation lengths.
+- `src/components/spots/`: one animation per feature, in HTML and CSS on a square, transparent stage (`src/styles/spot.css` holds the shared pieces: screen, windows, pointer, keycaps, labels). Each runs its keyframes once over `--d` while its root has `.playing`.
+- `src/pages/spots/[id].astro`: each animation alone, for recording; `scripts/render-spots.mjs` records them as 1080 px transparent WebM into `public/spots` (and ProRes 4444 with `--mov`), for social posts or elsewhere. `--sheet` writes a few frames side by side to check one.
+- `src/config.ts`: where Download points (the public downloads repo's latest release).
+
 ## Project structure
 
 Estris is meant to grow into a set of macOS utilities, so code is grouped by area:

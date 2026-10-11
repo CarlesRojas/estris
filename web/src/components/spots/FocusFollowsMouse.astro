@@ -1,0 +1,47 @@
+---
+import Win from "../Win.astro";
+import Cursor from "../Cursor.astro";
+/** Pointing at a window brings it forward; passing quickly over one leaves it behind. */
+const { d } = Astro.props;
+---
+<div class="spot s-focus" style={`--d:${d}s`}>
+  <div class="screen">
+    <Win class="focus-a blue" />
+    <Win class="focus-b pink" />
+    <Win class="focus-c green" />
+    <div class="focus-trail"><i></i><i></i><i></i></div>
+    <Cursor class="focus-cursor" />
+  </div>
+</div>
+
+<style is:global>
+  .s-focus .focus-a { left: 4%; top: 12%; width: 46%; height: 60%; z-index: 3; }
+  .s-focus .focus-b { left: 28%; top: 26%; width: 44%; height: 60%; z-index: 2; }
+  .s-focus .focus-c { left: 52%; top: 10%; width: 44%; height: 60%; z-index: 1; }
+  .s-focus .win { filter: brightness(.62); }
+  .s-focus .focus-a { filter: none; }
+  .s-focus .focus-cursor { left: 20%; top: 50%; }
+  .s-focus .focus-trail { position: absolute; left: 40%; top: 60%; width: 30%; z-index: 40; opacity: 0; display: flex; flex-direction: column; gap: 1.2cqw; }
+  .s-focus .focus-trail i { display: block; height: 0.5cqw; border-radius: 1cqw; background: rgba(255, 255, 255, .55); }
+  .s-focus .focus-trail i:nth-child(2) { width: 70%; margin-left: 20%; }
+  .s-focus .focus-trail i:nth-child(3) { width: 50%; margin-left: 40%; }
+
+  .s-focus.playing .focus-a { animation: focus-a var(--d) step-end both; }
+  .s-focus.playing .focus-b { animation: focus-b var(--d) step-end both; }
+  .s-focus.playing .focus-c { animation: focus-c var(--d) step-end both; }
+  .s-focus.playing .focus-cursor { animation: focus-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-focus.playing .focus-trail { animation: focus-trail var(--d) ease both; }
+
+  /* Steps: who is in front, and lit, at each moment. */
+  @keyframes focus-a { 0% { z-index: 3; filter: none; } 24% { z-index: 2; filter: brightness(.62); } 46% { z-index: 1; filter: brightness(.62); } 68% { z-index: 4; filter: none; } 100% { z-index: 4; filter: none; } }
+  @keyframes focus-b { 0% { z-index: 2; filter: brightness(.62); } 24% { z-index: 4; filter: none; } 46% { z-index: 2; filter: brightness(.62); } 100% { z-index: 2; filter: brightness(.62); } }
+  @keyframes focus-c { 0% { z-index: 1; filter: brightness(.62); } 46% { z-index: 5; filter: none; } 68% { z-index: 3; filter: brightness(.62); } 100% { z-index: 3; filter: brightness(.62); } }
+  @keyframes focus-cursor {
+    0%, 6% { left: 20%; top: 50%; }
+    20%, 28% { left: 52%; top: 78%; }
+    42%, 52% { left: 84%; top: 40%; }
+    60% { left: 22%; top: 60%; }
+    100% { left: 22%; top: 60%; }
+  }
+  @keyframes focus-trail { 0%, 54% { opacity: 0; transform: translateX(10cqw); } 57% { opacity: 1; transform: none; } 64%, 100% { opacity: 0; transform: translateX(-12cqw); } }
+</style>

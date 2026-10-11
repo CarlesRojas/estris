@@ -1,0 +1,7 @@
+---
+/** The macOS pointer; its tip is the element's top left. */
+const { class: className = "" } = Astro.props;
+---
+<div class={`cursor ${className}`}>
+  <svg viewBox="0 0 24 24"><path d="M3 2.5v17.2l4.6-4.4 2.9 6.6 2.7-1.2-2.8-6.4h6.4z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+</div>

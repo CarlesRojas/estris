@@ -1,0 +1,58 @@
+---
+/** ⌘⇧C, a loupe over a picture taking each colour it passes, a click, and the colour copied. */
+const { d } = Astro.props;
+---
+<div class="spot s-color" style={`--d:${d}s`}>
+  <div class="screen">
+    <div class="color-art"></div>
+    <div class="color-loupe"><div class="color-grid"></div><div class="color-center"></div></div>
+  </div>
+  <div class="keys color-keys"><span class="key">⌘</span><span class="key">⇧</span><span class="key color-c">C</span></div>
+  <div class="color-copied"><span class="pill"><span class="color-swatch"></span>#FF7A45 · Copied</span></div>
+</div>
+
+<style is:global>
+  .s-color .color-art {
+    position: absolute; inset: 5% 0 0 0;
+    background:
+      radial-gradient(circle at 22% 40%, #ff7a45 0 14%, transparent 15%),
+      radial-gradient(circle at 52% 66%, #0a84ff 0 16%, transparent 17%),
+      radial-gradient(circle at 78% 34%, #30d158 0 13%, transparent 14%),
+      radial-gradient(circle at 60% 22%, #ffd60a 0 8%, transparent 9%);
+  }
+  .s-color .color-loupe {
+    position: absolute; left: 70%; top: 70%; width: 17cqw; height: 17cqw; margin: -8.5cqw 0 0 -8.5cqw; border-radius: 50%;
+    background: #3a3a3f; box-shadow: 0 0 0 0.6cqw #fff, 0 1.6cqw 3cqw rgba(0, 0, 0, .5); overflow: hidden; opacity: 0;
+  }
+  .s-color .color-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(0, 0, 0, .18) 0.15cqw, transparent 0.15cqw), linear-gradient(90deg, rgba(0, 0, 0, .18) 0.15cqw, transparent 0.15cqw);
+    background-size: 2.1cqw 2.1cqw;
+  }
+  .s-color .color-center { position: absolute; left: 50%; top: 50%; width: 2.1cqw; height: 2.1cqw; margin: -1.05cqw 0 0 -1.05cqw; box-shadow: 0 0 0 0.3cqw #fff; }
+  .s-color .keys { opacity: 0; }
+  .s-color .color-copied { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
+  .s-color .color-copied .pill { font-size: 3.6cqw; padding: 1.6cqw 3cqw; }
+  .s-color .color-swatch { width: 4cqw; height: 4cqw; border-radius: 50%; background: #ff7a45; box-shadow: 0 0 0 0.3cqw rgba(255, 255, 255, .8); }
+
+  .s-color.playing .color-keys { animation: color-keys var(--d) ease both; }
+  .s-color.playing .color-c { animation: color-c var(--d) ease both; }
+  .s-color.playing .color-loupe { animation: color-loupe var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-color.playing .color-copied { animation: color-copied var(--d) cubic-bezier(.3, 1.4, .5, 1) both; }
+
+  @keyframes color-keys { 0%, 2% { opacity: 0; } 5%, 20% { opacity: 1; } 24%, 100% { opacity: 0; } }
+  @keyframes color-c { 0%, 9% { transform: none; background: #2c2c31; } 11%, 14% { transform: translateY(.5cqw); background: #0a84ff; } 16%, 100% { transform: none; background: #2c2c31; } }
+  @keyframes color-loupe {
+    0%, 16% { opacity: 0; left: 70%; top: 70%; background-color: #3a3a3f; transform: scale(.8); }
+    20% { opacity: 1; left: 70%; top: 70%; background-color: #3a3a3f; transform: none; }
+    30% { left: 78%; top: 36%; background-color: #30d158; }
+    38% { left: 78%; top: 36%; background-color: #30d158; }
+    48% { left: 52%; top: 68%; background-color: #0a84ff; }
+    54% { left: 52%; top: 68%; background-color: #0a84ff; }
+    64%, 68% { left: 22%; top: 42%; background-color: #ff7a45; transform: none; }
+    70% { left: 22%; top: 42%; background-color: #ff7a45; transform: scale(.88); }
+    73% { left: 22%; top: 42%; background-color: #ff7a45; transform: none; opacity: 1; }
+    78%, 100% { left: 22%; top: 42%; background-color: #ff7a45; opacity: 0; }
+  }
+  @keyframes color-copied { 0%, 72% { opacity: 0; transform: translateY(2cqw) scale(.9); } 77%, 100% { opacity: 1; transform: none; } }
+</style>
