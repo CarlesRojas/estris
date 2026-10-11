@@ -100,6 +100,8 @@
 "Copy As" = "Kopieren als";
 "Copying something already in the history moves it to the top instead of adding it again." = "Wird etwas kopiert, das schon im Verlauf ist, rückt es nach oben, statt erneut hinzugefügt zu werden.";
 "Corners" = "Ecken";
+"Couldn't export the settings" = "Einstellungen konnten nicht exportiert werden";
+"Couldn't import the settings" = "Einstellungen konnten nicht importiert werden";
 "Create Mapping" = "Belegung erstellen";
 "Custom color" = "Eigene Farbe";
 "Date format" = "Datumsformat";
@@ -134,6 +136,8 @@
 "Event Viewer" = "Ereignisanzeige";
 "Example" = "Beispiel";
 "Excluded Apps" = "Ausgeschlossene Apps";
+"Export & Import" = "Exportieren und importieren";
+"Export Settings…" = "Einstellungen exportieren …";
 "Fast Forward" = "Vorspulen";
 "Fill the space next to other windows" = "Platz neben anderen Fenstern füllen";
 "Focus after hovering for" = "Fokussieren nach Überfahren von";
@@ -157,6 +161,9 @@
 "Idle Time Before Sleep" = "Inaktivität bis zum Ruhezustand";
 "Ignore passwords" = "Passwörter ignorieren";
 "Immediately" = "Sofort";
+"Import" = "Importieren";
+"Import Settings…" = "Einstellungen importieren …";
+"Import these settings?" = "Diese Einstellungen importieren?";
 "Inactive" = "Inaktiv";
 "Inactive, macOS sleep settings apply" = "Inaktiv, es gelten die Ruhezustand-Einstellungen von macOS";
 "Include # prefix" = "Präfix # einfügen";
@@ -235,6 +242,7 @@
 "Nothing logged yet." = "Noch nichts protokolliert.";
 "Numbers" = "Zahlen";
 "Off" = "Aus";
+"OK" = "OK";
 "On" = "Ein";
 "On battery" = "Mit Batterie";
 "On power adapter" = "Am Netzteil";
@@ -316,6 +324,7 @@
 "Ring menu" = "Ringmenü";
 "Ring shows" = "Ring zeigt";
 "Same as System" = "Wie das System";
+"Saves every Estris setting to a file, to keep or use on another Mac. The clipboard history isn't included." = "Sichert alle Einstellungen von Estris in einer Datei, zum Aufbewahren oder für einen anderen Mac. Der Verlauf der Zwischenablage ist nicht enthalten.";
 "Screen Recording" = "Bildschirmaufnahme";
 "Screenshot of Screen" = "Bildschirmfoto des Bildschirms";
 "Screenshot of Selection" = "Bildschirmfoto der Auswahl";
@@ -379,8 +388,10 @@
 "The new language is used once Estris opens again." = "Die neue Sprache wird verwendet, sobald Estris wieder geöffnet ist.";
 "The window under the pointer comes to the front and gets the focus." = "Das Fenster unter dem Zeiger kommt nach vorne und erhält den Fokus.";
 "They often open away from the pointer; this leaves time to get there." = "Sie öffnen sich oft abseits des Zeigers; so bleibt Zeit, dorthin zu gelangen.";
+"They replace your current settings, and Estris opens again to apply them." = "Sie ersetzen deine aktuellen Einstellungen, und Estris wird neu geöffnet, um sie anzuwenden.";
 "Thirds" = "Drittel";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Diese Taste erreicht macOS, ohne zu sagen, welches Gerät sie gesendet hat, daher gilt nur die Belegung auf %@.";
+"This file isn't an Estris settings file." = "Diese Datei ist keine Einstellungsdatei von Estris.";
 "Three fingers" = "Drei Finger";
 "Time format" = "Zeitformat";
 "Tint" = "Tönung";

@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Settings shared by every utility.
 struct GeneralPane: View {
@@ -10,6 +11,14 @@ struct GeneralPane: View {
     @State private var versionTaps: [Date] = []
     @State private var accessibilityGranted = Paster.isTrusted(prompt: false)
     @State private var asksToRelaunch = false
+    /// Settings read from a file, waiting for the import to be confirmed.
+    @State private var pendingImport: Data?
+    @State private var transferError: TransferFailure?
+
+    private struct TransferFailure {
+        let title: String
+        let message: String
+    }
 
     var body: some View {
         Form {
@@ -98,6 +107,18 @@ struct GeneralPane: View {
                     }
                 }
             }
+
+            Section {
+                HStack {
+                    Button("Export Settings…", action: exportSettings)
+                    Button("Import Settings…", action: chooseSettingsFile)
+                }
+            } header: {
+                Text("Export & Import")
+            } footer: {
+                Text("Saves every Estris setting to a file, to keep or use on another Mac. The clipboard history isn't included.")
+                    .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .settingsPage()
@@ -116,6 +137,52 @@ struct GeneralPane: View {
             Button("Cancel", role: .cancel) { general.language = general.launchLanguage }
         } message: {
             Text("The new language is used once Estris opens again.")
+        }
+        .alert("Import these settings?", isPresented: Binding(get: { pendingImport != nil }, set: { if !$0 { pendingImport = nil } })) {
+            Button("Import", action: importPendingSettings)
+            Button("Cancel", role: .cancel) { pendingImport = nil }
+        } message: {
+            Text("They replace your current settings, and Estris opens again to apply them.")
+        }
+        .alert(transferError?.title ?? "", isPresented: Binding(get: { transferError != nil }, set: { if !$0 { transferError = nil } })) {
+            Button("OK", role: .cancel) { transferError = nil }
+        } message: {
+            Text(verbatim: transferError?.message ?? "")
+        }
+    }
+
+    private func exportSettings() {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = SettingsTransfer.suggestedFileName
+        panel.allowedContentTypes = [.json]
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            try SettingsTransfer.exportData().write(to: url, options: .atomic)
+        } catch {
+            transferError = TransferFailure(title: String(localized: "Couldn't export the settings"), message: error.localizedDescription)
+        }
+    }
+
+    private func chooseSettingsFile() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            pendingImport = try Data(contentsOf: url)
+        } catch {
+            transferError = TransferFailure(title: String(localized: "Couldn't import the settings"), message: error.localizedDescription)
+        }
+    }
+
+    private func importPendingSettings() {
+        guard let data = pendingImport else { return }
+        pendingImport = nil
+        do {
+            try SettingsTransfer.importData(data)
+            Relaunch.now(reopeningSettings: true)
+        } catch {
+            transferError = TransferFailure(title: String(localized: "Couldn't import the settings"), message: error.localizedDescription)
         }
     }
 
