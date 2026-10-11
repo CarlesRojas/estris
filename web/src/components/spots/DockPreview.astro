@@ -1,0 +1,95 @@
+---
+import Win from "../Win.astro";
+import Cursor from "../Cursor.astro";
+import { pointer, presses, pop } from "../../lib/motion";
+/** Resting on an app in the Dock shows its windows, as the app draws them; a click brings one
+    forward, and it minimizes back into the Dock, so it loops. */
+const { d } = Astro.props;
+const tiles = [
+  { color: "var(--blue)", running: true },
+  { color: "var(--pink)", running: true },
+  { color: "var(--green)", running: false },
+  { color: "var(--orange)", running: false },
+  { color: "var(--purple)", running: false },
+];
+const cards = ["Notes", "Ideas", "Draft"];
+const css = [
+  pointer("dock-cursor", [[0, 72, 28], [4, 72, 28], [12, 40.68, 88.67], [22, 40.68, 88.67], [29, 40.8, 63.7], [36, 40.8, 63.7], [46, 86, 40], [84, 86, 40], [95, 72, 28], [100, 72, 28]]),
+  presses("dock-press", [34]),
+  pop("dock-panel", 17, 36, 0.82),
+].join("\n");
+
+---
+<div class="spot s-dock" style={`--d:${d}s`}>
+  <div class="screen">
+    <Win class="dock-front pink" />
+    <div class="dock-panel">
+      {cards.map((title, index) => (
+        <div class={`dock-card dock-card-${index}`}>
+          <div class="dock-head"><span class="dock-icon"></span><span class="dock-title">{title}</span></div>
+          <div class="dock-thumb"><b></b><b></b><b></b></div>
+        </div>
+      ))}
+    </div>
+    <div class="dock">
+      {tiles.map((tile) => <span class={`tile${tile.running ? " running" : ""}`} style={`background:${tile.color}`}></span>)}
+    </div>
+    <Cursor class="dock-cursor" />
+  </div>
+</div>
+
+<style is:global>
+  /* Like the app's panel: little padding, cards close together, each with the app's icon and
+     the window's title over its thumbnail. */
+  .s-dock .dock-panel {
+    position: absolute; left: 4.68%; top: 48.4%; width: 72.3%; height: 30.6%;
+    display: flex; gap: 0.6cqw; padding: 1.2cqw; border-radius: 3.2cqw;
+    background: rgba(58, 58, 64, 0.88); box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.16), 0 2.4cqw 5cqw rgba(0, 0, 0, .45);
+    opacity: 0; transform: translateY(1.5cqw); transform-origin: 50% 100%;
+  }
+  .s-dock .dock-card { flex: 1; display: flex; flex-direction: column; gap: 0.8cqw; padding: 0.9cqw; border-radius: 2cqw; }
+  .s-dock .dock-head { display: flex; align-items: center; gap: 0.9cqw; }
+  .s-dock .dock-icon { width: 3.2cqw; height: 3.2cqw; border-radius: 0.8cqw; background: var(--pink); }
+  .s-dock .dock-title { font-size: 2.3cqw; font-weight: 500; }
+  .s-dock .dock-thumb {
+    flex: 1; border-radius: 1.2cqw; background: #2c2c31; padding: 1.4cqw; display: flex; flex-direction: column; gap: 0.9cqw;
+    box-shadow: inset 0 0 0 0.15cqw rgba(255, 255, 255, 0.1);
+  }
+  .s-dock .dock-thumb b { display: block; height: 0.9cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.16); }
+  .s-dock .dock-thumb b:first-child { width: 70%; background: var(--pink); }
+  .s-dock .dock-thumb b:nth-child(3) { width: 55%; }
+  .s-dock .dock-front { left: 16%; top: 8%; width: 68%; height: 64%; opacity: 0; }
+  .s-dock .dock-cursor { left: 72%; top: 28%; }
+
+  .s-dock .dock .tile:nth-child(2) { transform-origin: 50% 100%; }
+  .s-dock.playing .dock-panel { animation: dock-panel var(--d) both; }
+  .s-dock.playing .dock-card-1 { animation: dock-card var(--d) both; }
+  .s-dock.playing .dock-front { animation: dock-front var(--d) both; }
+  .s-dock.playing .dock-cursor { animation: dock-cursor-x var(--d) both, dock-cursor-y var(--d) both; }
+  .s-dock.playing .dock-cursor .press { animation: dock-press var(--d) both; }
+  .s-dock.playing .dock .tile:nth-child(2) { animation: dock-tile var(--d) both; }
+
+  @keyframes dock-card {
+    0%, 28% { background: transparent; transform: none; }
+    30%, 34% { background: rgba(255, 255, 255, .13); transform: none; }
+    34.6% { background: rgba(255, 255, 255, .18); transform: scale(.95); }
+    35.8% { background: rgba(255, 255, 255, .18); transform: scale(1.03); }
+    37%, 100% { background: transparent; transform: none; }
+  }
+  /* Springs open from its card, then minimizes into its icon in the Dock, which takes it in
+     with a little squash. */
+  @keyframes dock-front {
+    0%, 35% { opacity: 0; left: 30%; top: 52%; width: 21.6%; height: 24%; animation-timing-function: cubic-bezier(.34, 1.4, .64, 1); }
+    35.5% { opacity: 1; left: 30%; top: 52%; width: 21.6%; height: 24%; animation-timing-function: cubic-bezier(.34, 1.4, .64, 1); }
+    42%, 70% { opacity: 1; left: 16%; top: 8%; width: 68%; height: 64%; animation-timing-function: cubic-bezier(.55, 0, .9, .4); }
+    77% { opacity: 1; left: 37.5%; top: 84.5%; width: 6.4%; height: 8.5%; }
+    78%, 100% { opacity: 0; left: 37.5%; top: 84.5%; width: 6.4%; height: 8.5%; }
+  }
+  @keyframes dock-tile {
+    0%, 77% { transform: none; }
+    78% { transform: scale(1.12, .86); }
+    80% { transform: scale(.94, 1.08); }
+    82.5%, 100% { transform: none; }
+  }
+</style>
+<Fragment set:html={`<style>${css}</style>`} />

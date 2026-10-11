@@ -1,0 +1,64 @@
+---
+import Win from "../Win.astro";
+import Cursor from "../Cursor.astro";
+import { pointer, presses, pop } from "../../lib/motion";
+/** Closing an app's last window quits it: the window goes, then its dot in the Dock. A click
+    on its icon opens it again, so it loops. */
+const { d } = Astro.props;
+const tiles = ["var(--blue)", "var(--orange)", "var(--green)", "var(--purple)"];
+// The close button is at (18.3%, 13.2%); the app's icon at (45.3%, 88.7%).
+const css = [
+  pointer("quit-cursor", [[0, 60, 55], [4, 60, 55], [16, 18.3, 13.2], [24, 18.3, 13.2], [44, 45.3, 88.7], [58, 45.3, 88.7], [72, 60, 55], [100, 60, 55]]),
+  presses("quit-press", [21, 49]),
+  pop("quit-pill", 31, 46),
+].join("\n");
+---
+<div class="spot s-quit" style={`--d:${d}s`}>
+  <div class="screen">
+    <Win class="quit-win orange" />
+    <div class="dock">
+      {tiles.map((color, index) => <span class={`tile quit-tile-${index}${index < 2 ? " running" : ""}`} style={`background:${color}`}></span>)}
+    </div>
+    <Cursor class="quit-cursor" />
+  </div>
+  <div class="quit-pill"><span class="pill">Last window closed · App quit</span></div>
+</div>
+
+<style is:global>
+  .s-quit .quit-win { left: 16%; top: 10%; width: 64%; height: 62%; transform-origin: 50% 50%; }
+  .s-quit .quit-cursor { left: 60%; top: 55%; }
+  .s-quit .quit-pill { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
+  .s-quit .quit-pill .pill { font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
+
+  .s-quit .dock .tile:nth-child(2) { transform-origin: 50% 100%; }
+  .s-quit.playing .quit-win { animation: quit-win var(--d) both; }
+  .s-quit.playing .quit-win .bar i:first-child { animation: quit-close var(--d) both; }
+  .s-quit.playing .quit-cursor { animation: quit-cursor-x var(--d) both, quit-cursor-y var(--d) both; }
+  .s-quit.playing .quit-cursor .press { animation: quit-press var(--d) both; }
+  .s-quit.playing .dock .tile:nth-child(2) { animation: quit-tile var(--d) both; }
+  .s-quit.playing .dock .tile:nth-child(2)::after { animation: quit-dot var(--d) both; }
+  .s-quit.playing .quit-pill { animation: quit-pill var(--d) both; }
+
+  @keyframes quit-close { 0%, 21% { transform: none; } 21.8% { transform: scale(.7); } 23% { transform: scale(1.6); } 25%, 100% { transform: none; } }
+  /* Closes quickly; reopens from the Dock with a spring. */
+  @keyframes quit-win {
+    0%, 22.5% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
+    27%, 56% { opacity: 0; transform: scale(.82); animation-timing-function: cubic-bezier(.34, 1.4, .64, 1); }
+    63%, 100% { opacity: 1; transform: none; }
+  }
+  /* The launch bounce, as the Dock does it. */
+  @keyframes quit-tile {
+    0%, 49.6% { transform: none; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    52% { transform: translateY(-3cqw); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+    54.5% { transform: translateY(0) scale(1.08, .9); animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    56.5% { transform: translateY(-1.4cqw); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+    58.5% { transform: none; }
+    100% { transform: none; }
+  }
+  @keyframes quit-dot {
+    0%, 29% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
+    31%, 55% { opacity: 0; transform: scale(0); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    58%, 100% { opacity: 1; transform: none; }
+  }
+</style>
+<Fragment set:html={`<style>${css}</style>`} />

@@ -224,6 +224,16 @@ English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **Ge
 - Translations: `Resources/Localization/<language>.lproj/Localizable.strings`, keyed by the English text (the permission prompt is in `InfoPlist.strings`); `build-app.sh` copies them into the app and `Info.plist` lists the languages.
 - `scripts/check-localization.py` finds the text the app shows and reports anything missing in a language.
 
+## Website
+
+`web/` is the download site, built with Astro as a static site (for Vercel, with `web` as the project's root directory). Everything is centred. On a desktop it fits one screen: a top bar with the icon, the name and **Download**; the app icon, larger, right above the headline, with lots of room around both; the features as labels with their icons (two rows); and a large panel tinted with the playing feature's colour, with its animation, title, one-line pitch and up to three lines on how it works (when the panel is wide, at least 8:5, the words on the left and the animation, larger, on the right, with the glow behind it). Scrolling only reveals a small footer: the download button, the macOS version needed and the copyright. The features play one after another, each for its animation's length (a short line under the playing one shows its progress), back to the first after the last, until one is picked: it then keeps replaying. Every animation ends exactly as it starts, so replaying is seamless. Keep Awake and Remap are still pictures. On narrow or short screens the page scrolls, with the features as a row to swipe above the panel and a smaller top bar. Only plays while on screen; with Reduce Motion each animation shows how it ends.
+
+- `src/data/features.ts`: the features' texts, order, animation lengths, colours and icons.
+- `src/lib/motion.ts`: the animations' motion language, after LottieFiles' motion-design skill (the "Playful" personality): fast starts with soft landings, a small overshoot when things arrive (ease-out-back), a squash and spring on every click and keypress, a pointer that travels in arcs (x and y on different curves) and holds down while dragging, and a soft light drifting over each screen. Helpers return the keyframes, so every spot moves the same way. Colours are a softer palette than the system's pure ones (`--blue`, `--pink`… in `spot.css`).
+- `src/components/spots/`: one animation per feature, in HTML and CSS on a square, transparent stage (`src/styles/spot.css` holds the shared pieces: screen, windows, pointer, keycaps, labels). Each runs its keyframes once over `--d` while its root has `.playing`.
+- `src/pages/spots/[id].astro`: each animation alone, for recording; `scripts/render-spots.mjs` records them as 1080 px transparent WebM into `public/spots` (and ProRes 4444 with `--mov`), for social posts or elsewhere. `--sheet` writes a few frames side by side to check one.
+- `src/config.ts`: where Download points (the public downloads repo's latest release).
+
 ## Project structure
 
 Estris is meant to grow into a set of macOS utilities, so code is grouped by area:

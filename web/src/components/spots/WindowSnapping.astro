@@ -1,0 +1,84 @@
+---
+import Win from "../Win.astro";
+import Cursor from "../Cursor.astro";
+import { pointer, pointerAnimation, presses, keyPresses, pop, EASE } from "../../lib/motion";
+/** Dragging a window to the left edge snaps it to the left half; ⌃⌥→ sends another to the
+    right half; ⌃⌥Space shares the screen among all three; then they glide back, so it loops. */
+const { d } = Astro.props;
+const css = [
+  pointer("snap-cursor", [[0, 70, 80], [6, 70, 80], [13, 31, 16], [14.5, 31, 16], [24, 1.5, 30], [25, 1.5, 30], [31, 26, 58], [84, 26, 58], [95, 70, 80], [100, 70, 80]]),
+  presses("snap-press", [], [[14.5, 25]]),
+  keyPresses("snap-key-1", [35]),
+  keyPresses("snap-key-2", [51]),
+  pop("snap-keys-1", 31, 44),
+  pop("snap-keys-2", 47, 66),
+].join("\n");
+---
+<div class="spot s-snap" style={`--d:${d}s`}>
+  <div class="screen">
+    <div class="snap-preview"></div>
+    <Win class="snap-c green" lines={3} />
+    <Win class="snap-b pink" />
+    <Win class="snap-a blue" />
+    <Cursor class="snap-cursor" />
+  </div>
+  <div class="keys snap-keys-1"><span class="key">⌃</span><span class="key">⌥</span><span class="key">→</span></div>
+  <div class="keys snap-keys-2"><span class="key">⌃</span><span class="key">⌥</span><span class="key">Space</span></div>
+</div>
+<Fragment set:html={`<style>${css}</style>`} />
+
+<style is:global>
+  .s-snap .snap-a { left: 8%; top: 14%; width: 46%; height: 52%; z-index: 3; }
+  .s-snap .snap-b { left: 40%; top: 30%; width: 45%; height: 50%; z-index: 2; }
+  .s-snap .snap-c { left: 52%; top: 12%; width: 38%; height: 40%; z-index: 1; }
+  .s-snap .snap-cursor { left: 70%; top: 80%; }
+  .s-snap .snap-preview {
+    position: absolute; left: 1.2%; top: 4%; width: 48.2%; height: 94%;
+    border-radius: 1.6cqw; background: rgba(110, 168, 254, 0.22);
+    box-shadow: inset 0 0 0 0.3cqw rgba(110, 168, 254, 0.75); opacity: 0;
+  }
+  .s-snap .keys { opacity: 0; }
+
+  .s-snap.playing .snap-cursor { animation: snap-cursor-x var(--d) both, snap-cursor-y var(--d) both; }
+  .s-snap.playing .snap-cursor .press { animation: snap-press var(--d) both; }
+  .s-snap.playing .snap-a { animation: snap-a var(--d) both; }
+  .s-snap.playing .snap-b { animation: snap-b var(--d) both; }
+  .s-snap.playing .snap-c { animation: snap-c var(--d) both; }
+  .s-snap.playing .snap-preview { animation: snap-preview var(--d) both; }
+  .s-snap.playing .snap-keys-1 { animation: snap-keys-1 var(--d) both; }
+  .s-snap.playing .snap-keys-2 { animation: snap-keys-2 var(--d) both; }
+  .s-snap.playing .snap-keys-1 .key:last-child { animation: snap-key-1 var(--d) both; }
+  .s-snap.playing .snap-keys-2 .key:last-child { animation: snap-key-2 var(--d) both; }
+
+  /* Lifted while dragged, then a rubber-band landing in each new place; back home at the end. */
+  @keyframes snap-a {
+    0%, 14.5% { left: 8%; top: 14%; width: 46%; height: 52%; transform: none; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    16% { left: 8%; top: 14%; width: 46%; height: 52%; transform: scale(1.025); animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    24% { left: -21.5%; top: 28%; width: 46%; height: 52%; transform: scale(1.025); }
+    25% { left: -21.5%; top: 28%; width: 46%; height: 52%; transform: scale(1.025); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    29%, 53% { left: 1.2%; top: 4%; width: 48.2%; height: 94%; transform: none; }
+    53% { animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    57%, 86% { left: 1.2%; top: 4%; width: 31.7%; height: 94%; transform: none; }
+    86% { animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    93%, 100% { left: 8%; top: 14%; width: 46%; height: 52%; transform: none; }
+  }
+  @keyframes snap-b {
+    0%, 36% { left: 40%; top: 30%; width: 45%; height: 50%; animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    40%, 54% { left: 50.6%; top: 4%; width: 48.2%; height: 94%; }
+    54% { animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    58%, 85% { left: 34.15%; top: 4%; width: 31.7%; height: 94%; }
+    85% { animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    92%, 100% { left: 40%; top: 30%; width: 45%; height: 50%; }
+  }
+  @keyframes snap-c {
+    0%, 55% { left: 52%; top: 12%; width: 38%; height: 40%; animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    59%, 84% { left: 67.1%; top: 4%; width: 31.7%; height: 94%; }
+    84% { animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    91%, 100% { left: 52%; top: 12%; width: 38%; height: 40%; }
+  }
+  @keyframes snap-preview {
+    0%, 19% { opacity: 0; transform: scale(.92); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    22%, 25% { opacity: 1; transform: none; }
+    28%, 100% { opacity: 0; transform: none; }
+  }
+</style>

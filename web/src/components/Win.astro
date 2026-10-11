@@ -1,0 +1,8 @@
+---
+/** A window: traffic lights and a few lines of content. */
+const { class: className = "", lines = 4 } = Astro.props;
+---
+<div class={`win ${className}`}>
+  <div class="bar"><i></i><i></i><i></i></div>
+  <div class="body">{Array.from({ length: lines }, () => <b></b>)}<slot /></div>
+</div>
