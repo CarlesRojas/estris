@@ -1,13 +1,25 @@
 ---
 import Cursor from "../Cursor.astro";
+import { pointer, presses } from "../../lib/motion";
 /** Music up, the browser down and muted, the call to AirPods; then all of it undone, so it
     loops. The pointer holds each knob as it drags it: rows are laid out at fixed positions so
     the pointer's path and the knobs' share the same numbers. */
 const { d } = Astro.props;
+// Knob x for a value v: 4 + 0.92 × (16 + 79v); row tracks at y 30.72 and 59.72; the browser's
+// speaker at (10.06, 59.5); the call's device at (84, 76.33).
+const css = [
+  pointer("vol-cursor", [
+    [0, 84, 76.33], [2, 84, 76.33], [7, 55.06, 30.72], [8.6, 55.06, 30.72], [16, 80.5, 30.72], [17, 80.5, 30.72],
+    [22, 62.33, 59.72], [23.6, 62.33, 59.72], [31, 36.89, 59.72], [32, 36.89, 59.72], [37, 10.06, 59.5], [40, 10.06, 59.5],
+    [45, 84, 76.33], [49, 84, 76.33], [54, 10.06, 59.5], [58, 10.06, 59.5], [62, 36.89, 59.72], [62.6, 36.89, 59.72], [70, 62.33, 59.72],
+    [71, 62.33, 59.72], [76, 80.5, 30.72], [76.6, 80.5, 30.72], [84, 55.06, 30.72], [85, 55.06, 30.72], [92, 84, 76.33], [100, 84, 76.33],
+  ]),
+  presses("vol-press", [38, 46.5, 55.5, 93.5], [[8, 16], [23, 31], [62, 70], [76, 84]]),
+].join("\n");
 const rows = [
-  { id: "music", name: "Music", color: "#ff375f", device: "Same as System", value: 50 },
-  { id: "web", name: "Browser", color: "#ff9f0a", device: "Same as System", value: 60 },
-  { id: "call", name: "Call", color: "#30d158", device: "MacBook Speakers", value: 70 },
+  { id: "music", name: "Music", color: "var(--pink)", device: "Same as System", value: 50 },
+  { id: "web", name: "Browser", color: "var(--orange)", device: "Same as System", value: 60 },
+  { id: "call", name: "Call", color: "var(--green)", device: "MacBook Speakers", value: 70 },
 ];
 ---
 <div class="spot s-vol" style={`--d:${d}s`}>
@@ -46,60 +58,73 @@ const rows = [
   .s-vol .vol-name { position: absolute; left: 14%; top: 12%; line-height: 5.4cqw; font-size: 3.3cqw; font-weight: 600; }
   .s-vol .vol-device { position: absolute; right: 4%; top: 12%; height: 5.4cqw; display: grid; justify-items: end; align-items: center; font-size: 2.6cqw; color: rgba(245, 245, 247, .6); }
   .s-vol .vol-device > span { grid-area: 1 / 1; white-space: nowrap; }
-  .s-vol .vol-dev-b { opacity: 0; color: #64b5ff; font-weight: 600; }
+  .s-vol .vol-dev-b { opacity: 0; color: #9cc3ff; font-weight: 600; }
   .s-vol .vol-speaker { position: absolute; left: 4%; top: 62%; width: 4cqw; height: 4cqw; color: rgba(245, 245, 247, .8); }
   .s-vol .vol-speaker svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .s-vol .vol-off { opacity: 0; color: #ff453a; }
+  .s-vol .vol-off { opacity: 0; color: var(--red); }
   .s-vol .vol-track { position: absolute; left: 16%; right: 5%; top: calc(72% - 0.6cqw); height: 1.2cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.14); }
   .s-vol .vol-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 1cqw; background: #f5f5f7; }
   .s-vol .vol-knob { position: absolute; top: 50%; width: 3.6cqw; height: 3.6cqw; margin: -1.8cqw 0 0 -1.8cqw; border-radius: 50%; background: #fff; box-shadow: 0 0.4cqw 1cqw rgba(0, 0, 0, .4); }
   .s-vol .vol-cursor { left: 84%; top: 76.33%; }
+  .s-vol .vol-speaker, .s-vol .vol-device { transform-origin: center; }
 
-  .s-vol.playing .vol-cursor { animation: vol-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-vol.playing .vol-music .vol-fill { animation: vol-music-fill var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-vol.playing .vol-music .vol-knob { animation: vol-music-knob var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-vol.playing .vol-web .vol-fill { animation: vol-web-fill var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-vol.playing .vol-web .vol-knob { animation: vol-web-knob var(--d) cubic-bezier(.45, 0, .25, 1) both; }
+  .s-vol.playing .vol-cursor { animation: vol-cursor-x var(--d) both, vol-cursor-y var(--d) both; }
+  .s-vol.playing .vol-cursor .press { animation: vol-press var(--d) both; }
+  .s-vol.playing .vol-music .vol-fill { animation: vol-music-fill var(--d) both; }
+  .s-vol.playing .vol-music .vol-knob { animation: vol-music-knob var(--d) both; }
+  .s-vol.playing .vol-web .vol-fill { animation: vol-web-fill var(--d) both; }
+  .s-vol.playing .vol-web .vol-knob { animation: vol-web-knob var(--d) both; }
+  .s-vol.playing .vol-web .vol-speaker { animation: vol-tap var(--d) both; }
   .s-vol.playing .vol-web .vol-on { animation: vol-web-on var(--d) step-end both; }
   .s-vol.playing .vol-web .vol-off { animation: vol-web-off var(--d) step-end both; }
-  .s-vol.playing .vol-dev-a { animation: vol-dev-a var(--d) ease both; }
-  .s-vol.playing .vol-dev-b { animation: vol-dev-b var(--d) ease both; }
+  .s-vol.playing .vol-call .vol-device { animation: vol-device var(--d) both; }
+  .s-vol.playing .vol-dev-a { animation: vol-dev-a var(--d) step-end both; }
+  .s-vol.playing .vol-dev-b { animation: vol-dev-b var(--d) step-end both; }
 
-  @keyframes vol-cursor {
-    0%, 2% { left: 84%; top: 76.33%; transform: none; }
-    8% { left: 55.06%; top: 30.72%; }
-    18% { left: 80.5%; top: 30.72%; }
-    24% { left: 62.33%; top: 59.72%; }
-    34% { left: 36.89%; top: 59.72%; }
-    40% { left: 10.06%; top: 59.5%; transform: none; }
-    41% { left: 10.06%; top: 59.5%; transform: scale(.85); }
-    42% { left: 10.06%; top: 59.5%; transform: none; }
-    48% { left: 84%; top: 76.33%; transform: none; }
-    49% { left: 84%; top: 76.33%; transform: scale(.85); }
-    50% { left: 84%; top: 76.33%; transform: none; }
-    56% { left: 10.06%; top: 59.5%; transform: none; }
-    57% { left: 10.06%; top: 59.5%; transform: scale(.85); }
-    58% { left: 10.06%; top: 59.5%; transform: none; }
-    63% { left: 36.89%; top: 59.72%; }
-    73% { left: 62.33%; top: 59.72%; }
-    79% { left: 80.5%; top: 30.72%; }
-    89% { left: 55.06%; top: 30.72%; }
-    96% { left: 84%; top: 76.33%; transform: none; }
-    97% { left: 84%; top: 76.33%; transform: scale(.85); }
-    98%, 100% { left: 84%; top: 76.33%; transform: none; }
+  /* Knobs move on the pointer's own x curve while dragged, so they stay under it, and swell a
+     little while held. */
+  @keyframes vol-music-knob {
+    0%, 8% { left: 50%; transform: none; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    8.6% { left: 50%; transform: scale(1.2); animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    16% { left: 85%; transform: scale(1.2); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    18%, 76% { left: 85%; transform: none; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    76.6% { left: 85%; transform: scale(1.2); animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    84% { left: 50%; transform: scale(1.2); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    86%, 100% { left: 50%; transform: none; }
   }
-  @keyframes vol-music-fill { 0%, 8% { width: 50%; } 18%, 79% { width: 85%; } 89%, 100% { width: 50%; } }
-  @keyframes vol-music-knob { 0%, 8% { left: 50%; } 18%, 79% { left: 85%; } 89%, 100% { left: 50%; } }
+  @keyframes vol-music-fill {
+    0%, 8.6% { width: 50%; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    16%, 76.6% { width: 85%; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    84%, 100% { width: 50%; }
+  }
+  @keyframes vol-web-knob {
+    0%, 23% { left: 60%; transform: none; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    23.6% { left: 60%; transform: scale(1.2); animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    31% { left: 25%; transform: scale(1.2); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    33%, 62% { left: 25%; transform: none; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    62.6% { left: 25%; transform: scale(1.2); animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    70% { left: 60%; transform: scale(1.2); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    72%, 100% { left: 60%; transform: none; }
+  }
   @keyframes vol-web-fill {
-    0%, 24% { width: 60%; background: #f5f5f7; }
-    34%, 41% { width: 25%; background: #f5f5f7; }
-    42%, 57% { width: 25%; background: rgba(245, 245, 247, .3); }
-    58%, 63% { width: 25%; background: #f5f5f7; }
-    73%, 100% { width: 60%; background: #f5f5f7; }
+    0%, 23.6% { width: 60%; background: #f5f5f7; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    31%, 38.6% { width: 25%; background: #f5f5f7; }
+    39.6%, 55.6% { width: 25%; background: rgba(245, 245, 247, .3); }
+    56.6%, 62.6% { width: 25%; background: #f5f5f7; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    70%, 100% { width: 60%; background: #f5f5f7; }
   }
-  @keyframes vol-web-knob { 0%, 24% { left: 60%; } 34%, 63% { left: 25%; } 73%, 100% { left: 60%; } }
-  @keyframes vol-web-on { 0% { opacity: 1; } 41% { opacity: 0; } 57% { opacity: 1; } 100% { opacity: 1; } }
-  @keyframes vol-web-off { 0% { opacity: 0; } 41% { opacity: 1; } 57% { opacity: 0; } 100% { opacity: 0; } }
-  @keyframes vol-dev-a { 0%, 49% { opacity: 1; } 50%, 97% { opacity: 0; } 98%, 100% { opacity: 1; } }
-  @keyframes vol-dev-b { 0%, 49% { opacity: 0; } 50%, 97% { opacity: 1; } 98%, 100% { opacity: 0; } }
+  /* The speaker and the device name jump a little when clicked. */
+  @keyframes vol-tap {
+    0%, 38.6% { transform: none; } 39.4% { transform: scale(.8); } 40.6% { transform: scale(1.2); } 42%, 55.6% { transform: none; }
+    56.4% { transform: scale(.8); } 57.6% { transform: scale(1.2); } 59%, 100% { transform: none; }
+  }
+  @keyframes vol-device {
+    0%, 47% { transform: none; } 47.8% { transform: scale(.9); } 49% { transform: scale(1.08); } 50.5%, 94% { transform: none; }
+    94.8% { transform: scale(.9); } 96% { transform: scale(1.08); } 97.5%, 100% { transform: none; }
+  }
+  @keyframes vol-web-on { 0% { opacity: 1; } 39.4% { opacity: 0; } 56.4% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes vol-web-off { 0% { opacity: 0; } 39.4% { opacity: 1; } 56.4% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes vol-dev-a { 0% { opacity: 1; } 47.8% { opacity: 0; } 94.8% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes vol-dev-b { 0% { opacity: 0; } 47.8% { opacity: 1; } 94.8% { opacity: 0; } 100% { opacity: 0; } }
 </style>
+<Fragment set:html={`<style>${css}</style>`} />

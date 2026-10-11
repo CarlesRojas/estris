@@ -24,10 +24,10 @@ const { d } = Astro.props;
     background: rgba(40, 40, 45, 0.95); box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.14), 0 3cqw 6cqw rgba(0, 0, 0, .4);
   }
   .s-awake .awake-head { display: flex; align-items: center; gap: 2.4cqw; padding-bottom: 2cqw; }
-  .s-awake .awake-tile { width: 9cqw; height: 9cqw; border-radius: 2.2cqw; background: #ff9f0a; color: #fff; display: grid; place-items: center; }
+  .s-awake .awake-tile { width: 9cqw; height: 9cqw; border-radius: 2.2cqw; background: var(--orange); color: #fff; display: grid; place-items: center; }
   .s-awake .awake-tile svg { width: 60%; height: 60%; }
   .s-awake .awake-name { flex: 1; font-size: 4.4cqw; font-weight: 700; }
-  .s-awake .awake-switch { position: relative; width: 9cqw; height: 5.4cqw; border-radius: 3cqw; background: #30d158; }
+  .s-awake .awake-switch { position: relative; width: 9cqw; height: 5.4cqw; border-radius: 3cqw; background: var(--green); }
   .s-awake .awake-switch i { position: absolute; right: 0.5cqw; top: 0.5cqw; width: 4.4cqw; height: 4.4cqw; border-radius: 50%; background: #fff; }
   .s-awake .awake-switch.small { width: 6.4cqw; height: 3.8cqw; }
   .s-awake .awake-switch.small i { width: 2.9cqw; height: 2.9cqw; right: 0.45cqw; top: 0.45cqw; }
@@ -38,5 +38,5 @@ const { d } = Astro.props;
   .s-awake .awake-value { color: rgba(245, 245, 247, .6); }
   .s-awake .awake-pill { position: absolute; left: 0; right: 0; top: 80%; display: flex; justify-content: center; }
   .s-awake .awake-pill .pill { font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
-  .s-awake .awake-dot { width: 2.2cqw; height: 2.2cqw; border-radius: 50%; background: #30d158; box-shadow: 0 0 1.4cqw #30d158; }
+  .s-awake .awake-dot { width: 2.2cqw; height: 2.2cqw; border-radius: 50%; background: var(--green); box-shadow: 0 0 1.4cqw var(--green); }
 </style>

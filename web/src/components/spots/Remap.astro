@@ -34,13 +34,13 @@ const { d } = Astro.props;
   .s-remap .key { height: 13cqw; font-size: 4cqw; padding: 0 3.6cqw; gap: 1.4cqw; }
   .s-remap .remap-from-1 { min-width: 30cqw; justify-content: flex-start; }
   .s-remap .remap-to-1 { min-width: 16cqw; }
-  .s-remap .remap-to-1, .s-remap .remap-to-2 { background: #0a84ff; }
+  .s-remap .remap-to-1, .s-remap .remap-to-2 { background: var(--blue); }
   .s-remap .remap-to-2 svg { width: 4.4cqw; height: 4.4cqw; }
   .s-remap .remap-arrow { position: relative; flex: 1; height: 0.8cqw; }
-  .s-remap .remap-arrow i { position: absolute; inset: 0; border-radius: 1cqw; background: #0a84ff; transform-origin: left; }
+  .s-remap .remap-arrow i { position: absolute; inset: 0; border-radius: 1cqw; background: var(--blue); transform-origin: left; }
   .s-remap .remap-arrow i::after {
     content: ""; position: absolute; right: -0.4cqw; top: 50%; width: 3cqw; height: 3cqw; margin-top: -1.5cqw;
-    border-top: 0.8cqw solid #0a84ff; border-right: 0.8cqw solid #0a84ff; border-radius: 0.3cqw; transform: rotate(45deg);
+    border-top: 0.8cqw solid var(--blue); border-right: 0.8cqw solid var(--blue); border-radius: 0.3cqw; transform: rotate(45deg);
   }
   .s-remap .remap-mouse {
     position: relative; width: 13cqw; height: 20cqw; border-radius: 6.5cqw; background: #2c2c31;

@@ -1,11 +1,20 @@
 ---
 import Win from "../Win.astro";
 import Cursor from "../Cursor.astro";
-/** The pointer glides across three windows and back; each comes forward the moment the pointer
-    enters it. The path is straight and steady, so the instants are known: going right, x = 44%
-    (A's edge) at 23.33% and 70% (B's edge) at 37.07%; coming back, 58% (C's edge) at 69.27%
-    and 32% (B's edge) at 83.01%. */
+/** The pointer glides across three windows and back, in a gentle arc; each comes forward, with
+    a little bounce, the moment the pointer enters it. The instants come from the path's own
+    curve (see FOCUS below): going right it reaches x = 44% (A's edge) and 70% (B's edge),
+    coming back 58% (C's edge) and 32% (B's edge). */
 const { d } = Astro.props;
+// Worked out from cubic-bezier(.45, 0, .55, 1) between x 15 and 85 over 8%–45% and back over
+// 55%–92% (solved numerically).
+const FOCUS = { b: 24.74, c: 32.86, cBack: 71.14, a: 79.12 };
+const raise = (name: string, at: number[]) => `@keyframes ${name} { 0% { transform: none; } ${at.map((p) => `${p}% { transform: none; } ${p + 0.8}% { transform: scale(1.025); } ${p + 2.2}% { transform: none; }`).join(" ")} 100% { transform: none; } }`;
+const css = [raise("focus-pop-a", [FOCUS.a]), raise("focus-pop-b", [FOCUS.b, FOCUS.cBack]), raise("focus-pop-c", [FOCUS.c])].join("\n")
+  + `
+  @keyframes focus-a { 0% { z-index: 3; filter: none; } ${FOCUS.b}% { z-index: 2; filter: brightness(.6); } ${FOCUS.c}% { z-index: 1; filter: brightness(.6); } ${FOCUS.a}% { z-index: 3; filter: none; } 100% { z-index: 3; filter: none; } }
+  @keyframes focus-b { 0% { z-index: 2; filter: brightness(.6); } ${FOCUS.b}% { z-index: 3; filter: none; } ${FOCUS.c}% { z-index: 2; filter: brightness(.6); } ${FOCUS.cBack}% { z-index: 3; filter: none; } ${FOCUS.a}% { z-index: 2; filter: brightness(.6); } 100% { z-index: 2; filter: brightness(.6); } }
+  @keyframes focus-c { 0% { z-index: 1; filter: brightness(.6); } ${FOCUS.c}% { z-index: 3; filter: none; } ${FOCUS.cBack}% { z-index: 2; filter: brightness(.6); } ${FOCUS.a}% { z-index: 1; filter: brightness(.6); } 100% { z-index: 1; filter: brightness(.6); } }`;
 ---
 <div class="spot s-focus" style={`--d:${d}s`}>
   <div class="screen">
@@ -15,6 +24,7 @@ const { d } = Astro.props;
     <Cursor class="focus-cursor" />
   </div>
 </div>
+<Fragment set:html={`<style>${css}</style>`} />
 
 <style is:global>
   .s-focus .focus-a { left: 4%; top: 12%; width: 40%; height: 66%; z-index: 3; }
@@ -22,18 +32,22 @@ const { d } = Astro.props;
   .s-focus .focus-c { left: 58%; top: 10%; width: 38%; height: 66%; z-index: 1; filter: brightness(.6); }
   .s-focus .focus-cursor { left: 15%; top: 58%; }
 
-  .s-focus.playing .focus-a { animation: focus-a var(--d) step-end both; }
-  .s-focus.playing .focus-b { animation: focus-b var(--d) step-end both; }
-  .s-focus.playing .focus-c { animation: focus-c var(--d) step-end both; }
-  .s-focus.playing .focus-cursor { animation: focus-cursor var(--d) linear both; }
+  .s-focus.playing .focus-a { animation: focus-a var(--d) step-end both, focus-pop-a var(--d) both; }
+  .s-focus.playing .focus-b { animation: focus-b var(--d) step-end both, focus-pop-b var(--d) both; }
+  .s-focus.playing .focus-c { animation: focus-c var(--d) step-end both, focus-pop-c var(--d) both; }
+  .s-focus.playing .focus-cursor { animation: focus-x var(--d) both, focus-y var(--d) both; }
 
-  @keyframes focus-cursor {
-    0%, 8% { left: 15%; top: 58%; }
-    45%, 55% { left: 85%; top: 58%; }
-    92%, 100% { left: 15%; top: 58%; }
+  @keyframes focus-x {
+    0%, 8% { left: 15%; animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+    45%, 55% { left: 85%; animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+    92%, 100% { left: 15%; }
   }
-  /* Front to back: A B C, then B A C, C B A, B C A, and A B C again. */
-  @keyframes focus-a { 0% { z-index: 3; filter: none; } 23.33% { z-index: 2; filter: brightness(.6); } 37.07% { z-index: 1; filter: brightness(.6); } 83.01% { z-index: 3; filter: none; } 100% { z-index: 3; filter: none; } }
-  @keyframes focus-b { 0% { z-index: 2; filter: brightness(.6); } 23.33% { z-index: 3; filter: none; } 37.07% { z-index: 2; filter: brightness(.6); } 69.27% { z-index: 3; filter: none; } 83.01% { z-index: 2; filter: brightness(.6); } 100% { z-index: 2; filter: brightness(.6); } }
-  @keyframes focus-c { 0% { z-index: 1; filter: brightness(.6); } 37.07% { z-index: 3; filter: none; } 69.27% { z-index: 2; filter: brightness(.6); } 83.01% { z-index: 1; filter: brightness(.6); } 100% { z-index: 1; filter: brightness(.6); } }
+  /* A gentle dip going right and a rise coming back: the path is an arc, not a line. */
+  @keyframes focus-y {
+    0%, 8% { top: 58%; animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
+    26.5% { top: 64%; animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
+    45%, 55% { top: 56%; animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
+    73.5% { top: 50%; animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
+    92%, 100% { top: 58%; }
+  }
 </style>

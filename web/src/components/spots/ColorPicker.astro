@@ -1,7 +1,16 @@
 ---
+import { pointer, keyPresses, pop } from "../../lib/motion";
 /** ⌘⇧C, then the loupe crosses a sunset in flat colours, taking each one it passes; a click on
     the sun copies it. Ends as it starts. */
 const { d } = Astro.props;
+// The loupe's stops, each over one flat colour: sky, far hills, near hills, the sun.
+const stops: [number, number, number][] = [[0, 22, 17], [16, 22, 17], [24, 48, 46], [29, 48, 46], [37, 22, 72], [42, 22, 72], [50, 62, 40], [100, 62, 40]];
+const css = [
+  pointer("color-loupe", stops),
+  keyPresses("color-c", [7]),
+  pop("color-keys", 3, 17),
+  pop("color-copied", 61, 88, 0.6),
+].join("\n");
 ---
 <div class="spot s-color" style={`--d:${d}s`}>
   <div class="screen color-scene">
@@ -10,56 +19,61 @@ const { d } = Astro.props;
     <div class="color-far"></div>
     <div class="color-near"></div>
     <div class="color-sea"><i></i><i></i></div>
-    <div class="color-loupe"><div class="color-grid"></div><div class="color-center"></div></div>
+    <div class="color-loupe"><div class="color-lens"><div class="color-grid"></div><div class="color-center"></div></div></div>
   </div>
   <div class="keys color-keys"><span class="key">⌘</span><span class="key">⇧</span><span class="key color-c">C</span></div>
-  <div class="color-copied"><span class="pill"><span class="color-swatch"></span>#FF6B3D · Copied</span></div>
+  <div class="color-copied"><span class="pill"><span class="color-swatch"></span>#FF8A5C · Copied</span></div>
 </div>
+<Fragment set:html={`<style>${css}</style>`} />
 
 <style is:global>
-  /* Flat bands and shapes, so the loupe's colour at each stop is exactly what is under it:
-     sky #FFD27A (y < 24%), sun #FF6B3D (centre 62%, 43%), far hills #8E5BD6, near hills
-     #4B3AA6, sea #1F6FE0. */
-  .s-color .color-scene { background: #ffd27a; }
-  .s-color .color-sky2 { position: absolute; left: 0; right: 0; top: 24%; height: 30%; background: #ffb15e; }
-  .s-color .color-sun { position: absolute; left: 52%; top: 29.7%; width: 20%; height: 26.7%; border-radius: 50%; background: #ff6b3d; }
-  .s-color .color-far { position: absolute; inset: 0; background: #8e5bd6; clip-path: polygon(0 70%, 18% 48%, 32% 62%, 48% 40%, 66% 64%, 80% 50%, 100% 66%, 100% 100%, 0 100%); }
-  .s-color .color-near { position: absolute; inset: 0; background: #4b3aa6; clip-path: polygon(0 80%, 22% 64%, 40% 76%, 58% 62%, 78% 78%, 100% 70%, 100% 100%, 0 100%); }
-  .s-color .color-sea { position: absolute; left: 0; right: 0; top: 84%; bottom: 0; background: #1f6fe0; }
-  .s-color .color-sea i { position: absolute; height: 0.6cqw; border-radius: 1cqw; background: #5ba2ff; }
+  /* Flat bands and shapes, so the loupe's colour at each stop is exactly what is under it. */
+  .s-color .color-scene { background: #ffd9a0; }
+  .s-color .color-scene::after { display: none; }
+  .s-color .color-sky2 { position: absolute; left: 0; right: 0; top: 24%; height: 30%; background: #ffbe85; }
+  .s-color .color-sun { position: absolute; left: 52%; top: 29.7%; width: 20%; height: 26.7%; border-radius: 50%; background: #ff8a5c; }
+  .s-color .color-far { position: absolute; inset: 0; background: #a184de; clip-path: polygon(0 70%, 18% 48%, 32% 62%, 48% 40%, 66% 64%, 80% 50%, 100% 66%, 100% 100%, 0 100%); }
+  .s-color .color-near { position: absolute; inset: 0; background: #6458bd; clip-path: polygon(0 80%, 22% 64%, 40% 76%, 58% 62%, 78% 78%, 100% 70%, 100% 100%, 0 100%); }
+  .s-color .color-sea { position: absolute; left: 0; right: 0; top: 84%; bottom: 0; background: #4f8fe3; }
+  .s-color .color-sea i { position: absolute; height: 0.6cqw; border-radius: 1cqw; background: #8bb9f3; }
   .s-color .color-sea i:first-child { left: 14%; width: 22%; top: 30%; }
   .s-color .color-sea i:last-child { left: 58%; width: 30%; top: 62%; }
-  .s-color .color-loupe {
-    position: absolute; left: 22%; top: 17%; width: 17cqw; height: 17cqw; margin: -8.5cqw 0 0 -8.5cqw; border-radius: 50%;
-    background: #ffd27a; box-shadow: 0 0 0 0.6cqw #fff, 0 1.6cqw 3cqw rgba(0, 0, 0, .4); overflow: hidden; opacity: 0; transform: scale(.8);
+  .s-color .color-loupe { position: absolute; left: 22%; top: 17%; width: 0; height: 0; }
+  .s-color .color-lens {
+    position: absolute; left: -8.5cqw; top: -8.5cqw; width: 17cqw; height: 17cqw; border-radius: 50%;
+    background: #ffd9a0; box-shadow: 0 0 0 0.6cqw #fff, 0 1.6cqw 3cqw rgba(0, 0, 0, .35); overflow: hidden; opacity: 0;
   }
   .s-color .color-grid {
     position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(0, 0, 0, .14) 0.15cqw, transparent 0.15cqw), linear-gradient(90deg, rgba(0, 0, 0, .14) 0.15cqw, transparent 0.15cqw);
+    background-image: linear-gradient(rgba(0, 0, 0, .12) 0.15cqw, transparent 0.15cqw), linear-gradient(90deg, rgba(0, 0, 0, .12) 0.15cqw, transparent 0.15cqw);
     background-size: 2.1cqw 2.1cqw;
   }
   .s-color .color-center { position: absolute; left: 50%; top: 50%; width: 2.1cqw; height: 2.1cqw; margin: -1.05cqw 0 0 -1.05cqw; box-shadow: 0 0 0 0.3cqw #fff, 0 0 0 0.5cqw rgba(0, 0, 0, .25); }
   .s-color .keys { opacity: 0; }
   .s-color .color-copied { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
   .s-color .color-copied .pill { font-size: 3.6cqw; padding: 1.6cqw 3cqw; }
-  .s-color .color-swatch { width: 4cqw; height: 4cqw; border-radius: 50%; background: #ff6b3d; box-shadow: 0 0 0 0.3cqw rgba(255, 255, 255, .8); }
+  .s-color .color-swatch { width: 4cqw; height: 4cqw; border-radius: 50%; background: #ff8a5c; box-shadow: 0 0 0 0.3cqw rgba(255, 255, 255, .8); }
 
-  .s-color.playing .color-keys { animation: color-keys var(--d) ease both; }
-  .s-color.playing .color-c { animation: color-c var(--d) ease both; }
-  .s-color.playing .color-loupe { animation: color-loupe var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-color.playing .color-copied { animation: color-copied var(--d) cubic-bezier(.3, 1.4, .5, 1) both; }
+  .s-color.playing .color-loupe { animation: color-loupe-x var(--d) both, color-loupe-y var(--d) both; }
+  .s-color.playing .color-lens { animation: color-lens var(--d) both, color-tint var(--d) both; }
+  .s-color.playing .color-keys { animation: color-keys var(--d) both; }
+  .s-color.playing .color-c { animation: color-c var(--d) both; }
+  .s-color.playing .color-copied { animation: color-copied var(--d) both; }
 
-  @keyframes color-keys { 0%, 2% { opacity: 0; } 4%, 16% { opacity: 1; } 19%, 100% { opacity: 0; } }
-  @keyframes color-c { 0%, 7% { transform: none; background: #2c2c31; } 8%, 11% { transform: translateY(.5cqw); background: #0a84ff; } 13%, 100% { transform: none; background: #2c2c31; } }
-  @keyframes color-loupe {
-    0%, 12% { opacity: 0; left: 22%; top: 17%; background-color: #ffd27a; transform: scale(.8); }
-    15%, 18% { opacity: 1; left: 22%; top: 17%; background-color: #ffd27a; transform: none; }
-    28%, 31% { left: 48%; top: 46%; background-color: #8e5bd6; }
-    41%, 44% { left: 22%; top: 72%; background-color: #4b3aa6; }
-    54%, 58% { left: 62%; top: 40%; background-color: #ff6b3d; transform: none; opacity: 1; }
-    59% { left: 62%; top: 40%; background-color: #ff6b3d; transform: scale(.88); }
-    61% { left: 62%; top: 40%; background-color: #ff6b3d; transform: none; opacity: 1; }
-    66%, 100% { left: 62%; top: 40%; background-color: #ff6b3d; opacity: 0; transform: none; }
+  /* The loupe pops up, squashes on the click and is gone; its colour changes on the pointer's
+     own timing, so it matches what is under it at each stop. */
+  @keyframes color-lens {
+    0%, 12% { opacity: 0; transform: scale(.4); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    16%, 56% { opacity: 1; transform: none; }
+    56.8% { transform: scale(.86); }
+    58% { transform: scale(1.08); }
+    59.5% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
+    62%, 100% { opacity: 0; transform: scale(.5); }
   }
-  @keyframes color-copied { 0%, 61% { opacity: 0; transform: translateY(2cqw) scale(.9); } 66%, 88% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; transform: translateY(-1cqw); } }
+  @keyframes color-tint {
+    0%, 16% { background-color: #ffd9a0; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    24%, 29% { background-color: #a184de; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    37%, 42% { background-color: #6458bd; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    50%, 100% { background-color: #ff8a5c; }
+  }
 </style>

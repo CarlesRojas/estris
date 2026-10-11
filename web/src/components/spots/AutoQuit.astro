@@ -1,10 +1,17 @@
 ---
 import Win from "../Win.astro";
 import Cursor from "../Cursor.astro";
+import { pointer, presses, pop } from "../../lib/motion";
 /** Closing an app's last window quits it: the window goes, then its dot in the Dock. A click
     on its icon opens it again, so it loops. */
 const { d } = Astro.props;
-const tiles = ["#0a84ff", "#ff9f0a", "#30d158", "#bf5af2"];
+const tiles = ["var(--blue)", "var(--orange)", "var(--green)", "var(--purple)"];
+// The close button is at (18.3%, 13.2%); the app's icon at (45.3%, 88.7%).
+const css = [
+  pointer("quit-cursor", [[0, 60, 55], [4, 60, 55], [16, 18.3, 13.2], [24, 18.3, 13.2], [44, 45.3, 88.7], [58, 45.3, 88.7], [72, 60, 55], [100, 60, 55]]),
+  presses("quit-press", [21, 49]),
+  pop("quit-pill", 31, 46),
+].join("\n");
 ---
 <div class="spot s-quit" style={`--d:${d}s`}>
   <div class="screen">
@@ -23,31 +30,35 @@ const tiles = ["#0a84ff", "#ff9f0a", "#30d158", "#bf5af2"];
   .s-quit .quit-pill { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
   .s-quit .quit-pill .pill { font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
 
-  .s-quit.playing .quit-win { animation: quit-win var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-quit.playing .quit-win .bar i:first-child { animation: quit-close var(--d) ease both; }
-  .s-quit.playing .quit-cursor { animation: quit-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-quit.playing .quit-tile-1 { animation: quit-tile var(--d) ease both; }
-  .s-quit.playing .quit-tile-1::after { animation: quit-dot var(--d) step-end both; }
-  .s-quit.playing .quit-pill { animation: quit-pill var(--d) cubic-bezier(.3, 1.4, .5, 1) both; }
+  .s-quit .dock .tile:nth-child(2) { transform-origin: 50% 100%; }
+  .s-quit.playing .quit-win { animation: quit-win var(--d) both; }
+  .s-quit.playing .quit-win .bar i:first-child { animation: quit-close var(--d) both; }
+  .s-quit.playing .quit-cursor { animation: quit-cursor-x var(--d) both, quit-cursor-y var(--d) both; }
+  .s-quit.playing .quit-cursor .press { animation: quit-press var(--d) both; }
+  .s-quit.playing .dock .tile:nth-child(2) { animation: quit-tile var(--d) both; }
+  .s-quit.playing .dock .tile:nth-child(2)::after { animation: quit-dot var(--d) both; }
+  .s-quit.playing .quit-pill { animation: quit-pill var(--d) both; }
 
-  /* The close button is at (18.3%, 13.2%); the app's icon at (45.3%, 88.7%). */
-  @keyframes quit-cursor {
-    0%, 4% { left: 60%; top: 55%; transform: none; }
-    20%, 23% { left: 18.3%; top: 13.2%; transform: none; }
-    24% { left: 18.3%; top: 13.2%; transform: scale(.85); }
-    25% { left: 18.3%; top: 13.2%; transform: none; }
-    52%, 57% { left: 45.3%; top: 88.7%; transform: none; }
-    58% { left: 45.3%; top: 88.7%; transform: scale(.85); }
-    59% { left: 45.3%; top: 88.7%; transform: none; }
-    76%, 100% { left: 60%; top: 55%; }
-  }
-  @keyframes quit-close { 0%, 22% { transform: none; } 24% { transform: scale(1.5); } 26%, 100% { transform: none; } }
+  @keyframes quit-close { 0%, 21% { transform: none; } 21.8% { transform: scale(.7); } 23% { transform: scale(1.6); } 25%, 100% { transform: none; } }
+  /* Closes quickly; reopens from the Dock with a spring. */
   @keyframes quit-win {
-    0%, 25% { opacity: 1; transform: none; }
-    32%, 64% { opacity: 0; transform: scale(.85); }
-    72%, 100% { opacity: 1; transform: none; }
+    0%, 22.5% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
+    27%, 56% { opacity: 0; transform: scale(.82); animation-timing-function: cubic-bezier(.34, 1.4, .64, 1); }
+    63%, 100% { opacity: 1; transform: none; }
   }
-  @keyframes quit-tile { 0%, 58% { transform: none; } 61% { transform: translateY(-1.6cqw); } 64% { transform: none; } 66% { transform: translateY(-0.8cqw); } 68%, 100% { transform: none; } }
-  @keyframes quit-dot { 0% { opacity: 1; } 36% { opacity: 0; } 62% { opacity: 1; } 100% { opacity: 1; } }
-  @keyframes quit-pill { 0%, 36% { opacity: 0; transform: translateY(2cqw) scale(.9); } 40%, 52% { opacity: 1; transform: none; } 56%, 100% { opacity: 0; transform: none; } }
+  /* The launch bounce, as the Dock does it. */
+  @keyframes quit-tile {
+    0%, 49.6% { transform: none; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    52% { transform: translateY(-3cqw); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+    54.5% { transform: translateY(0) scale(1.08, .9); animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    56.5% { transform: translateY(-1.4cqw); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+    58.5% { transform: none; }
+    100% { transform: none; }
+  }
+  @keyframes quit-dot {
+    0%, 29% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
+    31%, 55% { opacity: 0; transform: scale(0); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    58%, 100% { opacity: 1; transform: none; }
+  }
 </style>
+<Fragment set:html={`<style>${css}</style>`} />
