@@ -102,6 +102,7 @@
 "Corners" = "Corners";
 "Couldn't export the settings" = "Couldn't export the settings";
 "Couldn't import the settings" = "Couldn't import the settings";
+"Couldn't move Estris to Applications" = "Couldn't move Estris to Applications";
 "Create Mapping" = "Create Mapping";
 "Custom color" = "Custom color";
 "Date format" = "Date format";
@@ -121,6 +122,7 @@
 "Don't keep awake" = "Don't keep awake";
 "Down" = "Down";
 "Down Arrow" = "Down Arrow";
+"Drag it to the Applications folder yourself, then open it from there." = "Drag it to the Applications folder yourself, then open it from there.";
 "Dragging" = "Dragging";
 "Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Drops fonts, colours and other formatting, so pasted text matches where it goes.";
 "Edge area" = "Edge area";
@@ -169,6 +171,7 @@
 "Include # prefix" = "Include # prefix";
 "Indefinitely" = "Indefinitely";
 "Insert" = "Insert";
+"It is running from where it was downloaded. In Applications it stays installed and can open at login." = "It is running from where it was downloaded. In Applications it stays installed and can open at login.";
 "Keep apps that just opened in front" = "Keep apps that just opened in front";
 "Keep Awake" = "Keep Awake";
 "Keep them in front for" = "Keep them in front for";
@@ -219,7 +222,9 @@
 "Mixer" = "Mixer";
 "Modifiers" = "Modifiers";
 "Mouse Buttons" = "Mouse Buttons";
+"Move Estris to Applications?" = "Move Estris to Applications?";
 "Move pasted entry to the top" = "Move pasted entry to the top";
+"Move to Applications" = "Move to Applications";
 "Mute" = "Mute";
 "Name" = "Name";
 "Navigation" = "Navigation";

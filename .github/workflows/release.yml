@@ -71,7 +71,9 @@ jobs:
       - name: Make the disk image
         env:
           SIGN_IDENTITY: ${{ steps.signing.outputs.identity || '-' }}
-        run: ./scripts/make-dmg.sh
+        run: |
+          python3 -m pip install --break-system-packages dmgbuild
+          ./scripts/make-dmg.sh
 
       - name: Notarize
         if: steps.signing.outputs.identity != ''

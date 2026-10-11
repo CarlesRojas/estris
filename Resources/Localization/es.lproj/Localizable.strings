@@ -102,6 +102,7 @@
 "Corners" = "Esquinas";
 "Couldn't export the settings" = "No se han podido exportar los ajustes";
 "Couldn't import the settings" = "No se han podido importar los ajustes";
+"Couldn't move Estris to Applications" = "No se ha podido mover Estris a Aplicaciones";
 "Create Mapping" = "Crear asignación";
 "Custom color" = "Color personalizado";
 "Date format" = "Formato de fecha";
@@ -121,6 +122,7 @@
 "Don't keep awake" = "No mantener despierto";
 "Down" = "Pulsado";
 "Down Arrow" = "Flecha abajo";
+"Drag it to the Applications folder yourself, then open it from there." = "Arrástralo tú a la carpeta Aplicaciones y ábrelo desde allí.";
 "Dragging" = "Arrastrar";
 "Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Quita tipos de letra, colores y otros formatos para que el texto pegado se adapte a donde va.";
 "Edge area" = "Zona del borde";
@@ -169,6 +171,7 @@
 "Include # prefix" = "Incluir el prefijo #";
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Insertar";
+"It is running from where it was downloaded. In Applications it stays installed and can open at login." = "Se está ejecutando desde donde se descargó. En Aplicaciones queda instalado y puede abrirse al iniciar sesión.";
 "Keep apps that just opened in front" = "Mantener delante las apps recién abiertas";
 "Keep Awake" = "Mantener despierto";
 "Keep them in front for" = "Mantenerlas delante durante";
@@ -219,7 +222,9 @@
 "Mixer" = "Mezclador";
 "Modifiers" = "Modificadores";
 "Mouse Buttons" = "Botones del ratón";
+"Move Estris to Applications?" = "¿Mover Estris a Aplicaciones?";
 "Move pasted entry to the top" = "Subir la entrada pegada arriba";
+"Move to Applications" = "Mover a Aplicaciones";
 "Mute" = "Silenciar";
 "Name" = "Nombre";
 "Navigation" = "Navegación";
