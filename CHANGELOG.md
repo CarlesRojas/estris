@@ -1,8 +1,5 @@
 # Changelog
 
-What changed for people using Estris, newest first. New entries go under Unreleased; the
-Release workflow turns them into the next version's notes.
-
 ## Unreleased
 
 - First release, with ten utilities in the menu bar:
