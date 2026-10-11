@@ -6,6 +6,8 @@ import Carbon.HIToolbox
 /// windows spread over them, the fewer per column on the left. Five is a left third plus four
 /// quarters of the rest, six is three columns of two, seven is 2 + 2 + 3, and so on. Each
 /// window goes to the space nearest where it is, so what is on the left stays on the left.
+/// An app that can't get as wide or tall as its share takes what it can, and the others
+/// share the rest.
 enum WindowArranger {
     /// The windows mostly on the screen: normal windows of regular apps (and
     /// Estris's own), not minimized or hidden ones.
@@ -32,10 +34,10 @@ enum WindowArranger {
         }.map(\.element)
     }
 
-    /// Which frame each window gets: the pairing that moves them least in all, measuring
+    /// Which space each window gets: the pairing that moves them least in all, measuring
     /// between centres in proportion to the area, so a window further left ends up on the left,
-    /// a higher one higher. `result[i]` is the frame for `windows[i]`.
-    static func assign(_ windows: [NSRect], to frames: [NSRect], in area: NSRect) -> [NSRect] {
+    /// a higher one higher. `result[i]` is the index in `frames` for `windows[i]`.
+    static func assign(_ windows: [NSRect], to frames: [NSRect], in area: NSRect) -> [Int] {
         let count = min(windows.count, frames.count)
         guard count > 0 else { return [] }
         func center(_ rect: NSRect) -> (CGFloat, CGFloat) {
@@ -48,7 +50,7 @@ enum WindowArranger {
                 return Double((wx - fx) * (wx - fx) + (wy - fy) * (wy - fy))
             }
         }
-        return hungarian(cost).map { frames[$0] }
+        return hungarian(cost)
     }
 
     /// The cheapest pairing of rows with columns of a square cost matrix (Kuhn and Munkres):
@@ -103,25 +105,59 @@ enum WindowArranger {
         return result
     }
 
-    /// One frame per window: left column first, top to bottom.
-    static func frames(count: Int, in area: NSRect) -> [NSRect] {
+    /// How many windows each column gets, left to right; the extra ones go to the right-hand
+    /// columns.
+    static func columns(count: Int) -> [Int] {
         guard count > 0 else { return [] }
         let columns = count <= 3 ? count : Int(Double(count).squareRoot().rounded(.up))
         let base = count / columns
         let extra = count % columns
-        var frames: [NSRect] = []
-        for column in 0..<columns {
-            // The extra windows go to the right-hand columns.
-            let rows = base + (column >= columns - extra ? 1 : 0)
-            let minX = (area.minX + area.width * CGFloat(column) / CGFloat(columns)).rounded()
-            let maxX = (area.minX + area.width * CGFloat(column + 1) / CGFloat(columns)).rounded()
-            for row in 0..<rows {
-                // From the top down.
-                let maxY = (area.maxY - area.height * CGFloat(row) / CGFloat(rows)).rounded()
-                let minY = (area.maxY - area.height * CGFloat(row + 1) / CGFloat(rows)).rounded()
-                frames.append(NSRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY))
+        return (0..<columns).map { base + ($0 >= columns - extra ? 1 : 0) }
+    }
+
+    /// One frame per window, column by column, each from the top down. Space is shared
+    /// evenly, except that a window that can't get as wide or as tall as its share (an app
+    /// with a maximum size) takes only what it can, and the others share the rest. A column is
+    /// as wide as its widest window can be. `maxWidths` and `maxHeights` are per window, in
+    /// the same order; infinity when there is no limit.
+    static func frames(columns: [Int], in area: NSRect, maxWidths: [[CGFloat]]? = nil, maxHeights: [[CGFloat]]? = nil) -> [[NSRect]] {
+        let widths = share(area.width, maximums: columns.indices.map { maxWidths?[$0].max() ?? .infinity })
+        var minX = area.minX
+        return columns.enumerated().map { column, rows in
+            let heights = share(area.height, maximums: maxHeights?[column] ?? Array(repeating: .infinity, count: rows))
+            let left = minX.rounded()
+            minX += widths[column]
+            let right = minX.rounded()
+            var maxY = area.maxY
+            return (0..<rows).map { row in
+                let top = maxY.rounded()
+                maxY -= heights[row]
+                let bottom = maxY.rounded()
+                return NSRect(x: left, y: bottom, width: right - left, height: top - bottom)
             }
         }
-        return frames
+    }
+
+    /// Splits a length as evenly as the parts' maximums allow: a part whose maximum is under
+    /// an even share gets its maximum, and the others share what is left. When every part has
+    /// reached its maximum, the rest stays empty, at the end.
+    static func share(_ length: CGFloat, maximums: [CGFloat]) -> [CGFloat] {
+        var sizes = maximums.map { _ in CGFloat(0) }
+        var open = Array(maximums.indices)
+        var left = length
+        while !open.isEmpty {
+            let even = left / CGFloat(open.count)
+            let capped = open.filter { maximums[$0] < even }
+            guard !capped.isEmpty else {
+                for index in open { sizes[index] = even }
+                break
+            }
+            for index in capped {
+                sizes[index] = maximums[index]
+                left -= maximums[index]
+            }
+            open.removeAll { capped.contains($0) }
+        }
+        return sizes
     }
 }

@@ -81,10 +81,40 @@ final class WindowSnapping {
         guard !windows.isEmpty else { return log("arrange all: no windows on this screen (needs Accessibility access)") }
         let area = screen.visibleFrame
         let current = windows.compactMap { window in window.frame.map { (window: window, frame: $0) } }
-        let frames = WindowArranger.assign(current.map(\.frame), to: WindowArranger.frames(count: current.count, in: area), in: area)
-        for ((window, original), frame) in zip(current, frames) {
-            window.setFrame(frame)
-            let snapped = window.frame ?? frame
+        let columns = WindowArranger.columns(count: current.count)
+        // Each window's column and row, from the even layout.
+        let slots = columns.enumerated().flatMap { column, rows in (0..<rows).map { (column: column, row: $0) } }
+        let even = WindowArranger.frames(columns: columns, in: area).flatMap { $0 }
+        let assigned = WindowArranger.assign(current.map(\.frame), to: even, in: area).map { slots[$0] }
+        // Apps with a maximum size end up smaller than asked; the layout is worked out again
+        // with what they took, so the others share the space left. A few rounds, as a window
+        // given more room may turn out to have a maximum too.
+        var maxWidths = columns.map { Array(repeating: CGFloat.infinity, count: $0) }
+        var maxHeights = maxWidths
+        var asked: [NSRect?] = Array(repeating: nil, count: current.count)
+        for _ in 0..<3 {
+            let layout = WindowArranger.frames(columns: columns, in: area, maxWidths: maxWidths, maxHeights: maxHeights)
+            var learned = false
+            for (index, (window, _)) in current.enumerated() {
+                let (column, row) = assigned[index]
+                let frame = layout[column][row]
+                guard frame != asked[index] else { continue }
+                asked[index] = frame
+                window.setFrame(frame)
+                guard let got = window.frame else { continue }
+                if got.width < frame.width - 1, got.width < maxWidths[column][row] {
+                    maxWidths[column][row] = got.width
+                    learned = true
+                }
+                if got.height < frame.height - 1, got.height < maxHeights[column][row] {
+                    maxHeights[column][row] = got.height
+                    learned = true
+                }
+            }
+            if !learned { break }
+        }
+        for ((window, original), frame) in zip(current, asked) {
+            let snapped = window.frame ?? frame ?? original
             if let saved = restoreFrames.firstIndex(where: { $0.window.isSame(as: window) }) {
                 if restoreFrames[saved].snapped != original { restoreFrames[saved].original = original }
                 restoreFrames[saved].snapped = snapped
@@ -138,6 +168,13 @@ final class WindowSnapping {
             target = usual
             window.setFrame(target)
         }
+        // An app that can't get as big as the space keeps to the screen edge it was snapped
+        // to (or the middle), so the space left is next to the others, where filling a snap
+        // or Arrange All can use it.
+        if let got = window.frame, got.width < target.width - 1 || got.height < target.height - 1 {
+            let aligned = Self.align(got.size, in: target, area: screen.visibleFrame)
+            if aligned.origin != got.origin { window.setFrame(aligned) }
+        }
         // Apps can round the size, so what it ended up as is what a later move is compared to.
         let snapped = window.frame ?? target
         if let saved {
@@ -150,6 +187,23 @@ final class WindowSnapping {
         }
         // Asked to fill but nothing to fill counts as exact, so a second press does nothing new.
         return (snapped, fills && target != usual)
+    }
+
+    /// A smaller size placed in a snap's frame: against the screen edges the frame touches,
+    /// centred where it touches neither or both.
+    private static func align(_ size: NSSize, in frame: NSRect, area: NSRect) -> NSRect {
+        func place(_ length: CGFloat, in min: CGFloat, _ max: CGFloat, edges lower: CGFloat, _ upper: CGFloat) -> CGFloat {
+            let atLower = abs(min - lower) < 2
+            let atUpper = abs(max - upper) < 2
+            if atLower && !atUpper { return min }
+            if atUpper && !atLower { return max - length }
+            return ((min + max - length) / 2).rounded()
+        }
+        let width = Swift.min(size.width, frame.width)
+        let height = Swift.min(size.height, frame.height)
+        let x = place(width, in: frame.minX, frame.maxX, edges: area.minX, area.maxX)
+        let y = place(height, in: frame.minY, frame.maxY, edges: area.minY, area.maxY)
+        return NSRect(x: x, y: y, width: width, height: height)
     }
 
     private func log(_ message: String) {
