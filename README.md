@@ -38,4 +38,9 @@ cd web && npm run build && npm run render-spots
 ```
 Re-records the feature animations as transparent videos in `web/public/spots` (add `-- --mov` for ProRes too).
 
+```sh
+cd web && npm run build && npm run render-og
+```
+Re-records `web/public/og.png`, the picture shown when the site is shared.
+
 Vercel: Add New > Project > import this repo > Root Directory `web` > Deploy.

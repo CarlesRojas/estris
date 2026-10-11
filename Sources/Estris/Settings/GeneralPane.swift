@@ -4,6 +4,8 @@ import UniformTypeIdentifiers
 
 /// Settings shared by every utility.
 struct GeneralPane: View {
+    private static let websiteURL = URL(string: "https://estris.pro")!
+    private static let issuesURL = URL(string: "https://github.com/CarlesRojas/estris/issues/new")!
     private static let accessibilitySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
 
     @ObservedObject var general: GeneralSettings
@@ -85,6 +87,11 @@ struct GeneralPane: View {
                             .foregroundStyle(.secondary)
                             .contentShape(Rectangle())
                             .onTapGesture(perform: versionTapped)
+                        HStack(spacing: 14) {
+                            Link("Website", destination: Self.websiteURL)
+                            Link("Report an Issue", destination: Self.issuesURL)
+                        }
+                        .font(.callout)
                     }
                     Spacer()
                     // Local builds can't update themselves.

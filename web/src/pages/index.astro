@@ -3,7 +3,7 @@ import "../styles/spot.css";
 import "../styles/site.css";
 import { features } from "../data/features";
 import { spots } from "../components/spots";
-import { DOWNLOAD_URL, MIN_MACOS } from "../config";
+import { DOWNLOAD_URL, MIN_MACOS, MIN_STARS_SHOWN, REPO_URL, SITE_URL } from "../config";
 
 const description = "Ten small utilities for your Mac in one menu bar app: window snapping, clipboard history, a volume mixer and more. Free.";
 const year = new Date().getFullYear();
@@ -17,6 +17,13 @@ const year = new Date().getFullYear();
     <meta name="description" content={description} />
     <meta property="og:title" content="Estris" />
     <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={SITE_URL} />
+    <meta property="og:image" content={`${SITE_URL}/og.png`} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Estris: the little tools your Mac is missing." />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -26,6 +33,9 @@ const year = new Date().getFullYear();
       <a class="brand" href="/" aria-label="Estris">
         <img src="/icon.svg" alt="" width="34" height="34" />
         <span>Estris</span>
+      </a>
+      <a class="github" href={REPO_URL} data-min-stars={MIN_STARS_SHOWN}>
+        <svg class="github-mark" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span><span class="stars" hidden></span>
       </a>
     </header>
 
@@ -199,6 +209,31 @@ const year = new Date().getFullYear();
         if (visible) play(current);
         else window.clearTimeout(timer);
       }, { threshold: 0.25 }).observe(document.querySelector(".stage")!);
+
+      // The star count, once there are enough to show; asked once per visit.
+      const github = document.querySelector<HTMLElement>(".github");
+      const stars = github?.querySelector<HTMLElement>(".stars");
+      if (github && stars) {
+        const show = (count: number) => {
+          if (count < Number(github.dataset.minStars)) return;
+          stars.textContent = `★ ${count.toLocaleString("en")}`;
+          stars.hidden = false;
+        };
+        let cached: string | null = null;
+        try { cached = sessionStorage.getItem("stars"); } catch {}
+        if (cached) {
+          show(Number(cached));
+        } else {
+          fetch("https://api.github.com/repos/CarlesRojas/estris")
+            .then((response) => (response.ok ? response.json() : null))
+            .then((repo) => {
+              if (typeof repo?.stargazers_count !== "number") return;
+              try { sessionStorage.setItem("stars", String(repo.stargazers_count)); } catch {}
+              show(repo.stargazers_count);
+            })
+            .catch(() => {});
+        }
+      }
     </script>
   </body>
 </html>

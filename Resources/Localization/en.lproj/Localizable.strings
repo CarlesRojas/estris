@@ -307,6 +307,7 @@
 "Rename" = "Rename";
 "Rename Device" = "Rename Device";
 "Rename this device" = "Rename this device";
+"Report an Issue" = "Report an Issue";
 "Reset Appearance to Defaults" = "Reset Appearance to Defaults";
 "Reset to Default" = "Reset to Default";
 "Reset to Defaults" = "Reset to Defaults";
@@ -424,6 +425,7 @@
 "Volume Down" = "Volume Down";
 "Volume Mixer" = "Volume Mixer";
 "Volume Up" = "Volume Up";
+"Website" = "Website";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.";
 "Width" = "Width";
 "Window Snapping" = "Window Snapping";
