@@ -134,7 +134,6 @@
 "Entries" = "Entrades";
 "Escape" = "Esc";
 "Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris no ha pogut canviar el so de %@. Permet-ho a Només gravació d'àudio del sistema, a Configuració del Sistema > Privadesa i seguretat > Gravació de pantalla i àudio del sistema.";
-"Estris needs Accessibility access" = "Estris necessita accés d’accessibilitat";
 "Event Viewer" = "Visor d’esdeveniments";
 "Example" = "Exemple";
 "Excluded Apps" = "Apps excloses";
@@ -207,7 +206,6 @@
 "Logs" = "Registres";
 "Logs and settings for finding out what Estris is doing." = "Registres i configuració per saber què fa Estris.";
 "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "El macOS ja fa servir aquesta drecera. Desactiva-la a Dreceres de teclat per fer-la servir aquí, o tria una altra tecla.";
-"macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "El macOS només deixa escriure en altres apps a les apps amb aquest permís. Estris l’utilitza per enganxar l’entrada que triïs directament a l’app on treballes, el Tancament automàtic per veure les finestres de cada app, el Clic central per fer clic amb el botó central, Reassignar per canviar tecles i botons, i l’Ajust de finestres per moure i redimensionar finestres. Sense ell, les entrades només es copien al porta-retalls i les altres utilitats no fan res.";
 "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "El macOS fa servir aquesta drecera per canviar la font d’entrada del teclat. Desactiva-la per fer-la servir aquí: Dreceres de teclat > Fonts d’entrada > Seleccionar la següent font al menú Entrada.";
 "Mappings" = "Assignacions";
 "Maximize" = "Maximitza";

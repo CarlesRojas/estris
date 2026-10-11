@@ -134,7 +134,6 @@
 "Entries" = "Entradas";
 "Escape" = "Esc";
 "Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "O Estris não conseguiu alterar o som de %@. Permita em Apenas Gravação de Áudio do Sistema, em Ajustes do Sistema > Privacidade e Segurança > Gravação de Tela e Áudio do Sistema.";
-"Estris needs Accessibility access" = "O Estris precisa de acesso de Acessibilidade";
 "Event Viewer" = "Visualizador de eventos";
 "Example" = "Exemplo";
 "Excluded Apps" = "Apps excluídos";
@@ -207,7 +206,6 @@
 "Logs" = "Registros";
 "Logs and settings for finding out what Estris is doing." = "Registros e ajustes para descobrir o que o Estris está fazendo.";
 "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "O macOS já usa este atalho. Desative-o em Atalhos de Teclado para usá-lo aqui, ou escolha outra tecla.";
-"macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "O macOS só permite que apps com esta permissão digitem em outros apps. O Estris a usa para colar o item escolhido diretamente no app em que você está trabalhando, o Encerramento automático para ver as janelas de cada app, o Clique do meio para clicar com o botão do meio, o Remapear para alterar teclas e botões e o Encaixe de janelas para mover e redimensionar janelas. Sem ela, os itens são apenas copiados para a Área de Transferência e os outros utilitários não fazem nada.";
 "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "O macOS usa este atalho para trocar a fonte de entrada do teclado. Desative-o para usá-lo aqui: Atalhos de Teclado > Fontes de Entrada > Selecionar a próxima fonte no menu Entrada.";
 "Mappings" = "Mapeamentos";
 "Maximize" = "Maximizar";

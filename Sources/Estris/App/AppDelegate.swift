@@ -1,4 +1,5 @@
 import AppKit
+import CoreServices
 import SwiftUI
 
 /// Creates the shared settings and every utility, and owns the menu bar item and the
@@ -19,8 +20,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let colorPicker = ScreenColorPicker()
     private lazy var volumeMixer = VolumeMixer(log: log)
     private var settingsWindow: SettingsWindowController?
+    /// Opened by macOS at login, rather than by the user.
+    private var launchedAtLogin = false
+    private var accessibilityWatch: Timer?
     private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer, clipboard: clipboard, colorPicker: colorPicker) { [weak self] in
         self?.openSettings()
+    }
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        let event = NSAppleEventManager.shared().currentAppleEvent
+        launchedAtLogin = event?.eventID == AEEventID(kAEOpenApplication)
+            && event?.paramDescriptor(forKeyword: AEKeyword(keyAEPropData))?.enumCodeValue == OSType(keyAELaunchedAsLogInItem)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -42,10 +52,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !ApplicationsMover.isOutsideApplications {
             LoginItem.enableOnFirstLaunch()
         }
-        _ = Paster.isTrusted(prompt: true)
-        // Relaunched from Settings (to change the language): back where the user was.
-        if Relaunch.takeReopenSettings() {
+        watchAccessibility()
+        // Opened by the user (not at login): Settings, to choose what to turn on. Also after a
+        // relaunch from Settings, back where the user was.
+        let reopensSettings = Relaunch.takeReopenSettings()
+        if reopensSettings || !launchedAtLogin {
             openSettings()
+        }
+    }
+
+    /// Opened again while running (a double-click in Applications): Settings.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        openSettings()
+        return false
+    }
+
+    /// Utilities set up their event taps and window access at launch, which fails without
+    /// Accessibility; once it is allowed, Estris opens again so they work, without anyone
+    /// having to quit it.
+    private func watchAccessibility() {
+        guard !AXIsProcessTrusted() else { return }
+        accessibilityWatch = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] timer in
+            MainActor.assumeIsolated {
+                guard AXIsProcessTrusted() else { return }
+                timer.invalidate()
+                self?.log.record("Accessibility allowed: opening again", source: "Permissions")
+                Relaunch.now(reopeningSettings: self?.settingsWindow?.window.isVisible == true)
+            }
         }
     }
 

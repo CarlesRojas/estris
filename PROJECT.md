@@ -20,7 +20,9 @@ History is saved in `~/Library/Application Support/Estris` (readable by your use
 
 ## Settings
 
-Open **Settings** from the menu bar menu. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Dock Preview, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
+Every utility is off at first, so nothing asks for a permission until one that needs it is turned on. Settings opens whenever Estris is opened by hand (double-clicking it in Applications, also while it's running), not when it opens at login (`keyAELaunchedAsLogInItem` in the launch event). While Accessibility isn't allowed, Estris checks every 2 seconds; once it is, Estris opens again (Settings too, if it was open) so the utilities that set themselves up at launch get it.
+
+Open **Settings** from the menu bar menu, or by opening Estris again. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Dock Preview, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
 
 Look and accessibility, kept the same everywhere: sidebar icons stay in the label color (the accent color clashes with the selected row); the switches inside a pane are the mini size (`RowSwitchStyle`, as System Settings), the utility's own switch in its header stays large; warnings under a row are an orange triangle with secondary text (`WarningLabel`), never orange text; icon-only buttons carry a VoiceOver label matching their tooltip; section headers use title case; the window shows the app's name, **Estris**, as its title at the top of the right column. With Reduce Motion, the clipboard overlay's styles move the selection without springs or slides, and the snap preview only fades.
 
@@ -31,13 +33,13 @@ Every pane but General, Remap and Developer ends with **Reset to Defaults**, whi
 Every row with a setting (switch, slider, stepper, picker, color, shortcut key), the utilities' on/off switches, each Excluded Apps row and each Volume Mixer app also has a right-click menu (anywhere on the row, its background included) with **Reset to Default**, which puts back just that one (`resetMenu` in `Settings/ResetMenu.swift`); no menu shows while it already has its default. Each settings class keeps its defaults as constants, used by `reset()` and these menus alike. Not covered, as they have no default: Remap's mappings, the Clipboard's alternative shortcuts, the Volume Mixer's output and microphone (the Mac's own), and history.
 
 **General** (applies to every utility)
-- **Accessibility**: when the permission is missing, a notice explains why it is needed, with a button to its page in System Settings.
+- **Permissions**: whether Accessibility is allowed, with a button to its page in System Settings when it isn't. It isn't asked for at launch, only when turning on a utility that needs it.
 - **Language** (see Languages below), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
 - **Open at login**: on by default, so Estris is running after a restart.
 - **About**: app icon, name and version.
 - **Export & Import** (at the bottom): **Export Settings…** saves every Estris setting to a JSON file; **Import Settings…** reads one back after a confirmation, replacing the current settings, and Estris opens again to apply them. Everything Estris keeps in UserDefaults goes in (the app's language too), except state tied to the Mac (login item setup, permission hints, migrations); the clipboard history and Open at login don't. Data stored as JSON stays readable in the file (`$json`), other data and dates are wrapped (`$data`, `$date`) (`Shared/SettingsTransfer.swift`).
 
-**Clipboard** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
+**Clipboard** (off by default) starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
 - **Settings**:
   - *General*: how many entries to keep (5 to 100, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and these switches:
     - **Ignore passwords**: skips text copied from password fields and password managers.
