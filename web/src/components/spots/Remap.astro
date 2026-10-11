@@ -1,5 +1,6 @@
 ---
-/** Caps Lock becomes Escape on the keyboard; a mouse's side button opens Mission Control. */
+/** A still picture: Caps Lock becomes Escape on the keyboard, and a mouse's side button opens
+    Mission Control. */
 const { d } = Astro.props;
 ---
 <div class="spot s-remap" style={`--d:${d}s`}>
@@ -33,9 +34,10 @@ const { d } = Astro.props;
   .s-remap .key { height: 13cqw; font-size: 4cqw; padding: 0 3.6cqw; gap: 1.4cqw; }
   .s-remap .remap-from-1 { min-width: 30cqw; justify-content: flex-start; }
   .s-remap .remap-to-1 { min-width: 16cqw; }
+  .s-remap .remap-to-1, .s-remap .remap-to-2 { background: #0a84ff; }
   .s-remap .remap-to-2 svg { width: 4.4cqw; height: 4.4cqw; }
   .s-remap .remap-arrow { position: relative; flex: 1; height: 0.8cqw; }
-  .s-remap .remap-arrow i { position: absolute; inset: 0; border-radius: 1cqw; background: #0a84ff; transform-origin: left; transform: scaleX(0); }
+  .s-remap .remap-arrow i { position: absolute; inset: 0; border-radius: 1cqw; background: #0a84ff; transform-origin: left; }
   .s-remap .remap-arrow i::after {
     content: ""; position: absolute; right: -0.4cqw; top: 50%; width: 3cqw; height: 3cqw; margin-top: -1.5cqw;
     border-top: 0.8cqw solid #0a84ff; border-right: 0.8cqw solid #0a84ff; border-radius: 0.3cqw; transform: rotate(45deg);
@@ -47,17 +49,4 @@ const { d } = Astro.props;
   .s-remap .remap-mouse::before { content: ""; position: absolute; left: 50%; top: 0; width: 0.25cqw; height: 40%; background: rgba(255, 255, 255, .15); }
   .s-remap .remap-button { position: absolute; left: -0.6cqw; top: 46%; width: 1.6cqw; height: 5cqw; border-radius: 1cqw; background: #48484e; }
 
-  .s-remap.playing .remap-from-1 { animation: remap-press-1 var(--d) ease both; }
-  .s-remap.playing .remap-arrow-1 i { animation: remap-arrow-1 var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-remap.playing .remap-to-1 { animation: remap-to-1 var(--d) ease both; }
-  .s-remap.playing .remap-button { animation: remap-button var(--d) ease both; }
-  .s-remap.playing .remap-arrow-2 i { animation: remap-arrow-2 var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-remap.playing .remap-to-2 { animation: remap-to-2 var(--d) ease both; }
-
-  @keyframes remap-press-1 { 0%, 10% { transform: none; background: #2c2c31; } 12%, 18% { transform: translateY(.6cqw); background: #3a3a40; } 21%, 100% { transform: none; background: #2c2c31; } }
-  @keyframes remap-arrow-1 { 0%, 14% { transform: scaleX(0); } 26%, 100% { transform: scaleX(1); } }
-  @keyframes remap-to-1 { 0%, 26% { background: #2c2c31; transform: none; } 29%, 100% { background: #0a84ff; transform: scale(1.06); } }
-  @keyframes remap-button { 0%, 44% { background: #48484e; } 46%, 52% { background: #f5f5f7; } 55%, 100% { background: #48484e; } }
-  @keyframes remap-arrow-2 { 0%, 48% { transform: scaleX(0); } 60%, 100% { transform: scaleX(1); } }
-  @keyframes remap-to-2 { 0%, 60% { background: #2c2c31; transform: none; } 63%, 100% { background: #0a84ff; transform: scale(1.06); } }
 </style>

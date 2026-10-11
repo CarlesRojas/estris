@@ -5,40 +5,34 @@ import { features } from "../data/features";
 import { spots } from "../components/spots";
 import { DOWNLOAD_URL, MIN_MACOS } from "../config";
 
-const description = "Ten small utilities for your Mac in one quiet menu bar app: window snapping, clipboard history, a volume mixer and more. Free.";
+const description = "Ten small utilities for your Mac in one menu bar app: window snapping, clipboard history, a volume mixer and more. Free.";
+const year = new Date().getFullYear();
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Estris · The little tools your Mac is missing</title>
     <meta name="description" content={description} />
     <meta property="og:title" content="Estris" />
     <meta property="og:description" content={description} />
-    <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
     <header class="top">
       <a class="brand" href="/" aria-label="Estris">
-        <img src="/icon.svg" alt="" width="32" height="32" />
+        <img src="/icon.svg" alt="" width="34" height="34" />
         <span>Estris</span>
       </a>
-      <a class="button small" href={DOWNLOAD_URL}>Download</a>
+      <a class="button" href={DOWNLOAD_URL}>Download</a>
     </header>
 
-    <main>
-      <section class="hero">
-        <img class="hero-icon" src="/icon.svg" alt="" width="112" height="112" />
+    <main class="showcase">
+      <div class="side">
         <h1>The little tools your Mac is missing.</h1>
-        <p class="lead">Ten small utilities in one quiet menu bar app. Turn on the ones you want, and forget the rest.</p>
-        <a class="button" href={DOWNLOAD_URL}>Download for Mac</a>
-        <p class="note">Free · {MIN_MACOS}</p>
-      </section>
-
-      <section class="features" aria-label="Features">
         <nav class="feature-list" role="tablist" aria-label="Features">
           {features.map((feature, index) => (
             <button
@@ -48,47 +42,50 @@ const description = "Ten small utilities for your Mac in one quiet menu bar app:
               aria-controls={`panel-${feature.id}`}
               aria-selected={index === 0 ? "true" : "false"}
               tabindex={index === 0 ? 0 : -1}
-              data-index={index}
-              style={`--seconds:${feature.seconds}s`}
+              style={`--seconds:${feature.seconds}s;--accent:${feature.accent}`}
             >
-              <span>{feature.title}</span>
+              <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" set:html={feature.icon} />
+              <span class="tab-name">{feature.title}</span>
               <span class="progress" aria-hidden="true"><i></i></span>
             </button>
           ))}
         </nav>
+      </div>
 
-        <div class="stage">
-          {features.map((feature, index) => {
-            const Spot = spots[feature.id];
-            return (
-              <article
-                class="feature-panel"
-                role="tabpanel"
-                id={`panel-${feature.id}`}
-                aria-labelledby={`tab-${feature.id}`}
-                data-seconds={feature.seconds}
-                hidden={index !== 0}
-              >
-                <div class="copy">
-                  <h2>{feature.title}</h2>
-                  <p class="tagline">{feature.tagline}</p>
-                  <p class="details">{feature.details}</p>
-                </div>
-                <div class="spot-frame" aria-hidden="true"><Spot d={feature.seconds} /></div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section class="closing">
-        <h2>All ten, free.</h2>
-        <a class="button" href={DOWNLOAD_URL}>Download for Mac</a>
-        <p class="note">{MIN_MACOS}</p>
-      </section>
+      <div class="stage">
+        {features.map((feature, index) => {
+          const Spot = spots[feature.id];
+          return (
+            <article
+              class="feature-panel"
+              role="tabpanel"
+              id={`panel-${feature.id}`}
+              aria-labelledby={`tab-${feature.id}`}
+              data-seconds={feature.seconds}
+              style={`--accent:${feature.accent}`}
+              hidden={index !== 0}
+            >
+              <div class="spot-frame" aria-hidden="true"><Spot d={feature.seconds} /></div>
+              <div class="copy">
+                <h2>{feature.title}</h2>
+                <p class="tagline">{feature.tagline}</p>
+                <p class="details">{feature.details}</p>
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </main>
 
-    <footer class="foot">Estris</footer>
+    <footer class="foot">
+      <div class="foot-cta">
+        <img src="/icon.svg" alt="" width="64" height="64" />
+        <p class="foot-title">All ten tools, free.</p>
+        <a class="button large" href={DOWNLOAD_URL}>Download for Mac</a>
+        <p class="note">{MIN_MACOS}</p>
+      </div>
+      <p class="copyright">© {year} Carles Rojas</p>
+    </footer>
 
     <script>
       // The features play one after another, each for its animation's length. Picking one
@@ -106,7 +103,7 @@ const description = "Ten small utilities for your Mac in one quiet menu bar app:
           const active = i === index;
           tab.setAttribute("aria-selected", String(active));
           tab.tabIndex = active ? 0 : -1;
-          tab.classList.toggle("running", false);
+          tab.classList.remove("running");
         });
         panels.forEach((panel, i) => (panel.hidden = i !== index));
         const panel = panels[index];
@@ -123,7 +120,8 @@ const description = "Ten small utilities for your Mac in one quiet menu bar app:
         window.clearTimeout(timer);
         if (!visible) return;
         const seconds = Number(panel.dataset.seconds) || 7;
-        timer = window.setTimeout(() => play(picked ? current : (current + 1) % panels.length), seconds * 1000 + 600);
+        // Each animation ends as it starts, so replaying one is seamless.
+        timer = window.setTimeout(() => play(picked ? current : (current + 1) % panels.length), seconds * 1000);
       }
 
       tabs.forEach((tab, index) =>
@@ -145,12 +143,12 @@ const description = "Ten small utilities for your Mac in one quiet menu bar app:
         tabs[next].focus();
       });
 
-      // Only plays while the section is on screen.
+      // Only plays while on screen.
       new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
         if (visible) play(current);
         else window.clearTimeout(timer);
-      }, { threshold: 0.3 }).observe(document.querySelector(".features")!);
+      }, { threshold: 0.25 }).observe(document.querySelector(".stage")!);
     </script>
   </body>
 </html>

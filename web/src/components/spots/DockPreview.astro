@@ -1,61 +1,85 @@
 ---
 import Win from "../Win.astro";
 import Cursor from "../Cursor.astro";
-/** Resting on an app in the Dock shows its windows; clicking one brings it forward. */
+/** Resting on an app in the Dock shows its windows, as the app draws them; a click brings one
+    forward, and it minimizes back into the Dock, so it loops. */
 const { d } = Astro.props;
-const tiles = ["#0a84ff", "#ff375f", "#30d158", "#ff9f0a", "#bf5af2"];
+const tiles = [
+  { color: "#0a84ff", running: true },
+  { color: "#ff375f", running: true },
+  { color: "#30d158", running: false },
+  { color: "#ff9f0a", running: false },
+  { color: "#bf5af2", running: false },
+];
+const cards = ["Notes", "Ideas", "Draft"];
 ---
 <div class="spot s-dock" style={`--d:${d}s`}>
   <div class="screen">
     <Win class="dock-front pink" />
     <div class="dock-panel">
-      <div class="dock-thumb dock-t1"><Win class="pink" lines={3} /></div>
-      <div class="dock-thumb dock-t2"><Win class="pink" lines={3} /></div>
-      <div class="dock-thumb dock-t3"><Win class="pink" lines={3} /></div>
+      {cards.map((title, index) => (
+        <div class={`dock-card dock-card-${index}`}>
+          <div class="dock-head"><span class="dock-icon"></span><span class="dock-title">{title}</span></div>
+          <div class="dock-thumb"><b></b><b></b><b></b></div>
+        </div>
+      ))}
     </div>
-    <div class="dock-bar">
-      {tiles.map((color, index) => <span class={`dock-tile dock-tile-${index}`} style={`background:${color}`}></span>)}
+    <div class="dock">
+      {tiles.map((tile) => <span class={`tile${tile.running ? " running" : ""}`} style={`background:${tile.color}`}></span>)}
     </div>
     <Cursor class="dock-cursor" />
   </div>
 </div>
 
 <style is:global>
-  .s-dock .dock-bar {
-    position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%); display: flex; gap: 1.6cqw;
-    padding: 1.4cqw; border-radius: 2.4cqw; background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 0.2cqw rgba(255, 255, 255, 0.12);
-  }
-  .s-dock .dock-tile { position: relative; width: 6.6cqw; height: 6.6cqw; border-radius: 1.6cqw; }
-  .s-dock .dock-tile-1::after { content: ""; position: absolute; left: 50%; bottom: -1cqw; width: 0.8cqw; height: 0.8cqw; margin-left: -0.4cqw; border-radius: 50%; background: rgba(255, 255, 255, .7); }
+  /* Like the app's panel: little padding, cards close together, each with the app's icon and
+     the window's title over its thumbnail. */
   .s-dock .dock-panel {
-    position: absolute; left: 14%; top: 40%; width: 72%; height: 36%; padding: 2cqw; display: flex; gap: 2cqw; border-radius: 2.4cqw;
-    background: rgba(58, 58, 64, 0.85); box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.16), 0 2.4cqw 5cqw rgba(0, 0, 0, .45);
-    opacity: 0; transform: translateY(2cqw) scale(.96); transform-origin: 40% 100%;
+    position: absolute; left: 4.68%; top: 48.4%; width: 72.3%; height: 30.6%;
+    display: flex; gap: 0.6cqw; padding: 1.2cqw; border-radius: 3.2cqw;
+    background: rgba(58, 58, 64, 0.88); box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.16), 0 2.4cqw 5cqw rgba(0, 0, 0, .45);
+    opacity: 0; transform: translateY(1.5cqw); transform-origin: 50% 100%;
   }
-  .s-dock .dock-thumb { position: relative; flex: 1; border-radius: 1.6cqw; padding: 1cqw; }
-  .s-dock .dock-thumb .win { position: absolute; inset: 1cqw; }
-  .s-dock .dock-front { left: 18%; top: 12%; width: 64%; height: 58%; opacity: 0; transform: scale(.5) translateY(30%); }
-  .s-dock .dock-cursor { left: 70%; top: 20%; }
+  .s-dock .dock-card { flex: 1; display: flex; flex-direction: column; gap: 0.8cqw; padding: 0.9cqw; border-radius: 2cqw; }
+  .s-dock .dock-head { display: flex; align-items: center; gap: 0.9cqw; }
+  .s-dock .dock-icon { width: 3.2cqw; height: 3.2cqw; border-radius: 0.8cqw; background: #ff375f; }
+  .s-dock .dock-title { font-size: 2.3cqw; font-weight: 500; }
+  .s-dock .dock-thumb {
+    flex: 1; border-radius: 1.2cqw; background: #2c2c31; padding: 1.4cqw; display: flex; flex-direction: column; gap: 0.9cqw;
+    box-shadow: inset 0 0 0 0.15cqw rgba(255, 255, 255, 0.1);
+  }
+  .s-dock .dock-thumb b { display: block; height: 0.9cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.16); }
+  .s-dock .dock-thumb b:first-child { width: 70%; background: #ff375f; }
+  .s-dock .dock-thumb b:nth-child(3) { width: 55%; }
+  .s-dock .dock-front { left: 16%; top: 8%; width: 68%; height: 64%; opacity: 0; }
+  .s-dock .dock-cursor { left: 72%; top: 28%; }
 
   .s-dock.playing .dock-panel { animation: dock-panel var(--d) cubic-bezier(.3, 1.2, .5, 1) both; }
-  .s-dock.playing .dock-t2 { animation: dock-t2 var(--d) ease both; }
-  .s-dock.playing .dock-front { animation: dock-front var(--d) cubic-bezier(.3, 1.1, .5, 1) both; }
+  .s-dock.playing .dock-card-1 { animation: dock-card var(--d) ease both; }
+  .s-dock.playing .dock-front { animation: dock-front var(--d) cubic-bezier(.45, 0, .25, 1) both; }
   .s-dock.playing .dock-cursor { animation: dock-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-dock.playing .dock-tile-1 { animation: dock-tile var(--d) ease both; }
 
   @keyframes dock-cursor {
-    0% { left: 70%; top: 20%; }
-    18%, 36% { left: 41%; top: 90%; }
-    48%, 58% { left: 50%; top: 58%; }
-    60% { left: 50%; top: 58%; transform: scale(.85); }
-    62%, 100% { left: 50%; top: 58%; transform: none; }
+    0%, 4% { left: 72%; top: 28%; transform: none; }
+    16%, 22% { left: 40.68%; top: 88.67%; }
+    34%, 39% { left: 40.8%; top: 63.7%; transform: none; }
+    40% { left: 40.8%; top: 63.7%; transform: scale(.85); }
+    41% { left: 40.8%; top: 63.7%; transform: none; }
+    56%, 84% { left: 86%; top: 40%; }
+    98%, 100% { left: 72%; top: 28%; }
   }
-  @keyframes dock-tile { 0%, 18% { transform: none; } 22%, 56% { transform: translateY(-1cqw) scale(1.1); } 60%, 100% { transform: none; } }
   @keyframes dock-panel {
-    0%, 24% { opacity: 0; transform: translateY(2cqw) scale(.96); }
-    29%, 60% { opacity: 1; transform: none; }
-    64%, 100% { opacity: 0; transform: translateY(1cqw) scale(.98); }
+    0%, 19% { opacity: 0; transform: translateY(1.5cqw); }
+    23%, 41% { opacity: 1; transform: none; }
+    45%, 100% { opacity: 0; transform: translateY(1cqw); }
   }
-  @keyframes dock-t2 { 0%, 46% { background: transparent; } 49%, 100% { background: rgba(255, 255, 255, .14); } }
-  @keyframes dock-front { 0%, 61% { opacity: 0; transform: scale(.5) translateY(30%); } 68%, 100% { opacity: 1; transform: none; } }
+  @keyframes dock-card { 0%, 33% { background: transparent; } 35%, 41% { background: rgba(255, 255, 255, .12); } 45%, 100% { background: transparent; } }
+  /* Opens from its card, then minimizes into its icon in the Dock. */
+  @keyframes dock-front {
+    0%, 42% { opacity: 0; left: 30%; top: 52%; width: 21.6%; height: 24%; }
+    43% { opacity: 1; left: 30%; top: 52%; width: 21.6%; height: 24%; }
+    50%, 70% { opacity: 1; left: 16%; top: 8%; width: 68%; height: 64%; }
+    82% { opacity: 1; left: 36.9%; top: 83.7%; width: 7.5%; height: 10%; }
+    84%, 100% { opacity: 0; left: 36.9%; top: 83.7%; width: 7.5%; height: 10%; }
+  }
 </style>

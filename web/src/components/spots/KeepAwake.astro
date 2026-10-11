@@ -1,53 +1,42 @@
 ---
-import Win from "../Win.astro";
-import Cursor from "../Cursor.astro";
-/** The screen starts to dim towards sleep; turning Keep Awake on brings it back and holds it. */
+/** A still picture: Keep Awake's settings, on, and what it is doing. */
 const { d } = Astro.props;
 ---
 <div class="spot s-awake" style={`--d:${d}s`}>
-  <div class="screen">
-    <Win class="awake-win blue" />
-    <div class="awake-cup">
-      <svg viewBox="0 0 24 24"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" fill="currentColor"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16" stroke="currentColor" stroke-width="1.8" fill="none"/><path class="awake-steam" d="M8 3.5c-1 1.2 1 1.8 0 3M12 3.5c-1 1.2 1 1.8 0 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+  <div class="awake-card">
+    <div class="awake-head">
+      <span class="awake-tile">
+        <svg viewBox="0 0 24 24"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" fill="currentColor"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 3.5c-1 1.2 1 1.8 0 3M12 3.5c-1 1.2 1 1.8 0 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      </span>
+      <span class="awake-name">Keep Awake</span>
+      <span class="awake-switch on"><i></i></span>
     </div>
-    <div class="awake-dim"></div>
-    <div class="awake-z"><span>z</span><span>z</span><span>z</span></div>
-    <Cursor class="awake-cursor" />
+    <div class="awake-row"><span>On power adapter</span><span class="awake-value">Indefinitely</span></div>
+    <div class="awake-row"><span>On battery</span><span class="awake-value">1 hour</span></div>
+    <div class="awake-row"><span>Start the screen saver instead</span><span class="awake-switch small on"><i></i></span></div>
   </div>
   <div class="awake-pill"><span class="pill"><span class="awake-dot"></span>Awake · Indefinitely</span></div>
 </div>
 
 <style is:global>
-  .s-awake .awake-win { left: 14%; top: 16%; width: 60%; height: 64%; }
-  .s-awake .awake-cup { position: absolute; right: 3%; top: 0.4%; width: 4.2%; height: 4.2%; color: rgba(245, 245, 247, .55); z-index: 30; }
-  .s-awake .awake-cup svg { width: 100%; height: 100%; display: block; }
-  .s-awake .awake-steam { opacity: 0; }
-  .s-awake .awake-dim { position: absolute; inset: 5% 0 0 0; background: #000; opacity: 0; z-index: 20; }
-  .s-awake .awake-z { position: absolute; left: 70%; top: 40%; z-index: 25; display: flex; gap: 1cqw; font-size: 5cqw; font-weight: 700; color: rgba(245, 245, 247, .7); opacity: 0; }
-  .s-awake .awake-z span:nth-child(2) { transform: translateY(-2cqw); font-size: 6cqw; }
-  .s-awake .awake-z span:nth-child(3) { transform: translateY(-4.5cqw); font-size: 7cqw; }
-  .s-awake .awake-cursor { left: 50%; top: 60%; }
-  .s-awake .awake-pill { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
+  .s-awake .awake-card {
+    position: absolute; left: 9%; top: 9%; width: 82%; padding: 4cqw; border-radius: 3cqw; display: flex; flex-direction: column; gap: 1.6cqw;
+    background: rgba(40, 40, 45, 0.95); box-shadow: 0 0 0 0.25cqw rgba(255, 255, 255, 0.14), 0 3cqw 6cqw rgba(0, 0, 0, .4);
+  }
+  .s-awake .awake-head { display: flex; align-items: center; gap: 2.4cqw; padding-bottom: 2cqw; }
+  .s-awake .awake-tile { width: 9cqw; height: 9cqw; border-radius: 2.2cqw; background: #ff9f0a; color: #fff; display: grid; place-items: center; }
+  .s-awake .awake-tile svg { width: 60%; height: 60%; }
+  .s-awake .awake-name { flex: 1; font-size: 4.4cqw; font-weight: 700; }
+  .s-awake .awake-switch { position: relative; width: 9cqw; height: 5.4cqw; border-radius: 3cqw; background: #30d158; }
+  .s-awake .awake-switch i { position: absolute; right: 0.5cqw; top: 0.5cqw; width: 4.4cqw; height: 4.4cqw; border-radius: 50%; background: #fff; }
+  .s-awake .awake-switch.small { width: 6.4cqw; height: 3.8cqw; }
+  .s-awake .awake-switch.small i { width: 2.9cqw; height: 2.9cqw; right: 0.45cqw; top: 0.45cqw; }
+  .s-awake .awake-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 2cqw; padding: 2.4cqw 2.6cqw; border-radius: 1.8cqw;
+    background: rgba(255, 255, 255, 0.06); font-size: 3cqw;
+  }
+  .s-awake .awake-value { color: rgba(245, 245, 247, .6); }
+  .s-awake .awake-pill { position: absolute; left: 0; right: 0; top: 80%; display: flex; justify-content: center; }
   .s-awake .awake-pill .pill { font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
   .s-awake .awake-dot { width: 2.2cqw; height: 2.2cqw; border-radius: 50%; background: #30d158; box-shadow: 0 0 1.4cqw #30d158; }
-
-  .s-awake.playing .awake-dim { animation: awake-dim var(--d) ease-in-out both; }
-  .s-awake.playing .awake-z { animation: awake-z var(--d) ease both; }
-  .s-awake.playing .awake-cup { animation: awake-cup var(--d) ease both; }
-  .s-awake.playing .awake-steam { animation: awake-steam var(--d) ease both; }
-  .s-awake.playing .awake-cursor { animation: awake-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
-  .s-awake.playing .awake-pill { animation: awake-pill var(--d) cubic-bezier(.3, 1.4, .5, 1) both; }
-
-  @keyframes awake-dim { 0%, 8% { opacity: 0; } 38% { opacity: .62; } 48% { opacity: .62; } 56%, 100% { opacity: 0; } }
-  @keyframes awake-z { 0%, 18% { opacity: 0; transform: translateY(2cqw); } 30%, 46% { opacity: 1; transform: none; } 52%, 100% { opacity: 0; transform: translateY(-3cqw); } }
-  @keyframes awake-cup { 0%, 48% { color: rgba(245, 245, 247, .55); } 50%, 100% { color: #ff9f0a; } }
-  @keyframes awake-steam { 0%, 50% { opacity: 0; } 54%, 100% { opacity: 1; } }
-  @keyframes awake-cursor {
-    0%, 10% { left: 50%; top: 60%; }
-    40%, 46% { left: 96.5%; top: 2.6%; }
-    48% { left: 96.5%; top: 2.6%; transform: scale(.85); }
-    50% { left: 96.5%; top: 2.6%; transform: none; }
-    70%, 100% { left: 80%; top: 50%; }
-  }
-  @keyframes awake-pill { 0%, 52% { opacity: 0; transform: translateY(2cqw) scale(.9); } 58%, 100% { opacity: 1; transform: none; } }
 </style>

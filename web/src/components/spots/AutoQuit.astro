@@ -1,15 +1,16 @@
 ---
 import Win from "../Win.astro";
 import Cursor from "../Cursor.astro";
-/** Closing an app's last window quits it: the window goes, then the app's dot in the Dock. */
+/** Closing an app's last window quits it: the window goes, then its dot in the Dock. A click
+    on its icon opens it again, so it loops. */
 const { d } = Astro.props;
 const tiles = ["#0a84ff", "#ff9f0a", "#30d158", "#bf5af2"];
 ---
 <div class="spot s-quit" style={`--d:${d}s`}>
   <div class="screen">
     <Win class="quit-win orange" />
-    <div class="quit-dock">
-      {tiles.map((color, index) => <span class={`quit-tile quit-tile-${index}`} style={`background:${color}`}></span>)}
+    <div class="dock">
+      {tiles.map((color, index) => <span class={`tile quit-tile-${index}${index < 2 ? " running" : ""}`} style={`background:${color}`}></span>)}
     </div>
     <Cursor class="quit-cursor" />
   </div>
@@ -17,36 +18,36 @@ const tiles = ["#0a84ff", "#ff9f0a", "#30d158", "#bf5af2"];
 </div>
 
 <style is:global>
-  .s-quit .quit-win { left: 16%; top: 12%; width: 64%; height: 60%; transform-origin: 50% 50%; }
-  .s-quit .quit-dock {
-    position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%); display: flex; gap: 1.6cqw;
-    padding: 1.4cqw; border-radius: 2.4cqw; background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 0.2cqw rgba(255, 255, 255, 0.12);
-  }
-  .s-quit .quit-tile { position: relative; width: 6.6cqw; height: 6.6cqw; border-radius: 1.6cqw; }
-  .s-quit .quit-tile-1::after, .s-quit .quit-tile-0::after {
-    content: ""; position: absolute; left: 50%; bottom: -1cqw; width: 0.8cqw; height: 0.8cqw; margin-left: -0.4cqw; border-radius: 50%; background: rgba(255, 255, 255, .7);
-  }
-  .s-quit .quit-cursor { left: 60%; top: 60%; }
+  .s-quit .quit-win { left: 16%; top: 10%; width: 64%; height: 62%; transform-origin: 50% 50%; }
+  .s-quit .quit-cursor { left: 60%; top: 55%; }
   .s-quit .quit-pill { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
   .s-quit .quit-pill .pill { font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
 
-  .s-quit.playing .quit-win { animation: quit-win var(--d) cubic-bezier(.5, 0, .7, .4) both; }
+  .s-quit.playing .quit-win { animation: quit-win var(--d) cubic-bezier(.45, 0, .25, 1) both; }
   .s-quit.playing .quit-win .bar i:first-child { animation: quit-close var(--d) ease both; }
   .s-quit.playing .quit-cursor { animation: quit-cursor var(--d) cubic-bezier(.45, 0, .25, 1) both; }
   .s-quit.playing .quit-tile-1 { animation: quit-tile var(--d) ease both; }
-  .s-quit.playing .quit-tile-1::after { animation: quit-dot var(--d) ease both; }
+  .s-quit.playing .quit-tile-1::after { animation: quit-dot var(--d) step-end both; }
   .s-quit.playing .quit-pill { animation: quit-pill var(--d) cubic-bezier(.3, 1.4, .5, 1) both; }
 
+  /* The close button is at (18.3%, 13.2%); the app's icon at (45.3%, 88.7%). */
   @keyframes quit-cursor {
-    0%, 8% { left: 60%; top: 60%; }
-    30%, 34% { left: 18.3%; top: 14.2%; }
-    36% { left: 18.3%; top: 14.2%; transform: scale(.85); }
-    38% { left: 18.3%; top: 14.2%; transform: none; }
-    60%, 100% { left: 30%; top: 50%; }
+    0%, 4% { left: 60%; top: 55%; transform: none; }
+    20%, 23% { left: 18.3%; top: 13.2%; transform: none; }
+    24% { left: 18.3%; top: 13.2%; transform: scale(.85); }
+    25% { left: 18.3%; top: 13.2%; transform: none; }
+    52%, 57% { left: 45.3%; top: 88.7%; transform: none; }
+    58% { left: 45.3%; top: 88.7%; transform: scale(.85); }
+    59% { left: 45.3%; top: 88.7%; transform: none; }
+    76%, 100% { left: 60%; top: 55%; }
   }
-  @keyframes quit-close { 0%, 33% { transform: none; } 35% { transform: scale(1.5); } 38%, 100% { transform: none; } }
-  @keyframes quit-win { 0%, 38% { opacity: 1; transform: none; } 46%, 100% { opacity: 0; transform: scale(.85); } }
-  @keyframes quit-tile { 0%, 52% { transform: none; } 56% { transform: translateY(-1.4cqw); } 60%, 100% { transform: none; } }
-  @keyframes quit-dot { 0%, 56% { opacity: 1; } 62%, 100% { opacity: 0; } }
-  @keyframes quit-pill { 0%, 60% { opacity: 0; transform: translateY(2cqw) scale(.9); } 66%, 100% { opacity: 1; transform: none; } }
+  @keyframes quit-close { 0%, 22% { transform: none; } 24% { transform: scale(1.5); } 26%, 100% { transform: none; } }
+  @keyframes quit-win {
+    0%, 25% { opacity: 1; transform: none; }
+    32%, 64% { opacity: 0; transform: scale(.85); }
+    72%, 100% { opacity: 1; transform: none; }
+  }
+  @keyframes quit-tile { 0%, 58% { transform: none; } 61% { transform: translateY(-1.6cqw); } 64% { transform: none; } 66% { transform: translateY(-0.8cqw); } 68%, 100% { transform: none; } }
+  @keyframes quit-dot { 0% { opacity: 1; } 36% { opacity: 0; } 62% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes quit-pill { 0%, 36% { opacity: 0; transform: translateY(2cqw) scale(.9); } 40%, 52% { opacity: 1; transform: none; } 56%, 100% { opacity: 0; transform: none; } }
 </style>

@@ -39,51 +39,55 @@ const { d } = Astro.props;
   .s-snap.playing .snap-keys-1 .key { animation: snap-press-1 var(--d) ease both; }
   .s-snap.playing .snap-keys-2 .key { animation: snap-press-2 var(--d) ease both; }
 
+  /* Ends as it starts: the windows glide back, so it loops without a seam. */
   @keyframes snap-cursor {
     0% { left: 70%; top: 80%; }
-    12% { left: 31%; top: 16%; }
-    28% { left: 1.5%; top: 30%; }
-    36% { left: 24%; top: 55%; }
-    100% { left: 24%; top: 55%; }
+    10% { left: 31%; top: 16%; }
+    24% { left: 1.5%; top: 30%; }
+    30%, 84% { left: 24%; top: 55%; }
+    98%, 100% { left: 70%; top: 80%; }
   }
   @keyframes snap-a {
-    0%, 12% { left: 8%; top: 14%; width: 46%; height: 52%; }
-    28% { left: -21.5%; top: 28%; width: 46%; height: 52%; }
-    33%, 62% { left: 1.2%; top: 7%; width: 48.2%; height: 91%; }
-    70%, 100% { left: 1.2%; top: 7%; width: 31.7%; height: 91%; }
+    0%, 10% { left: 8%; top: 14%; width: 46%; height: 52%; }
+    24% { left: -21.5%; top: 28%; width: 46%; height: 52%; }
+    28%, 53% { left: 1.2%; top: 7%; width: 48.2%; height: 91%; }
+    60%, 84% { left: 1.2%; top: 7%; width: 31.7%; height: 91%; }
+    96%, 100% { left: 8%; top: 14%; width: 46%; height: 52%; }
   }
   @keyframes snap-b {
-    0%, 41% { left: 40%; top: 30%; width: 45%; height: 50%; }
-    46%, 62% { left: 50.6%; top: 7%; width: 48.2%; height: 91%; }
-    70%, 100% { left: 34.15%; top: 7%; width: 31.7%; height: 91%; }
+    0%, 35% { left: 40%; top: 30%; width: 45%; height: 50%; }
+    40%, 53% { left: 50.6%; top: 7%; width: 48.2%; height: 91%; }
+    60%, 84% { left: 34.15%; top: 7%; width: 31.7%; height: 91%; }
+    96%, 100% { left: 40%; top: 30%; width: 45%; height: 50%; }
   }
   @keyframes snap-c {
-    0%, 63% { left: 52%; top: 12%; width: 38%; height: 40%; }
-    71%, 100% { left: 67.1%; top: 7%; width: 31.7%; height: 91%; }
+    0%, 54% { left: 52%; top: 12%; width: 38%; height: 40%; }
+    61%, 84% { left: 67.1%; top: 7%; width: 31.7%; height: 91%; }
+    96%, 100% { left: 52%; top: 12%; width: 38%; height: 40%; }
   }
   @keyframes snap-preview {
-    0%, 22% { opacity: 0; }
-    26%, 29% { opacity: 1; }
-    33%, 100% { opacity: 0; }
+    0%, 18% { opacity: 0; }
+    21%, 24% { opacity: 1; }
+    28%, 100% { opacity: 0; }
   }
   @keyframes snap-keys-1 {
-    0%, 35% { opacity: 0; transform: translateY(2cqw); }
-    38%, 50% { opacity: 1; transform: none; }
-    54%, 100% { opacity: 0; transform: translateY(-1cqw); }
+    0%, 30% { opacity: 0; transform: translateY(2cqw); }
+    33%, 43% { opacity: 1; transform: none; }
+    46%, 100% { opacity: 0; transform: translateY(-1cqw); }
   }
   @keyframes snap-press-1 {
-    0%, 40% { transform: none; background: #2c2c31; }
-    42%, 47% { transform: translateY(0.5cqw); background: #0a84ff; }
-    50%, 100% { transform: none; background: #2c2c31; }
+    0%, 35% { transform: none; background: #2c2c31; }
+    36%, 40% { transform: translateY(0.5cqw); background: #0a84ff; }
+    42%, 100% { transform: none; background: #2c2c31; }
   }
   @keyframes snap-keys-2 {
-    0%, 55% { opacity: 0; transform: translateY(2cqw); }
-    58%, 82% { opacity: 1; transform: none; }
-    88%, 100% { opacity: 0; transform: translateY(-1cqw); }
+    0%, 48% { opacity: 0; transform: translateY(2cqw); }
+    51%, 66% { opacity: 1; transform: none; }
+    70%, 100% { opacity: 0; transform: translateY(-1cqw); }
   }
   @keyframes snap-press-2 {
-    0%, 61% { transform: none; background: #2c2c31; }
-    63%, 70% { transform: translateY(0.5cqw); background: #0a84ff; }
-    73%, 100% { transform: none; background: #2c2c31; }
+    0%, 54% { transform: none; background: #2c2c31; }
+    55%, 60% { transform: translateY(0.5cqw); background: #0a84ff; }
+    62%, 100% { transform: none; background: #2c2c31; }
   }
 </style>
