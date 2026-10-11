@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Settings look as they should on the latest macOS: releases are built with the newest Xcode.
+
 ## 0.1.1 - 2026-10-11
 
 - **Export & Import** in General: save all your settings to a file and load them again, on this Mac or another.

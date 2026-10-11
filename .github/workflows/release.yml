@@ -21,7 +21,8 @@ concurrency: release
 
 jobs:
   release:
-    runs-on: macos-15
+    # The newest macOS and Xcode: an app built with an older SDK gets the older look on new macOS.
+    runs-on: macos-26
     steps:
       - name: Only from main
         if: github.ref != 'refs/heads/main'
@@ -30,6 +31,14 @@ jobs:
           exit 1
 
       - uses: actions/checkout@v4
+
+      - name: Use the latest Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Show the SDK
+        run: xcodebuild -version && xcrun --show-sdk-version
 
       - name: Bump the version and the changelog
         id: version
