@@ -140,13 +140,13 @@ final class Remap {
             settings.activeDevice(for: input).map { InputDevice(id: $0.id, name: $0.entry.name, kind: $0.entry.kind) }
         }
         if isViewing, !parsed.isRepeat, !isLinkClick {
-            let (original, result) = remapping(of: parsed.input, on: target)
+            let result = remapping(of: parsed.input, on: target, viaKeyboard: device != nil)
             eventLog.record(InputEvent(
                 device: device.map(settings.name(of:)) ?? unknownSource(sender: sender, event: event),
                 source: device,
-                input: original ?? parsed.input,
+                input: parsed.input,
                 phase: parsed.phase,
-                name: original?.title ?? parsed.name,
+                name: parsed.name,
                 detail: parsed.detail,
                 result: result?.title
             ))
@@ -188,17 +188,16 @@ final class Remap {
         return String(localized: "Posted by \(poster)")
     }
 
-    /// For the Event Viewer: what an event was remapped to, and, for a key changed on the
-    /// keyboard itself (which macOS already reports as the new key), the key pressed.
-    private func remapping(of input: RemapInput?, on device: InputDevice?) -> (original: RemapInput?, result: RemapOutput?) {
-        guard settings.isEnabled, let device, let input else { return (nil, nil) }
-        // Checked first: the keyboard reports the result, which may be mapped too, but only as
-        // the result of this mapping.
-        if case .key(let usage) = input,
-           let pair = settings.keyboardMappings(for: device.id).first(where: { $0.destination == usage }) {
-            return (.key(pair.source), .key(usage))
+    /// For the Event Viewer: what an event was remapped to. A key changed on the keyboard
+    /// itself already reaches macOS as the new key, and pressing it can't be told apart from
+    /// pressing the new key, so it shows as the new key with no mapping.
+    private func remapping(of input: RemapInput?, on device: InputDevice?, viaKeyboard: Bool) -> RemapOutput? {
+        guard settings.isEnabled, let device, let input else { return nil }
+        if viaKeyboard, case .key(let usage) = input,
+           settings.keyboardMappings(for: device.id).contains(where: { $0.source == usage || $0.destination == usage }) {
+            return nil
         }
-        return (nil, settings.mappings(for: device.id).first(where: { $0.input == input })?.output)
+        return settings.mappings(for: device.id).first(where: { $0.input == input })?.output
     }
 
     private func perform(_ output: RemapOutput, down: Bool, isRepeat: Bool) {
