@@ -35,6 +35,7 @@ Every row with a setting (switch, slider, stepper, picker, color, shortcut key),
 - **Language** (see Languages below), **Date format** (Oct 9, 9 Oct, 10/9 or 9/10; never the year) and **Time format** (system setting, 24-hour or 12-hour).
 - **Open at login**: on by default, so Estris is running after a restart.
 - **About**: app icon, name and version.
+- **Export & Import** (at the bottom): **Export Settings…** saves every Estris setting to a JSON file; **Import Settings…** reads one back after a confirmation, replacing the current settings, and Estris opens again to apply them. Everything Estris keeps in UserDefaults goes in (the app's language too), except state tied to the Mac (login item setup, permission hints, migrations); the clipboard history and Open at login don't. Data stored as JSON stays readable in the file (`$json`), other data and dates are wrapped (`$data`, `$date`) (`Shared/SettingsTransfer.swift`).
 
 **Clipboard** starts with its on/off switch (off stops recording and frees its shortcuts), then three tabs:
 - **Settings**:

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Export & Import** in General: save all your settings to a file and load them again, on this Mac or another.
+
 ## 0.1.0 - 2026-10-11
 
 - First release, with ten utilities in the menu bar:
