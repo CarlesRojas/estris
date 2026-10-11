@@ -134,7 +134,6 @@
 "Entries" = "Entrées";
 "Escape" = "Échappement";
 "Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris n'a pas pu modifier le son de %@. Autorisez-le sous Enregistrement audio du système uniquement, dans Réglages Système > Confidentialité et sécurité > Enregistrement de l'écran et de l'audio du système.";
-"Estris needs Accessibility access" = "Estris a besoin de l’accès Accessibilité";
 "Event Viewer" = "Visualiseur d’évènements";
 "Example" = "Exemple";
 "Excluded Apps" = "Apps exclues";
@@ -207,7 +206,6 @@
 "Logs" = "Journaux";
 "Logs and settings for finding out what Estris is doing." = "Journaux et réglages pour savoir ce que fait Estris.";
 "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS utilise déjà ce raccourci. Désactivez-le dans Raccourcis clavier pour l’utiliser ici, ou choisissez une autre touche.";
-"macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS ne permet qu’aux apps disposant de cette autorisation de saisir dans d’autres apps. Estris l’utilise pour coller l’entrée choisie directement dans l’app où vous travaillez, Fermeture automatique pour voir les fenêtres de chaque app, Clic central pour cliquer avec le bouton central, Réaffecter pour modifier les touches et les boutons, et Ancrage des fenêtres pour déplacer et redimensionner les fenêtres. Sans elle, les entrées sont seulement copiées dans le presse-papiers et les autres utilitaires ne font rien.";
 "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS utilise ce raccourci pour changer de source de saisie. Désactivez-le pour l’utiliser ici : Raccourcis clavier > Sources de saisie > Sélectionner la source suivante dans le menu Saisie.";
 "Mappings" = "Affectations";
 "Maximize" = "Agrandir";

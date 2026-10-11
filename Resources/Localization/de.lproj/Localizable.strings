@@ -134,7 +134,6 @@
 "Entries" = "Einträge";
 "Escape" = "Escape";
 "Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris konnte den Ton von %@ nicht ändern. Erlaube es unter „Nur Systemaudioaufnahme“ in Systemeinstellungen > Datenschutz & Sicherheit > Bildschirm- & Systemaudioaufnahme.";
-"Estris needs Accessibility access" = "Estris braucht Zugriff auf die Bedienungshilfen";
 "Event Viewer" = "Ereignisanzeige";
 "Example" = "Beispiel";
 "Excluded Apps" = "Ausgeschlossene Apps";
@@ -207,7 +206,6 @@
 "Logs" = "Protokolle";
 "Logs and settings for finding out what Estris is doing." = "Protokolle und Einstellungen, um zu sehen, was Estris tut.";
 "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS verwendet diesen Kurzbefehl bereits. Deaktiviere ihn unter Tastaturkurzbefehle, um ihn hier zu nutzen, oder wähle eine andere Taste.";
-"macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS lässt nur Apps mit dieser Berechtigung in andere Apps tippen. Estris nutzt sie, um den gewählten Eintrag direkt in die App einzusetzen, in der du arbeitest, Automatisch beenden, um die Fenster jeder App zu sehen, Mittelklick, um mit der mittleren Taste zu klicken, Neu belegen, um Tasten zu ändern, und Fenster einrasten, um Fenster zu bewegen und zu skalieren. Ohne sie werden Einträge nur in die Zwischenablage kopiert und die anderen Werkzeuge tun nichts.";
 "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS verwendet diesen Kurzbefehl, um die Eingabequelle zu wechseln. Deaktiviere ihn, um ihn hier zu nutzen: Tastaturkurzbefehle > Eingabequellen > Nächste Quelle im Eingabemenü auswählen.";
 "Mappings" = "Belegungen";
 "Maximize" = "Maximieren";

@@ -73,7 +73,7 @@ final class ClipboardSettings: ObservableObject {
 
     /// What each setting is at first, for Reset to Defaults and each row's Reset to Default.
     enum Default {
-        static let isEnabled = true
+        static let isEnabled = false
         static let maxItems = 50
         static let ignorePasswords = true
         static let recordImages = true

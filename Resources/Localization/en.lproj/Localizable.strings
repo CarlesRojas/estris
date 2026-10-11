@@ -134,7 +134,6 @@
 "Entries" = "Entries";
 "Escape" = "Escape";
 "Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording.";
-"Estris needs Accessibility access" = "Estris needs Accessibility access";
 "Event Viewer" = "Event Viewer";
 "Example" = "Example";
 "Excluded Apps" = "Excluded Apps";
@@ -207,7 +206,6 @@
 "Logs" = "Logs";
 "Logs and settings for finding out what Estris is doing." = "Logs and settings for finding out what Estris is doing.";
 "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key." = "macOS already uses this shortcut. Turn it off in Keyboard Shortcuts to use it here, or pick another key.";
-"macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing." = "macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing.";
 "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu." = "macOS uses this shortcut to switch the keyboard's input source. Turn it off to use it here: Keyboard Shortcuts > Input Sources > Select next source in Input menu.";
 "Mappings" = "Mappings";
 "Maximize" = "Maximize";

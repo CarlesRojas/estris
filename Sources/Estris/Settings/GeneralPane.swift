@@ -22,30 +22,6 @@ struct GeneralPane: View {
 
     var body: some View {
         Form {
-            // Missing permission: a warning at the very top. Once granted, it is a plain row
-            // further down.
-            if !accessibilityGranted {
-                Section {
-                    HStack(alignment: .top, spacing: 14) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.title)
-                            .foregroundStyle(.orange)
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Estris needs Accessibility access")
-                                .font(.headline)
-                            Text("macOS only lets apps with this permission type into other apps. Estris uses it to paste the entry you pick straight into the app you are working in, Auto Quit uses it to see each app's windows, Middle Click uses it to click the middle button, Remap uses it to change keys and buttons, and Window Snapping uses it to move and resize windows. Without it, entries are only copied to the clipboard, and the other utilities do nothing.")
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                            Button("Open Accessibility Settings") {
-                                NSWorkspace.shared.open(Self.accessibilitySettingsURL)
-                            }
-                            .controlSize(.large)
-                        }
-                    }
-                    .padding(.vertical, 6)
-                }
-            }
-
             Section("Language & Region") {
                 Picker("Language", selection: $general.language) {
                     ForEach(AppLanguage.allCases) { language in
@@ -83,11 +59,16 @@ struct GeneralPane: View {
                 }
             }
 
-            if accessibilityGranted {
-                Section("Permissions") {
-                    LabeledContent("Accessibility") {
+            // Asked for when a utility that needs it is turned on, not before.
+            Section("Permissions") {
+                LabeledContent("Accessibility") {
+                    if accessibilityGranted {
                         Label("Allowed", systemImage: "checkmark.circle.fill")
                             .foregroundStyle(.green)
+                    } else {
+                        Button("Open Accessibility Settings") {
+                            NSWorkspace.shared.open(Self.accessibilitySettingsURL)
+                        }
                     }
                 }
             }
