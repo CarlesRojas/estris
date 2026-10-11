@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 - 2026-10-11
+
 - First release, with ten utilities in the menu bar:
   - **Clipboard**: a history of what you copy, to pick from when pasting.
   - **Window Snapping**: drag windows to edges or use shortcuts; one shortcut arranges every window on the screen.
