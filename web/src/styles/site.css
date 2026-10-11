@@ -88,7 +88,7 @@ h1 { font: 700 clamp(28px, 3vw, 44px)/1.08 var(--display); letter-spacing: -0.03
 @keyframes progress { to { width: 100%; } }
 
 /* The stage: a large tinted panel, the animation in the middle, its words under it. */
-.stage { position: relative; flex: 1; width: 100%; min-height: 0; border-radius: var(--radius, 48px); overflow: hidden; background: var(--stage); }
+.stage { position: relative; flex: 1; width: min(100%, 1440px); min-height: 0; border-radius: var(--radius, 48px); overflow: hidden; background: var(--stage); }
 .feature-panel {
   position: absolute; inset: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 4px;
   padding: clamp(24px, 3vw, 44px) clamp(24px, 3.2vw, 48px) clamp(26px, 3.2vw, 44px);
@@ -105,12 +105,12 @@ h1 { font: 700 clamp(28px, 3vw, 44px)/1.08 var(--display); letter-spacing: -0.03
 .copy h2 { font: 600 12px/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
 .tagline { font: 700 clamp(22px, 2.2vw, 32px)/1.12 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
 .details { color: var(--muted); font-size: clamp(15px, 1.15vw, 17px); line-height: 1.45; max-width: 38em; text-wrap: balance; }
-/* A wide stage: the words on the left and the animation, larger, on the right. */
+/* A wide stage: the animation, larger, on the left and the words on the right, centred together. */
 .stage { container: stage / size; }
 @container stage (min-aspect-ratio: 8 / 5) {
-  .feature-panel { --glow-x: 66%; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 30em) auto; justify-content: center; align-items: center; gap: clamp(32px, 6cqw, 120px); }
-  .spot-frame { grid-column: 2; grid-row: 1; }
-  .copy { grid-column: 1; grid-row: 1; justify-items: start; text-align: left; max-width: 30em; }
+  .feature-panel { --glow-x: 36%; grid-template-rows: minmax(0, 1fr); grid-template-columns: auto minmax(0, 30em); justify-content: center; align-items: center; gap: clamp(40px, 6cqw, 96px); }
+  .spot-frame { grid-column: 1; grid-row: 1; }
+  .copy { grid-column: 2; grid-row: 1; justify-items: start; text-align: left; max-width: 30em; }
   .details { text-wrap: pretty; }
 }
 
