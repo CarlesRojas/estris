@@ -16,6 +16,8 @@
     </array>
     <key>CFBundleExecutable</key>
     <string>Estris</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
     <string>com.carlesrojas.Estris</string>
     <key>CFBundleInfoDictionaryVersion</key>

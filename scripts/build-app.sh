@@ -17,6 +17,7 @@ cp "$BIN_DIR/Estris" "$APP/Contents/MacOS/Estris"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 mkdir -p "$APP/Contents/Resources"
 cp -R Resources/Localization/*.lproj "$APP/Contents/Resources/"
+cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
 IDENTITY="${SIGN_IDENTITY:-}"
 if [[ -z "$IDENTITY" ]]; then

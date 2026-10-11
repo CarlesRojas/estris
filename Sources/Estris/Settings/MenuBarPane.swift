@@ -4,7 +4,7 @@ import SwiftUI
 /// The Menu Bar pane: which icon Estris shows in the menu bar, all in view to click, and
 /// what its menu shows.
 struct MenuBarPane: View {
-    private static let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 16)
+    private static let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 13)
 
     @ObservedObject var settings: MenuBarSettings
 
@@ -101,8 +101,7 @@ struct MenuBarPane: View {
         return Button {
             settings.icon = icon
         } label: {
-            Image(systemName: MenuBarIcon.symbol(for: icon))
-                .font(.system(size: 14))
+            MenuBarIcon.view(for: icon, size: 18)
                 .foregroundStyle(isSelected ? Color.white : settings.iconColor.flatMap(NSColor.init(hex:)).map { Color(nsColor: $0) } ?? Color.primary)
                 .frame(maxWidth: .infinity, minHeight: 28)
                 .background(
