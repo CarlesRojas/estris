@@ -6,8 +6,10 @@ import ScreenCaptureKit
 struct AppWindow: Identifiable, Equatable {
     let id: CGWindowID
     let title: String
+    /// In points, as the window server has it now.
+    let size: CGSize
     /// Width over height, for the preview's shape.
-    let aspect: CGFloat
+    var aspect: CGFloat { size.width / max(size.height, 1) }
 }
 
 /// Lists an app's windows, captures their thumbnails, and brings one forward or closes it.
@@ -39,7 +41,7 @@ enum AppWindows {
                 ?? axTitles[CGWindowID(number)] ?? ""
             let isOnScreen = entry[kCGWindowIsOnscreen as String] as? Bool ?? false
             guard isOnScreen || !title.isEmpty else { return nil }
-            return AppWindow(id: CGWindowID(number), title: title, aspect: bounds.width / bounds.height)
+            return AppWindow(id: CGWindowID(number), title: title, size: bounds.size)
         }
         return Array(windows.prefix(limit))
     }
@@ -55,7 +57,8 @@ enum AppWindows {
             await withTaskGroup(of: (CGWindowID, CGImage?).self) { group in
                 for window in windows {
                     guard let scWindow = content.windows.first(where: { $0.windowID == window.id }) else { continue }
-                    let frame = scWindow.frame
+                    // The size now: the list may be older than a resize.
+                    let frame = window.size
                     let scale = min(1, maxPixels / max(frame.width, frame.height, 1))
                     let configuration = SCStreamConfiguration()
                     configuration.width = max(1, Int((frame.width * scale).rounded()))
@@ -153,13 +156,13 @@ enum AppWindows {
     }()
 }
 
-/// The list of windows ScreenCaptureKit can capture, kept for a moment. Getting it goes through
-/// every window on the Mac, the slowest part of a capture, so moving from icon to icon reuses
-/// it; a window it doesn't have yet (just opened) asks again. Requests made while one is under
-/// way wait for it.
+/// The list of windows ScreenCaptureKit can capture, kept for a while. Getting it goes through
+/// every window on the Mac, the slowest part of a capture, and windows come and go less often
+/// than that: a window it doesn't have yet (just opened) asks again, and sizes come from the
+/// window server's list each time. Requests made while one is under way wait for it.
 @available(macOS 14, *)
 private actor ShareableContentCache {
-    private static let lifetime: TimeInterval = 3
+    private static let lifetime: TimeInterval = 30
     private var content: SCShareableContent?
     private var time = Date.distantPast
     private var loading: Task<SCShareableContent?, Never>?
