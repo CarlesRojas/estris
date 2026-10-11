@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 # Builds Estris.app into ./build.
 # Signs with SIGN_IDENTITY, else your Apple Development certificate, else ad hoc.
+# RELEASE=1 builds for both Apple silicon and Intel and, with a Developer ID identity, signs
+# for notarization (hardened runtime, secure timestamp).
 # Ad-hoc signatures change every build, so macOS forgets the Accessibility permission each
 # time; an Apple Development certificate keeps it.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-swift build -c release
-BIN_DIR="$(swift build -c release --show-bin-path)"
+ARCHS=()
+if [[ "${RELEASE:-}" == 1 ]]; then
+    ARCHS=(--arch arm64 --arch x86_64)
+fi
+swift build -c release ${ARCHS[@]+"${ARCHS[@]}"}
+BIN_DIR="$(swift build -c release ${ARCHS[@]+"${ARCHS[@]}"} --show-bin-path)"
 
 APP="build/Estris.app"
 rm -rf "$APP"
@@ -28,7 +34,11 @@ if [[ -z "$IDENTITY" ]]; then
     IDENTITY="-"
     echo "No Apple Development certificate: signing ad hoc, so Accessibility must be granted again after each build."
 fi
-codesign --force --sign "$IDENTITY" "$APP"
+if [[ "${RELEASE:-}" == 1 && "$IDENTITY" != "-" ]]; then
+    codesign --force --options runtime --timestamp --entitlements Resources/Estris.entitlements --sign "$IDENTITY" "$APP"
+else
+    codesign --force --sign "$IDENTITY" "$APP"
+fi
 SIGNATURE="$(codesign -dvv "$APP" 2>&1)"
 AUTHORITY="$(grep '^Authority=' <<<"$SIGNATURE" | head -1 | cut -d= -f2- || true)"
 echo "Signed with: ${AUTHORITY:-ad hoc}"
