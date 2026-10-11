@@ -148,6 +148,19 @@ const year = new Date().getFullYear();
         if (document.visibilityState === "visible" && visible) play(current);
       });
 
+      // The stage's corners follow the animation's screen, so both curves are concentric:
+      // its radius is the screen's (2.6% of the animation) plus the gap above the screen.
+      const stage = document.querySelector<HTMLElement>(".stage")!;
+      function fitCorners() {
+        const panel = panels.find((p) => !p.hidden) ?? panels[0];
+        const spot = panel.querySelector<HTMLElement>(".spot");
+        const screen = panel.querySelector<HTMLElement>(".screen");
+        if (!spot || !screen) return;
+        const gap = screen.getBoundingClientRect().top - stage.getBoundingClientRect().top;
+        stage.style.setProperty("--radius", `${Math.round(gap + spot.offsetWidth * 0.026)}px`);
+      }
+      new ResizeObserver(fitCorners).observe(stage);
+
       // Only plays while on screen.
       new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
