@@ -13,6 +13,10 @@ final class Updates: NSObject, ObservableObject {
     /// The newer version found, if any.
     @Published private(set) var availableVersion: String?
     private var controller: SPUStandardUpdaterController?
+    /// While Sparkle's windows are up: moves each to the screen the pointer is on.
+    private var windowObserver: NSObjectProtocol?
+    /// Windows already open, or already moved.
+    private var knownWindows: Set<ObjectIdentifier> = []
 
     /// Whether this build can update itself.
     var canCheck: Bool { controller != nil }
@@ -31,7 +35,37 @@ final class Updates: NSObject, ObservableObject {
 
     /// Shows Sparkle's window for the update found (or checks now), to install it.
     func checkForUpdates() {
-        controller?.checkForUpdates(nil)
+        guard let controller else { return }
+        followPointer()
+        controller.checkForUpdates(nil)
+    }
+
+    /// Sparkle centres its windows on the main screen, which for a menu bar app isn't the one
+    /// being used. Until the update session ends, each new window (checking, up to date, the
+    /// update, its progress) moves to the middle of the screen with the pointer, once. Windows
+    /// already open and Estris's own panels stay.
+    private func followPointer() {
+        stopFollowingPointer()
+        knownWindows = Set(NSApp.windows.map(ObjectIdentifier.init))
+        windowObserver = NotificationCenter.default.addObserver(forName: NSWindow.didBecomeKeyNotification, object: nil, queue: .main) { [weak self] note in
+            MainActor.assumeIsolated {
+                guard let self, let window = note.object as? NSWindow, !(window is MenuBarPanel), !(window is OverlayPanel),
+                      self.knownWindows.insert(ObjectIdentifier(window)).inserted
+                else { return }
+                let mouse = NSEvent.mouseLocation
+                guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }),
+                      window.screen != screen
+                else { return }
+                let area = screen.visibleFrame
+                window.setFrameOrigin(NSPoint(x: (area.midX - window.frame.width / 2).rounded(),
+                                              y: (area.midY - window.frame.height / 2 + area.height / 6).rounded()))
+            }
+        }
+    }
+
+    private func stopFollowingPointer() {
+        if let windowObserver { NotificationCenter.default.removeObserver(windowObserver) }
+        windowObserver = nil
     }
 }
 
@@ -52,5 +86,9 @@ extension Updates: SPUStandardUserDriverDelegate {
 
     nonisolated func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
         false
+    }
+
+    nonisolated func standardUserDriverWillFinishUpdateSession() {
+        MainActor.assumeIsolated { stopFollowingPointer() }
     }
 }
