@@ -170,7 +170,8 @@ final class Remap {
         else { return true }
         // Set on the keyboard itself, so this already is the new key; a press without its
         // device didn't go through that, so it is changed here.
-        if case .key = input, case .key = output, device != nil { return true }
+        if device != nil, case .key(let usage) = input,
+           settings.keyboardMappings(for: target.id).contains(where: { $0.source == usage }) { return true }
         perform(output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
         return false
     }
@@ -191,18 +192,13 @@ final class Remap {
     /// keyboard itself (which macOS already reports as the new key), the key pressed.
     private func remapping(of input: RemapInput?, on device: InputDevice?) -> (original: RemapInput?, result: RemapOutput?) {
         guard settings.isEnabled, let device, let input else { return (nil, nil) }
-        let mappings = settings.mappings(for: device.id)
-        if let output = mappings.first(where: { $0.input == input })?.output {
-            return (nil, output)
-        }
+        // Checked first: the keyboard reports the result, which may be mapped too, but only as
+        // the result of this mapping.
         if case .key(let usage) = input,
-           let mapping = mappings.first(where: { mapping in
-               guard case .key? = mapping.input, case .key(usage)? = mapping.output else { return false }
-               return true
-           }) {
-            return (mapping.input, mapping.output)
+           let pair = settings.keyboardMappings(for: device.id).first(where: { $0.destination == usage }) {
+            return (.key(pair.source), .key(usage))
         }
-        return (nil, nil)
+        return (nil, settings.mappings(for: device.id).first(where: { $0.input == input })?.output)
     }
 
     private func perform(_ output: RemapOutput, down: Bool, isRepeat: Bool) {

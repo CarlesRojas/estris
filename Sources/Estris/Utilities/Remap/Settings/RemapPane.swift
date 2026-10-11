@@ -76,12 +76,12 @@ private struct MappingsView: View {
                         header(device)
                     } footer: {
                         HStack {
-                            Spacer()
                             Button {
                                 settings.addMapping(to: device)
                             } label: {
                                 Label("Add Mapping", systemImage: "plus")
                             }
+                            Spacer()
                         }
                         .padding(.top, 4)
                     }

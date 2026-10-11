@@ -83,8 +83,13 @@ final class RemapSettings: ObservableObject {
 
     /// Mappings per device, keyed by `InputDevice.id`.
     @Published var devices: [String: DeviceMappings] {
-        didSet { defaults.set(try? JSONEncoder().encode(devices), forKey: Keys.devices) }
+        didSet {
+            defaults.set(try? JSONEncoder().encode(devices), forKey: Keys.devices)
+            keyboardMappingsCache = [:]
+        }
     }
+
+    private var keyboardMappingsCache: [String: [(source: UInt64, destination: UInt64)]] = [:]
 
     /// Names given by the user, keyed by `InputDevice.id`.
     @Published var customNames: [String: String] {
@@ -136,6 +141,31 @@ final class RemapSettings: ObservableObject {
         }
         guard mapping.isDeviceLess == true, let active = activeDevice(for: input), active.id != deviceID else { return nil }
         return .otherDevice(customNames[active.id] ?? active.entry.name)
+    }
+
+    /// The key-to-key mappings set on the keyboard itself, in order. The keyboard then reports
+    /// the new key, so a key that is the result of one of these can't have a mapping of its
+    /// own: pressing it and pressing the mapped key would look the same. Such mappings are left
+    /// to the event tap instead, which sees the key actually pressed.
+    func keyboardMappings(for deviceID: String) -> [(source: UInt64, destination: UInt64)] {
+        if let cached = keyboardMappingsCache[deviceID] { return cached }
+        // Only the first complete mapping for a key applies.
+        var seen: Set<RemapInput> = []
+        let applied = mappings(for: deviceID).filter { mapping in
+            guard let input = mapping.input, mapping.output != nil else { return false }
+            return seen.insert(input).inserted
+        }
+        var pairs: [(source: UInt64, destination: UInt64)] = applied.compactMap { mapping in
+            guard case .key(let source)? = mapping.input, case .key(let destination)? = mapping.output else { return nil }
+            return (source, destination)
+        }
+        var inTap = Set(applied.compactMap(\.input)).subtracting(pairs.map { RemapInput.key($0.source) })
+        // Leaving one to the tap gives its key a mapping there, which can push out another.
+        while let index = pairs.firstIndex(where: { inTap.contains(.key($0.destination)) }) {
+            inTap.insert(.key(pairs.remove(at: index).source))
+        }
+        keyboardMappingsCache[deviceID] = pairs
+        return pairs
     }
 
     func mappings(for deviceID: String) -> [Mapping] {
