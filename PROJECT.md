@@ -294,6 +294,10 @@ Sources/Estris/
 
 To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting and a `settingsPane()` that begins with `UtilityHeader`, then, if it needs any, a `PermissionsSection` listing them and why), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
 
+## Installing
+
+Opened from the disk image or Downloads (the real location, through App Translocation's original path), Estris first asks **Move Estris to Applications?** (`App/ApplicationsMover.swift`). **Move to Applications** copies it there (an older copy goes to the Trash), clears the download quarantine, quits, opens the moved copy and ejects the disk image, which closes its window; if the copy fails, an alert says to drag it there instead. **Not Now** carries on from where it is, without adding it to the login items until it runs from elsewhere.
+
 ## Releases
 
 - `CHANGELOG.md`: what changed for people using Estris. Every user-facing change adds a line under **Unreleased** in the same change.
@@ -301,6 +305,7 @@ To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager
   1. `scripts/release.py` bumps `CFBundleShortVersionString` (and `CFBundleVersion` by one) in `Resources/Info.plist` and turns Unreleased into the new version's section, dated; those entries are the release notes. It stops if Unreleased is empty.
   2. Builds for Apple silicon and Intel (`RELEASE=1 scripts/build-app.sh`), signed with the Developer ID certificate from the secrets (hardened runtime, `Resources/Estris.entitlements`), packs `Estris.dmg` with a link to Applications (`scripts/make-dmg.sh`), and notarizes and staples it.
   3. Commits "Release X.Y.Z" to main, tags it `vX.Y.Z` and creates the GitHub release with `Estris.dmg`, which the website's Download points to.
+  - `Estris.dmg` opens to a window with the app, a link to Applications and a background (`Resources/DMG/background.svg`, rendered to `background.png` and `@2x`) titled "Drag Estris to Applications", with an arrow between them and a line saying Estris can also be opened from there. Laid out by `dmgbuild` (`scripts/dmg-settings.py`).
   - Without the signing secrets it still releases, signed ad hoc and not notarized, with a warning; macOS then makes people allow the app by hand. Secrets: `DEVELOPER_ID_CERTIFICATE` (base64 .p12), `DEVELOPER_ID_CERTIFICATE_PASSWORD`, `APPLE_ID`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID`.
 
 ## Notes

@@ -102,6 +102,7 @@
 "Corners" = "Cantonades";
 "Couldn't export the settings" = "No s’ha pogut exportar la configuració";
 "Couldn't import the settings" = "No s’ha pogut importar la configuració";
+"Couldn't move Estris to Applications" = "No s’ha pogut moure Estris a Aplicacions";
 "Create Mapping" = "Crea una assignació";
 "Custom color" = "Color personalitzat";
 "Date format" = "Format de data";
@@ -121,6 +122,7 @@
 "Don't keep awake" = "No el mantinguis despert";
 "Down" = "Premut";
 "Down Arrow" = "Fletxa avall";
+"Drag it to the Applications folder yourself, then open it from there." = "Arrossega’l tu a la carpeta Aplicacions i obre’l des d’allà.";
 "Dragging" = "Arrossegar";
 "Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Elimina tipus de lletra, colors i altres formats perquè el text enganxat s’adapti a on va.";
 "Edge area" = "Zona de la vora";
@@ -169,6 +171,7 @@
 "Include # prefix" = "Inclou el prefix #";
 "Indefinitely" = "Indefinidament";
 "Insert" = "Insereix";
+"It is running from where it was downloaded. In Applications it stays installed and can open at login." = "S’està executant des d’on es va baixar. A Aplicacions queda instal·lat i es pot obrir en iniciar la sessió.";
 "Keep apps that just opened in front" = "Mantén al davant les apps que s’acaben d’obrir";
 "Keep Awake" = "Mantén despert";
 "Keep them in front for" = "Mantén-les al davant durant";
@@ -219,7 +222,9 @@
 "Mixer" = "Mesclador";
 "Modifiers" = "Modificadors";
 "Mouse Buttons" = "Botons del ratolí";
+"Move Estris to Applications?" = "Vols moure Estris a Aplicacions?";
 "Move pasted entry to the top" = "Mou l’entrada enganxada a dalt";
+"Move to Applications" = "Mou a Aplicacions";
 "Mute" = "Silencia";
 "Name" = "Nom";
 "Navigation" = "Navegació";

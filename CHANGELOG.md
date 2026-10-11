@@ -3,6 +3,7 @@
 ## Unreleased
 
 - **Export & Import** in General: save all your settings to a file and load them again, on this Mac or another.
+- The disk image shows how to install Estris: drag it to Applications. Opened from the disk image, Estris offers to move itself there, opens again from Applications and ejects the disk image.
 
 ## 0.1.0 - 2026-10-11
 

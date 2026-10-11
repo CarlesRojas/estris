@@ -24,6 +24,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Opened from the disk image: moving to Applications opens it again from there.
+        if ApplicationsMover.offerIfNeeded() { return }
         permissionLog.start()
         clipboard.start()
         autoQuit.start()
@@ -36,7 +38,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         colorPicker.start()
         volumeMixer.start()
         menuBar.start()
-        LoginItem.enableOnFirstLaunch()
+        // Only from where it stays: a login item for the disk image would break once it's ejected.
+        if !ApplicationsMover.isOutsideApplications {
+            LoginItem.enableOnFirstLaunch()
+        }
         _ = Paster.isTrusted(prompt: true)
         // Relaunched from Settings (to change the language): back where the user was.
         if Relaunch.takeReopenSettings() {
