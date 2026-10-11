@@ -51,6 +51,11 @@ h1, h2, p { margin: 0; }
   display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 16px; border-radius: 980px;
   background: var(--button); color: var(--button-text); font-weight: 600; font-size: 14px; text-decoration: none; transition: opacity .15s, transform .15s;
 }
+.button { gap: 7px; }
+.button-icon { width: 16px; height: 16px; flex: none; margin-left: -2px; }
+/* The main call to action, under the headline. */
+.button-large { min-height: 44px; padding: 0 22px; font-size: 16px; margin-top: clamp(6px, 1.2vh, 12px); }
+.button-large .button-icon { width: 18px; height: 18px; }
 .button:hover { opacity: 0.86; }
 .button:active { transform: scale(0.97); }
 :focus-visible { outline: 3px solid #0a84ff; outline-offset: 3px; }
@@ -127,6 +132,7 @@ h1 { font: 700 clamp(28px, 3vw, 44px)/1.08 var(--display); letter-spacing: -0.03
   .brand { font-size: 17px; gap: 8px; }
   .brand img { width: 26px; height: 26px; }
   .button { min-height: 30px; padding: 0 14px; font-size: 13px; }
+  .button-large { min-height: 40px; padding: 0 18px; font-size: 15px; }
   .showcase { height: auto; gap: 14px; padding-top: 4px; align-items: stretch; }
   .hero { padding: 32px 0 22px; gap: 10px; }
   .hero img { width: 52px; }
