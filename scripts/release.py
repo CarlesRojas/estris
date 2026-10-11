@@ -4,8 +4,8 @@ section into the new version's. Used by the Release workflow.
 
     python3 scripts/release.py patch|minor|major NOTES_FILE
 
-Writes the release notes (the Unreleased entries) to NOTES_FILE and prints `version=X.Y.Z`
-for the workflow. Fails, changing nothing, when Unreleased has no entries.
+Writes the release notes (the Unreleased entries, then a line every release has) to NOTES_FILE
+and prints `version=X.Y.Z` for the workflow. Unreleased may be empty.
 """
 import datetime
 import re
@@ -15,6 +15,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PLIST = ROOT / "Resources/Info.plist"
 CHANGELOG = ROOT / "CHANGELOG.md"
+# Last in every release's notes, even when nothing else is.
+ALWAYS = "- Performance improvements and bug fixes."
 
 
 def plist_value(text, key):
@@ -33,9 +35,7 @@ def main():
     section = re.search(r"^## Unreleased\n(.*?)(?=^## |\Z)", changelog, re.S | re.M)
     if not section:
         sys.exit("CHANGELOG.md has no '## Unreleased' section")
-    notes = section.group(1).strip()
-    if not notes:
-        sys.exit("Nothing to release: the changelog's Unreleased section is empty")
+    notes = "\n".join(line for line in (section.group(1).strip(), ALWAYS) if line)
 
     plist = PLIST.read_text()
     current = plist_value(plist, "CFBundleShortVersionString")
