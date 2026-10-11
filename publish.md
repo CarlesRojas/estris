@@ -1,6 +1,6 @@
-# Publishing a release
+# Setting up releases
 
-## Once: signing and notarization
+Done once. After that, each release is Actions > Release > Run workflow on main (see README).
 
 Needs a paid Apple Developer Program membership (developer.apple.com/programs, 99 USD a year). Without it the workflow still releases, but macOS warns that the app can't be checked and people must allow it in System Settings > Privacy & Security.
 
@@ -16,11 +16,3 @@ Needs a paid Apple Developer Program membership (developer.apple.com/programs, 9
    - `APPLE_APP_PASSWORD`: the password from step 4.
    - `APPLE_TEAM_ID`: from step 5.
 7. **Let the workflow push**: Settings > Actions > General > Workflow permissions > **Read and write permissions**. If main has branch protection, allow GitHub Actions to bypass it, or the release commit can't be pushed.
-
-## Each release
-
-1. Check `CHANGELOG.md`: what's under **Unreleased** becomes the release notes.
-2. Actions > **Release** > Run workflow > branch `main` > choose **patch** (fixes), **minor** (new features) or **major** > Run workflow.
-3. It takes about 10 minutes (notarization is most of it). When it finishes there is a "Release X.Y.Z" commit, a `vX.Y.Z` tag and a release with `Estris.dmg`, which the website's Download button already points to.
-
-If it fails before the last step, nothing is committed or published: fix it and run it again.
