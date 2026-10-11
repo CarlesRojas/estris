@@ -1,0 +1,44 @@
+---
+import "../styles/spot.css";
+import { features } from "../data/features";
+import { spots } from "../components/spots";
+
+/** The picture shown when the site is shared (1200 × 630), recorded into public/og.png by
+    scripts/render-og.mjs: the icon, the headline and Window Snapping's animation, paused. */
+const feature = features.find((f) => f.id === "window-snapping")!;
+const Spot = spots[feature.id];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Estris</title>
+    <style is:global>
+      html, body { margin: 0; }
+      body {
+        width: 1200px; height: 630px; overflow: hidden; display: grid; grid-template-columns: 1fr 540px; align-items: center; gap: 24px;
+        padding: 0 72px 0 88px; box-sizing: border-box; color: #f5f5f7;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased;
+        background:
+          radial-gradient(60% 75% at 74% 50%, rgba(110, 168, 254, 0.28), transparent 70%),
+          radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1.4px) 0 0 / 22px 22px,
+          linear-gradient(160deg, #15161b, #0b0b0e);
+      }
+      .words { display: grid; gap: 22px; }
+      .brand { display: flex; align-items: center; gap: 16px; font-size: 34px; font-weight: 700; letter-spacing: -0.01em; }
+      .brand img { width: 64px; height: 64px; }
+      h1 { margin: 0; font-size: 62px; line-height: 1.04; font-weight: 700; letter-spacing: -0.035em; }
+      p { margin: 0; font-size: 26px; color: #a1a1a6; }
+    </style>
+  </head>
+  <body>
+    <div class="words">
+      <div class="brand"><img src="/icon.svg" alt="" />Estris</div>
+      <h1>The little tools your Mac is missing.</h1>
+      <p>Ten utilities in one menu bar app. Free.</p>
+    </div>
+    <Spot d={feature.seconds} />
+    <script is:inline>document.querySelector(".spot").classList.add("playing");</script>
+  </body>
+</html>

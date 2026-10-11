@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "render-spots": "node scripts/render-spots.mjs"
+    "render-spots": "node scripts/render-spots.mjs",
+    "render-og": "node scripts/render-og.mjs"
   },
   "dependencies": {
     "astro": "5.18.2"

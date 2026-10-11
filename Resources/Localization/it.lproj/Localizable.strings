@@ -307,6 +307,7 @@
 "Rename" = "Rinomina";
 "Rename Device" = "Rinomina dispositivo";
 "Rename this device" = "Rinomina questo dispositivo";
+"Report an Issue" = "Segnala un problema";
 "Reset Appearance to Defaults" = "Ripristina l’aspetto predefinito";
 "Reset to Default" = "Ripristina valore predefinito";
 "Reset to Defaults" = "Ripristina valori predefiniti";
@@ -424,6 +425,7 @@
 "Volume Down" = "Abbassa volume";
 "Volume Mixer" = "Mixer del volume";
 "Volume Up" = "Alza volume";
+"Website" = "Sito web";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Se disattivo, la cronologia mantiene l’ordine di copia e ⌘V continua a incollare l’ultimo testo copiato.";
 "Width" = "Larghezza";
 "Window Snapping" = "Aggancio finestre";

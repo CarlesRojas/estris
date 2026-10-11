@@ -307,6 +307,7 @@
 "Rename" = "Canvia el nom";
 "Rename Device" = "Canvia el nom del dispositiu";
 "Rename this device" = "Canvia el nom d’aquest dispositiu";
+"Report an Issue" = "Informa d’un problema";
 "Reset Appearance to Defaults" = "Restableix l’aparença per defecte";
 "Reset to Default" = "Restableix el valor per defecte";
 "Reset to Defaults" = "Restableix els valors per defecte";
@@ -424,6 +425,7 @@
 "Volume Down" = "Abaixa el volum";
 "Volume Mixer" = "Mesclador de volum";
 "Volume Up" = "Apuja el volum";
+"Website" = "Lloc web";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Si està desactivat, l’historial manté l’ordre en què es van copiar les coses i ⌘V continua enganxant l’últim text copiat.";
 "Width" = "Amplada";
 "Window Snapping" = "Ajust de finestres";
