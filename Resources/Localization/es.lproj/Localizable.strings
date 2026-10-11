@@ -84,6 +84,7 @@
 "Center Third" = "Tercio central";
 "Center Two Thirds" = "Dos tercios centrales";
 "Change what keys and mouse buttons do, per device." = "Cambia lo que hacen las teclas y los botones del ratón, por dispositivo.";
+"Check for Updates…" = "Buscar actualizaciones…";
 "Choose the icon Estris shows in the menu bar." = "Elige el icono que Estris muestra en la barra de menús.";
 "Choose…" = "Elegir…";
 "Clear" = "Borrar";
@@ -412,6 +413,8 @@
 "Unmute" = "Activar sonido";
 "Up" = "Soltado";
 "Up Arrow" = "Flecha arriba";
+"Update" = "Actualizar";
+"Update Available" = "Actualización disponible";
 "usage %@" = "uso %@";
 "Use Original Name" = "Usar el nombre original";
 "Utility" = "Utilidad";

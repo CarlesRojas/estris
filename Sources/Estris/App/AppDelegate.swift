@@ -48,6 +48,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         colorPicker.start()
         volumeMixer.start()
         menuBar.start()
+        Updates.shared.start()
         // Only from where it stays: a login item for the disk image would break once it's ejected.
         if !ApplicationsMover.isOutsideApplications {
             LoginItem.enableOnFirstLaunch()

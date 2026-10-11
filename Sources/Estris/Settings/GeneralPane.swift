@@ -86,6 +86,11 @@ struct GeneralPane: View {
                             .contentShape(Rectangle())
                             .onTapGesture(perform: versionTapped)
                     }
+                    Spacer()
+                    // Local builds can't update themselves.
+                    if Updates.shared.canCheck {
+                        Button("Check for Updates…") { Updates.shared.checkForUpdates() }
+                    }
                 }
             }
 

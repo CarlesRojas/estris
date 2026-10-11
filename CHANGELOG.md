@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Updates: when a new version is out, the menu bar menu shows **Update Available** with a button that installs it. **Check for Updates…** is in General.
 - Settings look as they should on the latest macOS: releases are built with the newest Xcode.
 
 ## 0.1.1 - 2026-10-11

@@ -36,6 +36,15 @@
     <true/>
     <key>NSAudioCaptureUsageDescription</key>
     <string>Estris uses an app's sound only to play it at the volume and on the device you choose for it in Volume Mixer. Nothing is recorded.</string>
+    <key>SUFeedURL</key>
+    <string>https://github.com/CarlesRojas/estris/releases/latest/download/appcast.xml</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>21600</integer>
+    <!-- Set by scripts/build-app.sh from SPARKLE_PUBLIC_KEY; empty in local builds, which don't check for updates. -->
+    <key>SUPublicEDKey</key>
+    <string></string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

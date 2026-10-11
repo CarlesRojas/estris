@@ -55,10 +55,11 @@ enum SettingsTransfer {
         return domain.filter { isSetting($0.key) }
     }
 
-    /// Estris's own keys, plus the app's language; not what macOS adds (window frames and such).
+    /// Estris's own keys, plus the app's language; not what macOS adds (window frames and such)
+    /// or Sparkle keeps (`SU…`, when it last checked for updates).
     private static func isSetting(_ key: String) -> Bool {
         if key == "AppleLanguages" { return true }
-        return !machineKeys.contains(key) && !["NS", "Apple", "com.apple"].contains { key.hasPrefix($0) }
+        return !machineKeys.contains(key) && !["NS", "Apple", "com.apple", "SU"].contains { key.hasPrefix($0) }
     }
 
     // MARK: Values
