@@ -16,7 +16,7 @@ final class MenuBarSettings: ObservableObject {
         static let showsClipboardHistory = false
         static let showsClearHistory = true
         static let showsColorPicker = true
-        static let showsRecentColors = true
+        static let showsRecentColors = false
     }
 
     private let defaults = UserDefaults.standard

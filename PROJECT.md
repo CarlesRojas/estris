@@ -68,7 +68,7 @@ Clicking the menu bar icon opens a menu below it in the clipboard overlay's defa
 
 - **Volume Mixer**: the same rows as its pane, titled **System Volume** and **Apps Volume**.
 - **Clipboard**: the most recent entries (off by default), each with its source app and one line of it; a click pastes it into the app in front, as the overlay does. A **Clear History** button (on by default) empties the history.
-- **Color Picker**: the recent colors (on by default), a click copies one; a **Pick a Color** button (on by default) that starts picking.
+- **Color Picker**: the recent colors (off by default), a click copies one; a **Pick a Color** button (on by default) that starts picking.
 
 Then **Settings** and **Quit** side by side at the bottom, as capsules, set apart from the groups above by three times the gap between groups. The menu hangs a little below the menu bar; its corners are concentric with the capsule buttons, and each part (System Volume, Apps Volume, Clipboard, Color Picker) sits in its own rounded box. In dark mode the menu is a shade darker than the overlay's surface and the boxes a lighter grey; in light mode the menu is almost white and the boxes a light grey, concentric with the menu; no separator lines. A click outside, Esc or another click on the icon closes it.
 
@@ -76,7 +76,7 @@ Then **Settings** and **Quit** side by side at the bottom, as capsules, set apar
 
 - **Volume Mixer**: **Show System Volume**, with **Show Output** and **Show Microphone** under it (they do nothing while it is off), **Show Apps Volume**, **Show device pickers** (all on) and **Show volume percentages** (off).
 - **Clipboard**: **Show recent entries** (off) and how many (**Entries**, 1 to 10, default 5), **Show Clear History button** (on).
-- **Color Picker**: **Show Pick a Color button** and **Show recent colors** (both on).
+- **Color Picker**: **Show Pick a Color button** (on) and **Show recent colors** (off).
 
 **Reset to Defaults** puts the icon and all of these back.
 
@@ -298,11 +298,11 @@ To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager
 
 ## Installing
 
-Opened from the disk image or Downloads (the real location, through App Translocation's original path), Estris first asks **Move Estris to Applications?** (`App/ApplicationsMover.swift`). **Move to Applications** copies it there (an older copy goes to the Trash), clears the download quarantine, quits, opens the moved copy and ejects the disk image, which closes its window; if the copy fails, an alert says to drag it there instead. **Not Now** carries on from where it is, without adding it to the login items until it runs from elsewhere.
+Opened from the disk image or Downloads (the real location, through App Translocation's original path), Estris first asks **Move Estris to Applications?** (`App/ApplicationsMover.swift`). **Move to Applications** copies it there (an older copy goes to the Trash), clears the download quarantine, quits, opens the moved copy and ejects the disk image, which closes its window; if the copy fails, an alert says to drag it there instead. **Not Now** carries on from where it is, without adding it to the login items until it runs from elsewhere. Dragged to Applications instead, the disk image stays mounted (its icon on the desktop) until Estris opens from Applications: at each launch it ejects any read-only volume holding an Estris.app with its bundle identifier.
 
 ## Updates
 
-Through Sparkle (`Shared/Updates.swift`): Estris reads `appcast.xml` from the latest GitHub release at launch and every 6 hours (`SUFeedURL`, `SUScheduledCheckInterval` in Info.plist; checking is on without asking). A newer version shows at the top of the menu bar menu as **Update Available**, with its version and an **Update** button, instead of Sparkle's own window (gentle scheduled update reminders). **Update**, or **Check for Updates…** in General > About, opens Sparkle's window with the release notes and **Install Update**, which downloads the disk image, checks its signature, replaces the app and opens it again. Updates are signed with an EdDSA key: the public half is put in Info.plist (`SUPublicEDKey`) at build time from `SPARKLE_PUBLIC_KEY`; builds without it (local ones) don't check and hide **Check for Updates…**. `build-app.sh` copies `Sparkle.framework` into `Contents/Frameworks` and signs its helpers, the framework and then the app.
+Through Sparkle (`Shared/Updates.swift`): Estris reads `appcast.xml` from the latest GitHub release at launch and every 6 hours (`SUFeedURL`, `SUScheduledCheckInterval` in Info.plist; checking is on without asking). A newer version shows at the top of the menu bar menu as **Update Available**, with its version and an **Update** button, instead of Sparkle's own window (gentle scheduled update reminders). **Update**, or **Check for Updates…** in General > About, opens Sparkle's window with the release notes and **Install Update**, which downloads the disk image, checks its signature, replaces the app and opens it again. Sparkle's windows open on the screen with the pointer: until the update session ends, each new one moves there once it becomes key. Updates are signed with an EdDSA key: the public half is put in Info.plist (`SUPublicEDKey`) at build time from `SPARKLE_PUBLIC_KEY`; builds without it (local ones) don't check and hide **Check for Updates…**. `build-app.sh` copies `Sparkle.framework` into `Contents/Frameworks` and signs its helpers, the framework and then the app.
 
 ## Releases
 
@@ -312,7 +312,7 @@ Through Sparkle (`Shared/Updates.swift`): Estris reads `appcast.xml` from the la
   2. On the newest macOS runner with the latest stable Xcode (an app built with an older SDK gets the older look on new macOS), builds for Apple silicon and Intel (`RELEASE=1 scripts/build-app.sh`), signed with the Developer ID certificate from the secrets (hardened runtime, `Resources/Estris.entitlements`), packs `Estris.dmg` with a link to Applications (`scripts/make-dmg.sh`), and notarizes and staples it.
   3. Signs `Estris.dmg` for Sparkle (`sign_update` with the `SPARKLE_PRIVATE_KEY` secret) and writes `appcast.xml` (`scripts/make-appcast.py`: the version, build number, minimum macOS, the notes as HTML and the disk image's link and signature); skipped with a warning without the key.
   4. Commits "Release X.Y.Z" to main, tags it `vX.Y.Z` and creates the GitHub release with `Estris.dmg` (which the website's Download points to) and `appcast.xml` (which installed copies check).
-  - `Estris.dmg` opens to a window with the app, a link to Applications and a background (`Resources/DMG/background.svg`, rendered to `background.png` and `@2x`) titled "Drag Estris to Applications", with an arrow between them and a line saying Estris can also be opened from there. Laid out by `dmgbuild` (`scripts/dmg-settings.py`).
+  - `Estris.dmg` opens to a window with the app, a link to Applications and a background (`Resources/DMG/background.svg`, rendered to `background.png` and `@2x`) titled "Drag Estris to Applications", with an arrow between them and the line "Then open Estris from Applications. This window closes by itself." Laid out by `dmgbuild` (`scripts/dmg-settings.py`).
   - Without the signing secrets it still releases, signed ad hoc and not notarized, with a warning; macOS then makes people allow the app by hand. Secrets: `DEVELOPER_ID_CERTIFICATE` (base64 .p12), `DEVELOPER_ID_CERTIFICATE_PASSWORD`, `APPLE_ID`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID`.
 
 ## Notes

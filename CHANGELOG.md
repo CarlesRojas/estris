@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The menu bar menu no longer shows recent colors unless turned on in Settings > Menu Bar.
+- Update windows open on the screen you are using.
+- After dragging Estris to Applications, opening it ejects the disk image, so its window and desktop icon go away.
+
 ## 0.1.2 - 2026-10-11
 
 - Updates: when a new version is out, the menu bar menu shows **Update Available** with a button that installs it. **Check for Updates…** is in General.

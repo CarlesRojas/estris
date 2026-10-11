@@ -2,7 +2,8 @@ import AppKit
 
 /// Opened from the disk image or Downloads, Estris offers to move itself to Applications,
 /// where it stays installed and can open at login. It then opens again from there and ejects
-/// the disk image, closing its window.
+/// the disk image, closing its window. Dragged there instead, it ejects the disk image when
+/// first opened from Applications.
 @MainActor
 enum ApplicationsMover {
     private static let destination = URL(fileURLWithPath: "/Applications/Estris.app")
@@ -43,6 +44,23 @@ enum ApplicationsMover {
         }
         relaunchFromApplications()
         return true
+    }
+
+    /// Once installed, ejects Estris's disk image if it's still mounted (dragging to
+    /// Applications leaves it open, with its icon on the desktop): a read-only volume holding
+    /// an Estris.app with the same bundle identifier.
+    static func ejectInstallerDiskImage() {
+        guard !isOutsideApplications else { return }
+        let keys: [URLResourceKey] = [.volumeIsReadOnlyKey]
+        let volumes = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: keys, options: [.skipHiddenVolumes]) ?? []
+        for volume in volumes where volume.path.hasPrefix("/Volumes/") {
+            guard (try? volume.resourceValues(forKeys: Set(keys)))?.volumeIsReadOnly == true,
+                  Bundle(url: volume.appendingPathComponent("Estris.app"))?.bundleIdentifier == Bundle.main.bundleIdentifier
+            else { continue }
+            DispatchQueue.global(qos: .utility).async {
+                try? NSWorkspace.shared.unmountAndEjectDevice(at: volume)
+            }
+        }
     }
 
     private static func move() throws {
