@@ -232,7 +232,7 @@ English, Spanish, French, Portuguese (Brazil), German, Italian and Catalan. **Ge
 - `src/lib/motion.ts`: the animations' motion language, after LottieFiles' motion-design skill (the "Playful" personality): fast starts with soft landings, a small overshoot when things arrive (ease-out-back), a squash and spring on every click and keypress, a pointer that travels in arcs (x and y on different curves) and holds down while dragging, and a soft light drifting over each screen. Helpers return the keyframes, so every spot moves the same way. Colours are a softer palette than the system's pure ones (`--blue`, `--pink`… in `spot.css`).
 - `src/components/spots/`: one animation per feature, in HTML and CSS on a square, transparent stage (`src/styles/spot.css` holds the shared pieces: screen, windows, pointer, keycaps, labels). Each runs its keyframes once over `--d` while its root has `.playing`.
 - `src/pages/spots/[id].astro`: each animation alone, for recording; `scripts/render-spots.mjs` records them as 1080 px transparent WebM into `public/spots` (and ProRes 4444 with `--mov`), for social posts or elsewhere. `--sheet` writes a few frames side by side to check one.
-- `src/config.ts`: where Download points (the public downloads repo's latest release).
+- `src/config.ts`: where Download points (`Estris.dmg` of this repo's latest GitHub release).
 
 ## Project structure
 
@@ -292,6 +292,15 @@ Sources/Estris/
 ```
 
 To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager` (a `start()`, an on/off setting and a `settingsPane()` that begins with `UtilityHeader`, then, if it needs any, a `PermissionsSection` listing them and why), create and start it in `AppDelegate`, and add a case for it to `SettingsPane` in `Settings/SettingsView.swift`, put it in a `SettingsGroup`, and report its state in `isOn(_:)`.
+
+## Releases
+
+- `CHANGELOG.md`: what changed for people using Estris. Every user-facing change adds a line under **Unreleased** in the same change.
+- The **Release** workflow (`.github/workflows/release.yml`, run by hand from Actions on main, choosing patch, minor or major):
+  1. `scripts/release.py` bumps `CFBundleShortVersionString` (and `CFBundleVersion` by one) in `Resources/Info.plist` and turns Unreleased into the new version's section, dated; those entries are the release notes. It stops if Unreleased is empty.
+  2. Builds for Apple silicon and Intel (`RELEASE=1 scripts/build-app.sh`), signed with the Developer ID certificate from the secrets (hardened runtime, `Resources/Estris.entitlements`), packs `Estris.dmg` with a link to Applications (`scripts/make-dmg.sh`), and notarizes and staples it.
+  3. Commits "Release X.Y.Z" to main, tags it `vX.Y.Z` and creates the GitHub release with `Estris.dmg`, which the website's Download points to.
+  - Without the signing secrets it still releases, signed ad hoc and not notarized, with a warning; macOS then makes people allow the app by hand. `publish.md` explains the secrets.
 
 ## Notes
 

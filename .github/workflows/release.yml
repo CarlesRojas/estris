@@ -1,0 +1,95 @@
+# Publishes a new version: bumps it, turns the changelog's Unreleased entries into its notes,
+# builds a signed and notarized Estris.dmg, commits, tags and creates the GitHub release.
+# Run it from Actions > Release > Run workflow, on main. Signing secrets: see publish.md;
+# without them the app is signed ad hoc and macOS warns when opening it.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version part to bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: write
+
+concurrency: release
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - name: Only from main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Run the release from main."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - name: Bump the version and the changelog
+        id: version
+        run: python3 scripts/release.py "${{ inputs.bump }}" build/release-notes.md >> "$GITHUB_OUTPUT"
+
+      - name: Import the Developer ID certificate
+        id: signing
+        env:
+          CERTIFICATE: ${{ secrets.DEVELOPER_ID_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+        run: |
+          if [[ -z "$CERTIFICATE" ]]; then
+            echo "::warning::No DEVELOPER_ID_CERTIFICATE secret: the app is signed ad hoc and not notarized."
+            exit 0
+          fi
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          echo "$CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          security import "$RUNNER_TEMP/certificate.p12" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          rm "$RUNNER_TEMP/certificate.p12"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | grep "Developer ID Application" | head -1 | awk '{print $2}')"
+          if [[ -z "$IDENTITY" ]]; then
+            echo "::error::The certificate isn't a Developer ID Application one."
+            exit 1
+          fi
+          echo "identity=$IDENTITY" >> "$GITHUB_OUTPUT"
+
+      - name: Build the app
+        env:
+          RELEASE: 1
+          SIGN_IDENTITY: ${{ steps.signing.outputs.identity || '-' }}
+        run: ./scripts/build-app.sh
+
+      - name: Make the disk image
+        env:
+          SIGN_IDENTITY: ${{ steps.signing.outputs.identity || '-' }}
+        run: ./scripts/make-dmg.sh
+
+      - name: Notarize
+        if: steps.signing.outputs.identity != ''
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          xcrun notarytool submit build/Estris.dmg --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
+          xcrun stapler staple build/Estris.dmg
+
+      - name: Commit, tag and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Release $VERSION"
+          git tag "v$VERSION"
+          git push origin HEAD:main "v$VERSION"
+          gh release create "v$VERSION" build/Estris.dmg --title "Estris $VERSION" --notes-file build/release-notes.md

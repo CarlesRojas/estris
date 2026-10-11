@@ -8,3 +8,4 @@
 - Every settings pane except General, Remap and Developer ends with a **Reset to Defaults** button. When adding a setting, include it in that pane's `reset()`. Resets leave on/off switches, excluded apps, history and Open at login alone.
 - Every settings row also gets a right-click **Reset to Default** with `.resetMenu(...)` (`Settings/ResetMenu.swift`), taking its default from the settings class's constants, the same ones `reset()` uses. Add it to any new row.
 - Features still to add live in `TODO.md`. When asked for the to-do list, read it; when a feature from it is implemented, remove it in the same change.
+- Every change that people using Estris would notice (a feature, a setting, a fix, a behavior change) adds a short line under **Unreleased** in `CHANGELOG.md`, in the same change, written for users. Internal changes (refactors, docs, the website, build scripts) don't.
