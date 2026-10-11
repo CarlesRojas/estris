@@ -31,26 +31,26 @@ const year = new Date().getFullYear();
     </header>
 
     <main class="showcase">
-      <div class="side">
-        <h1>The little tools your Mac is missing.</h1>
-        <nav class="feature-list" role="tablist" aria-label="Features">
-          {features.map((feature, index) => (
-            <button
-              class="feature-tab"
-              role="tab"
-              id={`tab-${feature.id}`}
-              aria-controls={`panel-${feature.id}`}
-              aria-selected={index === 0 ? "true" : "false"}
-              tabindex={index === 0 ? 0 : -1}
-              style={`--seconds:${feature.seconds}s;--accent:${feature.accent}`}
-            >
+      <h1>The little tools your Mac is missing.</h1>
+      <nav class="feature-list" role="tablist" aria-label="Features">
+        {features.map((feature, index) => (
+          <button
+            class="feature-tab"
+            role="tab"
+            id={`tab-${feature.id}`}
+            aria-controls={`panel-${feature.id}`}
+            aria-selected={index === 0 ? "true" : "false"}
+            tabindex={index === 0 ? 0 : -1}
+            style={`--seconds:${feature.seconds}s;--accent:${feature.accent}`}
+          >
+            <span class="tab-label">
               <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" set:html={feature.icon} />
               <span class="tab-name">{feature.title}</span>
-              <span class="progress" aria-hidden="true"><i></i></span>
-            </button>
-          ))}
-        </nav>
-      </div>
+            </span>
+            <span class="progress" aria-hidden="true"><i></i></span>
+          </button>
+        ))}
+      </nav>
 
       <div class="stage">
         {features.map((feature, index) => {
@@ -79,9 +79,9 @@ const year = new Date().getFullYear();
 
     <footer class="foot">
       <div class="foot-cta">
-        <img src="/icon.svg" alt="" width="64" height="64" />
+        <img src="/icon.svg" alt="" width="40" height="40" />
         <p class="foot-title">All ten tools, free.</p>
-        <a class="button large" href={DOWNLOAD_URL}>Download for Mac</a>
+        <a class="button" href={DOWNLOAD_URL}>Download for Mac</a>
         <p class="note">{MIN_MACOS}</p>
       </div>
       <p class="copyright">© {year} Carles Rojas</p>
@@ -141,6 +141,11 @@ const year = new Date().getFullYear();
         const next = (current + step + tabs.length) % tabs.length;
         play(next);
         tabs[next].focus();
+      });
+
+      // Back in front after being in the background: carry on from where it was.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && visible) play(current);
       });
 
       // Only plays while on screen.

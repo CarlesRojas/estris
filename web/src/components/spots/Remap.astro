@@ -8,7 +8,7 @@ const { d } = Astro.props;
     <span class="remap-device pill">Keyboard</span>
     <div class="remap-line">
       <span class="key remap-from-1">⇪ caps lock</span>
-      <span class="remap-arrow remap-arrow-1"><i></i></span>
+      <span class="remap-arrow"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span class="key remap-to-1">esc</span>
     </div>
   </div>
@@ -16,7 +16,7 @@ const { d } = Astro.props;
     <span class="remap-device pill">Mouse</span>
     <div class="remap-line">
       <span class="remap-mouse"><i class="remap-button"></i></span>
-      <span class="remap-arrow remap-arrow-2"><i></i></span>
+      <span class="remap-arrow"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span class="key remap-to-2">
         <svg viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="6" rx="1.5" fill="currentColor"/><rect x="13" y="5" width="8" height="6" rx="1.5" fill="currentColor"/><rect x="3" y="13" width="8" height="6" rx="1.5" fill="currentColor"/><rect x="13" y="13" width="8" height="6" rx="1.5" fill="currentColor"/></svg>
         Mission Control
@@ -26,27 +26,22 @@ const { d } = Astro.props;
 </div>
 
 <style is:global>
-  .s-remap .remap-row { position: absolute; left: 6%; right: 6%; display: flex; flex-direction: column; align-items: flex-start; gap: 3cqw; }
-  .s-remap .remap-row-1 { top: 10%; }
-  .s-remap .remap-row-2 { top: 54%; }
+  /* Each mapping centred: from, a small chevron, to. */
+  .s-remap .remap-row { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 3cqw; }
+  .s-remap .remap-row-1 { top: 13%; }
+  .s-remap .remap-row-2 { top: 50%; }
   .s-remap .remap-device { font-size: 2.6cqw; color: rgba(245, 245, 247, .7); }
-  .s-remap .remap-line { width: 100%; display: flex; align-items: center; gap: 3cqw; }
+  .s-remap .remap-line { display: flex; align-items: center; justify-content: center; gap: 3.4cqw; }
   .s-remap .key { height: 13cqw; font-size: 4cqw; padding: 0 3.6cqw; gap: 1.4cqw; }
-  .s-remap .remap-from-1 { min-width: 30cqw; justify-content: flex-start; }
-  .s-remap .remap-to-1 { min-width: 16cqw; }
   .s-remap .remap-to-1, .s-remap .remap-to-2 { background: var(--blue); }
+  .s-remap .remap-to-1 { min-width: 15cqw; }
   .s-remap .remap-to-2 svg { width: 4.4cqw; height: 4.4cqw; }
-  .s-remap .remap-arrow { position: relative; flex: 1; height: 0.8cqw; }
-  .s-remap .remap-arrow i { position: absolute; inset: 0; border-radius: 1cqw; background: var(--blue); transform-origin: left; }
-  .s-remap .remap-arrow i::after {
-    content: ""; position: absolute; right: -0.4cqw; top: 50%; width: 3cqw; height: 3cqw; margin-top: -1.5cqw;
-    border-top: 0.8cqw solid var(--blue); border-right: 0.8cqw solid var(--blue); border-radius: 0.3cqw; transform: rotate(45deg);
-  }
+  .s-remap .remap-arrow { width: 5cqw; height: 5cqw; color: #8e8e93; }
+  .s-remap .remap-arrow svg { display: block; width: 100%; height: 100%; }
   .s-remap .remap-mouse {
-    position: relative; width: 13cqw; height: 20cqw; border-radius: 6.5cqw; background: #2c2c31;
+    position: relative; width: 13cqw; height: 20cqw; border-radius: 6.5cqw; background: var(--key);
     box-shadow: inset 0 -0.6cqw 0 rgba(0, 0, 0, .35), 0 0 0 0.2cqw rgba(255, 255, 255, 0.15);
   }
   .s-remap .remap-mouse::before { content: ""; position: absolute; left: 50%; top: 0; width: 0.25cqw; height: 40%; background: rgba(255, 255, 255, .15); }
-  .s-remap .remap-button { position: absolute; left: -0.6cqw; top: 46%; width: 1.6cqw; height: 5cqw; border-radius: 1cqw; background: #48484e; }
-
+  .s-remap .remap-button { position: absolute; left: -0.6cqw; top: 46%; width: 1.6cqw; height: 5cqw; border-radius: 1cqw; background: var(--blue); }
 </style>

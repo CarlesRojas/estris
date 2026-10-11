@@ -1,47 +1,35 @@
 ---
 import { pointer, keyPresses, pop } from "../../lib/motion";
-/** ⌘⇧C, then the loupe crosses a sunset in flat colours, taking each one it passes; a click on
-    the sun copies it. Ends as it starts. */
+/** ⌘⇧C, then the loupe passes over a few colour swatches, taking each colour, and a click on
+    one copies it. Ends as it starts. */
 const { d } = Astro.props;
-// The loupe's stops, each over one flat colour: sky, far hills, near hills, the sun.
-const stops: [number, number, number][] = [[0, 22, 17], [16, 22, 17], [24, 48, 46], [29, 48, 46], [37, 22, 72], [42, 22, 72], [50, 62, 40], [100, 62, 40]];
+// Four swatches in a row, centred at x 18.5, 39.5, 60.5 and 81.5, y 45.
+const swatches = ["#6ea8fe", "#6fd39a", "#ffb867", "#f589a3"];
+const stops: [number, number, number][] = [[0, 18.5, 45], [16, 18.5, 45], [24, 39.5, 45], [30, 39.5, 45], [38, 60.5, 45], [100, 60.5, 45]];
 const css = [
   pointer("color-loupe", stops),
   keyPresses("color-c", [7]),
   pop("color-keys", 3, 17),
-  pop("color-copied", 61, 88, 0.6),
+  pop("color-copied", 52, 86, 0.6),
 ].join("\n");
 ---
 <div class="spot s-color" style={`--d:${d}s`}>
-  <div class="screen color-scene">
-    <div class="color-sky2"></div>
-    <div class="color-sun"></div>
-    <div class="color-far"></div>
-    <div class="color-near"></div>
-    <div class="color-sea"><i></i><i></i></div>
+  <div class="screen">
+    {swatches.map((color, index) => <span class={`color-swatch-tile color-s${index}`} style={`background:${color}`}></span>)}
     <div class="color-loupe"><div class="color-lens"><div class="color-grid"></div><div class="color-center"></div></div></div>
   </div>
   <div class="keys color-keys"><span class="key">⌘</span><span class="key">⇧</span><span class="key color-c">C</span></div>
-  <div class="color-copied"><span class="pill"><span class="color-swatch"></span>#FF8A5C · Copied</span></div>
+  <div class="color-copied"><span class="pill"><span class="color-swatch"></span>#FFB867 · Copied</span></div>
 </div>
 <Fragment set:html={`<style>${css}</style>`} />
 
 <style is:global>
-  /* Flat bands and shapes, so the loupe's colour at each stop is exactly what is under it. */
-  .s-color .color-scene { background: #ffd9a0; }
-  .s-color .color-scene::after { display: none; }
-  .s-color .color-sky2 { position: absolute; left: 0; right: 0; top: 24%; height: 30%; background: #ffbe85; }
-  .s-color .color-sun { position: absolute; left: 52%; top: 29.7%; width: 20%; height: 26.7%; border-radius: 50%; background: #ff8a5c; }
-  .s-color .color-far { position: absolute; inset: 0; background: #a184de; clip-path: polygon(0 70%, 18% 48%, 32% 62%, 48% 40%, 66% 64%, 80% 50%, 100% 66%, 100% 100%, 0 100%); }
-  .s-color .color-near { position: absolute; inset: 0; background: #6458bd; clip-path: polygon(0 80%, 22% 64%, 40% 76%, 58% 62%, 78% 78%, 100% 70%, 100% 100%, 0 100%); }
-  .s-color .color-sea { position: absolute; left: 0; right: 0; top: 84%; bottom: 0; background: #4f8fe3; }
-  .s-color .color-sea i { position: absolute; height: 0.6cqw; border-radius: 1cqw; background: #8bb9f3; }
-  .s-color .color-sea i:first-child { left: 14%; width: 22%; top: 30%; }
-  .s-color .color-sea i:last-child { left: 58%; width: 30%; top: 62%; }
-  .s-color .color-loupe { position: absolute; left: 22%; top: 17%; width: 0; height: 0; }
+  .s-color .color-swatch-tile { position: absolute; top: 33.65%; width: 17%; height: 22.7%; border-radius: 2.4cqw; }
+  .s-color .color-s0 { left: 10%; } .s-color .color-s1 { left: 31%; } .s-color .color-s2 { left: 52%; } .s-color .color-s3 { left: 73%; }
+  .s-color .color-loupe { position: absolute; left: 18.5%; top: 45%; width: 0; height: 0; z-index: 5; }
   .s-color .color-lens {
-    position: absolute; left: -8.5cqw; top: -8.5cqw; width: 17cqw; height: 17cqw; border-radius: 50%;
-    background: #ffd9a0; box-shadow: 0 0 0 0.6cqw #fff, 0 1.6cqw 3cqw rgba(0, 0, 0, .35); overflow: hidden; opacity: 0;
+    position: absolute; left: -8cqw; top: -8cqw; width: 16cqw; height: 16cqw; border-radius: 50%;
+    background: #6ea8fe; box-shadow: 0 0 0 0.6cqw #fff, 0 1.6cqw 3cqw rgba(0, 0, 0, .4); overflow: hidden; opacity: 0;
   }
   .s-color .color-grid {
     position: absolute; inset: 0;
@@ -52,28 +40,32 @@ const css = [
   .s-color .keys { opacity: 0; }
   .s-color .color-copied { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
   .s-color .color-copied .pill { font-size: 3.6cqw; padding: 1.6cqw 3cqw; }
-  .s-color .color-swatch { width: 4cqw; height: 4cqw; border-radius: 50%; background: #ff8a5c; box-shadow: 0 0 0 0.3cqw rgba(255, 255, 255, .8); }
+  .s-color .color-swatch { width: 4cqw; height: 4cqw; border-radius: 50%; background: #ffb867; box-shadow: 0 0 0 0.3cqw rgba(255, 255, 255, .8); }
 
   .s-color.playing .color-loupe { animation: color-loupe-x var(--d) both, color-loupe-y var(--d) both; }
   .s-color.playing .color-lens { animation: color-lens var(--d) both, color-tint var(--d) both; }
   .s-color.playing .color-keys { animation: color-keys var(--d) both; }
   .s-color.playing .color-c { animation: color-c var(--d) both; }
   .s-color.playing .color-copied { animation: color-copied var(--d) both; }
+  .s-color.playing .color-s2 { animation: color-picked var(--d) both; }
 
   /* The loupe pops up, squashes on the click and is gone; its colour changes on the pointer's
-     own timing, so it matches what is under it at each stop. */
+     own timing, so it matches the swatch under it. */
   @keyframes color-lens {
     0%, 12% { opacity: 0; transform: scale(.4); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
-    16%, 56% { opacity: 1; transform: none; }
-    56.8% { transform: scale(.86); }
-    58% { transform: scale(1.08); }
-    59.5% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
-    62%, 100% { opacity: 0; transform: scale(.5); }
+    16%, 46% { opacity: 1; transform: none; }
+    46.8% { transform: scale(.86); }
+    48% { transform: scale(1.08); }
+    49.5% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
+    52%, 100% { opacity: 0; transform: scale(.5); }
   }
   @keyframes color-tint {
-    0%, 16% { background-color: #ffd9a0; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
-    24%, 29% { background-color: #a184de; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
-    37%, 42% { background-color: #6458bd; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
-    50%, 100% { background-color: #ff8a5c; }
+    0%, 16% { background-color: #6ea8fe; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    24%, 30% { background-color: #6fd39a; animation-timing-function: cubic-bezier(.3, 0, .1, 1); }
+    38%, 100% { background-color: #ffb867; }
+  }
+  /* The picked swatch gives a little jump. */
+  @keyframes color-picked {
+    0%, 47% { transform: none; } 48.5% { transform: scale(.94); } 50.5% { transform: scale(1.05); } 53%, 100% { transform: none; }
   }
 </style>
