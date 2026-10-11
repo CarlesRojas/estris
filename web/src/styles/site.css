@@ -60,7 +60,10 @@ h1, h2, p { margin: 0; }
   display: flex; flex-direction: column; align-items: center; gap: 18px;
   height: calc(100svh - 56px); padding: 8px max(16px, 3vw) max(16px, 2vw);
 }
-h1 { font: 700 clamp(28px, 3vw, 44px)/1.08 var(--display); letter-spacing: -0.03em; text-align: center; text-wrap: balance; padding: clamp(16px, 3.4vh, 40px) 0 clamp(8px, 1.6vh, 18px); }
+/* The app icon, larger than in the top bar, right above the headline, with lots of room around both. */
+.hero { display: flex; flex-direction: column; align-items: center; gap: clamp(12px, 1.8vh, 18px); padding: clamp(28px, 7vh, 88px) 0 clamp(24px, 5.5vh, 64px); }
+.hero img { display: block; width: clamp(56px, 7vh, 76px); height: auto; }
+h1 { font: 700 clamp(28px, 3vw, 44px)/1.08 var(--display); letter-spacing: -0.03em; text-align: center; text-wrap: balance; }
 
 /* The features: plain labels, the playing one in full colour with a short progress line. */
 .feature-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 26px; max-width: 920px; }
@@ -112,7 +115,9 @@ h1 { font: 700 clamp(28px, 3vw, 44px)/1.08 var(--display); letter-spacing: -0.03
   .brand img { width: 26px; height: 26px; }
   .button { min-height: 30px; padding: 0 14px; font-size: 13px; }
   .showcase { height: auto; gap: 14px; padding-top: 4px; align-items: stretch; }
-  h1 { font-size: clamp(24px, 6.4vw, 36px); padding: 18px 0 8px; }
+  .hero { padding: 40px 0 28px; gap: 12px; }
+  .hero img { width: 60px; }
+  h1 { font-size: clamp(24px, 6.4vw, 36px); }
   .feature-list {
     flex-wrap: nowrap; justify-content: flex-start; gap: 20px; overflow-x: auto; scrollbar-width: none; max-width: none;
     margin: 0 calc(-1 * max(16px, 3vw)); padding: 0 max(16px, 3vw) 2px;

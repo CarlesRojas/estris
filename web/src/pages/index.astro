@@ -31,7 +31,10 @@ const year = new Date().getFullYear();
     </header>
 
     <main class="showcase">
-      <h1>The little tools your Mac is missing.</h1>
+      <div class="hero">
+        <img src="/icon.svg" alt="" width="72" height="72" />
+        <h1>The little tools your Mac is missing.</h1>
+      </div>
       <nav class="feature-list" role="tablist" aria-label="Features">
         {features.map((feature, index) => (
           <button
