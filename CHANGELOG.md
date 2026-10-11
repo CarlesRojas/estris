@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.1.4 - 2026-10-11
+
+- Performance improvements and bug fixes.
+
 ## 0.1.3 - 2026-10-11
 
 - The menu bar menu no longer shows recent colors unless turned on in Settings > Menu Bar.
