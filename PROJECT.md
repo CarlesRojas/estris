@@ -298,7 +298,7 @@ To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager
 
 ## Installing
 
-Opened from the disk image or Downloads (the real location, through App Translocation's original path), Estris first asks **Move Estris to Applications?** (`App/ApplicationsMover.swift`). **Move to Applications** copies it there (an older copy goes to the Trash), clears the download quarantine, quits, opens the moved copy and ejects the disk image, which closes its window; if the copy fails, an alert says to drag it there instead. **Not Now** carries on from where it is, without adding it to the login items until it runs from elsewhere.
+Opened from the disk image or Downloads (the real location, through App Translocation's original path), Estris first asks **Move Estris to Applications?** (`App/ApplicationsMover.swift`). **Move to Applications** copies it there (an older copy goes to the Trash), clears the download quarantine, quits, opens the moved copy and ejects the disk image, which closes its window; if the copy fails, an alert says to drag it there instead. **Not Now** carries on from where it is, without adding it to the login items until it runs from elsewhere. Dragged to Applications instead, the disk image stays mounted (its icon on the desktop) until Estris opens from Applications: at each launch it ejects any read-only volume holding an Estris.app with its bundle identifier.
 
 ## Updates
 
@@ -312,7 +312,7 @@ Through Sparkle (`Shared/Updates.swift`): Estris reads `appcast.xml` from the la
   2. On the newest macOS runner with the latest stable Xcode (an app built with an older SDK gets the older look on new macOS), builds for Apple silicon and Intel (`RELEASE=1 scripts/build-app.sh`), signed with the Developer ID certificate from the secrets (hardened runtime, `Resources/Estris.entitlements`), packs `Estris.dmg` with a link to Applications (`scripts/make-dmg.sh`), and notarizes and staples it.
   3. Signs `Estris.dmg` for Sparkle (`sign_update` with the `SPARKLE_PRIVATE_KEY` secret) and writes `appcast.xml` (`scripts/make-appcast.py`: the version, build number, minimum macOS, the notes as HTML and the disk image's link and signature); skipped with a warning without the key.
   4. Commits "Release X.Y.Z" to main, tags it `vX.Y.Z` and creates the GitHub release with `Estris.dmg` (which the website's Download points to) and `appcast.xml` (which installed copies check).
-  - `Estris.dmg` opens to a window with the app, a link to Applications and a background (`Resources/DMG/background.svg`, rendered to `background.png` and `@2x`) titled "Drag Estris to Applications", with an arrow between them and a line saying Estris can also be opened from there. Laid out by `dmgbuild` (`scripts/dmg-settings.py`).
+  - `Estris.dmg` opens to a window with the app, a link to Applications and a background (`Resources/DMG/background.svg`, rendered to `background.png` and `@2x`) titled "Drag Estris to Applications", with an arrow between them and the line "Then open Estris from Applications. This window closes by itself." Laid out by `dmgbuild` (`scripts/dmg-settings.py`).
   - Without the signing secrets it still releases, signed ad hoc and not notarized, with a warning; macOS then makes people allow the app by hand. Secrets: `DEVELOPER_ID_CERTIFICATE` (base64 .p12), `DEVELOPER_ID_CERTIFICATE_PASSWORD`, `APPLE_ID`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID`.
 
 ## Notes

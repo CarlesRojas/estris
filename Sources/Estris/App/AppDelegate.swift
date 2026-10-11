@@ -36,6 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Opened from the disk image: moving to Applications opens it again from there.
         if ApplicationsMover.offerIfNeeded() { return }
+        ApplicationsMover.ejectInstallerDiskImage()
         permissionLog.start()
         clipboard.start()
         autoQuit.start()

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- After dragging Estris to Applications, opening it ejects the disk image, so its window and desktop icon go away.
+
 ## 0.1.2 - 2026-10-11
 
 - Updates: when a new version is out, the menu bar menu shows **Update Available** with a button that installs it. **Check for Updates…** is in General.

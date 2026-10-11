@@ -11,5 +11,5 @@
   <path d="M262 190 C 300 160, 362 162, 400 188" fill="none" stroke="#a1a1a6" stroke-width="4" stroke-linecap="round"/>
   <!-- The head follows the curve's direction at its end, 35° to each side. -->
   <path d="M393.7 171.2 L 400 188 L 382 188.2" fill="none" stroke="#a1a1a6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="330" y="352" text-anchor="middle" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" fill="#6e6e73">Or open it from here: Estris offers to move itself.</text>
+  <text x="330" y="352" text-anchor="middle" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" fill="#6e6e73">Then open Estris from Applications. This window closes by itself.</text>
 </svg>
