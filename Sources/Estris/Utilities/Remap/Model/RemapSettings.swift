@@ -41,6 +41,9 @@ struct Mapping: Codable, Identifiable, Hashable {
     var output: RemapOutput?
     /// When it was added; the oldest wins when mappings on several devices compete.
     var created: Date? = Date()
+    /// Recorded from a press that reached macOS without its device. Only these can compete
+    /// with mappings on other devices; a key picked from the list belongs to its device.
+    var isDeviceLess: Bool? = nil
 }
 
 /// A device's mappings, with its name kept so it still shows while disconnected.
@@ -80,14 +83,13 @@ final class RemapSettings: ObservableObject {
 
     /// Mappings per device, keyed by `InputDevice.id`.
     @Published var devices: [String: DeviceMappings] {
-        didSet { defaults.set(try? JSONEncoder().encode(devices), forKey: Keys.devices) }
+        didSet {
+            defaults.set(try? JSONEncoder().encode(devices), forKey: Keys.devices)
+            keyboardMappingsCache = [:]
+        }
     }
 
-    /// Keys and buttons seen reaching macOS without their device (some mice and utilities
-    /// send them that way). Only one device's mapping can apply to each.
-    @Published private(set) var deviceLessInputs: Set<RemapInput> {
-        didSet { defaults.set(try? JSONEncoder().encode(deviceLessInputs), forKey: Keys.deviceLessInputs) }
-    }
+    private var keyboardMappingsCache: [String: [(source: UInt64, destination: UInt64)]] = [:]
 
     /// Names given by the user, keyed by `InputDevice.id`.
     @Published var customNames: [String: String] {
@@ -98,7 +100,8 @@ final class RemapSettings: ObservableObject {
         let defaults = UserDefaults.standard
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         customNames = defaults.dictionary(forKey: Keys.customNames) as? [String: String] ?? [:]
-        deviceLessInputs = defaults.data(forKey: Keys.deviceLessInputs).flatMap { try? JSONDecoder().decode(Set<RemapInput>.self, from: $0) } ?? []
+        // Device-less keys are now kept per mapping, not per key.
+        defaults.removeObject(forKey: Keys.oldDeviceLessInputs)
         devices = defaults.data(forKey: Keys.devices).flatMap { try? JSONDecoder().decode([String: DeviceMappings].self, from: $0) } ?? [:]
         removeEmptyMappings()
     }
@@ -114,20 +117,14 @@ final class RemapSettings: ObservableObject {
         customNames[deviceID] = trimmed.isEmpty ? nil : trimmed
     }
 
-    /// Returns true when the input wasn't known to arrive without its device.
-    @discardableResult
-    func noteDeviceLess(_ input: RemapInput) -> Bool {
-        guard !deviceLessInputs.contains(input) else { return false }
-        deviceLessInputs.insert(input)
-        return true
-    }
-
-    /// For an input that arrives without its device: the device whose mapping applies, the
-    /// one with the oldest complete mapping for it.
+    /// For a press that arrives without its device: the device whose mapping applies, the one
+    /// with the oldest complete device-less mapping for it.
     func activeDevice(for input: RemapInput) -> (id: String, entry: DeviceMappings)? {
         devices
             .compactMap { id, entry -> (id: String, entry: DeviceMappings, created: Date)? in
-                guard let mapping = entry.mappings.first(where: { $0.input == input }), mapping.output != nil else { return nil }
+                guard let mapping = entry.mappings.first(where: { $0.input == input }),
+                      mapping.isDeviceLess == true, mapping.output != nil
+                else { return nil }
                 return (id, entry, mapping.created ?? .distantPast)
             }
             .min { ($0.created, $0.id) < ($1.created, $1.id) }
@@ -135,15 +132,40 @@ final class RemapSettings: ObservableObject {
     }
 
     /// Why a mapping doesn't apply, or nil when it does: an earlier row on the same device has
-    /// the same key or button, or, for one that arrives without its device, another device's
-    /// mapping wins.
+    /// the same key or button, or, for a device-less one, another device's device-less mapping
+    /// wins. Mappings on different devices never compete otherwise.
     func conflict(for mapping: Mapping, on deviceID: String) -> MappingConflict? {
         guard let input = mapping.input else { return nil }
         if let first = mappings(for: deviceID).first(where: { $0.input == input }), first.id != mapping.id {
             return .above
         }
-        guard deviceLessInputs.contains(input), let active = activeDevice(for: input), active.id != deviceID else { return nil }
+        guard mapping.isDeviceLess == true, let active = activeDevice(for: input), active.id != deviceID else { return nil }
         return .otherDevice(customNames[active.id] ?? active.entry.name)
+    }
+
+    /// The key-to-key mappings set on the keyboard itself, in order. The keyboard then reports
+    /// the new key, so a key that is the result of one of these can't have a mapping of its
+    /// own: pressing it and pressing the mapped key would look the same. Such mappings are left
+    /// to the event tap instead, which sees the key actually pressed.
+    func keyboardMappings(for deviceID: String) -> [(source: UInt64, destination: UInt64)] {
+        if let cached = keyboardMappingsCache[deviceID] { return cached }
+        // Only the first complete mapping for a key applies.
+        var seen: Set<RemapInput> = []
+        let applied = mappings(for: deviceID).filter { mapping in
+            guard let input = mapping.input, mapping.output != nil else { return false }
+            return seen.insert(input).inserted
+        }
+        var pairs: [(source: UInt64, destination: UInt64)] = applied.compactMap { mapping in
+            guard case .key(let source)? = mapping.input, case .key(let destination)? = mapping.output else { return nil }
+            return (source, destination)
+        }
+        var inTap = Set(applied.compactMap(\.input)).subtracting(pairs.map { RemapInput.key($0.source) })
+        // Leaving one to the tap gives its key a mapping there, which can push out another.
+        while let index = pairs.firstIndex(where: { inTap.contains(.key($0.destination)) }) {
+            inTap.insert(.key(pairs.remove(at: index).source))
+        }
+        keyboardMappingsCache[deviceID] = pairs
+        return pairs
     }
 
     func mappings(for deviceID: String) -> [Mapping] {
@@ -189,7 +211,6 @@ final class RemapSettings: ObservableObject {
         static let isEnabled = "remapEnabled"
         static let devices = "remapDevices"
         static let customNames = "remapDeviceNames"
-        // Renamed to forget inputs wrongly noted from events posted by apps.
-        static let deviceLessInputs = "remapDeviceLessInputs2"
+        static let oldDeviceLessInputs = "remapDeviceLessInputs2"
     }
 }

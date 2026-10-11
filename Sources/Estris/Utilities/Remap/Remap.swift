@@ -28,7 +28,7 @@ final class Remap {
     var isOverViewerLink = false
 
     /// Waiting for a key or button on a device, to remap it.
-    private var recording: (deviceID: String, done: (RemapInput) -> Void)?
+    private var recording: (deviceID: String, done: (RemapInput, Bool) -> Void)?
 
     init(log: AppLog) {
         appLog = log
@@ -57,8 +57,9 @@ final class Remap {
         RemapPane(remap: self, settings: settings)
     }
 
-    /// Calls `done` with the next key or button pressed on the device, which isn't passed on.
-    func record(on deviceID: String, _ done: @escaping (RemapInput) -> Void) {
+    /// Calls `done` with the next key or button pressed on the device, which isn't passed on,
+    /// and whether it arrived without its device.
+    func record(on deviceID: String, _ done: @escaping (RemapInput, Bool) -> Void) {
         recording = (deviceID, done)
         log("recording: waiting for a key or button on \(deviceID)")
         updateTap()
@@ -131,24 +132,21 @@ final class Remap {
         // A click on Create Mapping in the Event Viewer; logging it would add a row and move
         // the list under the pointer.
         let isLinkClick = isOverViewerLink && (type == .leftMouseDown || type == .leftMouseUp)
-        // Some presses reach macOS without their device; they take the mappings of the one
-        // device whose mapping applies to them. Events posted by an app (Estris's own key
-        // presses included) never come from a device, so they don't count.
+        // Some presses reach macOS without their device; they take the device-less mapping
+        // that applies to them. Events posted by an app (Estris's own key presses included)
+        // never come from a device, so they don't count.
         let isPosted = event.getIntegerValueField(.eventSourceUnixProcessID) != 0
-        if device == nil, !isPosted, let input = parsed.input, parsed.phase == .down, input != .mouseButton(0) {
-            settings.noteDeviceLess(input)
-        }
         let target = device ?? (isPosted ? nil : parsed.input).flatMap { input in
             settings.activeDevice(for: input).map { InputDevice(id: $0.id, name: $0.entry.name, kind: $0.entry.kind) }
         }
         if isViewing, !parsed.isRepeat, !isLinkClick {
-            let (original, result) = remapping(of: parsed.input, on: target)
+            let result = remapping(of: parsed.input, on: target, viaKeyboard: device != nil)
             eventLog.record(InputEvent(
                 device: device.map(settings.name(of:)) ?? unknownSource(sender: sender, event: event),
                 source: device,
-                input: original ?? parsed.input,
+                input: parsed.input,
                 phase: parsed.phase,
-                name: original?.title ?? parsed.name,
+                name: parsed.name,
                 detail: parsed.detail,
                 result: result?.title
             ))
@@ -162,7 +160,7 @@ final class Remap {
                 log("recording: \(parsed.name) from \(device?.name ?? "an unknown device")")
                 self.recording = nil
                 updateTap()
-                recording.done(input)
+                recording.done(input, device == nil)
                 return false
             }
         }
@@ -172,7 +170,8 @@ final class Remap {
         else { return true }
         // Set on the keyboard itself, so this already is the new key; a press without its
         // device didn't go through that, so it is changed here.
-        if case .key = input, case .key = output, device != nil { return true }
+        if device != nil, case .key(let usage) = input,
+           settings.keyboardMappings(for: target.id).contains(where: { $0.source == usage }) { return true }
         perform(output, down: parsed.phase == .down, isRepeat: parsed.isRepeat)
         return false
     }
@@ -189,22 +188,16 @@ final class Remap {
         return String(localized: "Posted by \(poster)")
     }
 
-    /// For the Event Viewer: what an event was remapped to, and, for a key changed on the
-    /// keyboard itself (which macOS already reports as the new key), the key pressed.
-    private func remapping(of input: RemapInput?, on device: InputDevice?) -> (original: RemapInput?, result: RemapOutput?) {
-        guard settings.isEnabled, let device, let input else { return (nil, nil) }
-        let mappings = settings.mappings(for: device.id)
-        if let output = mappings.first(where: { $0.input == input })?.output {
-            return (nil, output)
+    /// For the Event Viewer: what an event was remapped to. A key changed on the keyboard
+    /// itself already reaches macOS as the new key, and pressing it can't be told apart from
+    /// pressing the new key, so it shows as the new key with no mapping.
+    private func remapping(of input: RemapInput?, on device: InputDevice?, viaKeyboard: Bool) -> RemapOutput? {
+        guard settings.isEnabled, let device, let input else { return nil }
+        if viaKeyboard, case .key(let usage) = input,
+           settings.keyboardMappings(for: device.id).contains(where: { $0.source == usage || $0.destination == usage }) {
+            return nil
         }
-        if case .key(let usage) = input,
-           let mapping = mappings.first(where: { mapping in
-               guard case .key? = mapping.input, case .key(usage)? = mapping.output else { return false }
-               return true
-           }) {
-            return (mapping.input, mapping.output)
-        }
-        return (nil, nil)
+        return settings.mappings(for: device.id).first(where: { $0.input == input })?.output
     }
 
     private func perform(_ output: RemapOutput, down: Bool, isRepeat: Bool) {

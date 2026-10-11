@@ -14,15 +14,11 @@ enum KeyMapper {
     static func apply(_ settings: RemapSettings, devices: InputDevices) {
         var mapped: Set<String> = []
         if settings.isEnabled {
-            for (deviceID, entry) in settings.devices {
-                // Only the first mapping for a key applies.
-                var seen: Set<RemapInput> = []
-                let pairs: [[String: NSNumber]] = entry.mappings.compactMap { mapping in
-                    guard let input = mapping.input, seen.insert(input).inserted else { return nil }
-                    guard case .key(let source) = input, case .key(let destination)? = mapping.output else { return nil }
-                    return [
-                        "HIDKeyboardModifierMappingSrc": NSNumber(value: source),
-                        "HIDKeyboardModifierMappingDst": NSNumber(value: destination),
+            for deviceID in settings.devices.keys {
+                let pairs: [[String: NSNumber]] = settings.keyboardMappings(for: deviceID).map { pair in
+                    [
+                        "HIDKeyboardModifierMappingSrc": NSNumber(value: pair.source),
+                        "HIDKeyboardModifierMappingDst": NSNumber(value: pair.destination),
                     ]
                 }
                 guard !pairs.isEmpty else { continue }
