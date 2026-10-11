@@ -68,7 +68,7 @@ Clicking the menu bar icon opens a menu below it in the clipboard overlay's defa
 
 - **Volume Mixer**: the same rows as its pane, titled **System Volume** and **Apps Volume**.
 - **Clipboard**: the most recent entries (off by default), each with its source app and one line of it; a click pastes it into the app in front, as the overlay does. A **Clear History** button (on by default) empties the history.
-- **Color Picker**: the recent colors (on by default), a click copies one; a **Pick a Color** button (on by default) that starts picking.
+- **Color Picker**: the recent colors (off by default), a click copies one; a **Pick a Color** button (on by default) that starts picking.
 
 Then **Settings** and **Quit** side by side at the bottom, as capsules, set apart from the groups above by three times the gap between groups. The menu hangs a little below the menu bar; its corners are concentric with the capsule buttons, and each part (System Volume, Apps Volume, Clipboard, Color Picker) sits in its own rounded box. In dark mode the menu is a shade darker than the overlay's surface and the boxes a lighter grey; in light mode the menu is almost white and the boxes a light grey, concentric with the menu; no separator lines. A click outside, Esc or another click on the icon closes it.
 
@@ -76,7 +76,7 @@ Then **Settings** and **Quit** side by side at the bottom, as capsules, set apar
 
 - **Volume Mixer**: **Show System Volume**, with **Show Output** and **Show Microphone** under it (they do nothing while it is off), **Show Apps Volume**, **Show device pickers** (all on) and **Show volume percentages** (off).
 - **Clipboard**: **Show recent entries** (off) and how many (**Entries**, 1 to 10, default 5), **Show Clear History button** (on).
-- **Color Picker**: **Show Pick a Color button** and **Show recent colors** (both on).
+- **Color Picker**: **Show Pick a Color button** (on) and **Show recent colors** (off).
 
 **Reset to Defaults** puts the icon and all of these back.
 
