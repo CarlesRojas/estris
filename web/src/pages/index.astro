@@ -164,6 +164,35 @@ const year = new Date().getFullYear();
       }
       new ResizeObserver(fitCorners).observe(stage);
 
+      // The feature pills wrap into rows as even as they can be: the narrowest list that keeps
+      // the same number of rows (as text-wrap: balance does for words).
+      const list = document.querySelector<HTMLElement>(".feature-list")!;
+      const rowCount = () => new Set(tabs.map((tab) => tab.offsetTop)).size;
+      function balanceRows() {
+        list.style.maxWidth = "";
+        if (getComputedStyle(list).display !== "flex") return;
+        const rows = rowCount();
+        if (rows < 2) return;
+        let low = 0;
+        let high = list.offsetWidth;
+        while (high - low > 1) {
+          const middle = Math.floor((low + high) / 2);
+          list.style.maxWidth = `${middle}px`;
+          if (rowCount() > rows) low = middle;
+          else high = middle;
+        }
+        list.style.maxWidth = `${high}px`;
+      }
+      balanceRows();
+      document.fonts?.ready.then(balanceRows);
+      let lastWidth = window.innerWidth;
+      window.addEventListener("resize", () => {
+        if (window.innerWidth !== lastWidth) {
+          lastWidth = window.innerWidth;
+          balanceRows();
+        }
+      });
+
       // Only plays while on screen.
       new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
