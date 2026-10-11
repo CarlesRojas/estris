@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// What clicking the menu bar icon shows, in the clipboard overlay's default frosted look: the
-/// Volume Mixer, the Clipboard and the Color Picker while each is on (the parts chosen in
+/// What clicking the menu bar icon shows, in the clipboard overlay's default frosted look: an
+/// update when one is out, the Volume Mixer, the Clipboard and the Color Picker while each is on (the parts chosen in
 /// Settings > Menu Bar), then Settings and Quit side by side.
 struct MenuBarMenu: View {
     static let width: CGFloat = 360
@@ -20,6 +20,8 @@ struct MenuBarMenu: View {
     let copyColor: (String) -> Void
     let openSettings: () -> Void
     let quit: () -> Void
+    let update: () -> Void
+    @ObservedObject private var updates = Updates.shared
 
     /// Whether any group shows above Settings and Quit.
     private var showsAnyGroup: Bool {
@@ -27,11 +29,14 @@ struct MenuBarMenu: View {
             && ((settings.showsSystem && (settings.showsOutput || settings.showsInput)) || settings.showsApps)
         let clipboard = clipboardSettings.isEnabled && (settings.showsClipboardHistory || settings.showsClearHistory)
         let colorPicker = colorPickerSettings.isEnabled && (settings.showsColorPicker || settings.showsRecentColors)
-        return mixer || clipboard || colorPicker
+        return mixer || clipboard || colorPicker || updates.availableVersion != nil
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            if let version = updates.availableVersion {
+                updateRow(version)
+            }
             if mixerSettings.isEnabled && VolumeMixer.isSupported {
                 if settings.showsSystem && (settings.showsOutput || settings.showsInput) {
                     group("System Volume") {
@@ -129,6 +134,35 @@ struct MenuBarMenu: View {
         VStack(alignment: .leading, spacing: 8) {
             header(title)
             content()
+        }
+        .padding(Self.padding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Self.groupFill, in: RoundedRectangle(cornerRadius: Self.groupRadius, style: .continuous))
+    }
+
+    /// A newer version is out: its number and a button that installs it.
+    private func updateRow(_ version: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.down.circle.fill")
+                .font(.title2)
+                .foregroundStyle(Color.accentColor)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Update Available")
+                    .font(.headline)
+                Text("Version \(version)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Button(action: update) {
+                Text("Update")
+                    .padding(.horizontal, 14)
+                    .frame(minHeight: Self.buttonHeight)
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.white)
+            .background(Color.accentColor, in: Capsule())
         }
         .padding(Self.padding)
         .frame(maxWidth: .infinity, alignment: .leading)

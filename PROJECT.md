@@ -247,7 +247,7 @@ Sources/Estris/
   MenuBar/                the menu bar item: settings, icon choices, the frosted menu and its panel
   General/                settings shared by every utility (language, date and time format)
   Settings/               the Settings window: sidebar, search, General and Menu Bar panes, the Permissions section
-  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher, localization, relaunch, hover delays, size reader)
+  Shared/                 helpers any utility can use (hotkeys, pasting, login item, app icons, device watcher, localization, relaunch, hover delays, size reader, settings export, updates)
   Utilities/
     AutoQuit/
       AutoQuit.swift           owns the utility
@@ -300,13 +300,18 @@ To add a utility: create `Utilities/<Name>/` with a class like `ClipboardManager
 
 Opened from the disk image or Downloads (the real location, through App Translocation's original path), Estris first asks **Move Estris to Applications?** (`App/ApplicationsMover.swift`). **Move to Applications** copies it there (an older copy goes to the Trash), clears the download quarantine, quits, opens the moved copy and ejects the disk image, which closes its window; if the copy fails, an alert says to drag it there instead. **Not Now** carries on from where it is, without adding it to the login items until it runs from elsewhere.
 
+## Updates
+
+Through Sparkle (`Shared/Updates.swift`): Estris reads `appcast.xml` from the latest GitHub release at launch and every 6 hours (`SUFeedURL`, `SUScheduledCheckInterval` in Info.plist; checking is on without asking). A newer version shows at the top of the menu bar menu as **Update Available**, with its version and an **Update** button, instead of Sparkle's own window (gentle scheduled update reminders). **Update**, or **Check for Updates…** in General > About, opens Sparkle's window with the release notes and **Install Update**, which downloads the disk image, checks its signature, replaces the app and opens it again. Updates are signed with an EdDSA key: the public half is put in Info.plist (`SUPublicEDKey`) at build time from `SPARKLE_PUBLIC_KEY`; builds without it (local ones) don't check and hide **Check for Updates…**. `build-app.sh` copies `Sparkle.framework` into `Contents/Frameworks` and signs its helpers, the framework and then the app.
+
 ## Releases
 
 - `CHANGELOG.md`: what changed for people using Estris. Every user-facing change adds a line under **Unreleased** in the same change.
 - The **Release** workflow (`.github/workflows/release.yml`, run by hand from Actions on main, choosing patch, minor or major):
   1. `scripts/release.py` bumps `CFBundleShortVersionString` (and `CFBundleVersion` by one) in `Resources/Info.plist` and turns Unreleased into the new version's section, dated; those entries are the release notes. It stops if Unreleased is empty.
   2. On the newest macOS runner with the latest stable Xcode (an app built with an older SDK gets the older look on new macOS), builds for Apple silicon and Intel (`RELEASE=1 scripts/build-app.sh`), signed with the Developer ID certificate from the secrets (hardened runtime, `Resources/Estris.entitlements`), packs `Estris.dmg` with a link to Applications (`scripts/make-dmg.sh`), and notarizes and staples it.
-  3. Commits "Release X.Y.Z" to main, tags it `vX.Y.Z` and creates the GitHub release with `Estris.dmg`, which the website's Download points to.
+  3. Signs `Estris.dmg` for Sparkle (`sign_update` with the `SPARKLE_PRIVATE_KEY` secret) and writes `appcast.xml` (`scripts/make-appcast.py`: the version, build number, minimum macOS, the notes as HTML and the disk image's link and signature); skipped with a warning without the key.
+  4. Commits "Release X.Y.Z" to main, tags it `vX.Y.Z` and creates the GitHub release with `Estris.dmg` (which the website's Download points to) and `appcast.xml` (which installed copies check).
   - `Estris.dmg` opens to a window with the app, a link to Applications and a background (`Resources/DMG/background.svg`, rendered to `background.png` and `@2x`) titled "Drag Estris to Applications", with an arrow between them and a line saying Estris can also be opened from there. Laid out by `dmgbuild` (`scripts/dmg-settings.py`).
   - Without the signing secrets it still releases, signed ad hoc and not notarized, with a warning; macOS then makes people allow the app by hand. Secrets: `DEVELOPER_ID_CERTIFICATE` (base64 .p12), `DEVELOPER_ID_CERTIFICATE_PASSWORD`, `APPLE_ID`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID`.
 

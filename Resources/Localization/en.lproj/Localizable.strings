@@ -84,6 +84,7 @@
 "Center Third" = "Center Third";
 "Center Two Thirds" = "Center Two Thirds";
 "Change what keys and mouse buttons do, per device." = "Change what keys and mouse buttons do, per device.";
+"Check for Updates…" = "Check for Updates…";
 "Choose the icon Estris shows in the menu bar." = "Choose the icon Estris shows in the menu bar.";
 "Choose…" = "Choose…";
 "Clear" = "Clear";
@@ -412,6 +413,8 @@
 "Unmute" = "Unmute";
 "Up" = "Up";
 "Up Arrow" = "Up Arrow";
+"Update" = "Update";
+"Update Available" = "Update Available";
 "usage %@" = "usage %@";
 "Use Original Name" = "Use Original Name";
 "Utility" = "Utility";

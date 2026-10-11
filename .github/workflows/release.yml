@@ -2,7 +2,9 @@
 # builds a signed and notarized Estris.dmg, commits, tags and creates the GitHub release.
 # Run it from Actions > Release > Run workflow, on main. Signing secrets: DEVELOPER_ID_CERTIFICATE
 # (base64 .p12), DEVELOPER_ID_CERTIFICATE_PASSWORD, APPLE_ID, APPLE_APP_PASSWORD, APPLE_TEAM_ID;
-# without them the app is signed ad hoc and macOS warns when opening it.
+# without them the app is signed ad hoc and macOS warns when opening it. Updates: the
+# SPARKLE_PRIVATE_KEY secret and SPARKLE_PUBLIC_KEY variable (Sparkle's generate_keys); with
+# them the release also carries appcast.xml, which installed copies check.
 name: Release
 
 on:
@@ -75,6 +77,7 @@ jobs:
         env:
           RELEASE: 1
           SIGN_IDENTITY: ${{ steps.signing.outputs.identity || '-' }}
+          SPARKLE_PUBLIC_KEY: ${{ vars.SPARKLE_PUBLIC_KEY }}
         run: ./scripts/build-app.sh
 
       - name: Make the disk image
@@ -94,6 +97,25 @@ jobs:
           xcrun notarytool submit build/Estris.dmg --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
           xcrun stapler staple build/Estris.dmg
 
+      - name: Make the update feed
+        id: appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ vars.SPARKLE_PUBLIC_KEY }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [[ -z "$SPARKLE_PRIVATE_KEY" || -z "$SPARKLE_PUBLIC_KEY" ]]; then
+            echo "::warning::SPARKLE_PRIVATE_KEY secret or SPARKLE_PUBLIC_KEY variable missing: no update feed, so installed copies won't see this release."
+            exit 0
+          fi
+          SIGN_UPDATE="$(find .build/artifacts -type f -name sign_update | head -1)"
+          KEY_FILE="$RUNNER_TEMP/sparkle-key"
+          printf '%s' "$SPARKLE_PRIVATE_KEY" > "$KEY_FILE"
+          SIGNATURE="$("$SIGN_UPDATE" --ed-key-file "$KEY_FILE" build/Estris.dmg)"
+          rm "$KEY_FILE"
+          python3 scripts/make-appcast.py "$VERSION" "$SIGNATURE" build/release-notes.md > build/appcast.xml
+          echo "file=build/appcast.xml" >> "$GITHUB_OUTPUT"
+
       - name: Commit, tag and publish
         env:
           GH_TOKEN: ${{ github.token }}
@@ -104,4 +126,4 @@ jobs:
           git commit -am "Release $VERSION"
           git tag "v$VERSION"
           git push origin HEAD:main "v$VERSION"
-          gh release create "v$VERSION" build/Estris.dmg --title "Estris $VERSION" --notes-file build/release-notes.md
+          gh release create "v$VERSION" build/Estris.dmg ${{ steps.appcast.outputs.file }} --title "Estris $VERSION" --notes-file build/release-notes.md

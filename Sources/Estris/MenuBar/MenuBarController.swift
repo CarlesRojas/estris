@@ -77,7 +77,11 @@ final class MenuBarController: NSObject {
                 self?.close()
                 self?.openSettings()
             },
-            quit: { NSApp.terminate(nil) }
+            quit: { NSApp.terminate(nil) },
+            update: { [weak self] in
+                self?.close()
+                Updates.shared.checkForUpdates()
+            }
         )
         let view = OverlayHostingView(rootView: menu
             .background(SizeReader { [weak self] size in self?.place(size) })
