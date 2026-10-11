@@ -306,6 +306,7 @@ final class DockPreview {
         }
         pendingOpen = (item.app.processIdentifier, work)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+        if #available(macOS 14, *) { AppWindows.prepareCapture() }
     }
 
     private func cancelOpen() {
@@ -375,8 +376,9 @@ final class DockPreview {
         // An automatically hidden Dock stays while the pointer is on the panel.
         DockHold.begin()
 
-        // Sharp on Retina: twice the points, and room for the widest shape.
-        let maxPixels = CGFloat(settings.size) * 2 * 2
+        // Room for the widest shape (twice the height), in the screen's pixels.
+        let scale = (panel.screen ?? NSScreen.main)?.backingScaleFactor ?? 2
+        let maxPixels = CGFloat(settings.size) * 2 * scale
         captureTask = AppWindows.captureThumbnails(of: windows, maxPixels: maxPixels) { [weak self] id, image in
             self?.thumbnailCache[id] = image
             guard self?.state.windows.contains(where: { $0.id == id }) == true else { return }

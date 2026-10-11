@@ -6,8 +6,10 @@ import ScreenCaptureKit
 struct AppWindow: Identifiable, Equatable {
     let id: CGWindowID
     let title: String
+    /// In points, as the window server has it now.
+    let size: CGSize
     /// Width over height, for the preview's shape.
-    let aspect: CGFloat
+    var aspect: CGFloat { size.width / max(size.height, 1) }
 }
 
 /// Lists an app's windows, captures their thumbnails, and brings one forward or closes it.
@@ -39,33 +41,53 @@ enum AppWindows {
                 ?? axTitles[CGWindowID(number)] ?? ""
             let isOnScreen = entry[kCGWindowIsOnscreen as String] as? Bool ?? false
             guard isOnScreen || !title.isEmpty else { return nil }
-            return AppWindow(id: CGWindowID(number), title: title, aspect: bounds.width / bounds.height)
+            return AppWindow(id: CGWindowID(number), title: title, size: bounds.size)
         }
         return Array(windows.prefix(limit))
     }
 
-    /// Thumbnails, at most `maxPixels` on their longer side, handed over one by one as they're
-    /// ready. Only with Screen Recording allowed; without it, none.
+    /// Thumbnails, at most `maxPixels` on their longer side, handed over as each is ready: all
+    /// captured at once, not one after another. Only with Screen Recording allowed; without it,
+    /// none.
     static func captureThumbnails(of windows: [AppWindow], maxPixels: CGFloat, onImage: @escaping @MainActor (CGWindowID, CGImage) -> Void) -> Task<Void, Never> {
         Task {
             // Without the permission, asking ScreenCaptureKit only brings up macOS's prompt again.
             guard CGPreflightScreenCaptureAccess() else { return }
-            guard let content = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false) else { return }
-            for window in windows {
-                guard !Task.isCancelled else { return }
-                guard let scWindow = content.windows.first(where: { $0.windowID == window.id }) else { continue }
-                let frame = scWindow.frame
-                let scale = min(1, maxPixels / max(frame.width, frame.height, 1))
-                let configuration = SCStreamConfiguration()
-                configuration.width = max(1, Int((frame.width * scale).rounded()))
-                configuration.height = max(1, Int((frame.height * scale).rounded()))
-                configuration.showsCursor = false
-                let filter = SCContentFilter(desktopIndependentWindow: scWindow)
-                guard let image = try? await SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration) else { continue }
-                await onImage(window.id, image)
+            guard let content = await contentCache.content(including: windows.map(\.id)), !Task.isCancelled else { return }
+            await withTaskGroup(of: (CGWindowID, CGImage?).self) { group in
+                for window in windows {
+                    guard let scWindow = content.windows.first(where: { $0.windowID == window.id }) else { continue }
+                    // The size now: the list may be older than a resize.
+                    let frame = window.size
+                    let scale = min(1, maxPixels / max(frame.width, frame.height, 1))
+                    let configuration = SCStreamConfiguration()
+                    configuration.width = max(1, Int((frame.width * scale).rounded()))
+                    configuration.height = max(1, Int((frame.height * scale).rounded()))
+                    configuration.showsCursor = false
+                    let filter = SCContentFilter(desktopIndependentWindow: scWindow)
+                    group.addTask {
+                        (window.id, try? await SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration))
+                    }
+                }
+                for await (id, image) in group {
+                    guard !Task.isCancelled else {
+                        group.cancelAll()
+                        return
+                    }
+                    if let image { await onImage(id, image) }
+                }
             }
         }
     }
+
+    /// Asks for the list of capturable windows ahead, while the pointer rests on an icon, so it
+    /// is ready when the panel opens. Only with Screen Recording allowed.
+    static func prepareCapture() {
+        guard CGPreflightScreenCaptureAccess() else { return }
+        Task { _ = await contentCache.content(including: []) }
+    }
+
+    private static let contentCache = ShareableContentCache()
 
     /// Brings the window to the front (un-minimizing it) and activates its app. A window on
     /// another desktop: goes to that desktop first.
@@ -132,4 +154,33 @@ enum AppWindows {
         guard let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: -2), "_AXUIElementGetWindow") else { return nil }
         return unsafeBitCast(symbol, to: (@convention(c) (AXUIElement, UnsafeMutablePointer<CGWindowID>) -> AXError).self)
     }()
+}
+
+/// The list of windows ScreenCaptureKit can capture, kept for a while. Getting it goes through
+/// every window on the Mac, the slowest part of a capture, and windows come and go less often
+/// than that: a window it doesn't have yet (just opened) asks again, and sizes come from the
+/// window server's list each time. Requests made while one is under way wait for it.
+@available(macOS 14, *)
+private actor ShareableContentCache {
+    private static let lifetime: TimeInterval = 30
+    private var content: SCShareableContent?
+    private var time = Date.distantPast
+    private var loading: Task<SCShareableContent?, Never>?
+
+    func content(including ids: [CGWindowID]) async -> SCShareableContent? {
+        if let content, Date().timeIntervalSince(time) < Self.lifetime,
+           ids.allSatisfy({ id in content.windows.contains { $0.windowID == id } }) {
+            return content
+        }
+        if let loading { return await loading.value }
+        let task = Task { try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false) }
+        loading = task
+        let result = await task.value
+        loading = nil
+        if let result {
+            content = result
+            time = Date()
+        }
+        return result
+    }
 }
