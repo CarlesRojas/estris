@@ -30,6 +30,9 @@ const Spot = spots[feature.id];
       .brand img { width: 64px; height: 64px; }
       h1 { margin: 0; font-size: 62px; line-height: 1.04; font-weight: 700; letter-spacing: -0.035em; }
       p { margin: 0; font-size: 26px; color: #a1a1a6; }
+      /* The screen is the top two thirds of the square and the shortcut keys under it aren't
+         showing, so the square moves down until the screen is in the middle. */
+      .spot { transform: translateY(12%); }
     </style>
   </head>
   <body>
