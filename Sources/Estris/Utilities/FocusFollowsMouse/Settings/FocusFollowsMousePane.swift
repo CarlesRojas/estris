@@ -55,6 +55,29 @@ struct FocusFollowsMousePane: View {
                 }
                 .resetMenu($settings.passThroughSpeed, to: FocusFollowsMouseSettings.defaultPassThroughSpeed)
             }
+            Section("New Apps") {
+                Toggle(isOn: $settings.keepsNewAppsInFront) {
+                    Text("Keep apps that just opened in front")
+                    Text("They often open away from the pointer; this leaves time to get there.")
+                }
+                .resetMenu($settings.keepsNewAppsInFront, to: FocusFollowsMouseSettings.defaultKeepsNewAppsInFront)
+                LabeledContent("Keep them in front for") {
+                    HStack(spacing: 8) {
+                        // No step: it would draw a tick mark for every second.
+                        Slider(
+                            value: Binding(get: { settings.newAppSeconds }, set: { settings.newAppSeconds = $0.rounded() }),
+                            in: FocusFollowsMouseSettings.newAppSecondsRange
+                        )
+                            .labelsHidden()
+                        Text("\(Int(settings.newAppSeconds)) s")
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                            .frame(width: 72, alignment: .trailing)
+                    }
+                }
+                .resetMenu($settings.newAppSeconds, to: FocusFollowsMouseSettings.defaultNewAppSeconds)
+                .disabled(!settings.keepsNewAppsInFront)
+            }
             Section {
                 Button("Reset to Defaults") { settings.reset() }
             }

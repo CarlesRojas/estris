@@ -10,6 +10,7 @@
 "%lld of %@" = "%lld de %@";
 "%lld of %lld" = "%lld de %lld";
 "%lld pt" = "%lld pt";
+"%lld s" = "%lld s";
 "' (Quote)" = "' (Cometa)";
 ", (Comma)" = ", (Coma)";
 "- (Minus)" = "- (Menys)";
@@ -128,6 +129,8 @@
 "entries" = "entrades";
 "Entries" = "Entrades";
 "Escape" = "Esc";
+"Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris no ha pogut canviar el so de %@. Permet-ho a Només gravació d'àudio del sistema, a Configuració del Sistema > Privadesa i seguretat > Gravació de pantalla i àudio del sistema.";
+"Estris needs Accessibility access" = "Estris necessita accés d’accessibilitat";
 "Event Viewer" = "Visor d’esdeveniments";
 "Example" = "Exemple";
 "Excluded Apps" = "Apps excloses";
@@ -159,7 +162,9 @@
 "Include # prefix" = "Inclou el prefix #";
 "Indefinitely" = "Indefinidament";
 "Insert" = "Insereix";
+"Keep apps that just opened in front" = "Mantén al davant les apps que s’acaben d’obrir";
 "Keep Awake" = "Mantén despert";
+"Keep them in front for" = "Mantén-les al davant durant";
 "Keep up to" = "Conserva fins a";
 "Keeps copied images in the history alongside text and files." = "Desa les imatges copiades a l’historial juntament amb el text i els fitxers.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Desa el que copies i et deixa triar què enganxar amb una drecera.";
@@ -212,6 +217,7 @@
 "Name" = "Nom";
 "Navigation" = "Navegació";
 "Never" = "Mai";
+"New Apps" = "Apps noves";
 "Next Desktop" = "Escriptori següent";
 "Next Track" = "Pista següent";
 "No app is playing sound." = "Cap app està reproduint so.";
@@ -256,8 +262,6 @@
 "Page Down" = "Av Pàg";
 "Page Up" = "Re Pàg";
 "Paste as plain text" = "Enganxa com a text sense format";
-"Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris no ha pogut canviar el so de %@. Permet-ho a Només gravació d'àudio del sistema, a Configuració del Sistema > Privadesa i seguretat > Gravació de pantalla i àudio del sistema.";
-"Estris needs Accessibility access" = "Estris necessita accés d’accessibilitat";
 "Pause" = "Pausa";
 "Permissions" = "Permisos";
 "Pick a color" = "Tria un color";
@@ -374,6 +378,7 @@
 "The Finder always keeps running" = "El Finder sempre continua obert";
 "The new language is used once Estris opens again." = "El nou idioma s'utilitzarà quan Estris es torni a obrir.";
 "The window under the pointer comes to the front and gets the focus." = "La finestra sota el punter passa al davant i rep el focus.";
+"They often open away from the pointer; this leaves time to get there." = "Sovint s’obren lluny del punter; així hi ha temps d’arribar-hi.";
 "Thirds" = "Terços";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Aquest botó arriba al macOS sense dir quin dispositiu l’ha enviat, així que només s’aplica l’assignació de %@.";
 "Three fingers" = "Tres dits";

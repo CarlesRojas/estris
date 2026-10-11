@@ -142,12 +142,20 @@ final class FocusFollowsMouse {
               NSEvent.pressedMouseButtons == 0,
               NSEvent.modifierFlags.intersection([.command, .control, .option, .shift]).isEmpty
         else { return }
-        isHandled = true
 
         let point = NSEvent.mouseLocation
+        let number = NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0)
+        // An app that just opened, often away from the pointer, keeps the focus for a while;
+        // tried again on the next move.
+        if settings.keepsNewAppsInFront, let front = NSWorkspace.shared.frontmostApplication,
+           let launched = front.launchDate, Date().timeIntervalSince(launched) < settings.newAppSeconds,
+           Self.windowInfo(CGWindowID(max(number, 0)))?.pid != front.processIdentifier {
+            return
+        }
+        isHandled = true
+
         // The window a click would reach, on top of everything; nothing to do over menus, the
         // Dock, the menu bar or the desktop, which aren't normal windows (layer 0).
-        let number = NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0)
         guard number > 0, let info = Self.windowInfo(CGWindowID(number)), info.layer == 0 else { return }
         // Estris's own: only its titled windows (Settings), not its panels.
         if info.pid == ProcessInfo.processInfo.processIdentifier {

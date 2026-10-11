@@ -10,6 +10,7 @@
 "%lld of %@" = "%lld de %@";
 "%lld of %lld" = "%lld de %lld";
 "%lld pt" = "%lld pt";
+"%lld s" = "%lld s";
 "' (Quote)" = "' (Comilla)";
 ", (Comma)" = ", (Coma)";
 "- (Minus)" = "- (Menos)";
@@ -128,6 +129,8 @@
 "entries" = "entradas";
 "Entries" = "Entradas";
 "Escape" = "Escape";
+"Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris no ha podido cambiar el sonido de %@. Permítelo en Solo grabación de audio del sistema, en Ajustes del Sistema > Privacidad y seguridad > Grabación de pantalla y audio del sistema.";
+"Estris needs Accessibility access" = "Estris necesita acceso de accesibilidad";
 "Event Viewer" = "Visor de eventos";
 "Example" = "Ejemplo";
 "Excluded Apps" = "Apps excluidas";
@@ -159,7 +162,9 @@
 "Include # prefix" = "Incluir el prefijo #";
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Insertar";
+"Keep apps that just opened in front" = "Mantener delante las apps recién abiertas";
 "Keep Awake" = "Mantener despierto";
+"Keep them in front for" = "Mantenerlas delante durante";
 "Keep up to" = "Conservar hasta";
 "Keeps copied images in the history alongside text and files." = "Guarda las imágenes copiadas en el historial junto al texto y los archivos.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Guarda lo que copias y te deja elegir qué pegar con un atajo.";
@@ -212,6 +217,7 @@
 "Name" = "Nombre";
 "Navigation" = "Navegación";
 "Never" = "Nunca";
+"New Apps" = "Apps nuevas";
 "Next Desktop" = "Escritorio siguiente";
 "Next Track" = "Pista siguiente";
 "No app is playing sound." = "Ninguna app está reproduciendo sonido.";
@@ -256,8 +262,6 @@
 "Page Down" = "Av Pág";
 "Page Up" = "Re Pág";
 "Paste as plain text" = "Pegar como texto sin formato";
-"Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris no ha podido cambiar el sonido de %@. Permítelo en Solo grabación de audio del sistema, en Ajustes del Sistema > Privacidad y seguridad > Grabación de pantalla y audio del sistema.";
-"Estris needs Accessibility access" = "Estris necesita acceso de accesibilidad";
 "Pause" = "Pausa";
 "Permissions" = "Permisos";
 "Pick a color" = "Elegir un color";
@@ -374,6 +378,7 @@
 "The Finder always keeps running" = "El Finder siempre sigue abierto";
 "The new language is used once Estris opens again." = "El nuevo idioma se usará cuando Estris vuelva a abrirse.";
 "The window under the pointer comes to the front and gets the focus." = "La ventana bajo el puntero pasa al frente y recibe el foco.";
+"They often open away from the pointer; this leaves time to get there." = "Suelen abrirse lejos del puntero; así da tiempo a llegar.";
 "Thirds" = "Tercios";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Este botón llega a macOS sin indicar qué dispositivo lo envió, así que solo se aplica la asignación de %@.";
 "Three fingers" = "Tres dedos";
