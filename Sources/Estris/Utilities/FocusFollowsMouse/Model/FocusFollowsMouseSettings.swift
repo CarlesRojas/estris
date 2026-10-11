@@ -19,7 +19,21 @@ final class FocusFollowsMouseSettings: ObservableObject {
         didSet { defaults.set(passThroughSpeed, forKey: Keys.passThroughSpeed) }
     }
 
+    /// Whether an app that just opened keeps the focus for a while, so the pointer can get
+    /// there before hovering other windows takes it away.
+    @Published var keepsNewAppsInFront: Bool {
+        didSet { defaults.set(keepsNewAppsInFront, forKey: Keys.keepsNewAppsInFront) }
+    }
+
+    /// For how long, in seconds.
+    @Published var newAppSeconds: Double {
+        didSet { defaults.set(newAppSeconds, forKey: Keys.newAppSeconds) }
+    }
+
     static let defaultPassThroughSpeed: Double = 800
+    static let defaultKeepsNewAppsInFront = true
+    static let defaultNewAppSeconds: Double = 5
+    static let newAppSecondsRange: ClosedRange<Double> = 1...15
     static let defaultDelay = HoverDelay.ms100
     static let passThroughSpeeds: ClosedRange<Double> = 200...3000
 
@@ -35,13 +49,19 @@ final class FocusFollowsMouseSettings: ObservableObject {
         passThroughSpeed = defaults.object(forKey: Keys.passThroughSpeed) == nil
             ? Self.defaultPassThroughSpeed
             : min(max(defaults.double(forKey: Keys.passThroughSpeed), Self.passThroughSpeeds.lowerBound), Self.passThroughSpeeds.upperBound)
+        keepsNewAppsInFront = defaults.object(forKey: Keys.keepsNewAppsInFront) as? Bool ?? Self.defaultKeepsNewAppsInFront
+        newAppSeconds = defaults.object(forKey: Keys.newAppSeconds) == nil
+            ? Self.defaultNewAppSeconds
+            : min(max(defaults.double(forKey: Keys.newAppSeconds), Self.newAppSecondsRange.lowerBound), Self.newAppSecondsRange.upperBound)
         excludedApps = Set(defaults.stringArray(forKey: Keys.excludedApps) ?? [])
     }
 
-    /// Back to the default delay and speed; the on/off switch and excluded apps stay as they are.
+    /// Back to the defaults; the on/off switch and excluded apps stay as they are.
     func reset() {
         delay = Self.defaultDelay
         passThroughSpeed = Self.defaultPassThroughSpeed
+        keepsNewAppsInFront = Self.defaultKeepsNewAppsInFront
+        newAppSeconds = Self.defaultNewAppSeconds
     }
 
     private enum Keys {
@@ -49,5 +69,7 @@ final class FocusFollowsMouseSettings: ObservableObject {
         static let delay = "focusFollowsMouseDelay"
         static let passThroughSpeed = "focusFollowsMousePassThroughSpeed"
         static let excludedApps = "focusFollowsMouseExcludedApps"
+        static let keepsNewAppsInFront = "focusFollowsMouseKeepsNewAppsInFront"
+        static let newAppSeconds = "focusFollowsMouseNewAppSeconds"
     }
 }

@@ -10,6 +10,7 @@
 "%lld of %@" = "%lld sur %@";
 "%lld of %lld" = "%lld sur %lld";
 "%lld pt" = "%lld pt";
+"%lld s" = "%lld s";
 "' (Quote)" = "' (Apostrophe)";
 ", (Comma)" = ", (Virgule)";
 "- (Minus)" = "- (Moins)";
@@ -128,6 +129,8 @@
 "entries" = "entrées";
 "Entries" = "Entrées";
 "Escape" = "Échappement";
+"Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris n'a pas pu modifier le son de %@. Autorisez-le sous Enregistrement audio du système uniquement, dans Réglages Système > Confidentialité et sécurité > Enregistrement de l'écran et de l'audio du système.";
+"Estris needs Accessibility access" = "Estris a besoin de l’accès Accessibilité";
 "Event Viewer" = "Visualiseur d’évènements";
 "Example" = "Exemple";
 "Excluded Apps" = "Apps exclues";
@@ -159,7 +162,9 @@
 "Include # prefix" = "Inclure le préfixe #";
 "Indefinitely" = "Indéfiniment";
 "Insert" = "Insertion";
+"Keep apps that just opened in front" = "Garder au premier plan les apps qui viennent de s’ouvrir";
 "Keep Awake" = "Garder éveillé";
+"Keep them in front for" = "Les garder au premier plan pendant";
 "Keep up to" = "Conserver jusqu’à";
 "Keeps copied images in the history alongside text and files." = "Conserve les images copiées dans l’historique avec le texte et les fichiers.";
 "Keeps what you copy and lets you pick what to paste with a shortcut." = "Conserve ce que vous copiez et vous laisse choisir quoi coller avec un raccourci.";
@@ -212,6 +217,7 @@
 "Name" = "Nom";
 "Navigation" = "Navigation";
 "Never" = "Jamais";
+"New Apps" = "Nouvelles apps";
 "Next Desktop" = "Bureau suivant";
 "Next Track" = "Piste suivante";
 "No app is playing sound." = "Aucune app ne joue de son.";
@@ -256,8 +262,6 @@
 "Page Down" = "Page suivante";
 "Page Up" = "Page précédente";
 "Paste as plain text" = "Coller en texte brut";
-"Estris couldn't change the sound of %@. Allow it under System Audio Recording Only in System Settings > Privacy & Security > Screen & System Audio Recording." = "Estris n'a pas pu modifier le son de %@. Autorisez-le sous Enregistrement audio du système uniquement, dans Réglages Système > Confidentialité et sécurité > Enregistrement de l'écran et de l'audio du système.";
-"Estris needs Accessibility access" = "Estris a besoin de l’accès Accessibilité";
 "Pause" = "Pause";
 "Permissions" = "Autorisations";
 "Pick a color" = "Prélever une couleur";
@@ -374,6 +378,7 @@
 "The Finder always keeps running" = "Le Finder reste toujours ouvert";
 "The new language is used once Estris opens again." = "La nouvelle langue sera utilisée à la réouverture d’Estris.";
 "The window under the pointer comes to the front and gets the focus." = "La fenêtre sous le pointeur passe au premier plan et reçoit le focus.";
+"They often open away from the pointer; this leaves time to get there." = "Elles s’ouvrent souvent loin du pointeur ; cela laisse le temps d’y aller.";
 "Thirds" = "Tiers";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Ce bouton parvient à macOS sans indiquer quel appareil l’a envoyé, donc seule l’affectation de %@ s’applique.";
 "Three fingers" = "Trois doigts";
