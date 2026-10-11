@@ -27,13 +27,13 @@ const year = new Date().getFullYear();
         <img src="/icon.svg" alt="" width="34" height="34" />
         <span>Estris</span>
       </a>
-      <a class="button" href={DOWNLOAD_URL}>Download</a>
     </header>
 
     <main class="showcase">
       <div class="hero">
         <img src="/icon.svg" alt="" width="72" height="72" />
         <h1>The little tools your Mac is missing.</h1>
+        <a class="button button-large" href={DOWNLOAD_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
       </div>
       <nav class="feature-list" role="tablist" aria-label="Features">
         {features.map((feature, index) => (
@@ -84,7 +84,7 @@ const year = new Date().getFullYear();
       <div class="foot-cta">
         <img src="/icon.svg" alt="" width="40" height="40" />
         <p class="foot-title">All ten tools, free.</p>
-        <a class="button" href={DOWNLOAD_URL}>Download for Mac</a>
+        <a class="button" href={DOWNLOAD_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
         <p class="note">{MIN_MACOS}</p>
       </div>
       <p class="copyright">© {year} Carles Rojas</p>
@@ -163,6 +163,35 @@ const year = new Date().getFullYear();
         stage.style.setProperty("--radius", `${Math.round(gap + spot.offsetWidth * 0.026)}px`);
       }
       new ResizeObserver(fitCorners).observe(stage);
+
+      // The feature pills wrap into rows as even as they can be: the narrowest list that keeps
+      // the same number of rows (as text-wrap: balance does for words).
+      const list = document.querySelector<HTMLElement>(".feature-list")!;
+      const rowCount = () => new Set(tabs.map((tab) => tab.offsetTop)).size;
+      function balanceRows() {
+        list.style.maxWidth = "";
+        if (getComputedStyle(list).display !== "flex") return;
+        const rows = rowCount();
+        if (rows < 2) return;
+        let low = 0;
+        let high = list.offsetWidth;
+        while (high - low > 1) {
+          const middle = Math.floor((low + high) / 2);
+          list.style.maxWidth = `${middle}px`;
+          if (rowCount() > rows) low = middle;
+          else high = middle;
+        }
+        list.style.maxWidth = `${high}px`;
+      }
+      balanceRows();
+      document.fonts?.ready.then(balanceRows);
+      let lastWidth = window.innerWidth;
+      window.addEventListener("resize", () => {
+        if (window.innerWidth !== lastWidth) {
+          lastWidth = window.innerWidth;
+          balanceRows();
+        }
+      });
 
       // Only plays while on screen.
       new IntersectionObserver(([entry]) => {
