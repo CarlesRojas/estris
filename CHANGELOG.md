@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dock Preview shows window previews faster, especially when the Mac is busy.
+
 ## 0.1.4 - 2026-10-11
 
 - Performance improvements and bug fixes.
