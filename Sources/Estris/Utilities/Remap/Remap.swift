@@ -35,9 +35,14 @@ final class Remap {
     }
 
     func start() {
-        devices.refresh()
+        refreshDevices()
         logDevices()
         watcher.start()
+        // Wireless keyboards can finish appearing a while after the Mac starts, without
+        // another notice: look again a little later.
+        for delay in [5.0, 20.0] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in self?.devicesChanged() }
+        }
         // Published values arrive before the property changes; applying on the next turn of
         // the run loop reads the new ones.
         settings.$isEnabled.map { _ in () }
@@ -75,8 +80,13 @@ final class Remap {
         updateTap()
     }
 
+    /// The devices again, with the ones that have mappings as known names.
+    func refreshDevices() {
+        devices.refresh(known: settings.devices.mapValues(\.name))
+    }
+
     private func devicesChanged() {
-        devices.refresh()
+        refreshDevices()
         logDevices()
         lastRefresh = Date()
         apply()
@@ -122,9 +132,9 @@ final class Remap {
         if let sender {
             device = devices.device(sender: sender)
             // A device that just connected, before the watcher noticed.
+            // Its key mappings are set on the keyboard once it is found.
             if device == nil, Date().timeIntervalSince(lastRefresh) > 2 {
-                lastRefresh = Date()
-                devices.refresh()
+                devicesChanged()
                 device = devices.device(sender: sender)
             }
         }
