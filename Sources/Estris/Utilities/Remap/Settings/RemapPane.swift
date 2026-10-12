@@ -93,7 +93,7 @@ private struct MappingsView: View {
             // Rows left with both sides empty are dropped once the page is left.
             .onDisappear { settings.removeEmptyMappings() }
             .onAppear {
-                devices.refresh()
+                remap.refreshDevices()
                 guard !selection.isEmpty else { return }
                 let target = selection
                 selection = ""

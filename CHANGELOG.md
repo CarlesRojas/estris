@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remap: wireless keyboards that showed as an unknown device after starting the Mac, with their mappings not working until turned off and on, are now recognized.
+
 ## 0.1.5 - 2026-10-11
 
 - Dock Preview shows window previews faster, especially when the Mac is busy.
