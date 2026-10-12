@@ -172,7 +172,7 @@
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Insertar";
 "It is running from where it was downloaded. In Applications it stays installed and can open at login." = "Se está ejecutando desde donde se descargó. En Aplicaciones queda instalado y puede abrirse al iniciar sesión.";
-"Keep apps that just opened in front" = "Mantener delante las apps recién abiertas";
+"Keep apps you open or switch to in front" = "Mantener delante las apps que abres o a las que cambias";
 "Keep Awake" = "Mantener despierto";
 "Keep them in front for" = "Mantenerlas delante durante";
 "Keep up to" = "Conservar hasta";
@@ -228,7 +228,6 @@
 "Name" = "Nombre";
 "Navigation" = "Navegación";
 "Never" = "Nunca";
-"New Apps" = "Apps nuevas";
 "Next Desktop" = "Escritorio siguiente";
 "Next Track" = "Pista siguiente";
 "No app is playing sound." = "Ninguna app está reproduciendo sonido.";
@@ -267,6 +266,7 @@
 "Open Keyboard Shortcuts" = "Abrir Funciones rápidas de teclado";
 "Open overlay" = "Abrir el panel";
 "Open System Settings" = "Abrir Ajustes del Sistema";
+"Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there." = "Al abrirlas, hacer clic o elegirlas con ⌘Tab o en Mission Control, suelen quedar lejos del puntero; así da tiempo a llegar.";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, solo para mostrar el color y su valor bajo la lupa mientras mueves el puntero.";
 "Other" = "Otras";
 "Other source" = "Otra fuente";
@@ -381,6 +381,7 @@
 "Style" = "Estilo";
 "Swap From and To" = "Intercambiar origen y destino";
 "Switch windows with the scroll wheel" = "Cambiar de ventana con la rueda del ratón";
+"Switching Apps" = "Cambio de app";
 "Symbols" = "Símbolos";
 "System" = "Sistema";
 "System Audio Recording" = "Grabación de audio del sistema";
@@ -392,7 +393,6 @@
 "The Finder always keeps running" = "El Finder siempre sigue abierto";
 "The new language is used once Estris opens again." = "El nuevo idioma se usará cuando Estris vuelva a abrirse.";
 "The window under the pointer comes to the front and gets the focus." = "La ventana bajo el puntero pasa al frente y recibe el foco.";
-"They often open away from the pointer; this leaves time to get there." = "Suelen abrirse lejos del puntero; así da tiempo a llegar.";
 "They replace your current settings, and Estris opens again to apply them." = "Sustituyen a tus ajustes actuales, y Estris se vuelve a abrir para aplicarlos.";
 "Thirds" = "Tercios";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Este botón llega a macOS sin indicar qué dispositivo lo envió, así que solo se aplica la asignación de %@.";

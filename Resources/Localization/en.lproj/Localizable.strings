@@ -172,7 +172,7 @@
 "Indefinitely" = "Indefinitely";
 "Insert" = "Insert";
 "It is running from where it was downloaded. In Applications it stays installed and can open at login." = "It is running from where it was downloaded. In Applications it stays installed and can open at login.";
-"Keep apps that just opened in front" = "Keep apps that just opened in front";
+"Keep apps you open or switch to in front" = "Keep apps you open or switch to in front";
 "Keep Awake" = "Keep Awake";
 "Keep them in front for" = "Keep them in front for";
 "Keep up to" = "Keep up to";
@@ -228,7 +228,6 @@
 "Name" = "Name";
 "Navigation" = "Navigation";
 "Never" = "Never";
-"New Apps" = "New Apps";
 "Next Desktop" = "Next Desktop";
 "Next Track" = "Next Track";
 "No app is playing sound." = "No app is playing sound.";
@@ -267,6 +266,7 @@
 "Open Keyboard Shortcuts" = "Open Keyboard Shortcuts";
 "Open overlay" = "Open overlay";
 "Open System Settings" = "Open System Settings";
+"Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there." = "Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there.";
 "Optional, only to show the color and its value under the loupe while you move." = "Optional, only to show the color and its value under the loupe while you move.";
 "Other" = "Other";
 "Other source" = "Other source";
@@ -381,6 +381,7 @@
 "Style" = "Style";
 "Swap From and To" = "Swap From and To";
 "Switch windows with the scroll wheel" = "Switch windows with the scroll wheel";
+"Switching Apps" = "Switching Apps";
 "Symbols" = "Symbols";
 "System" = "System";
 "System Audio Recording" = "System Audio Recording";
@@ -392,7 +393,6 @@
 "The Finder always keeps running" = "The Finder always keeps running";
 "The new language is used once Estris opens again." = "The new language is used once Estris opens again.";
 "The window under the pointer comes to the front and gets the focus." = "The window under the pointer comes to the front and gets the focus.";
-"They often open away from the pointer; this leaves time to get there." = "They often open away from the pointer; this leaves time to get there.";
 "They replace your current settings, and Estris opens again to apply them." = "They replace your current settings, and Estris opens again to apply them.";
 "Thirds" = "Thirds";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies.";

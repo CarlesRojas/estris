@@ -18,6 +18,12 @@ final class FocusFollowsMouse {
     private var observers: Set<AnyCancellable> = []
     private var tap: CFMachPort?
     private var spaceObserver: NSObjectProtocol?
+    private var activationObserver: NSObjectProtocol?
+    /// The app last brought forward by hovering, and when, so its activation isn't taken for
+    /// the user switching to it.
+    private var focusedByHover: (pid: pid_t, time: Date)?
+    /// The app the user last switched to (clicking it, ⌘Tab, Mission Control, the Dock), and when.
+    private var switchedTo: (pid: pid_t, time: Date)?
     private var pending: DispatchWorkItem?
     private var lastPoint: NSPoint?
     private var lastTime: TimeInterval = 0
@@ -51,6 +57,8 @@ final class FocusFollowsMouse {
         if let tap { CGEvent.tapEnable(tap: tap, enable: false) }
         if let spaceObserver { NSWorkspace.shared.notificationCenter.removeObserver(spaceObserver) }
         spaceObserver = nil
+        if let activationObserver { NSWorkspace.shared.notificationCenter.removeObserver(activationObserver) }
+        activationObserver = nil
         guard active else { return }
 
         // A listen-only event tap: unlike a global event monitor, it also sees moves over
@@ -77,6 +85,18 @@ final class FocusFollowsMouse {
                 self?.pending?.cancel()
                 self?.pending = nil
                 self?.candidate = 0
+            }
+        }
+        // An app becoming active that hovering didn't bring forward: the user switched to it.
+        activationObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
+        ) { [weak self] note in
+            guard let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+            let pid = app.processIdentifier
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                if let hover = self.focusedByHover, hover.pid == pid, Date().timeIntervalSince(hover.time) < 1 { return }
+                self.switchedTo = (pid, Date())
             }
         }
     }
@@ -145,12 +165,14 @@ final class FocusFollowsMouse {
 
         let point = NSEvent.mouseLocation
         let number = NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0)
-        // An app that just opened, often away from the pointer, keeps the focus for a while;
-        // tried again on the next move.
+        // An app that just opened, or that the user just switched to (clicking it, ⌘Tab,
+        // Mission Control), is often away from the pointer: it keeps the focus for a while.
+        // Tried again on the next move.
         if settings.keepsNewAppsInFront, let front = NSWorkspace.shared.frontmostApplication,
-           let launched = front.launchDate, Date().timeIntervalSince(launched) < settings.newAppSeconds,
            Self.windowInfo(CGWindowID(max(number, 0)))?.pid != front.processIdentifier {
-            return
+            let since = [front.launchDate, switchedTo.flatMap { $0.pid == front.processIdentifier ? $0.time : nil }]
+                .compactMap { $0 }.max()
+            if let since, Date().timeIntervalSince(since) < settings.newAppSeconds { return }
         }
         isHandled = true
 
@@ -161,6 +183,7 @@ final class FocusFollowsMouse {
         if info.pid == ProcessInfo.processInfo.processIdentifier {
             if let window = NSApp.window(withWindowNumber: number), window.styleMask.contains(.titled),
                !(NSApp.isActive && window.isKeyWindow) {
+                focusedByHover = (info.pid, Date())
                 NSApp.activate(ignoringOtherApps: true)
                 window.makeKeyAndOrderFront(nil)
                 log("focused \(window.title)")
@@ -196,6 +219,7 @@ final class FocusFollowsMouse {
         AXUIElementSetAttributeValue(window, kAXMainAttribute as CFString, kCFBooleanTrue)
         AXUIElementPerformAction(window, kAXRaiseAction as CFString)
         if !isFrontmost {
+            focusedByHover = (info.pid, Date())
             if #available(macOS 14, *) {
                 app.activate()
             } else {

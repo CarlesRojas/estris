@@ -172,7 +172,7 @@
 "Indefinitely" = "Indéfiniment";
 "Insert" = "Insertion";
 "It is running from where it was downloaded. In Applications it stays installed and can open at login." = "Il s’exécute depuis l’endroit où il a été téléchargé. Dans Applications, il reste installé et peut s’ouvrir à l’ouverture de session.";
-"Keep apps that just opened in front" = "Garder au premier plan les apps qui viennent de s’ouvrir";
+"Keep apps you open or switch to in front" = "Garder au premier plan les apps que vous ouvrez ou activez";
 "Keep Awake" = "Garder éveillé";
 "Keep them in front for" = "Les garder au premier plan pendant";
 "Keep up to" = "Conserver jusqu’à";
@@ -228,7 +228,6 @@
 "Name" = "Nom";
 "Navigation" = "Navigation";
 "Never" = "Jamais";
-"New Apps" = "Nouvelles apps";
 "Next Desktop" = "Bureau suivant";
 "Next Track" = "Piste suivante";
 "No app is playing sound." = "Aucune app ne joue de son.";
@@ -267,6 +266,7 @@
 "Open Keyboard Shortcuts" = "Ouvrir les raccourcis clavier";
 "Open overlay" = "Ouvrir le panneau";
 "Open System Settings" = "Ouvrir Réglages Système";
+"Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there." = "Ouvertes, cliquées ou choisies avec ⌘Tab ou dans Mission Control, elles sont souvent loin du pointeur ; cela laisse le temps d’y aller.";
 "Optional, only to show the color and its value under the loupe while you move." = "Facultatif, uniquement pour afficher la couleur et sa valeur sous la loupe pendant que vous bougez.";
 "Other" = "Autres";
 "Other source" = "Autre source";
@@ -381,6 +381,7 @@
 "Style" = "Style";
 "Swap From and To" = "Inverser la source et la cible";
 "Switch windows with the scroll wheel" = "Changer de fenêtre avec la molette";
+"Switching Apps" = "Changement d’app";
 "Symbols" = "Symboles";
 "System" = "Système";
 "System Audio Recording" = "Enregistrement audio du système";
@@ -392,7 +393,6 @@
 "The Finder always keeps running" = "Le Finder reste toujours ouvert";
 "The new language is used once Estris opens again." = "La nouvelle langue sera utilisée à la réouverture d’Estris.";
 "The window under the pointer comes to the front and gets the focus." = "La fenêtre sous le pointeur passe au premier plan et reçoit le focus.";
-"They often open away from the pointer; this leaves time to get there." = "Elles s’ouvrent souvent loin du pointeur ; cela laisse le temps d’y aller.";
 "They replace your current settings, and Estris opens again to apply them." = "Ils remplacent vos réglages actuels, et Estris se rouvre pour les appliquer.";
 "Thirds" = "Tiers";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Ce bouton parvient à macOS sans indiquer quel appareil l’a envoyé, donc seule l’affectation de %@ s’applique.";

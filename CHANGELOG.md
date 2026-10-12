@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Focus Follows Mouse also keeps an app in front for a few seconds after you switch to it (clicking it, ⌘Tab, Mission Control), not only after it opens. The setting is now **Keep apps you open or switch to in front**.
+
 ## 0.1.8 - 2026-10-12
 
 - Focus Follows Mouse leaves the app in front alone while it has a panel or dialog open, so passing over the windows behind it no longer hides the panel.
