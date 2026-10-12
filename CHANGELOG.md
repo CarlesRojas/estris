@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Focus Follows Mouse leaves the app in front alone while it has a panel or dialog open, so passing over the windows behind it no longer hides the panel.
+
 ## 0.1.7 - 2026-10-12
 
 - Remap: keyboards that reconnect while Estris is running, such as Bluetooth keyboards after starting the Mac, are recognized again, so their mappings keep working.

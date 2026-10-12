@@ -181,8 +181,16 @@ final class FocusFollowsMouse {
         if isFrontmost, let focused {
             // Already the focused window.
             if CFEqual(focused, window) { return }
-            // A sheet or a modal dialog keeps focus until it is answered.
-            if Self.string(focused, kAXRoleAttribute) == kAXSheetRole as String || Self.isModal(focused) { return }
+            // A sheet, a modal dialog or a panel keeps focus until it is closed.
+            if Self.string(focused, kAXRoleAttribute) == kAXSheetRole as String || Self.isModal(focused) || Self.isPanel(focused) { return }
+        }
+        // Another app in front with a panel open (one that doesn't cover the screen, so the
+        // windows behind are easy to cross): it keeps the focus, or the panel would end up
+        // behind the window raised.
+        if !isFrontmost, let front = NSWorkspace.shared.frontmostApplication,
+           front.processIdentifier != ProcessInfo.processInfo.processIdentifier,
+           Self.showsPanel(front.processIdentifier) {
+            return
         }
 
         AXUIElementSetAttributeValue(window, kAXMainAttribute as CFString, kCFBooleanTrue)
@@ -235,6 +243,31 @@ final class FocusFollowsMouse {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success else { return nil }
         return value as? String
+    }
+
+    /// Dialogs and floating windows: panels, inspectors, palettes, popovers turned windows.
+    private static func isPanel(_ window: AXUIElement) -> Bool {
+        let subrole = string(window, kAXSubroleAttribute)
+        return [kAXDialogSubrole, kAXSystemDialogSubrole, kAXFloatingWindowSubrole, kAXSystemFloatingWindowSubrole]
+            .contains { $0 as String == subrole }
+    }
+
+    /// Whether an app has a panel open: its focused window is one, or it has a window on screen
+    /// floating above normal ones (window layers 1 to 20, below menus).
+    private static func showsPanel(_ pid: pid_t) -> Bool {
+        let app = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(app, messagingTimeout)
+        if let focused = element(app, kAXFocusedWindowAttribute), isPanel(focused) { return true }
+        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        return list.contains { entry in
+            guard entry[kCGWindowOwnerPID as String] as? pid_t == pid,
+                  let layer = entry[kCGWindowLayer as String] as? Int, (1...20).contains(layer),
+                  (entry[kCGWindowAlpha as String] as? Double ?? 1) > 0,
+                  let bounds = entry[kCGWindowBounds as String] as? NSDictionary,
+                  let rect = CGRect(dictionaryRepresentation: bounds as CFDictionary)
+            else { return false }
+            return rect.width >= 100 && rect.height >= 60
+        }
     }
 
     private static func isModal(_ element: AXUIElement) -> Bool {
