@@ -32,7 +32,19 @@ enum HIDServices {
         dlsym(iokit, name).map { unsafeBitCast($0, to: type) }
     }
 
-    private static let client: AnyObject? = function("IOHIDEventSystemClientCreateSimpleClient", as: CreateClient.self)?(nil)?.takeRetainedValue()
+    private static let createClient = function("IOHIDEventSystemClientCreateSimpleClient", as: CreateClient.self)
+    /// The client the current services came from, kept so they stay usable.
+    private static var client: AnyObject?
+
+    /// A new client each time: one keeps the list of services it started with, so a device
+    /// that connects or reconnects later (with a new id) would never show up in it.
+    private static func freshServices() -> [AnyObject] {
+        guard let created = createClient?(nil)?.takeRetainedValue(), let copyServices,
+              let list = copyServices(created)?.takeRetainedValue() as? [AnyObject]
+        else { return [] }
+        client = created
+        return list
+    }
     private static let copyServices = function("IOHIDEventSystemClientCopyServices", as: CopyServices.self)
     private static let copyProperty = function("IOHIDServiceClientCopyProperty", as: CopyProperty.self)
     private static let setProperty = function("IOHIDServiceClientSetProperty", as: SetProperty.self)
@@ -42,8 +54,7 @@ enum HIDServices {
     /// (media keys, vendor extras), which can send buttons too. Some (wireless keyboards
     /// right after the Mac starts) have no product name yet; theirs is empty.
     static func all() -> [HIDService] {
-        guard let client, let copyServices, let list = copyServices(client)?.takeRetainedValue() as? [AnyObject] else { return [] }
-        return list.compactMap { service in
+        freshServices().compactMap { service in
             guard let registryID = (getRegistryID?(service)?.takeUnretainedValue() as? NSNumber)?.uint64Value else { return nil }
             let name = property(service, "Product") as? String ?? ""
             return HIDService(
@@ -58,12 +69,13 @@ enum HIDServices {
         }
     }
 
-    /// One line per input service, unnamed ones included, for the Developer logs.
+    /// One line per keyboard, pointer and media key service of the last `all()`, unnamed ones
+    /// included, for the Developer logs. Sensors and other services are left out.
     static func describeAll() -> [String] {
         guard let client, let copyServices, let list = copyServices(client)?.takeRetainedValue() as? [AnyObject] else {
             return ["can't list input services"]
         }
-        return list.map { service in
+        return list.filter { [1, 0xC].contains((property($0, "PrimaryUsagePage") as? NSNumber)?.intValue ?? 0) }.map { service in
             let name = property(service, "Product") as? String ?? "(no name)"
             let number = { (key: String) in (property(service, key) as? NSNumber)?.intValue ?? 0 }
             let registryID = (getRegistryID?(service)?.takeUnretainedValue() as? NSNumber)?.uint64Value ?? 0

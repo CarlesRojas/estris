@@ -18,6 +18,7 @@ final class Remap {
     private var observers: Set<AnyCancellable> = []
     private var tap: CFMachPort?
     private var lastRefresh = Date.distantPast
+    private var loggedServices: [String] = []
 
     /// Whether the Event Viewer is on screen, so events are logged.
     var isViewing = false {
@@ -136,6 +137,7 @@ final class Remap {
             if device == nil, Date().timeIntervalSince(lastRefresh) > 2 {
                 devicesChanged()
                 device = devices.device(sender: sender)
+                if device == nil { log(String(format: "press from a service not listed, id 0x%llX", sender)) }
             }
         }
 
@@ -279,9 +281,12 @@ final class Remap {
         }
     }
 
-    /// Every input service macOS reports, so a missing or unexpected device can be traced.
+    /// The keyboard, pointer and media key services macOS reports, so a missing or unexpected
+    /// device can be traced; only when they changed since the last time.
     private func logDevices() {
         let lines = HIDServices.describeAll()
+        guard lines != loggedServices else { return }
+        loggedServices = lines
         log("input services (\(lines.count)):\n" + lines.joined(separator: "\n"))
     }
 
