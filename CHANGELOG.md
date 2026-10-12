@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.1.6 - 2026-10-12
+
 - Remap: wireless keyboards that showed as an unknown device after starting the Mac, with their mappings not working until turned off and on, are now recognized.
+- Performance improvements and bug fixes.
 
 ## 0.1.5 - 2026-10-11
 
