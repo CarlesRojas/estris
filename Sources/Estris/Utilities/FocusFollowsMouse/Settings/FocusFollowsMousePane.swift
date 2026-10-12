@@ -55,10 +55,10 @@ struct FocusFollowsMousePane: View {
                 }
                 .resetMenu($settings.passThroughSpeed, to: FocusFollowsMouseSettings.defaultPassThroughSpeed)
             }
-            Section("New Apps") {
+            Section("Switching Apps") {
                 Toggle(isOn: $settings.keepsNewAppsInFront) {
-                    Text("Keep apps that just opened in front")
-                    Text("They often open away from the pointer; this leaves time to get there.")
+                    Text("Keep apps you open or switch to in front")
+                    Text("Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there.")
                 }
                 .resetMenu($settings.keepsNewAppsInFront, to: FocusFollowsMouseSettings.defaultKeepsNewAppsInFront)
                 LabeledContent("Keep them in front for") {
