@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remap: keyboards that reconnect while Estris is running, such as Bluetooth keyboards after starting the Mac, are recognized again, so their mappings keep working.
+
 ## 0.1.6 - 2026-10-12
 
 - Remap: wireless keyboards that showed as an unknown device after starting the Mac, with their mappings not working until turned off and on, are now recognized.
