@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.1.7 - 2026-10-12
+
 - Remap: keyboards that reconnect while Estris is running, such as Bluetooth keyboards after starting the Mac, are recognized again, so their mappings keep working.
+- Performance improvements and bug fixes.
 
 ## 0.1.6 - 2026-10-12
 
