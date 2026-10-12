@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.1.8 - 2026-10-12
+
 - Focus Follows Mouse leaves the app in front alone while it has a panel or dialog open, so passing over the windows behind it no longer hides the panel.
+- Performance improvements and bug fixes.
 
 ## 0.1.7 - 2026-10-12
 
