@@ -50,6 +50,8 @@ final class DragSnapper {
     private var tap: CFMachPort?
 
     private var window: AXWindow?
+    /// The dragged window's window server number, for keeping the preview behind it.
+    private var windowNumber: CGWindowID?
     private var startFrame: NSRect = .zero
     private var startPoint: NSPoint = .zero
     private var mode = Mode.undecided
@@ -117,6 +119,7 @@ final class DragSnapper {
         // Windows kept in front of everything are left alone, and don't drag others along.
         guard let window = AXWindow.at(NSEvent.mouseLocation), let frame = window.frame, window.isNormalLevel else { return }
         self.window = window
+        windowNumber = window.number
         startFrame = frame
         startPoint = NSEvent.mouseLocation
     }
@@ -171,6 +174,7 @@ final class DragSnapper {
 
     private func reset() {
         window = nil
+        windowNumber = nil
         mode = .undecided
         target = nil
         neighbours = nil
@@ -197,7 +201,7 @@ final class DragSnapper {
             area = SpaceFiller.fit(usual, for: found.action, on: screen, among: tiled[screen] ?? [], pid: window.pid)
         }
         target = (found.action, screen)
-        preview.show(area, from: found.edge, isFrosted: settings.frostedPreview)
+        preview.show(area, from: found.edge, below: windowNumber, isFrosted: settings.frostedPreview)
     }
 
     /// The snap area under the pointer: corners for quarters, the top for the whole screen,

@@ -31,6 +31,12 @@ struct AXWindow {
         pid = getpid()
     }
 
+    /// Its window server number, to order other windows relative to it.
+    var number: CGWindowID? {
+        if let own { return CGWindowID(own.windowNumber) }
+        return element.flatMap(Self.number(of:))
+    }
+
     /// Estris's own window under a point, leaving out panels such as the snap preview.
     private static func ownWindow(at point: NSPoint) -> NSWindow? {
         NSApp.windows.first { window in
