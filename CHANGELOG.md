@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.1.10 - 2026-10-14
+
 - Window Snapping can show the drag preview frosted instead of dark: turn on **Frosted preview** in its Dragging settings. The preview now also stays behind the window you're dragging.
+- Performance improvements and bug fixes.
 
 ## 0.1.9 - 2026-10-12
 
