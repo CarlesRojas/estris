@@ -113,6 +113,12 @@ struct AXWindow {
         return hiddenElement(pid: pid, number: number).map(AXWindow.init(element:))
     }
 
+    /// The window server's number for this window.
+    var number: CGWindowID? {
+        if let own { return CGWindowID(own.windowNumber) }
+        return element.flatMap(Self.number(of:))
+    }
+
     /// The window server's number for an Accessibility window.
     static func number(of element: AXUIElement) -> CGWindowID? {
         guard let getWindow else { return nil }
