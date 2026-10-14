@@ -197,7 +197,7 @@ final class DragSnapper {
             area = SpaceFiller.fit(usual, for: found.action, on: screen, among: tiled[screen] ?? [], pid: window.pid)
         }
         target = (found.action, screen)
-        preview.show(area, from: found.edge)
+        preview.show(area, from: found.edge, isFrosted: settings.frostedPreview)
     }
 
     /// The snap area under the pointer: corners for quarters, the top for the whole screen,

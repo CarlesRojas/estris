@@ -63,6 +63,9 @@ struct WindowSnappingPane: View {
             }
             .resetMenu($settings.edgeArea, to: WindowSnappingSettings.defaultEdgeArea)
             .disabled(!settings.snapsByDragging)
+            Toggle("Frosted preview", isOn: $settings.frostedPreview)
+                .resetMenu($settings.frostedPreview, to: WindowSnappingSettings.defaultFrostedPreview)
+                .disabled(!settings.snapsByDragging)
             Toggle("Resize side-by-side windows together", isOn: $settings.resizesTogether)
                 .resetMenu($settings.resizesTogether, to: WindowSnappingSettings.defaultResizesTogether)
             Toggle(isOn: $settings.fillsSpace) {

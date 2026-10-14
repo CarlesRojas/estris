@@ -1,14 +1,19 @@
 import AppKit
+import SwiftUI
 
 /// The outline showing where a dragged window will snap: rounded, with a dark see-through
-/// fill. It grows out of the screen edge or corner being dragged to, and glides between
-/// areas as the pointer moves; with Reduce Motion, it only fades.
+/// fill, or frosted like the overlays when chosen in Settings. It grows out of the screen edge
+/// or corner being dragged to, and glides between areas as the pointer moves; with Reduce
+/// Motion, it only fades.
 @MainActor
 final class SnapPreview {
     /// Room between the outline and the area, so it reads as a preview of it.
     private static let inset: CGFloat = 6
     private static let cornerRadius: CGFloat = 20
     private static let duration: TimeInterval = 0.18
+    /// The frosted fill is lighter than the overlays': thinner material, and see-through so
+    /// what's behind reads through the blur.
+    private static let frostedOpacity: Double = 0.75
 
     private lazy var panel: NSPanel = {
         let panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
@@ -24,18 +29,26 @@ final class SnapPreview {
         view.layer?.cornerCurve = .continuous
         view.layer?.borderWidth = 2
         view.layer?.borderColor = NSColor.white.withAlphaComponent(0.3).cgColor
-        view.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.3).cgColor
+        view.layer?.masksToBounds = true
+        frosted.frame = view.bounds
+        frosted.autoresizingMask = [.width, .height]
+        view.addSubview(frosted)
         panel.contentView = view
         return panel
     }()
 
+    private lazy var frosted = NSHostingView(rootView: FrostedFill(opacity: Self.frostedOpacity))
+
     private var shown: NSRect?
 
-    /// Shows the outline over `area`, growing from `edge` if it isn't showing yet.
-    func show(_ area: NSRect, from edge: SnapEdge) {
+    /// Shows the outline over `area`, growing from `edge` if it isn't showing yet; `isFrosted`
+    /// gives it the overlays' frosted fill instead of the dark one.
+    func show(_ area: NSRect, from edge: SnapEdge, isFrosted: Bool) {
         let target = area.insetBy(dx: Self.inset, dy: Self.inset)
         guard target != shown else { return }
         if shown == nil {
+            frosted.isHidden = !isFrosted
+            panel.contentView?.layer?.backgroundColor = isFrosted ? nil : NSColor.black.withAlphaComponent(0.3).cgColor
             panel.setFrame(edge.startRect(for: target), display: false)
             panel.alphaValue = 0
             panel.orderFrontRegardless()
@@ -63,6 +76,18 @@ final class SnapPreview {
                 if self?.shown == nil { self?.panel.orderOut(nil) }
             }
         })
+    }
+}
+
+/// The overlays' default frosted look, thinner and more see-through.
+private struct FrostedFill: View {
+    let opacity: Double
+
+    var body: some View {
+        Rectangle()
+            .fill(AppearanceSettings(usesDefaults: true).surfaceTint(isSelected: false) ?? .clear)
+            .background(.thinMaterial)
+            .opacity(opacity)
     }
 }
 
