@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Builds Estris.app into ./build.
-# Signs with SIGN_IDENTITY, else your Apple Development certificate, else ad hoc.
+# Signs with SIGN_IDENTITY, else your Developer ID certificate, else your Apple Development
+# certificate, else ad hoc.
 # RELEASE=1 builds for both Apple silicon and Intel and, with a Developer ID identity, signs
 # for notarization (hardened runtime, secure timestamp). SPARKLE_PUBLIC_KEY, when set, is the
 # key updates are checked against; without it the app doesn't look for updates.
 # Ad-hoc signatures change every build, so macOS forgets the Accessibility permission each
-# time; an Apple Development certificate keeps it.
+# time; a certificate keeps it. Developer ID comes first because it matches the released app,
+# so a local build shares the permission already granted to an installed copy.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -41,11 +43,14 @@ install_name_tool -add_rpath @executable_path/../Frameworks "$APP/Contents/MacOS
 IDENTITY="${SIGN_IDENTITY:-}"
 if [[ -z "$IDENTITY" ]]; then
     # By its hash: an expired or revoked certificate can share the same name.
+    IDENTITY="$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -v CSSMERR | head -1 | awk '{print $2}' || true)"
+fi
+if [[ -z "$IDENTITY" ]]; then
     IDENTITY="$(security find-identity -v -p codesigning | grep "Apple Development" | grep -v CSSMERR | head -1 | awk '{print $2}' || true)"
 fi
 if [[ -z "$IDENTITY" ]]; then
     IDENTITY="-"
-    echo "No Apple Development certificate: signing ad hoc, so Accessibility must be granted again after each build."
+    echo "No Developer ID or Apple Development certificate: signing ad hoc, so Accessibility must be granted again after each build."
 fi
 HARDENED=()
 if [[ "${RELEASE:-}" == 1 && "$IDENTITY" != "-" ]]; then

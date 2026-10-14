@@ -44,6 +44,9 @@ enum SpaceFiller {
                   let bounds = info[kCGWindowBounds as String] as? [String: Any],
                   let cgRect = CGRect(dictionaryRepresentation: bounds as CFDictionary)
             else { continue }
+            // Estris's panels, such as the snap preview, aren't windows to fit to.
+            if pid == getpid(), let number = (info[kCGWindowNumber as String] as? NSNumber)?.intValue,
+               NSApp.windows.contains(where: { $0 is NSPanel && $0.windowNumber == number }) { continue }
             let frame = AXWindow.appKitRect(cgRect)
             if pid == window.pid, let windowFrame, nearlyEqual(frame, windowFrame) { continue }
             defer { inFront.append(frame) }

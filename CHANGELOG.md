@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Window Snapping can show the drag preview frosted instead of dark: turn on **Frosted preview** in its Dragging settings. The preview now also stays behind the window you're dragging.
+
 ## 0.1.9 - 2026-10-12
 
 - Focus Follows Mouse also keeps an app in front for a few seconds after you switch to it (clicking it, ⌘Tab, Mission Control), not only after it opens. The setting is now **Keep apps you open or switch to in front**.

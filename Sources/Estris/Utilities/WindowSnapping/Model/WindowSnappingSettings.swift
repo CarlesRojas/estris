@@ -60,6 +60,11 @@ final class WindowSnappingSettings: ObservableObject {
         didSet { defaults.set(fillsSpace, forKey: Keys.fillsSpace) }
     }
 
+    /// The drag preview is frosted, like the overlays, instead of dark.
+    @Published var frostedPreview: Bool {
+        didSet { defaults.set(frostedPreview, forKey: Keys.frostedPreview) }
+    }
+
     /// How far into the screen, in points, the edges reach for dragging.
     @Published var edgeArea: Double {
         didSet { defaults.set(edgeArea, forKey: Keys.edgeArea) }
@@ -70,6 +75,7 @@ final class WindowSnappingSettings: ObservableObject {
     static let defaultSnapsByDragging = true
     static let defaultResizesTogether = true
     static let defaultFillsSpace = true
+    static let defaultFrostedPreview = false
     static let defaultArrangesAll = true
 
     /// A shortcut (⌃⌥Space unless changed) shares the screen evenly among all its windows.
@@ -103,6 +109,7 @@ final class WindowSnappingSettings: ObservableObject {
             Keys.snapsByDragging: Self.defaultSnapsByDragging,
             Keys.resizesTogether: Self.defaultResizesTogether,
             Keys.fillsSpace: Self.defaultFillsSpace,
+            Keys.frostedPreview: Self.defaultFrostedPreview,
             Keys.edgeArea: Self.defaultEdgeArea,
             Keys.gestures: SnapGesture.defaults.map(\.rawValue),
             Keys.arrangesAll: Self.defaultArrangesAll,
@@ -111,13 +118,14 @@ final class WindowSnappingSettings: ObservableObject {
         snapsByDragging = defaults.bool(forKey: Keys.snapsByDragging)
         resizesTogether = defaults.bool(forKey: Keys.resizesTogether)
         fillsSpace = defaults.bool(forKey: Keys.fillsSpace)
+        frostedPreview = defaults.bool(forKey: Keys.frostedPreview)
         edgeArea = defaults.double(forKey: Keys.edgeArea)
         gestures = Set((defaults.stringArray(forKey: Keys.gestures) ?? []).compactMap(SnapGesture.init(rawValue:)))
         arrangesAll = defaults.bool(forKey: Keys.arrangesAll)
         keyCodes = (defaults.dictionary(forKey: Keys.keyCodes) as? [String: NSNumber] ?? [:]).mapValues(\.uint32Value)
     }
 
-    /// Back to how dragging, resizing, gestures, Arrange All and the shortcut keys start out; the
+    /// Back to how dragging, the preview, resizing, gestures, Arrange All and the shortcut keys start out; the
     /// on/off switch stays.
     func reset() {
         arrangesAll = Self.defaultArrangesAll
@@ -125,6 +133,7 @@ final class WindowSnappingSettings: ObservableObject {
         snapsByDragging = Self.defaultSnapsByDragging
         resizesTogether = Self.defaultResizesTogether
         fillsSpace = Self.defaultFillsSpace
+        frostedPreview = Self.defaultFrostedPreview
         edgeArea = Self.defaultEdgeArea
         gestures = SnapGesture.defaults
     }
@@ -135,6 +144,7 @@ final class WindowSnappingSettings: ObservableObject {
         static let resizesTogether = "windowSnappingResizesTogether"
         static let edgeArea = "windowSnappingEdgeArea"
         static let fillsSpace = "windowSnappingFillsSpace"
+        static let frostedPreview = "windowSnappingFrostedPreview"
         static let gestures = "windowSnappingGestures"
         static let arrangesAll = "windowSnappingArrangesAll"
         static let keyCodes = "windowSnappingKeyCodes"
