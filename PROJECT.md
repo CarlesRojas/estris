@@ -4,7 +4,7 @@ The app was called PasteRing. On the first launch as Estris (new bundle identifi
 
 What the app does and how the code is organized. For building and running, see README.md.
 
-A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Focus Follows Mouse, Dock Preview, Keep Awake, Color Picker and Volume Mixer.
+A native macOS menu bar app with a set of utilities: Clipboard (a history of copied items to pick from when pasting), Auto Quit, Middle Click, Remap, Window Snapping, Focus Follows Mouse, Dock Preview, Keep Awake, Rounded Corners, Color Picker and Volume Mixer.
 
 ## Usage
 
@@ -22,11 +22,11 @@ History is saved in `~/Library/Application Support/Estris` (readable by your use
 
 Every utility is off at first, so nothing asks for a permission until one that needs it is turned on. Settings opens whenever Estris is opened by hand (double-clicking it in Applications, also while it's running), not when it opens at login (`keyAELaunchedAsLogInItem` in the launch event). While Accessibility isn't allowed, Estris checks every 2 seconds; once it is, Estris opens again (Settings too, if it was open) so the utilities that set themselves up at launch get it.
 
-Open **Settings** from the menu bar menu, or by opening Estris again. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Dock Preview, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
+Open **Settings** from the menu bar menu, or by opening Estris again. The sidebar (with search) has **General**, **Menu Bar** (and **Developer**, when unlocked) right under the search field, then the utilities in three groups, each under a small faint title: **Tools** (Clipboard, Color Picker, Volume Mixer, Keep Awake, Rounded Corners), **Windows & Apps** (Window Snapping, Focus Follows Mouse, Dock Preview, Auto Quit) and **Keyboard & Mouse** (Remap, Middle Click). A search hides groups with no match; each utility shows whether it is **On** or **Off** at the right of its row (in English in every language), and its pane starts with a switch to turn it on or off.
 
 Look and accessibility, kept the same everywhere: sidebar icons stay in the label color (the accent color clashes with the selected row); the switches inside a pane are the mini size (`RowSwitchStyle`, as System Settings), the utility's own switch in its header stays large; warnings under a row are an orange triangle with secondary text (`WarningLabel`), never orange text; icon-only buttons carry a VoiceOver label matching their tooltip; section headers use title case; the window shows the app's name, **Estris**, as its title at the top of the right column. With Reduce Motion, the clipboard overlay's styles move the selection without springs or slides, and the snap preview only fades.
 
-Every utility that needs permissions starts its pane (below its on/off switch) with a **Permissions** section: each permission it needs with, in plain words, the one thing it is used for (for example Screen Recording: only to show a thumbnail of what each window shows), whether it is allowed (System Audio Recording read through the private `TCCAccessPreflight`, macOS having no public way; it often can't tell even once allowed, so sound coming through a Volume Mixer tap is remembered as proof it is), and a button to its System Settings page when it isn't or can't be told. While one is known not to be allowed, an orange line says what still works without it, and the utility works that way: Clipboard records and copies the picked entry (no paste), Remap keeps key-to-key mappings, Volume Mixer keeps the output and microphone (each app's row is disabled and no app is tapped, which would only silence it), Color Picker uses macOS's loupe, Dock Preview shows app icons instead of thumbnails; Auto Quit, Middle Click, Window Snapping and Focus Follows Mouse can't do anything without Accessibility. Once allowed, the full behavior applies without changing any setting. Turning a utility on while one of its permissions isn't allowed opens an alert, "Allow what <utility> needs?", listing each missing permission and what it is for; **Allow** asks macOS for them (its own prompt for Accessibility, and for Screen Recording the first time; the System Settings page after that and for System Audio Recording, which has no public way to ask), **Not Now** leaves the utility on, working without them. Utilities that need none (Keep Awake) have no such section; an optional one (Color Picker's Screen Recording) says so.
+Every utility that needs permissions starts its pane (below its on/off switch) with a **Permissions** section: each permission it needs with, in plain words, the one thing it is used for (for example Screen Recording: only to show a thumbnail of what each window shows), whether it is allowed (System Audio Recording read through the private `TCCAccessPreflight`, macOS having no public way; it often can't tell even once allowed, so sound coming through a Volume Mixer tap is remembered as proof it is), and a button to its System Settings page when it isn't or can't be told. While one is known not to be allowed, an orange line says what still works without it, and the utility works that way: Clipboard records and copies the picked entry (no paste), Remap keeps key-to-key mappings, Volume Mixer keeps the output and microphone (each app's row is disabled and no app is tapped, which would only silence it), Color Picker uses macOS's loupe, Dock Preview shows app icons instead of thumbnails; Auto Quit, Middle Click, Window Snapping and Focus Follows Mouse can't do anything without Accessibility. Once allowed, the full behavior applies without changing any setting. Turning a utility on while one of its permissions isn't allowed opens an alert, "Allow what <utility> needs?", listing each missing permission and what it is for; **Allow** asks macOS for them (its own prompt for Accessibility, and for Screen Recording the first time; the System Settings page after that and for System Audio Recording, which has no public way to ask), **Not Now** leaves the utility on, working without them. Utilities that need none (Keep Awake, Rounded Corners) have no such section; an optional one (Color Picker's Screen Recording) says so.
 
 Every pane but General, Remap and Developer ends with **Reset to Defaults**, which puts that pane's settings back to how they start out. It leaves the utility's on/off switch, excluded apps, the clipboard history and Open at login as they are.
 
@@ -200,6 +200,14 @@ Keeps the Mac and its display awake until it has been idle for a chosen time, th
 - Plugging in or out (IOKit power source notifications) applies the other choice at once. "Don't keep awake" pauses it; "Indefinitely" always holds.
 - **Status** (while on): the power source; the state, refreshed every second while the pane is open (Active while the Mac is used, meaning input within the last second, or while another app keeps the display on; Inactive while counting down; Inactive, macOS sleep settings apply once the time is up; Always on; Not keeping awake); and, while counting, **Sleeps in** with a countdown of whole seconds left (full while the Mac is used, 0:00 during the last second) that ticks while the pane is open.
 
+## Rounded Corners
+
+Paints the corners of every screen black, as if the screens themselves had rounded corners. Turn it on with the switch in **Settings > Rounded Corners** (off by default).
+
+- **Radius** (2 to 40 points): how round the corners are. By default as round as macOS's window corners (16 points from macOS 26, 10 before), so a window filling the screen, which touches its edges, is concentric with them. The corners follow the slider as it moves.
+- Each corner is a small borderless window (twice the radius on each side) that lets clicks through, at the screen saver level so it covers the menu bar, the Dock and full screen apps, on every Space. A shape layer fills what lies outside the screen's continuous rounded outline (the same curve as SwiftUI's `RoundedRectangle(style: .continuous)`). The windows are kept and moved rather than made again, and redone when screens are added, removed or rearranged.
+- Left out of screenshots and screen recordings (`sharingType = .none`), where real screen corners wouldn't show.
+
 ## Color Picker
 
 Picks a color anywhere on screen with a shortcut and copies it. Off by default; turn it on in **Settings > Color Picker**.
@@ -285,6 +293,10 @@ Sources/Estris/
       KeepAwake.swift          owns the utility: power assertion and timer
       Model/                   settings, status, power source
       Settings/                the Keep Awake pane
+    RoundedCorners/
+      RoundedCorners.swift     owns the utility: a black corner window per screen corner
+      Model/                   settings (on/off, radius)
+      Settings/                the Rounded Corners pane
     Remap/
       Remap.swift              owns the utility and its event tap
       Model/                   settings, devices, key catalog, system actions, key mapper, event log

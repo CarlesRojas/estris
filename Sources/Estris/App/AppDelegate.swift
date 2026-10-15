@@ -17,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var focusFollowsMouse = FocusFollowsMouse(log: log)
     private lazy var dockPreview = DockPreview(log: log)
     private lazy var keepAwake = KeepAwake(log: log)
+    private let roundedCorners = RoundedCorners()
     private let colorPicker = ScreenColorPicker()
     private lazy var volumeMixer = VolumeMixer(log: log)
     private var settingsWindow: SettingsWindowController?
@@ -46,6 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         focusFollowsMouse.start()
         dockPreview.start()
         keepAwake.start()
+        roundedCorners.start()
         colorPicker.start()
         volumeMixer.start()
         menuBar.start()
@@ -93,7 +95,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, dockPreview: dockPreview, keepAwake: keepAwake, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, dockPreview: dockPreview, keepAwake: keepAwake, roundedCorners: roundedCorners, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
         }
         settingsWindow?.show()
     }

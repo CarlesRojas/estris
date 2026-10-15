@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New utility, Rounded Corners: paints the corners of your screens black so they look rounded, as round as macOS windows by default, with a slider to change it. Off by default.
+
 ## 0.1.10 - 2026-10-14
 
 - Window Snapping can show the drag preview frosted instead of dark: turn on **Frosted preview** in its Dragging settings. The preview now also stays behind the window you're dragging.
