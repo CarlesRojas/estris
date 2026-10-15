@@ -1,10 +1,9 @@
 ---
 import Cursor from "../Cursor.astro";
 import { pointer, presses, pop, EASE } from "../../lib/motion";
-/** A window filling a square-cornered screen below the menu bar, its own corners rounded, so
-    slivers of wallpaper show at the screen's bottom corners. A click on Rounded Corners' switch
-    rounds the screen's corners off in black, exactly along the window's curve; a second click
-    squares them up again, so it loops. */
+/** A square-cornered window filling a square-cornered screen below the menu bar. A click on
+    Rounded Corners' switch rounds the screen's corners off in black, as round as the menu bar is
+    tall; a second click squares them up again, so it loops. */
 const { d } = Astro.props;
 // The switch is at (70.5%, 55%) of the screen.
 const css = [
@@ -52,17 +51,10 @@ const css = [
 </div>
 
 <style is:global>
-  /* --r is the corners' radius: the window's, and the screen's once on, so the two curves meet. */
-  .s-rc { --r: 6cqw; --menubar: 4cqw; }
-  /* Square corners, as most displays have, and a bright wallpaper that shows in the window's
-     corners until the screen's own round off. */
-  .s-rc .rc-screen {
-    border-radius: 0.4cqw;
-    background:
-      radial-gradient(circle at 8% 100%, rgba(79, 209, 197, .95), transparent 40%),
-      radial-gradient(circle at 92% 100%, rgba(183, 148, 246, .9), transparent 40%),
-      linear-gradient(160deg, #3b3f58, #23242e);
-  }
+  /* --r is the screen's corner radius once on: the menu bar's height. */
+  .s-rc { --menubar: 4cqw; --r: var(--menubar); }
+  /* Square corners, as most displays have. */
+  .s-rc .rc-screen { border-radius: 0.4cqw; }
   /* Menus and status items kept clear of the corners. */
   .s-rc .rc-menubar {
     position: absolute; left: 0; right: 0; top: 0; height: var(--menubar); display: flex; align-items: center; justify-content: space-between;
@@ -72,10 +64,9 @@ const css = [
   .s-rc .rc-menubar i { width: 1.6cqw; height: 1.6cqw; border-radius: 50%; background: rgba(255, 255, 255, .85); }
   .s-rc .rc-menubar b { width: 4.5cqw; height: 1cqw; border-radius: 1cqw; background: rgba(255, 255, 255, .45); }
   .s-rc .rc-status b { width: 2.6cqw; }
-  /* Fills the screen under the menu bar, as a zoomed window does, with a window's rounded corners. */
+  /* Fills the screen under the menu bar, as a zoomed window does. */
   .s-rc .rc-win {
-    left: 0; right: 0; top: var(--menubar); bottom: 0; border-radius: 1cqw 1cqw var(--r) var(--r);
-    box-shadow: 0 0 0 0.2cqw rgba(255, 255, 255, .1); background: #26272d;
+    left: 0; right: 0; top: var(--menubar); bottom: 0; border-radius: 0; box-shadow: none; background: #26272d;
   }
   .s-rc .rc-win .bar { height: 4cqw; padding-left: 2cqw; gap: 0.8cqw; }
   .s-rc .rc-win .bar i { width: 1.3cqw; height: 1.3cqw; }
