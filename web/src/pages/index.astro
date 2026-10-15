@@ -1,11 +1,11 @@
 ---
 import "../styles/spot.css";
 import "../styles/site.css";
-import { features } from "../data/features";
+import { features, toolCount, ToolCount } from "../data/features";
 import { spots } from "../components/spots";
 import { DOWNLOAD_URL, MIN_MACOS, MIN_STARS_SHOWN, REPO_URL, SITE_URL } from "../config";
 
-const description = "Ten small utilities for your Mac in one menu bar app: window snapping, clipboard history, a volume mixer and more. Free.";
+const description = `${ToolCount} small utilities for your Mac in one menu bar app: window snapping, clipboard history, a volume mixer and more. Free.`;
 const year = new Date().getFullYear();
 ---
 <!doctype html>
@@ -93,7 +93,7 @@ const year = new Date().getFullYear();
     <footer class="foot">
       <div class="foot-cta">
         <img src="/icon.svg" alt="" width="40" height="40" />
-        <p class="foot-title">All ten tools, free.</p>
+        <p class="foot-title">All {toolCount} tools, free.</p>
         <a class="button" href={DOWNLOAD_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
         <p class="note">{MIN_MACOS}</p>
       </div>
