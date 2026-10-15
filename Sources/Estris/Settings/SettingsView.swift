@@ -14,6 +14,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case focusFollowsMouse
     case dockPreview
     case keepAwake
+    case roundedCorners
     case colorPicker
     case volumeMixer
     /// Hidden until unlocked from the version in General > About.
@@ -33,6 +34,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .focusFollowsMouse: String(localized: "Focus Follows Mouse")
         case .dockPreview: String(localized: "Dock Preview")
         case .keepAwake: String(localized: "Keep Awake")
+        case .roundedCorners: String(localized: "Rounded Corners")
         case .colorPicker: String(localized: "Color Picker")
         case .volumeMixer: String(localized: "Volume Mixer")
         case .developer: String(localized: "Developer")
@@ -51,6 +53,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .focusFollowsMouse: "cursorarrow.rays"
         case .dockPreview: "dock.rectangle"
         case .keepAwake: "cup.and.saucer"
+        case .roundedCorners: "display"
         case .colorPicker: "eyedropper"
         case .volumeMixer: "speaker.wave.2"
         case .developer: "hammer"
@@ -74,6 +77,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["color", "colour", "picker", "eyedropper", "hex", "rgb", "hsl", "swiftui", "sample"]
         case .keepAwake:
             ["awake", "sleep", "caffeinate", "display", "battery", "power", "timer"]
+        case .roundedCorners:
+            ["corners", "round", "radius", "screen", "display", "black"]
         case .dockPreview:
             ["dock", "preview", "thumbnail", "window", "hover", "close", "desktop", "screen recording"]
         case .focusFollowsMouse:
@@ -119,7 +124,7 @@ enum SettingsGroup: CaseIterable, Identifiable {
     var panes: [SettingsPane] {
         switch self {
         case .app: [.general, .menuBar, .developer]
-        case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake]
+        case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake, .roundedCorners]
         case .windows: [.windowSnapping, .focusFollowsMouse, .dockPreview, .autoQuit]
         case .input: [.remap, .middleClick]
         }
@@ -184,6 +189,7 @@ struct SettingsSidebar: View {
     @ObservedObject var focusFollowsMouseSettings: FocusFollowsMouseSettings
     @ObservedObject var dockPreviewSettings: DockPreviewSettings
     @ObservedObject var keepAwakeSettings: KeepAwakeSettings
+    @ObservedObject var roundedCornersSettings: RoundedCornersSettings
     @ObservedObject var colorPickerSettings: ColorPickerSettings
     @ObservedObject var volumeMixerSettings: VolumeMixerSettings
 
@@ -236,6 +242,7 @@ struct SettingsSidebar: View {
         case .focusFollowsMouse: focusFollowsMouseSettings.isEnabled
         case .dockPreview: dockPreviewSettings.isEnabled
         case .keepAwake: keepAwakeSettings.isEnabled
+        case .roundedCorners: roundedCornersSettings.isEnabled
         case .colorPicker: colorPickerSettings.isEnabled
         case .volumeMixer: volumeMixerSettings.isEnabled
         case .developer: nil
@@ -256,6 +263,7 @@ struct SettingsDetail: View {
     let focusFollowsMouse: FocusFollowsMouse
     let dockPreview: DockPreview
     let keepAwake: KeepAwake
+    let roundedCorners: RoundedCorners
     let colorPicker: ScreenColorPicker
     let volumeMixer: VolumeMixer
     let menuBarSettings: MenuBarSettings
@@ -285,6 +293,8 @@ struct SettingsDetail: View {
                     dockPreview.settingsPane()
                 case .keepAwake:
                     keepAwake.settingsPane()
+                case .roundedCorners:
+                    roundedCorners.settingsPane()
                 case .colorPicker:
                     colorPicker.settingsPane()
                 case .volumeMixer:

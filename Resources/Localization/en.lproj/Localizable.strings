@@ -78,6 +78,7 @@
 "Button %lld" = "Button %lld";
 "Button 4 (Back)" = "Button 4 (Back)";
 "Button 5 (Forward)" = "Button 5 (Forward)";
+"By default, as round as the corners of macOS windows, so a window filling the screen fits them." = "By default, as round as the corners of macOS windows, so a window filling the screen fits them.";
 "Cancel" = "Cancel";
 "Caps Lock" = "Caps Lock";
 "Carousel" = "Carousel";
@@ -296,6 +297,7 @@
 "process %d" = "process %d";
 "Quit" = "Quit";
 "Quits an app when you close its last window." = "Quits an app when you close its last window.";
+"Radius" = "Radius";
 "Recent Colors" = "Recent Colors";
 "Record from %@" = "Record from %@";
 "Record images" = "Record images";
@@ -329,6 +331,8 @@
 "Right Two Thirds" = "Right Two Thirds";
 "Ring menu" = "Ring menu";
 "Ring shows" = "Ring shows";
+"Rounded Corners" = "Rounded Corners";
+"Rounds the corners of your screens by painting them black." = "Rounds the corners of your screens by painting them black.";
 "Same as System" = "Same as System";
 "Saves every Estris setting to a file, to keep or use on another Mac. The clipboard history isn't included." = "Saves every Estris setting to a file, to keep or use on another Mac. The clipboard history isn't included.";
 "Screen Recording" = "Screen Recording";
