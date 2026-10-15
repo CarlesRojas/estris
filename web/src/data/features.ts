@@ -78,6 +78,15 @@ export const features: Feature[] = [
     icon: '<path d="M4.5 9h11v4.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 3.5c-.8 1 .8 1.6 0 2.8M12 3.5c-.8 1 .8 1.6 0 2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
   },
   {
+    id: "rounded-corners",
+    title: "Rounded Corners",
+    tagline: "Rounded corners for any screen.",
+    details: "Turn it on and the corners of every screen round off, as round as your windows. A slider makes them rounder or subtler.",
+    seconds: 8,
+    accent: "#4fd1c5",
+    icon: '<path d="M3.5 9.5V7.5a4 4 0 0 1 4-4h2M14.5 3.5h2a4 4 0 0 1 4 4v2M20.5 14.5v2a4 4 0 0 1-4 4h-2M9.5 20.5h-2a4 4 0 0 1-4-4v-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  },
+  {
     id: "remap",
     title: "Remap",
     tagline: "Make every key and button do what you want.",
@@ -105,3 +114,11 @@ export const features: Feature[] = [
     icon: '<rect x="4" y="4" width="16" height="16" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   },
 ];
+
+/** How many tools, as a word ("eleven"), for copy that names the count. */
+export const toolCount =
+  ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen"][features.length] ??
+  String(features.length);
+
+/** The same, capitalized to start a sentence. */
+export const ToolCount = toolCount[0].toUpperCase() + toolCount.slice(1);

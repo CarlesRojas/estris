@@ -5,6 +5,7 @@ import DockPreview from "./DockPreview.astro";
 import ColorPicker from "./ColorPicker.astro";
 import FocusFollowsMouse from "./FocusFollowsMouse.astro";
 import KeepAwake from "./KeepAwake.astro";
+import RoundedCorners from "./RoundedCorners.astro";
 import Remap from "./Remap.astro";
 import MiddleClick from "./MiddleClick.astro";
 import AutoQuit from "./AutoQuit.astro";
@@ -18,6 +19,7 @@ export const spots: Record<string, any> = {
   "color-picker": ColorPicker,
   "focus-follows-mouse": FocusFollowsMouse,
   "keep-awake": KeepAwake,
+  "rounded-corners": RoundedCorners,
   remap: Remap,
   "middle-click": MiddleClick,
   "auto-quit": AutoQuit,
