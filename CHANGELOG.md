@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.1.11 - 2026-10-15
+
 - New utility, Rounded Corners: paints the corners of your screens black so they look rounded, as round as macOS windows by default, with a slider to change it. Off by default.
+- Performance improvements and bug fixes.
 
 ## 0.1.10 - 2026-10-14
 
