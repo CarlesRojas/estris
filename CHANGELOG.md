@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.1.12 - 2026-10-17
+
 - Auto Quit now quits Safari when you close its last window.
+- Performance improvements and bug fixes.
 
 ## 0.1.11 - 2026-10-15
 
