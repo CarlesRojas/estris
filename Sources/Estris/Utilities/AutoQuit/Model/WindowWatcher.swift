@@ -320,11 +320,13 @@ final class WindowWatcher {
     /// windows after its last one closes, so counting those meant nothing was ever quit.
     /// An off-screen window counts only when it has a title, which macOS reports for other
     /// apps' windows only with the Screen Recording permission; without it, a window on
-    /// another desktop can't be told apart from a hidden one.
+    /// another desktop can't be told apart from a hidden one. It must also be on a desktop:
+    /// Safari keeps its closed windows, titled but on none, to reopen them.
     private static func hasWindowServerWindow(pid: pid_t, offscreenOnly: Bool) -> Bool {
         guard let list = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
             return false
         }
+        let canReadSpaces = !Spaces.displays().isEmpty
         return list.contains { window in
             guard (window[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value == pid,
                   (window[kCGWindowLayer as String] as? NSNumber)?.intValue == 0,
@@ -338,7 +340,10 @@ final class WindowWatcher {
                 return !offscreenOnly
             }
             let title = window[kCGWindowName as String] as? String ?? ""
-            return !title.isEmpty
+            guard !title.isEmpty else { return false }
+            // When desktops can't be read, a titled window is trusted as before.
+            guard canReadSpaces, let id = (window[kCGWindowNumber as String] as? NSNumber)?.uint32Value else { return true }
+            return Spaces.isOnHiddenSpace(id)
         }
     }
 
