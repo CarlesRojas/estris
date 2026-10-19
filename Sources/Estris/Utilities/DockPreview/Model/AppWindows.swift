@@ -114,6 +114,8 @@ enum AppWindows {
         guard let element = element(for: window.id, pid: app.processIdentifier),
               let button = AXUI.element(element, kAXCloseButtonAttribute)
         else { return }
+        // Auto Quit then treats it as closed by the person, not by the app.
+        NotificationCenter.default.post(name: WindowWatcher.userClosedWindowNotification, object: nil, userInfo: ["pid": app.processIdentifier])
         AXUIElementPerformAction(button, kAXPressAction as CFString)
     }
 

@@ -10,6 +10,11 @@ import ApplicationServices
 /// closed. If none are left, the app is asked to quit after the chosen delay (a normal quit,
 /// so unsaved changes can still be saved).
 ///
+/// Apps also close windows on their own to open another (Android Studio closes its project
+/// picker, then opens the project), so the chosen delay applies only when the person closed
+/// the window: its close button, a close menu item or ⌘W. Any other close waits longer for
+/// a new window first.
+///
 /// Left alone: apps never seen with a window, menu bar and background apps, hidden apps,
 /// excluded apps, and apps that may still have a window the Accessibility API can't see,
 /// such as one on another desktop.
@@ -31,6 +36,15 @@ final class WindowWatcher {
     /// Looks again, from the first miss, when a window isn't watched yet: the Accessibility
     /// API often lists a new window late, and a window nobody watches closes silently.
     private static let windowRetryOffsets: [TimeInterval] = [0.5, 1.5, 4.0]
+    /// How long an app that closed its last window on its own is given to open another.
+    private static let appCloseDelay: TimeInterval = 10
+    /// How long before (or, while the click is being looked at, after) a window closes the
+    /// person's request to close it counts; a sheet asking to save can stand in between.
+    private static let closeRequestWindow: ClosedRange<TimeInterval> = -0.5...3
+
+    /// Posted with the app's pid (`"pid"`) by other utilities that close a window for the
+    /// person, as Dock Preview's close button does.
+    static let userClosedWindowNotification = Notification.Name("EstrisAutoQuitUserClosedWindow")
 
     private let settings: AutoQuitSettings
     private var isRunning = false
@@ -46,7 +60,13 @@ final class WindowWatcher {
     private var attachRetries: Set<pid_t> = []
     /// Apps in a round of window retries: when the round started and how many looks are queued.
     private var windowRetries: [pid_t: (origin: DispatchTime, scheduled: Int)] = [:]
+    /// Last time the person asked each app to close a window.
+    private var closeRequests: [pid_t: Date] = [:]
+    /// Last time each app's window closed.
+    private var lastClose: [pid_t: Date] = [:]
     private var workspaceTokens: [NSObjectProtocol] = []
+    private var inputMonitor: Any?
+    private var closeToken: NSObjectProtocol?
 
     private let appLog: AppLog
 
@@ -78,6 +98,14 @@ final class WindowWatcher {
                 MainActor.assumeIsolated { self?.refreshAll() }
             },
         ]
+        closeToken = NotificationCenter.default.addObserver(forName: Self.userClosedWindowNotification, object: nil, queue: .main) { [weak self] note in
+            MainActor.assumeIsolated {
+                (note.userInfo?["pid"] as? pid_t).map { self?.closeRequests[$0] = Date() }
+            }
+        }
+        inputMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .keyDown]) { [weak self] event in
+            MainActor.assumeIsolated { self?.noteCloseRequest(event) }
+        }
         NSWorkspace.shared.runningApplications.forEach(attach)
         log("started, watching \(observers.count) apps, Accessibility \(AXIsProcessTrusted() ? "granted" : "NOT granted")")
     }
@@ -89,12 +117,68 @@ final class WindowWatcher {
         let center = NSWorkspace.shared.notificationCenter
         workspaceTokens.forEach(center.removeObserver)
         workspaceTokens = []
+        if let closeToken { NotificationCenter.default.removeObserver(closeToken) }
+        closeToken = nil
+        if let inputMonitor { NSEvent.removeMonitor(inputMonitor) }
+        inputMonitor = nil
         Array(observers.keys).forEach(detach)
         hadWindows = []
         fullScreenWindows = [:]
         lastCheckRound = [:]
         attachRetries = []
         windowRetries = [:]
+        closeRequests = [:]
+        lastClose = [:]
+    }
+
+    // MARK: - Close requests
+
+    /// Notes ⌘W in the app in front, and clicks on a close button or a close menu item.
+    private func noteCloseRequest(_ event: NSEvent) {
+        if event.type == .keyDown {
+            guard event.modifierFlags.contains(.command), event.charactersIgnoringModifiers?.lowercased() == "w",
+                  let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier else { return }
+            closeRequests[pid] = Date()
+            return
+        }
+        guard let point = event.cgEvent?.location else { return }
+        let clicked = Date()
+        let timeout = Self.messagingTimeout
+        // Asking the app what was clicked can block, so it's done off the main thread.
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let pid = Self.closeControlOwner(at: point, timeout: timeout) else { return }
+            DispatchQueue.main.async {
+                MainActor.assumeIsolated { self?.closeRequests[pid] = clicked }
+            }
+        }
+    }
+
+    /// The app owning the window close button or close menu item (the one with ⌘W) at
+    /// `point`, if that's what is there.
+    nonisolated private static func closeControlOwner(at point: CGPoint, timeout: Float) -> pid_t? {
+        let systemWide = AXUIElementCreateSystemWide()
+        AXUIElementSetMessagingTimeout(systemWide, timeout)
+        var hit: AXUIElement?
+        guard AXUIElementCopyElementAtPosition(systemWide, Float(point.x), Float(point.y), &hit) == .success,
+              let hit else { return nil }
+        func string(_ attribute: String) -> String? {
+            var value: CFTypeRef?
+            AXUIElementCopyAttributeValue(hit, attribute as CFString, &value)
+            return value as? String
+        }
+        let isCloseButton = string(kAXSubroleAttribute) == kAXCloseButtonSubrole
+        let isCloseItem = string(kAXRoleAttribute) == kAXMenuItemRole
+            && string(kAXMenuItemCmdCharAttribute)?.uppercased() == "W"
+        guard isCloseButton || isCloseItem else { return nil }
+        var pid: pid_t = 0
+        guard AXUIElementGetPid(hit, &pid) == .success else { return nil }
+        return pid
+    }
+
+    /// Whether the app's last window closed because the person asked it to.
+    private func closedByPerson(pid: pid_t) -> Bool {
+        guard let closed = lastClose[pid], let request = closeRequests[pid] else { return false }
+        return Self.closeRequestWindow.contains(closed.timeIntervalSince(request))
     }
 
     // MARK: - Observers
@@ -167,6 +251,8 @@ final class WindowWatcher {
         lastCheckRound[pid] = nil
         attachRetries.remove(pid)
         windowRetries[pid] = nil
+        closeRequests[pid] = nil
+        lastClose[pid] = nil
     }
 
     private func refreshAll() {
@@ -218,6 +304,7 @@ final class WindowWatcher {
         guard let pid = observers.first(where: { CFEqual($0.value, observer) })?.key else { return }
         if notification == kAXUIElementDestroyedNotification as String {
             log("\(NSRunningApplication(processIdentifier: pid)?.localizedName ?? "pid \(pid)"): a window closed")
+            lastClose[pid] = Date()
             let wasFullScreen = fullScreenWindows[pid]?.contains { CFEqual($0, element) } ?? false
             fullScreenWindows[pid]?.removeAll { CFEqual($0, element) }
             if !check(pid: pid, closed: element, wasFullScreen: wasFullScreen) {
@@ -271,7 +358,7 @@ final class WindowWatcher {
 
         let delay = wasFullScreen ? max(Self.fullScreenConfirmDelay, settings.delay.interval) : settings.delay.interval
         guard delay > 0 else {
-            quit(app, name: name)
+            confirmQuit(app, name: name)
             return true
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
@@ -280,9 +367,30 @@ final class WindowWatcher {
             guard let windows = Self.standardWindows(pid: pid), windows.isEmpty,
                   !Self.hasWindowServerWindow(pid: pid, offscreenOnly: false)
             else { return self.log("\(name): a window came back, left running") }
-            self.quit(app, name: name)
+            self.confirmQuit(app, name: name)
         }
         return true
+    }
+
+    /// Quits now when the person closed the window; otherwise gives the app time to open
+    /// another one first, looking once more before quitting.
+    private func confirmQuit(_ app: NSRunningApplication, name: String) {
+        let pid = app.processIdentifier
+        guard !closedByPerson(pid: pid), let closed = lastClose[pid] else {
+            return quit(app, name: name)
+        }
+        let wait = Self.appCloseDelay - Date().timeIntervalSince(closed)
+        guard wait > 0 else { return quit(app, name: name) }
+        log("\(name): closed its window on its own, waiting for another one")
+        DispatchQueue.main.asyncAfter(deadline: .now() + wait) { [weak self] in
+            // A newer close starts its own wait.
+            guard let self, self.isRunning, !app.isTerminated, self.hadWindows.contains(pid),
+                  self.lastClose[pid] == closed else { return }
+            guard let windows = Self.standardWindows(pid: pid), windows.isEmpty,
+                  !Self.hasWindowServerWindow(pid: pid, offscreenOnly: false)
+            else { return self.log("\(name): opened another window, left running") }
+            self.quit(app, name: name)
+        }
     }
 
     private func quit(_ app: NSRunningApplication, name: String) {

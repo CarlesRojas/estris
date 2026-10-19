@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Focus Follows Mouse also keeps new windows and popups in front for a moment (like a browser's screen sharing picker), so they no longer go behind as soon as you move the pointer. The time it keeps them in front now defaults to 2 seconds instead of 5.
+- Auto Quit no longer quits apps that close a window to open another, like Android Studio after you pick a project. When an app closes its last window on its own, it gets 10 seconds to open a new one.
 
 ## 0.1.12 - 2026-10-17
 
