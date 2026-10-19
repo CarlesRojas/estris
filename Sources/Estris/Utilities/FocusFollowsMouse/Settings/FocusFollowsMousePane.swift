@@ -57,8 +57,8 @@ struct FocusFollowsMousePane: View {
             }
             Section("Switching Apps") {
                 Toggle(isOn: $settings.keepsNewAppsInFront) {
-                    Text("Keep apps you open or switch to in front")
-                    Text("Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there.")
+                    Text("Keep new windows and apps you switch to in front")
+                    Text("New windows and popups, and apps opened, clicked or picked with ⌘Tab or in Mission Control, are often away from the pointer; this leaves time to get there.")
                 }
                 .resetMenu($settings.keepsNewAppsInFront, to: FocusFollowsMouseSettings.defaultKeepsNewAppsInFront)
                 LabeledContent("Keep them in front for") {

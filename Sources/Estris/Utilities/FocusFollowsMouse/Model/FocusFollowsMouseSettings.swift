@@ -32,7 +32,7 @@ final class FocusFollowsMouseSettings: ObservableObject {
 
     static let defaultPassThroughSpeed: Double = 800
     static let defaultKeepsNewAppsInFront = true
-    static let defaultNewAppSeconds: Double = 5
+    static let defaultNewAppSeconds: Double = 2
     static let newAppSecondsRange: ClosedRange<Double> = 1...15
     static let defaultDelay = HoverDelay.ms100
     static let passThroughSpeeds: ClosedRange<Double> = 200...3000

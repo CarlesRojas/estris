@@ -24,6 +24,13 @@ final class FocusFollowsMouse {
     private var focusedByHover: (pid: pid_t, time: Date)?
     /// The app the user last switched to (clicking it, ⌘Tab, Mission Control, the Dock), and when.
     private var switchedTo: (pid: pid_t, time: Date)?
+    /// Windows on screen, and when each was first seen: a new one (a dialog, a popup like a
+    /// browser's screen sharing picker) is kept in front for a while, like a new app.
+    private var windowsSeen: [CGWindowID: Date] = [:]
+    private var windowsCheckedAt: TimeInterval = 0
+    /// Until when windows appearing count as already there: after switching desktops, the
+    /// windows coming on screen aren't new.
+    private var windowsOldUntil: TimeInterval = 0
     private var pending: DispatchWorkItem?
     private var lastPoint: NSPoint?
     private var lastTime: TimeInterval = 0
@@ -59,7 +66,10 @@ final class FocusFollowsMouse {
         spaceObserver = nil
         if let activationObserver { NSWorkspace.shared.notificationCenter.removeObserver(activationObserver) }
         activationObserver = nil
+        windowsSeen = [:]
         guard active else { return }
+        windowsOldUntil = ProcessInfo.processInfo.systemUptime
+        checkWindows(at: windowsOldUntil)
 
         // A listen-only event tap: unlike a global event monitor, it also sees moves over
         // Estris's own windows (Settings).
@@ -85,6 +95,7 @@ final class FocusFollowsMouse {
                 self?.pending?.cancel()
                 self?.pending = nil
                 self?.candidate = 0
+                self?.windowsOldUntil = ProcessInfo.processInfo.systemUptime + 1
             }
         }
         // An app becoming active that hovering didn't bring forward: the user switched to it.
@@ -123,6 +134,7 @@ final class FocusFollowsMouse {
         }
         lastPoint = point
         lastTime = time
+        if time - windowsCheckedAt >= 0.2 { checkWindows(at: time) }
 
         let number = NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0)
         if number != candidate {
@@ -173,6 +185,12 @@ final class FocusFollowsMouse {
             let since = [front.launchDate, switchedTo.flatMap { $0.pid == front.processIdentifier ? $0.time : nil }]
                 .compactMap { $0 }.max()
             if let since, Date().timeIntervalSince(since) < settings.newAppSeconds { return }
+        }
+        // A window that just appeared, when the pointer isn't on it. Tried again on the next move.
+        if settings.keepsNewAppsInFront {
+            checkWindows(at: ProcessInfo.processInfo.systemUptime)
+            let recent = Date().addingTimeInterval(-settings.newAppSeconds)
+            if windowsSeen.contains(where: { $0.value > recent && $0.key != CGWindowID(max(number, 0)) }) { return }
         }
         isHandled = true
 
@@ -230,6 +248,27 @@ final class FocusFollowsMouse {
     }
 
     // MARK: Windows
+
+    /// Notes the normal windows on screen that weren't there before, and forgets those gone.
+    private func checkWindows(at time: TimeInterval) {
+        windowsCheckedAt = time
+        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        let ownPID = ProcessInfo.processInfo.processIdentifier
+        let isOld = time <= windowsOldUntil
+        var seen: [CGWindowID: Date] = [:]
+        for entry in list {
+            guard let id = entry[kCGWindowNumber as String] as? CGWindowID,
+                  entry[kCGWindowLayer as String] as? Int == 0,
+                  entry[kCGWindowOwnerPID as String] as? pid_t != ownPID,
+                  (entry[kCGWindowAlpha as String] as? Double ?? 1) > 0,
+                  let bounds = entry[kCGWindowBounds as String] as? NSDictionary,
+                  let rect = CGRect(dictionaryRepresentation: bounds as CFDictionary),
+                  rect.width >= 100, rect.height >= 60
+            else { continue }
+            seen[id] = windowsSeen[id] ?? (isOld ? .distantPast : Date())
+        }
+        windowsSeen = seen
+    }
 
     private struct WindowInfo {
         let pid: pid_t

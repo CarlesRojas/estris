@@ -174,7 +174,7 @@
 "Indefinitely" = "Indefinidamente";
 "Insert" = "Inserir";
 "It is running from where it was downloaded. In Applications it stays installed and can open at login." = "Ele está sendo executado de onde foi baixado. Em Aplicativos ele fica instalado e pode abrir ao iniciar a sessão.";
-"Keep apps you open or switch to in front" = "Manter na frente os apps que você abre ou para os quais muda";
+"Keep new windows and apps you switch to in front" = "Manter na frente janelas novas e apps para os quais você muda";
 "Keep Awake" = "Manter acordado";
 "Keep them in front for" = "Mantê-los na frente por";
 "Keep up to" = "Manter até";
@@ -268,7 +268,7 @@
 "Open Keyboard Shortcuts" = "Abrir Atalhos de Teclado";
 "Open overlay" = "Abrir o painel";
 "Open System Settings" = "Abrir Ajustes do Sistema";
-"Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there." = "Ao abri-los, clicar ou escolhê-los com ⌘Tab ou no Mission Control, eles costumam ficar longe do ponteiro; assim dá tempo de chegar lá.";
+"New windows and popups, and apps opened, clicked or picked with ⌘Tab or in Mission Control, are often away from the pointer; this leaves time to get there." = "Janelas novas e pop-ups, e apps que você abre, clica ou escolhe com ⌘Tab ou no Mission Control, costumam ficar longe do ponteiro; assim dá tempo de chegar lá.";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, apenas para mostrar a cor e seu valor sob a lupa enquanto você move o ponteiro.";
 "Other" = "Outras";
 "Other source" = "Outra origem";
