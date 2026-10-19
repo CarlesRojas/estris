@@ -174,7 +174,7 @@
 "Indefinitely" = "Indefinidament";
 "Insert" = "Insereix";
 "It is running from where it was downloaded. In Applications it stays installed and can open at login." = "S’està executant des d’on es va baixar. A Aplicacions queda instal·lat i es pot obrir en iniciar la sessió.";
-"Keep apps you open or switch to in front" = "Mantén al davant les apps que obres o a les quals canvies";
+"Keep new windows and apps you switch to in front" = "Mantén al davant les finestres noves i les apps a les quals canvies";
 "Keep Awake" = "Mantén despert";
 "Keep them in front for" = "Mantén-les al davant durant";
 "Keep up to" = "Conserva fins a";
@@ -268,7 +268,7 @@
 "Open Keyboard Shortcuts" = "Obre les dreceres de teclat";
 "Open overlay" = "Obre el tauler";
 "Open System Settings" = "Obre Configuració del Sistema";
-"Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there." = "En obrir-les, fer-hi clic o triar-les amb ⌘Tab o al Mission Control, sovint queden lluny del punter; així hi ha temps d’arribar-hi.";
+"New windows and popups, and apps opened, clicked or picked with ⌘Tab or in Mission Control, are often away from the pointer; this leaves time to get there." = "Les finestres noves i els popups, i les apps que obres, on fas clic o que tries amb ⌘Tab o al Mission Control, sovint queden lluny del punter; així hi ha temps d’arribar-hi.";
 "Optional, only to show the color and its value under the loupe while you move." = "Opcional, només per mostrar el color i el seu valor sota la lupa mentre mous el punter.";
 "Other" = "Altres";
 "Other source" = "Una altra font";

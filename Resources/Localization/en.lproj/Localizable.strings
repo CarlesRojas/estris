@@ -174,7 +174,7 @@
 "Indefinitely" = "Indefinitely";
 "Insert" = "Insert";
 "It is running from where it was downloaded. In Applications it stays installed and can open at login." = "It is running from where it was downloaded. In Applications it stays installed and can open at login.";
-"Keep apps you open or switch to in front" = "Keep apps you open or switch to in front";
+"Keep new windows and apps you switch to in front" = "Keep new windows and apps you switch to in front";
 "Keep Awake" = "Keep Awake";
 "Keep them in front for" = "Keep them in front for";
 "Keep up to" = "Keep up to";
@@ -268,7 +268,7 @@
 "Open Keyboard Shortcuts" = "Open Keyboard Shortcuts";
 "Open overlay" = "Open overlay";
 "Open System Settings" = "Open System Settings";
-"Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there." = "Opened, clicked, picked with ⌘Tab or in Mission Control, they are often away from the pointer; this leaves time to get there.";
+"New windows and popups, and apps opened, clicked or picked with ⌘Tab or in Mission Control, are often away from the pointer; this leaves time to get there." = "New windows and popups, and apps opened, clicked or picked with ⌘Tab or in Mission Control, are often away from the pointer; this leaves time to get there.";
 "Optional, only to show the color and its value under the loupe while you move." = "Optional, only to show the color and its value under the loupe while you move.";
 "Other" = "Other";
 "Other source" = "Other source";

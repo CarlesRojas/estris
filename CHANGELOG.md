@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Focus Follows Mouse also keeps new windows and popups in front for a moment (like a browser's screen sharing picker), so they no longer go behind as soon as you move the pointer. The time it keeps them in front now defaults to 2 seconds instead of 5.
+
 ## 0.1.12 - 2026-10-17
 
 - Auto Quit now quits Safari when you close its last window.
