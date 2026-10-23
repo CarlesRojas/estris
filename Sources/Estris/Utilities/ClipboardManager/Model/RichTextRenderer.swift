@@ -28,14 +28,13 @@ enum RichTextRenderer {
     private static func source(for item: ClipItem) -> NSAttributedString? {
         if let cached = sources[item.id] { return cached }
         guard let payload = ClipPayloadStore.load(item.id), let types = payload.first else { return nil }
-        // RTF first: HTML has to go through WebKit, which is slow.
+        // HTML isn't read: it goes through WebKit, which blocks the main thread for seconds
+        // (tens of seconds at launch), so HTML-only entries show as plain text.
         let source: NSAttributedString?
         if let rtf = types["public.rtf"] {
             source = NSAttributedString(rtf: rtf, documentAttributes: nil)
         } else if let rtfd = types["com.apple.flat-rtfd"] {
             source = NSAttributedString(rtfd: rtfd, documentAttributes: nil)
-        } else if let html = types["public.html"] {
-            source = NSAttributedString(html: html, documentAttributes: nil)
         } else {
             source = nil
         }

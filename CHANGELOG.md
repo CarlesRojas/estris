@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixed Estris freezing for up to half a minute when it opens, while the Clipboard history held text copied as HTML only (from some web pages and apps). Those entries now show as plain text; pasting them is unchanged.
+
 ## 0.1.13 - 2026-10-19
 
 - Focus Follows Mouse also keeps new windows and popups in front for a moment (like a browser's screen sharing picker), so they no longer go behind as soon as you move the pointer. The time it keeps them in front now defaults to 2 seconds instead of 5.
