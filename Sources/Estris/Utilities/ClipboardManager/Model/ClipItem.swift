@@ -1,9 +1,10 @@
 import Foundation
 
-/// What an entry holds. Everything but plain text keeps its full clipboard contents in a
-/// payload file, so pasting it gives back exactly what was copied.
+/// What an entry holds. Images and files keep their full clipboard contents in a payload
+/// file, so pasting them gives back exactly what was copied. Text is always plain.
 enum ClipKind: String, Codable {
     case text
+    /// Styled text recorded by older versions; shown and pasted as plain text.
     case richText
     case image
     case files

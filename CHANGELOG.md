@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fixed Estris freezing for up to half a minute when it opens, while the Clipboard history held text copied as HTML only (from some web pages and apps). Those entries now show as plain text; pasting them is unchanged.
+- Clipboard keeps text plain: it is recorded, shown and pasted without its styling, so the **Paste as plain text** setting is gone. This also fixes Estris freezing for up to half a minute when it opens, while the history held text copied from some web pages.
 
 ## 0.1.13 - 2026-10-19
 

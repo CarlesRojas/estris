@@ -28,13 +28,10 @@ struct SourceIcon: View {
     }
 }
 
-/// An entry's content: its text (styled, for rich text), the copied image, or the copied
-/// file names.
+/// An entry's content: its text, the copied image, or the copied file names.
 struct ClipContentView: View {
     let item: ClipItem
     var font: Font = .body
-    /// Point size of `font`, which rich text is scaled to.
-    var baseSize: CGFloat = 13
     /// One line with line breaks shown as ⏎, for small rows and chips.
     var singleLine = false
     /// Show an image whole inside the space it gets, instead of at full width (for cards
@@ -75,14 +72,7 @@ struct ClipContentView: View {
             }
         case .files:
             label(singleLine ? shownText.singleLine : shownText, symbol: item.text.contains("\n") ? "doc.on.doc" : "doc")
-        case .richText:
-            if let attributed = RichTextRenderer.attributed(for: item, baseSize: baseSize, singleLine: singleLine) {
-                Text(attributed)
-                    .truncationMode(.tail)
-            } else {
-                plainText
-            }
-        case .text:
+        case .text, .richText:
             plainText
         }
     }

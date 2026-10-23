@@ -90,7 +90,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .middleClick:
             ["trackpad", "mouse", "middle", "tap", "fingers", "click"]
         case .clipboard:
-            ["history", "paste", "search", "image", "file", "rich text", "excluded", "apps", "expiry", "shortcut", "hotkey", "keyboard", "password", "duplicate", "date", "delete", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
+            ["history", "paste", "search", "image", "file", "excluded", "apps", "expiry", "shortcut", "hotkey", "keyboard", "password", "duplicate", "date", "delete", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
         }
     }
 

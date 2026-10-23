@@ -126,7 +126,6 @@
 "Down Arrow" = "Pfeil nach unten";
 "Drag it to the Applications folder yourself, then open it from there." = "Ziehe es selbst in den Ordner „Programme“ und öffne es von dort.";
 "Dragging" = "Ziehen";
-"Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Entfernt Schriften, Farben und andere Formatierungen, damit eingesetzter Text zum Ziel passt.";
 "Edge area" = "Randbereich";
 "Editing" = "Bearbeiten";
 "Eject" = "Auswerfen";
@@ -275,7 +274,6 @@
 "Output" = "Ausgabe";
 "Page Down" = "Bild ab";
 "Page Up" = "Bild auf";
-"Paste as plain text" = "Als reinen Text einsetzen";
 "Pause" = "Pause";
 "Permissions" = "Berechtigungen";
 "Pick a color" = "Farbe aufnehmen";

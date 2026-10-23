@@ -8,15 +8,15 @@ A native macOS menu bar app with a set of utilities: Clipboard (a history of cop
 
 ## Usage
 
-- Copy as usual. Estris records text, rich text, images and files, most recent first, along with the app they were copied from (shown as its icon). Pasting an entry gives back exactly what was copied. The overlay shows images at the card's full width and rich text with its styling (fonts, bold and italic, colours, underline; copies that only carry HTML show as plain text, since reading HTML blocks the app). Copies that arrive from your other Apple devices through Universal Clipboard are recorded too, marked as coming from another device.
+- Copy as usual. Estris records text, images and files, most recent first, along with the app they were copied from (shown as its icon). Text is always kept, shown and pasted as plain text, without its styling (entries saved styled by older versions too). Pasting an image or files gives back exactly what was copied. The overlay shows images at the card's full width. Copies that arrive from your other Apple devices through Universal Clipboard are recorded too, marked as coming from another device.
 - Hold `⌘⇧` and press `V` to open the overlay in the middle of the screen. The highlighted entry is what will be pasted.
-- Stepping through the history stays quick from the first press: the latest 30 entries are prepared ahead (app icon and name, image decoded, rich text parsed; `ClipPreviewWarmer`), one per turn of the run loop so key presses go first, shortly after each copy and again in order when the overlay opens. Cards lay out only the first 3,000 characters of a text, and date formatters are reused.
+- Stepping through the history stays quick from the first press: the latest 30 entries are prepared ahead (app icon and name, image decoded; `ClipPreviewWarmer`), one per turn of the run loop so key presses go first, shortly after each copy and again in order when the overlay opens. Cards lay out only the first 3,000 characters of a text, and date formatters are reused.
 - Keep holding `⌘⇧` and press `V`, the arrow keys (`↑`/`←` previous, `↓`/`→` next), or scroll to move through entries.
 - Release `⌘` or `⇧` to paste the selected entry into the frontmost app.
 - `⌘⇧Esc` closes the overlay without pasting. `⌘⇧Delete` removes the selected entry from the history.
 - While holding `⌘⇧`, click any entry to paste it, click its trash icon to delete it, or click outside to close. Releasing always pastes the selected entry, not the one under the mouse.
 
-History is saved in `~/Library/Application Support/Estris` (readable by your user only), so it survives restarts. Rich text, images and files are kept in full, up to 25 MB per entry.
+History is saved in `~/Library/Application Support/Estris` (readable by your user only), so it survives restarts. Images and files are kept in full, up to 25 MB per entry.
 
 ## Settings
 
@@ -44,7 +44,6 @@ Every row with a setting (switch, slider, stepper, picker, color, shortcut key),
   - *General*: how many entries to keep (5 to 100, default 50), when to delete old entries (never by default, or after an hour, a day, a week or 30 days), and these switches:
     - **Ignore passwords**: skips text copied from password fields and password managers.
     - **Record images** (on): keeps copied images in the history.
-    - **Paste as plain text** (off): pastes rich text without its formatting.
     - **Remove duplicates**: copying something already in the history moves it to the top instead of adding it again.
     - **Move pasted entry to the top**: when off, the history keeps copy order and `⌘V` keeps pasting the last copied text after you paste an older entry.
   - *Appearance*, with a live preview over your wallpaper:
