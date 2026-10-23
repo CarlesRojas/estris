@@ -143,10 +143,9 @@ final class WindowWatcher {
         }
         guard let point = event.cgEvent?.location else { return }
         let clicked = Date()
-        let timeout = Self.messagingTimeout
         // Asking the app what was clicked can block, so it's done off the main thread.
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let pid = Self.closeControlOwner(at: point, timeout: timeout) else { return }
+            guard let pid = Self.closeControlOwner(at: point) else { return }
             DispatchQueue.main.async {
                 MainActor.assumeIsolated { self?.closeRequests[pid] = clicked }
             }
@@ -155,9 +154,10 @@ final class WindowWatcher {
 
     /// The app owning the window close button or close menu item (the one with ⌘W) at
     /// `point`, if that's what is there.
-    nonisolated private static func closeControlOwner(at point: CGPoint, timeout: Float) -> pid_t? {
+    nonisolated private static func closeControlOwner(at point: CGPoint) -> pid_t? {
         let systemWide = AXUIElementCreateSystemWide()
-        AXUIElementSetMessagingTimeout(systemWide, timeout)
+        // No timeout set here: on the system-wide element it would apply to every request
+        // Estris makes. This runs off the main thread, so the default wait is harmless.
         var hit: AXUIElement?
         guard AXUIElementCopyElementAtPosition(systemWide, Float(point.x), Float(point.y), &hit) == .success,
               let hit else { return nil }
