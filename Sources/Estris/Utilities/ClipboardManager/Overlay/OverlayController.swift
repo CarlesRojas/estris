@@ -65,16 +65,8 @@ final class OverlayController: NSObject {
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] items in
                 guard let self, !self.isVisible else { return }
-                self.warmer.warm(Array(items.prefix(Self.warmedEntries)), baseSize: self.cardTextSize)
+                self.warmer.warm(Array(items.prefix(Self.warmedEntries)))
             }
-    }
-
-    /// The size rich text is drawn at in the current style's cards.
-    private var cardTextSize: CGFloat {
-        switch settings.style {
-        case .simple, .stack: 15
-        case .grid, .carousel, .ring: 13
-        }
     }
 
     /// Opens the overlay, or moves to the next entry if it is already open. `shortcut` is
@@ -126,7 +118,7 @@ final class OverlayController: NSObject {
             panel.present(on: screen)
         }
         // The entries after the first, in the order the shortcut steps through them.
-        warmer.warm(Array(state.items.dropFirst()), baseSize: cardTextSize)
+        warmer.warm(Array(state.items.dropFirst()))
         NSAnimationContext.runAnimationGroup { context in
             context.duration = Self.fadeDuration
             panel.animator().alphaValue = 1
@@ -234,7 +226,7 @@ final class OverlayController: NSObject {
         if settings.moveToTopOnPaste {
             history.promote(item)
         }
-        monitor.write(item, plainText: settings.pasteAsPlainText)
+        monitor.write(item)
 
         guard Paster.isTrusted(prompt: true) else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {

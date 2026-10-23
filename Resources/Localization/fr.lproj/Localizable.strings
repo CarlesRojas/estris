@@ -126,7 +126,6 @@
 "Down Arrow" = "Flèche bas";
 "Drag it to the Applications folder yourself, then open it from there." = "Faites-le glisser vous-même dans le dossier Applications, puis ouvrez-le depuis celui-ci.";
 "Dragging" = "Glisser";
-"Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Supprime polices, couleurs et autres mises en forme pour que le texte collé s’adapte à sa destination.";
 "Edge area" = "Zone du bord";
 "Editing" = "Édition";
 "Eject" = "Éjecter";
@@ -275,7 +274,6 @@
 "Output" = "Sortie";
 "Page Down" = "Page suivante";
 "Page Up" = "Page précédente";
-"Paste as plain text" = "Coller en texte brut";
 "Pause" = "Pause";
 "Permissions" = "Autorisations";
 "Pick a color" = "Prélever une couleur";

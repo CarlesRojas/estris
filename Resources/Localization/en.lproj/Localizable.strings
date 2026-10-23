@@ -126,7 +126,6 @@
 "Down Arrow" = "Down Arrow";
 "Drag it to the Applications folder yourself, then open it from there." = "Drag it to the Applications folder yourself, then open it from there.";
 "Dragging" = "Dragging";
-"Drops fonts, colours and other formatting, so pasted text matches where it goes." = "Drops fonts, colours and other formatting, so pasted text matches where it goes.";
 "Edge area" = "Edge area";
 "Editing" = "Editing";
 "Eject" = "Eject";
@@ -275,7 +274,6 @@
 "Output" = "Output";
 "Page Down" = "Page Down";
 "Page Up" = "Page Up";
-"Paste as plain text" = "Paste as plain text";
 "Pause" = "Pause";
 "Permissions" = "Permissions";
 "Pick a color" = "Pick a color";

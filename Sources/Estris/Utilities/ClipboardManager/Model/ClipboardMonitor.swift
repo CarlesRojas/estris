@@ -2,7 +2,7 @@ import AppKit
 import ApplicationServices
 
 /// Polls the general pasteboard (macOS has no change notification) and records what is
-/// copied: text, rich text, images and files.
+/// copied: text (always plain), images and files.
 @MainActor
 final class ClipboardMonitor: NSObject {
     private let pasteboard = NSPasteboard.general
@@ -20,9 +20,6 @@ final class ClipboardMonitor: NSObject {
     private static let concealedType = NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType")
     /// Marks content that arrived through Universal Clipboard from another Apple device.
     private static let universalClipboardType = NSPasteboard.PasteboardType("com.apple.is-remote-clipboard")
-    private static let richTextTypes: Set<NSPasteboard.PasteboardType> = [
-        .rtf, .rtfd, .html, .init("com.apple.flat-rtfd"),
-    ]
     /// Larger copies (a huge image, say) are not kept.
     private static let maxPayloadBytes = 25 * 1024 * 1024
 
@@ -52,11 +49,11 @@ final class ClipboardMonitor: NSObject {
     }
 
     /// Puts an entry back on the pasteboard, exactly as it was copied, without recording it
-    /// as a new entry. With `plainText`, rich text goes back as its text only.
-    func write(_ item: ClipItem, plainText: Bool = false) {
+    /// as a new entry. Text goes back as plain text, also styled text saved by older versions.
+    func write(_ item: ClipItem) {
         pasteboard.clearContents()
-        let keepsFormatting = !(plainText && item.kind == .richText)
-        if keepsFormatting, item.hasPayload == true, let payload = ClipPayloadStore.load(item.id) {
+        let isText = item.kind == .text || item.kind == .richText
+        if !isText, item.hasPayload == true, let payload = ClipPayloadStore.load(item.id) {
             let objects = payload.map { types in
                 let pasteboardItem = NSPasteboardItem()
                 for (type, data) in types {
@@ -104,19 +101,18 @@ final class ClipboardMonitor: NSObject {
         history.add(item, removingDuplicates: settings.removeDuplicates)
     }
 
-    /// Plain text is kept as text only. Rich text, images and files keep every pasteboard
-    /// type, so pasting gives back the original.
+    /// Text is kept as plain text only, its styling dropped. Images and files keep every
+    /// pasteboard type, so pasting gives back the original.
     private func makeItem(types: [NSPasteboard.PasteboardType], source: String?, isFromOtherDevice: Bool) -> ClipItem? {
         let fileURLs = (pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL]) ?? []
         let string = pasteboard.string(forType: .string).flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
         let hasImage = types.contains(.png) || types.contains(.tiff)
-        let hasRichText = types.contains(where: Self.richTextTypes.contains)
 
         let kind: ClipKind
         if !fileURLs.isEmpty {
             kind = .files
         } else if string != nil {
-            kind = hasRichText ? .richText : .text
+            kind = .text
         } else if hasImage {
             guard settings.recordImages else { return nil }
             kind = .image

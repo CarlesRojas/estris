@@ -41,11 +41,6 @@ struct ClipboardSettingsForm: View {
                     Text("Keeps copied images in the history alongside text and files.")
                 }
                 .resetMenu($settings.recordImages, to: ClipboardSettings.Default.recordImages)
-                Toggle(isOn: $settings.pasteAsPlainText) {
-                    Text("Paste as plain text")
-                    Text("Drops fonts, colours and other formatting, so pasted text matches where it goes.")
-                }
-                .resetMenu($settings.pasteAsPlainText, to: ClipboardSettings.Default.pasteAsPlainText)
                 Toggle(isOn: $settings.removeDuplicates) {
                     Text("Remove duplicates")
                     Text("Copying something already in the history moves it to the top instead of adding it again.")

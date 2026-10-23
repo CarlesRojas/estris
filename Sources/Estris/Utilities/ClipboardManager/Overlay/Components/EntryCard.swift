@@ -36,7 +36,7 @@ struct EntryCard: View {
             }
             Group {
                 if let item {
-                    ClipContentView(item: item, font: .title3, baseSize: 15, fitsImageInside: !growsToFitImage)
+                    ClipContentView(item: item, font: .title3, fitsImageInside: !growsToFitImage)
                 } else {
                     Text("Clipboard history is empty")
                         .font(.title3)

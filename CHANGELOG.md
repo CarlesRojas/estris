@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Clipboard keeps text plain: it is recorded, shown and pasted without its styling, so the **Paste as plain text** setting is gone. This also fixes Estris freezing for up to half a minute when it opens, while the history held text copied from some web pages.
+
 ## 0.1.13 - 2026-10-19
 
 - Focus Follows Mouse also keeps new windows and popups in front for a moment (like a browser's screen sharing picker), so they no longer go behind as soon as you move the pointer. The time it keeps them in front now defaults to 2 seconds instead of 5.
