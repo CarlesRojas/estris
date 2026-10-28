@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.1.15 - 2026-10-28
+
 - New utility, Delete to Trash: Delete deletes what's selected, as on Windows, in Finder, Photos, Notes and any app with a ⌘⌫ command. Shift-Delete deletes without going to the Trash. Each key can be turned off, and apps excluded. Typing works as usual. Off by default.
+- Performance improvements and bug fixes.
 
 ## 0.1.14 - 2026-10-23
 
