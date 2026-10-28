@@ -112,13 +112,16 @@ Middle click from the trackpad, which macOS doesn't offer. Off by default; turn 
 
 ## Delete to Trash
 
-Delete moves files to the Trash in Finder, where macOS wants ⌘⌫. Off by default; turn it on in **Settings > Delete to Trash**.
+Delete deletes what is selected, as on Windows, where macOS wants ⌘⌫. Off by default; turn it on in **Settings > Delete to Trash**.
 
-- In Finder (windows and the desktop), Delete with no modifier is sent on as ⌘⌫, so the selected files and folders go to the Trash. With **Forward Delete too** (on by default), ⌦ (fn-Delete on a laptop) does the same.
-- Left as it is while the focus is on something that takes text (renaming a file, the search field, a path field), or when that can't be told; with ⌘, ⌃, ⌥ or ⇧ held; and in every other app.
-- Holding the key down moves the files once: repeats are dropped.
-- In the Trash window, ⌘⌫ is Finder's Put Back, so Delete puts the selected items back.
-- Uses an event tap on key presses, so it needs the Accessibility permission (also to see what has the focus).
+- In any app whose menus have a command on ⌘⌫ (Move to Trash in Finder, Delete in Photos, Notes, Music and many others), Delete with no modifier is sent on as ⌘⌫. The commands are found by their shortcut, read from the items of each menu in the app's menu bar through Accessibility (submenus left out), so it doesn't matter what they're called or in which language. They are read when an app comes to the front and kept for 5 seconds.
+- **Delete (⌫)** (the Mac keyboard's delete key, Backspace on others) and **Forward Delete (⌦)** (Delete on keyboards made for Windows, fn-Delete on a Mac keyboard) each have a switch, both on by default.
+- **Shift-Delete deletes immediately** (on by default): Shift with either key is sent on as ⌥⌘⌫ where the app has that (Delete Immediately in Finder, which asks first). Off, Shift-Delete is left as it is.
+- Finder always counts as having both (its Delete Immediately is a hidden alternate menu item). In Finder's Trash, where ⌘⌫ is Put Back, Delete is sent on as ⌥⌘⌫ instead, found by the front window's title being the Trash's name.
+- Left as it is while the focus is on something that takes text (a text field, a text area, a search field, renaming a file), or when that can't be told; with ⌘, ⌃ or ⌥ held; in Estris itself; in apps without such a command; and in excluded apps.
+- **Excluded Apps**: every installed app with a switch, all off. Switch an app on to leave the keys alone in it.
+- Holding the key down deletes once: repeats are dropped.
+- Uses an event tap on key presses and reads what has the focus and the apps' menus, so it needs the Accessibility permission.
 
 ## Remap
 
@@ -280,7 +283,7 @@ Sources/Estris/
       Model/                   settings and the tap listener
       Settings/                the Middle Click settings pane
     DeleteToTrash/
-      DeleteToTrash.swift      owns the utility and its key event tap
+      DeleteToTrash.swift      owns the utility: key event tap, menu commands, typing check
       Model/                   settings
       Settings/                the Delete to Trash settings pane
     WindowSnapping/

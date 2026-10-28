@@ -111,6 +111,7 @@
 "Debugging" = "Débogage";
 "Default" = "Par défaut";
 "Delete" = "Supprimer";
+"Delete (⌫)" = "Supprimer (⌫)";
 "Delete all clipboard entries?" = "Supprimer toutes les entrées du presse-papiers ?";
 "Delete entries" = "Supprimer les entrées";
 "Delete from history" = "Supprimer de l’historique";
@@ -148,7 +149,7 @@
 "Force Quit Applications" = "Forcer à quitter des applications";
 "Format" = "Format";
 "Forward Delete" = "Supprimer vers l’avant";
-"Forward Delete too" = "Aussi Supprimer vers l'avant";
+"Forward Delete (⌦)" = "Supprimer vers l'avant (⌦)";
 "Four fingers" = "Quatre doigts";
 "Frosted preview" = "Aperçu dépoli";
 "Function Keys" = "Touches de fonction";
@@ -261,7 +262,7 @@
 "Only to move and resize windows." = "Uniquement pour déplacer et redimensionner les fenêtres.";
 "Only to paste the entry you pick into the app you're working in." = "Uniquement pour coller l'entrée choisie dans l'app où vous travaillez.";
 "Only to read and change the keys and buttons you map." = "Uniquement pour lire et modifier les touches et boutons que vous remappez.";
-"Only to see the Delete key and whether you're typing." = "Uniquement pour voir la touche Supprimer et si vous êtes en train d'écrire.";
+"Only to see the Delete key, whether you're typing, and which commands an app's menus have." = "Uniquement pour voir la touche Supprimer, si vous êtes en train d'écrire et quelles commandes ont les menus d'une app.";
 "Only to see when an app's last window closes." = "Uniquement pour voir quand la dernière fenêtre d'une app se ferme.";
 "Only to send the middle click." = "Uniquement pour envoyer le clic du milieu.";
 "Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Uniquement pour afficher une miniature de ce que montre chaque fenêtre. Rien n'est enregistré ni envoyé.";
@@ -290,7 +291,7 @@
 "Power source" = "Source d’alimentation";
 "Press a key or button on %@" = "Appuyez sur une touche ou un bouton de %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Appuyez de nouveau sur le raccourci pour la taille exacte, ou maintenez ⌘ en faisant glisser.";
-"Press Delete in Finder to move the selected files to the Trash, without ⌘." = "Appuyez sur Supprimer dans le Finder pour placer les fichiers sélectionnés dans la Corbeille, sans ⌘.";
+"Press Delete to delete what's selected, as on Windows: files in Finder, photos, notes and more." = "Appuyez sur Supprimer pour supprimer la sélection, comme sous Windows : fichiers dans le Finder, photos, notes et plus.";
 "Press keys…" = "Appuyez sur les touches…";
 "Press the new shortcut, or Esc to cancel" = "Appuyez sur le nouveau raccourci, ou sur Échap pour annuler";
 "Previews" = "Aperçus";
@@ -349,6 +350,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Réglez le volume et l'appareil du son et du micro de votre Mac, et de chaque app.";
 "Settings" = "Réglages";
 "Shadow" = "Ombre";
+"Shift-Delete deletes immediately" = "Maj-Supprimer supprime immédiatement";
 "Shortcut" = "Raccourci";
 "Shortcuts" = "Raccourcis";
 "Show a button to close each window" = "Afficher un bouton pour fermer chaque fenêtre";
@@ -398,10 +400,11 @@
 "Tab" = "Tabulation";
 "Tap the trackpad with three or four fingers to middle click." = "Touchez le trackpad avec trois ou quatre doigts pour faire un clic central.";
 "Tap with" = "Toucher avec";
+"The delete key on a Mac keyboard, Backspace on other keyboards." = "La touche Supprimer d'un clavier Mac, Retour arrière sur les autres claviers.";
+"The Delete key on keyboards made for Windows, or fn-Delete on a Mac keyboard." = "La touche Suppr des claviers conçus pour Windows, ou fn-Supprimer sur un clavier Mac.";
 "The Finder always keeps running" = "Le Finder reste toujours ouvert";
 "The new language is used once Estris opens again." = "La nouvelle langue sera utilisée à la réouverture d’Estris.";
 "The window under the pointer comes to the front and gets the focus." = "La fenêtre sous le pointeur passe au premier plan et reçoit le focus.";
-"The ⌦ key, or fn-Delete on a laptop." = "La touche ⌦, ou fn-Supprimer sur un portable.";
 "They replace your current settings, and Estris opens again to apply them." = "Ils remplacent vos réglages actuels, et Estris se rouvre pour les appliquer.";
 "Thirds" = "Tiers";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Ce bouton parvient à macOS sans indiquer quel appareil l’a envoyé, donc seule l’affectation de %@ s’applique.";
@@ -436,10 +439,10 @@
 "Volume Up" = "Augmenter le volume";
 "Website" = "Site web";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Désactivé, l’historique garde l’ordre de copie et ⌘V continue de coller le dernier texte copié.";
-"While renaming a file or typing in a search field, Delete deletes text as usual. Holding it down moves the files once." = "Pendant que vous renommez un fichier ou écrivez dans un champ de recherche, Supprimer efface du texte comme d'habitude. Maintenue enfoncée, elle déplace les fichiers une seule fois.";
 "Width" = "Largeur";
 "Window Snapping" = "Ancrage des fenêtres";
 "Windows & Apps" = "Fenêtres et apps";
+"Without going to the Trash, where the app can, like Delete Immediately in Finder. Off, Shift-Delete is left as it is." = "Sans passer par la Corbeille, là où l'app le permet, comme Supprimer immédiatement dans le Finder. Désactivé, Maj-Supprimer reste tel quel.";
 "Without it, Auto Quit can't do anything." = "Sans elle, Fermeture automatique ne peut rien faire.";
 "Without it, Delete to Trash can't do anything." = "Sans elle, Supprimer vers la Corbeille ne peut rien faire.";
 "Without it, Dock Preview can't do anything." = "Sans elle, Aperçu du Dock ne peut rien faire.";
@@ -452,3 +455,4 @@
 "Without it, the output and the microphone still work, but not each app's sound." = "Sans elle, la sortie et le micro fonctionnent encore, mais pas le son de chaque app.";
 "Without it, Window Snapping can't do anything." = "Sans elle, Ancrage des fenêtres ne peut rien faire.";
 "§ (Section)" = "§ (Paragraphe)";
+"Works in apps with a command on ⌘⌫ in their menus, like Move to Trash or Delete. While typing, Delete deletes text as usual. Holding it down deletes once. In Finder's Trash, it deletes immediately." = "Fonctionne dans les apps qui ont une commande sur ⌘⌫ dans leurs menus, comme Placer dans la Corbeille ou Supprimer. Pendant que vous écrivez, Supprimer efface du texte comme d'habitude. Maintenue enfoncée, elle supprime une seule fois. Dans la Corbeille du Finder, elle supprime immédiatement.";

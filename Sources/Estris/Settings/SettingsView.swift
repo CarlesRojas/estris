@@ -93,7 +93,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .middleClick:
             ["trackpad", "mouse", "middle", "tap", "fingers", "click"]
         case .deleteToTrash:
-            ["delete", "backspace", "trash", "finder", "files", "folders", "keyboard"]
+            ["delete", "backspace", "forward delete", "shift", "trash", "finder", "files", "folders", "windows", "keyboard", "excluded", "apps"]
         case .clipboard:
             ["history", "paste", "search", "image", "file", "excluded", "apps", "expiry", "shortcut", "hotkey", "keyboard", "password", "duplicate", "date", "delete", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
         }
