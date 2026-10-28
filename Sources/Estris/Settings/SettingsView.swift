@@ -9,6 +9,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case clipboard
     case autoQuit
     case middleClick
+    case deleteToTrash
     case remap
     case windowSnapping
     case focusFollowsMouse
@@ -29,6 +30,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .clipboard: String(localized: "Clipboard")
         case .autoQuit: String(localized: "Auto Quit")
         case .middleClick: String(localized: "Middle Click")
+        case .deleteToTrash: String(localized: "Delete to Trash")
         case .remap: String(localized: "Remap")
         case .windowSnapping: String(localized: "Window Snapping")
         case .focusFollowsMouse: String(localized: "Focus Follows Mouse")
@@ -48,6 +50,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .clipboard: "list.clipboard"
         case .autoQuit: "xmark.app"
         case .middleClick: "hand.tap"
+        case .deleteToTrash: "trash"
         case .remap: "keyboard"
         case .windowSnapping: "rectangle.split.2x1"
         case .focusFollowsMouse: "cursorarrow.rays"
@@ -89,6 +92,8 @@ enum SettingsPane: String, CaseIterable, Identifiable {
             ["keys", "keyboard", "mouse", "buttons", "mapping", "remap", "device", "event viewer", "mission control", "desktop", "volume", "brightness"]
         case .middleClick:
             ["trackpad", "mouse", "middle", "tap", "fingers", "click"]
+        case .deleteToTrash:
+            ["delete", "backspace", "forward delete", "shift", "trash", "finder", "files", "folders", "windows", "keyboard", "excluded", "apps"]
         case .clipboard:
             ["history", "paste", "search", "image", "file", "excluded", "apps", "expiry", "shortcut", "hotkey", "keyboard", "password", "duplicate", "date", "delete", "style", "default", "grid", "carousel", "stack", "ring", "tint", "shadow", "dim", "surface", "entries"]
         }
@@ -126,7 +131,7 @@ enum SettingsGroup: CaseIterable, Identifiable {
         case .app: [.general, .menuBar, .developer]
         case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake, .roundedCorners]
         case .windows: [.windowSnapping, .focusFollowsMouse, .dockPreview, .autoQuit]
-        case .input: [.remap, .middleClick]
+        case .input: [.remap, .middleClick, .deleteToTrash]
         }
     }
 }
@@ -184,6 +189,7 @@ struct SettingsSidebar: View {
     @ObservedObject var clipboardSettings: ClipboardSettings
     @ObservedObject var autoQuitSettings: AutoQuitSettings
     @ObservedObject var middleClickSettings: MiddleClickSettings
+    @ObservedObject var deleteToTrashSettings: DeleteToTrashSettings
     @ObservedObject var remapSettings: RemapSettings
     @ObservedObject var windowSnappingSettings: WindowSnappingSettings
     @ObservedObject var focusFollowsMouseSettings: FocusFollowsMouseSettings
@@ -237,6 +243,7 @@ struct SettingsSidebar: View {
         case .clipboard: clipboardSettings.isEnabled
         case .autoQuit: autoQuitSettings.isEnabled
         case .middleClick: middleClickSettings.isEnabled
+        case .deleteToTrash: deleteToTrashSettings.isEnabled
         case .remap: remapSettings.isEnabled
         case .windowSnapping: windowSnappingSettings.isEnabled
         case .focusFollowsMouse: focusFollowsMouseSettings.isEnabled
@@ -258,6 +265,7 @@ struct SettingsDetail: View {
     let clipboard: ClipboardManager
     let autoQuit: AutoQuit
     let middleClick: MiddleClick
+    let deleteToTrash: DeleteToTrash
     let remap: Remap
     let windowSnapping: WindowSnapping
     let focusFollowsMouse: FocusFollowsMouse
@@ -283,6 +291,8 @@ struct SettingsDetail: View {
                     autoQuit.settingsPane()
                 case .middleClick:
                     middleClick.settingsPane()
+                case .deleteToTrash:
+                    deleteToTrash.settingsPane()
                 case .remap:
                     remap.settingsPane()
                 case .windowSnapping:

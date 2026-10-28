@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New utility, Delete to Trash: Delete deletes what's selected, as on Windows, in Finder, Photos, Notes and any app with a ⌘⌫ command. Shift-Delete deletes without going to the Trash. Each key can be turned off, and apps excluded. Typing works as usual. Off by default.
+
 ## 0.1.14 - 2026-10-23
 
 - Clipboard keeps text plain: it is recorded, shown and pasted without its styling, so the **Paste as plain text** setting is gone. This also fixes Estris freezing for up to half a minute when it opens, while the history held text copied from some web pages.

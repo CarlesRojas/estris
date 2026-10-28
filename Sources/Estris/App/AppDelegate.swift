@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var permissionLog = PermissionLog(log: log)
     private lazy var autoQuit = AutoQuit(log: log)
     private lazy var middleClick = MiddleClick(log: log)
+    private lazy var deleteToTrash = DeleteToTrash(log: log)
     private lazy var remap = Remap(log: log)
     private lazy var windowSnapping = WindowSnapping(log: log)
     private lazy var focusFollowsMouse = FocusFollowsMouse(log: log)
@@ -42,6 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         clipboard.start()
         autoQuit.start()
         middleClick.start()
+        deleteToTrash.start()
         remap.start()
         windowSnapping.start()
         focusFollowsMouse.start()
@@ -95,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, dockPreview: dockPreview, keepAwake: keepAwake, roundedCorners: roundedCorners, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, deleteToTrash: deleteToTrash, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, dockPreview: dockPreview, keepAwake: keepAwake, roundedCorners: roundedCorners, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
         }
         settingsWindow?.show()
     }

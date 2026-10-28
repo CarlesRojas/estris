@@ -111,10 +111,12 @@
 "Debugging" = "Debug";
 "Default" = "Predefinito";
 "Delete" = "Elimina";
+"Delete (⌫)" = "Elimina (⌫)";
 "Delete all clipboard entries?" = "Eliminare tutte le voci degli appunti?";
 "Delete entries" = "Elimina voci";
 "Delete from history" = "Elimina dalla cronologia";
 "Delete this entry" = "Elimina questa voce";
+"Delete to Trash" = "Elimina nel Cestino";
 "Developer" = "Sviluppatore";
 "development build" = "versione di sviluppo";
 "Device" = "Dispositivo";
@@ -147,6 +149,7 @@
 "Force Quit Applications" = "Uscita forzata applicazioni";
 "Format" = "Formato";
 "Forward Delete" = "Elimina in avanti";
+"Forward Delete (⌦)" = "Cancella avanti (⌦)";
 "Four fingers" = "Quattro dita";
 "Frosted preview" = "Anteprima smerigliata";
 "Function Keys" = "Tasti funzione";
@@ -190,6 +193,7 @@
 "Keypad %@" = "Tastierino %@";
 "Keypad Clear" = "Cancella del tastierino";
 "Keypad Enter" = "Invio del tastierino";
+"Keys" = "Tasti";
 "Language" = "Lingua";
 "Language & Region" = "Lingua e Zona";
 "Launchpad" = "Launchpad";
@@ -258,6 +262,7 @@
 "Only to move and resize windows." = "Solo per spostare e ridimensionare le finestre.";
 "Only to paste the entry you pick into the app you're working in." = "Solo per incollare la voce scelta nell'app in cui stai lavorando.";
 "Only to read and change the keys and buttons you map." = "Solo per leggere e cambiare i tasti e i pulsanti che rimappi.";
+"Only to see the Delete key, whether you're typing, and which commands an app's menus have." = "Solo per vedere il tasto Elimina, se stai scrivendo e quali comandi hanno i menu di un'app.";
 "Only to see when an app's last window closes." = "Solo per vedere quando si chiude l'ultima finestra di un'app.";
 "Only to send the middle click." = "Solo per inviare il clic centrale.";
 "Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Solo per mostrare una miniatura di ciò che mostra ogni finestra. Non viene salvato né inviato nulla.";
@@ -286,6 +291,7 @@
 "Power source" = "Fonte di alimentazione";
 "Press a key or button on %@" = "Premi un tasto o un pulsante su %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Premi di nuovo l’abbreviazione per la dimensione esatta, o tieni premuto ⌘ mentre trascini.";
+"Press Delete to delete what's selected, as on Windows: files in Finder, photos, notes and more." = "Premi Elimina per eliminare ciò che è selezionato, come su Windows: file nel Finder, foto, note e altro.";
 "Press keys…" = "Premi i tasti…";
 "Press the new shortcut, or Esc to cancel" = "Premi la nuova abbreviazione o Esc per annullare";
 "Previews" = "Anteprime";
@@ -344,6 +350,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Imposta volume e dispositivo dell'audio e del microfono del Mac, e di ogni app.";
 "Settings" = "Impostazioni";
 "Shadow" = "Ombra";
+"Shift-Delete deletes immediately" = "Maiusc-Elimina elimina subito";
 "Shortcut" = "Abbreviazione";
 "Shortcuts" = "Abbreviazioni";
 "Show a button to close each window" = "Mostra un pulsante per chiudere ogni finestra";
@@ -393,6 +400,8 @@
 "Tab" = "Tabulazione";
 "Tap the trackpad with three or four fingers to middle click." = "Tocca il trackpad con tre o quattro dita per fare clic centrale.";
 "Tap with" = "Tocca con";
+"The delete key on a Mac keyboard, Backspace on other keyboards." = "Il tasto Elimina di una tastiera Mac, Backspace sulle altre tastiere.";
+"The Delete key on keyboards made for Windows, or fn-Delete on a Mac keyboard." = "Il tasto Canc delle tastiere per Windows, o fn-Elimina su una tastiera Mac.";
 "The Finder always keeps running" = "Il Finder resta sempre aperto";
 "The new language is used once Estris opens again." = "La nuova lingua verrà usata alla riapertura di Estris.";
 "The window under the pointer comes to the front and gets the focus." = "La finestra sotto il puntatore passa in primo piano e riceve il focus.";
@@ -433,7 +442,9 @@
 "Width" = "Larghezza";
 "Window Snapping" = "Aggancio finestre";
 "Windows & Apps" = "Finestre e app";
+"Without going to the Trash, where the app can, like Delete Immediately in Finder. Off, Shift-Delete is left as it is." = "Senza passare dal Cestino, dove l'app lo permette, come Elimina immediatamente nel Finder. Disattivato, Maiusc-Elimina resta com'è.";
 "Without it, Auto Quit can't do anything." = "Senza, Chiusura automatica non può fare nulla.";
+"Without it, Delete to Trash can't do anything." = "Senza, Elimina nel Cestino non può fare nulla.";
 "Without it, Dock Preview can't do anything." = "Senza, l'Anteprima del Dock non può fare nulla.";
 "Without it, each window shows its app's icon instead of a thumbnail." = "Senza, ogni finestra mostra l'icona della sua app invece di una miniatura.";
 "Without it, Focus Follows Mouse can't do anything." = "Senza, Focus sotto il puntatore non può fare nulla.";
@@ -444,3 +455,4 @@
 "Without it, the output and the microphone still work, but not each app's sound." = "Senza, l'uscita e il microfono funzionano ancora, ma non l'audio di ogni app.";
 "Without it, Window Snapping can't do anything." = "Senza, Aggancio finestre non può fare nulla.";
 "§ (Section)" = "§ (Paragrafo)";
+"Works in apps with a command on ⌘⌫ in their menus, like Move to Trash or Delete. While typing, Delete deletes text as usual. Holding it down deletes once. In Finder's Trash, it deletes immediately." = "Funziona nelle app con un comando su ⌘⌫ nei loro menu, come Sposta nel Cestino o Elimina. Mentre scrivi, Elimina cancella il testo come sempre. Tenendolo premuto, elimina una sola volta. Nel Cestino del Finder, elimina subito.";

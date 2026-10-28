@@ -1,0 +1,121 @@
+---
+import Cursor from "../Cursor.astro";
+import { pointer, presses, keyPresses, pop } from "../../lib/motion";
+/** Clicking a file in Finder and pressing Delete, no ⌘: it drops into the Trash in the Dock,
+    which fills. Then it comes back (Put Back) and the Trash empties, so it loops. */
+const { d } = Astro.props;
+const files = [["Notes", "var(--blue)"], ["Photo", "var(--green)"], ["Draft", "var(--orange)"], ["Budget", "var(--purple)"]];
+// The Draft file's icon is at (52.8%, 38.6%) of the screen.
+const css = [
+  pointer("trash-cursor", [[0, 72, 56], [4, 72, 56], [12, 52.8, 38.6], [16, 52.8, 38.6], [23, 70, 58], [100, 70, 58]]),
+  presses("trash-press", [13]),
+  keyPresses("trash-key", [27]),
+  pop("trash-pill", 39, 66),
+].join("\n");
+---
+<div class="spot s-trash" style={`--d:${d}s`}>
+  <div class="screen">
+    <div class="win trash-win">
+      <div class="bar"><i></i><i></i><i></i><span class="trash-title">Documents</span></div>
+    </div>
+    {files.map(([name, color], index) => (
+      <div class={`trash-file trash-file-${index}`}>
+        <span class="trash-doc" style={`--c:${color}`}></span>
+        <span class="trash-name">{name}</span>
+      </div>
+    ))}
+    <div class="dock">
+      <span class="tile running" style="background:linear-gradient(160deg,#6ec3ff,#3b82f6)"></span>
+      <span class="tile" style="background:var(--pink)"></span>
+      <span class="tile" style="background:var(--yellow)"></span>
+      <span class="tile trash-bin">
+        <svg viewBox="0 0 24 24"><path d="M6 7.5h12l-1 12.5a1.6 1.6 0 0 1-1.6 1.5H8.6A1.6 1.6 0 0 1 7 20z" fill="rgba(255,255,255,.22)" stroke="rgba(255,255,255,.85)" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 7.5h15M10 7.5V5.8h4v1.7M10 10.5v8M14 10.5v8" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <i class="trash-paper"></i>
+      </span>
+    </div>
+    <Cursor class="trash-cursor" />
+  </div>
+  <div class="keys"><span class="key trash-key">delete ⌫</span></div>
+  <div class="trash-pill"><span class="pill">Moved to Trash</span></div>
+</div>
+
+<style is:global>
+  .s-trash .trash-win { left: 8%; top: 7%; width: 84%; height: 64%; }
+  .s-trash .trash-title { margin-left: 2cqw; font-size: 2.2cqw; font-weight: 600; color: rgba(245, 245, 247, .7); }
+  .s-trash .trash-file {
+    position: absolute; top: 30%; width: 12cqw; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 1cqw;
+  }
+  .s-trash .trash-file-0 { left: 14%; }
+  .s-trash .trash-file-1 { left: 30%; }
+  .s-trash .trash-file-2 { left: 46%; }
+  .s-trash .trash-file-3 { left: 62%; }
+  /* A document: a page with a folded corner and a coloured band. */
+  .s-trash .trash-doc {
+    position: relative; width: 8cqw; height: 10cqw; border-radius: .8cqw; background: #e9e9ee;
+    clip-path: polygon(0 0, 70% 0, 100% 24%, 100% 100%, 0 100%);
+    box-shadow: inset 0 -3.2cqw 0 var(--c);
+  }
+  .s-trash .trash-doc::after {
+    content: ""; position: absolute; right: 0; top: 0; width: 30%; height: 24%;
+    background: #b9b9c2; border-bottom-left-radius: .6cqw;
+  }
+  .s-trash .trash-name { font-size: 2.2cqw; font-weight: 600; padding: .2cqw 1cqw; border-radius: .6cqw; }
+  .s-trash .trash-cursor { left: 72%; top: 56%; }
+  .s-trash .trash-bin { background: linear-gradient(160deg, #5b5d68, #3a3b44); display: flex; align-items: center; justify-content: center; }
+  .s-trash .trash-bin svg { width: 78%; height: 78%; }
+  .s-trash .trash-bin { position: relative; }
+  /* The file, crumpled, showing over the rim while it is in the Trash. */
+  .s-trash .trash-paper {
+    position: absolute; left: 30%; top: 4%; width: 40%; height: 30%; border-radius: .4cqw .8cqw .3cqw .6cqw;
+    background: linear-gradient(150deg, #fff, #d9d9e0 60%, var(--orange)); opacity: 0; transform-origin: 50% 100%;
+  }
+  .s-trash .trash-pill { position: absolute; left: 0; right: 0; top: 46%; display: flex; justify-content: center; opacity: 0; z-index: 60; }
+  .s-trash .trash-pill .pill { font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
+  .s-trash .trash-file-2 .trash-doc { transform-origin: 50% 50%; }
+
+  .s-trash.playing .trash-cursor { animation: trash-cursor-x var(--d) both, trash-cursor-y var(--d) both; }
+  .s-trash.playing .trash-cursor .press { animation: trash-press var(--d) both; }
+  .s-trash.playing .trash-key { animation: trash-key var(--d) both; }
+  .s-trash.playing .trash-pill { animation: trash-pill var(--d) both; }
+  .s-trash.playing .trash-file-2 { animation: trash-fly var(--d) both; }
+  .s-trash.playing .trash-file-2 .trash-name { animation: trash-select var(--d) both; }
+  .s-trash.playing .trash-file-2 .trash-doc { animation: trash-doc var(--d) both; }
+  .s-trash.playing .trash-bin { animation: trash-bin var(--d) both; }
+  .s-trash.playing .trash-paper { animation: trash-paper var(--d) both; }
+
+  /* Selected by the click, the name highlighted in blue. */
+  @keyframes trash-select {
+    0%, 13.6% { background: transparent; }
+    14.4%, 30% { background: var(--blue); }
+    31%, 100% { background: transparent; }
+  }
+  @keyframes trash-doc {
+    0%, 13.6% { box-shadow: inset 0 -3.2cqw 0 var(--c); outline: 0 solid transparent; }
+    14% { transform: scale(.94); }
+    15.5% { transform: scale(1.04); }
+    16.5%, 100% { transform: none; }
+  }
+  /* Delete pressed at 27%: it lifts, then drops in an arc into the Trash; Put Back brings it
+     home with a spring. */
+  @keyframes trash-fly {
+    0%, 28% { transform: none; opacity: 1; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+    30% { transform: translate(0, -1.6cqw) scale(1.06); opacity: 1; animation-timing-function: cubic-bezier(.5, 0, .9, .6); }
+    37% { transform: translate(9.8cqw, 28.4cqw) scale(.18); opacity: .9; }
+    38%, 80% { transform: translate(9.8cqw, 28.4cqw) scale(.1); opacity: 0; animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    88%, 100% { transform: none; opacity: 1; }
+  }
+  /* The Trash gives a little as the file lands, and its paper shows until it is put back. */
+  @keyframes trash-bin {
+    0%, 37% { transform: none; }
+    38% { transform: translateY(.6cqw) scale(1.06, .9); }
+    40% { transform: translateY(-.4cqw) scale(.98, 1.04); }
+    42%, 100% { transform: none; }
+  }
+  @keyframes trash-paper {
+    0%, 37% { opacity: 0; transform: translateY(40%) scale(.6); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+    41%, 80% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.3, 0, 1, 1); }
+    83%, 100% { opacity: 0; transform: translateY(40%) scale(.6); }
+  }
+</style>
+<Fragment set:html={`<style>${css}</style>`} />

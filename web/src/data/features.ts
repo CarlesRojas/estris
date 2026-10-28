@@ -105,6 +105,15 @@ export const features: Feature[] = [
     icon: '<circle cx="6.5" cy="13" r="2" fill="currentColor"/><circle cx="12" cy="10" r="2" fill="currentColor"/><circle cx="17.5" cy="13" r="2" fill="currentColor"/>',
   },
   {
+    id: "delete-to-trash",
+    title: "Delete to Trash",
+    tagline: "The Delete key, as it works on Windows.",
+    details: "Select files and press Delete to move them to the Trash, no ⌘ needed. It works in Photos, Notes and other apps too, and Shift-Delete skips the Trash.",
+    seconds: 8,
+    accent: "#a3a8b8",
+    icon: '<path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2a1.8 1.8 0 0 0 1.8 1.6h5.6a1.8 1.8 0 0 0 1.8-1.6L17.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.2 10.5v6.5M13.8 10.5v6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  },
+  {
     id: "auto-quit",
     title: "Auto Quit",
     tagline: "Close the last window, and the app goes too.",

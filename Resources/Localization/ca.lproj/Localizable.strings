@@ -111,10 +111,12 @@
 "Debugging" = "Depuració";
 "Default" = "Per defecte";
 "Delete" = "Suprimeix";
+"Delete (⌫)" = "Suprimir (⌫)";
 "Delete all clipboard entries?" = "Vols eliminar totes les entrades del porta-retalls?";
 "Delete entries" = "Elimina entrades";
 "Delete from history" = "Elimina de l’historial";
 "Delete this entry" = "Elimina aquesta entrada";
+"Delete to Trash" = "Eliminar a la Paperera";
 "Developer" = "Desenvolupador";
 "development build" = "versió de desenvolupament";
 "Device" = "Dispositiu";
@@ -147,6 +149,7 @@
 "Force Quit Applications" = "Força la sortida d’aplicacions";
 "Format" = "Format";
 "Forward Delete" = "Suprimeix cap endavant";
+"Forward Delete (⌦)" = "Suprimir endavant (⌦)";
 "Four fingers" = "Quatre dits";
 "Frosted preview" = "Vista prèvia esmerilada";
 "Function Keys" = "Tecles de funció";
@@ -190,6 +193,7 @@
 "Keypad %@" = "Teclat numèric %@";
 "Keypad Clear" = "Esborra del teclat numèric";
 "Keypad Enter" = "Retorn del teclat numèric";
+"Keys" = "Tecles";
 "Language" = "Idioma";
 "Language & Region" = "Idioma i regió";
 "Launchpad" = "Launchpad";
@@ -258,6 +262,7 @@
 "Only to move and resize windows." = "Només per moure i canviar la mida de les finestres.";
 "Only to paste the entry you pick into the app you're working in." = "Només per enganxar l'entrada que triïs a l'app on estàs treballant.";
 "Only to read and change the keys and buttons you map." = "Només per llegir i canviar les tecles i botons que mapes.";
+"Only to see the Delete key, whether you're typing, and which commands an app's menus have." = "Només per veure la tecla Suprimir, si estàs escrivint i quines ordres tenen els menús d'una app.";
 "Only to see when an app's last window closes." = "Només per veure quan es tanca l'última finestra d'una app.";
 "Only to send the middle click." = "Només per enviar el clic central.";
 "Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Només per mostrar una miniatura del que es veu a cada finestra. No es desa ni s'envia res.";
@@ -286,6 +291,7 @@
 "Power source" = "Font d’alimentació";
 "Press a key or button on %@" = "Prem una tecla o un botó a %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Prem la drecera un altre cop per a la mida exacta, o mantén ⌘ en arrossegar.";
+"Press Delete to delete what's selected, as on Windows: files in Finder, photos, notes and more." = "Prem Suprimir per eliminar el que tens seleccionat, com a Windows: fitxers al Finder, fotos, notes i més.";
 "Press keys…" = "Prem les tecles…";
 "Press the new shortcut, or Esc to cancel" = "Prem la nova drecera o Esc per cancel·lar";
 "Previews" = "Previsualitzacions";
@@ -344,6 +350,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajusta el volum i el dispositiu del so i el micròfon del teu Mac, i de cada app.";
 "Settings" = "Configuració";
 "Shadow" = "Ombra";
+"Shift-Delete deletes immediately" = "Maj-Suprimir elimina a l'instant";
 "Shortcut" = "Drecera";
 "Shortcuts" = "Dreceres";
 "Show a button to close each window" = "Mostra un botó per tancar cada finestra";
@@ -393,6 +400,8 @@
 "Tab" = "Tabulador";
 "Tap the trackpad with three or four fingers to middle click." = "Toca el trackpad amb tres o quatre dits per fer clic central.";
 "Tap with" = "Toca amb";
+"The delete key on a Mac keyboard, Backspace on other keyboards." = "La tecla Suprimir d'un teclat de Mac, Retrocés en altres teclats.";
+"The Delete key on keyboards made for Windows, or fn-Delete on a Mac keyboard." = "La tecla Supr dels teclats fets per a Windows, o fn-Suprimir en un teclat de Mac.";
 "The Finder always keeps running" = "El Finder sempre continua obert";
 "The new language is used once Estris opens again." = "El nou idioma s'utilitzarà quan Estris es torni a obrir.";
 "The window under the pointer comes to the front and gets the focus." = "La finestra sota el punter passa al davant i rep el focus.";
@@ -433,7 +442,9 @@
 "Width" = "Amplada";
 "Window Snapping" = "Ajust de finestres";
 "Windows & Apps" = "Finestres i apps";
+"Without going to the Trash, where the app can, like Delete Immediately in Finder. Off, Shift-Delete is left as it is." = "Sense passar per la Paperera, on l'app ho permet, com Eliminar immediatament al Finder. Desactivat, Maj-Suprimir es queda com està.";
 "Without it, Auto Quit can't do anything." = "Sense aquest permís, Tancament automàtic no pot fer res.";
+"Without it, Delete to Trash can't do anything." = "Sense ell, Eliminar a la Paperera no pot fer res.";
 "Without it, Dock Preview can't do anything." = "Sense aquest permís, la Previsualització del Dock no pot fer res.";
 "Without it, each window shows its app's icon instead of a thumbnail." = "Sense aquest permís, cada finestra mostra la icona de la seva app en lloc d'una miniatura.";
 "Without it, Focus Follows Mouse can't do anything." = "Sense aquest permís, Focus sota el punter no pot fer res.";
@@ -444,3 +455,4 @@
 "Without it, the output and the microphone still work, but not each app's sound." = "Sense aquest permís, la sortida i el micròfon continuen funcionant, però no el so de cada app.";
 "Without it, Window Snapping can't do anything." = "Sense aquest permís, Ajust de finestres no pot fer res.";
 "§ (Section)" = "§ (Secció)";
+"Works in apps with a command on ⌘⌫ in their menus, like Move to Trash or Delete. While typing, Delete deletes text as usual. Holding it down deletes once. In Finder's Trash, it deletes immediately." = "Funciona a les apps amb una ordre a ⌘⌫ als seus menús, com Traslladar a la Paperera o Eliminar. Mentre escrius, Suprimir esborra text com sempre. Si la mantens premuda, elimina un sol cop. A la Paperera del Finder, elimina a l'instant.";

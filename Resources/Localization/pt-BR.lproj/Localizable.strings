@@ -111,10 +111,12 @@
 "Debugging" = "Depuração";
 "Default" = "Padrão";
 "Delete" = "Apagar";
+"Delete (⌫)" = "Apagar (⌫)";
 "Delete all clipboard entries?" = "Apagar todos os itens da Área de Transferência?";
 "Delete entries" = "Apagar itens";
 "Delete from history" = "Apagar do histórico";
 "Delete this entry" = "Apagar este item";
+"Delete to Trash" = "Apagar para o Lixo";
 "Developer" = "Desenvolvedor";
 "development build" = "versão de desenvolvimento";
 "Device" = "Dispositivo";
@@ -147,6 +149,7 @@
 "Force Quit Applications" = "Forçar Encerrar Aplicativos";
 "Format" = "Formato";
 "Forward Delete" = "Apagar à frente";
+"Forward Delete (⌦)" = "Apagar para a frente (⌦)";
 "Four fingers" = "Quatro dedos";
 "Frosted preview" = "Pré-visualização fosca";
 "Function Keys" = "Teclas de função";
@@ -190,6 +193,7 @@
 "Keypad %@" = "Teclado numérico %@";
 "Keypad Clear" = "Limpar do teclado numérico";
 "Keypad Enter" = "Enter do teclado numérico";
+"Keys" = "Teclas";
 "Language" = "Idioma";
 "Language & Region" = "Idioma e Região";
 "Launchpad" = "Launchpad";
@@ -258,6 +262,7 @@
 "Only to move and resize windows." = "Apenas para mover e redimensionar janelas.";
 "Only to paste the entry you pick into the app you're working in." = "Apenas para colar a entrada escolhida no app em que você está trabalhando.";
 "Only to read and change the keys and buttons you map." = "Apenas para ler e mudar as teclas e botões que você mapear.";
+"Only to see the Delete key, whether you're typing, and which commands an app's menus have." = "Só para ver a tecla Apagar, se você está digitando e quais comandos os menus de um app têm.";
 "Only to see when an app's last window closes." = "Apenas para ver quando a última janela de um app fecha.";
 "Only to send the middle click." = "Apenas para enviar o clique do meio.";
 "Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Apenas para mostrar uma miniatura do que cada janela mostra. Nada é salvo nem enviado.";
@@ -286,6 +291,7 @@
 "Power source" = "Fonte de energia";
 "Press a key or button on %@" = "Pressione uma tecla ou um botão em %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Pressione o atalho de novo para o tamanho exato, ou mantenha ⌘ pressionada ao arrastar.";
+"Press Delete to delete what's selected, as on Windows: files in Finder, photos, notes and more." = "Pressione Apagar para apagar o que estiver selecionado, como no Windows: arquivos no Finder, fotos, notas e mais.";
 "Press keys…" = "Pressione as teclas…";
 "Press the new shortcut, or Esc to cancel" = "Pressione o novo atalho, ou Esc para cancelar";
 "Previews" = "Pré-visualizações";
@@ -344,6 +350,7 @@
 "Set the volume and device of your Mac's sound and microphone, and of each app." = "Ajuste o volume e o dispositivo do som e do microfone do seu Mac, e de cada app.";
 "Settings" = "Ajustes";
 "Shadow" = "Sombra";
+"Shift-Delete deletes immediately" = "Shift-Apagar apaga na hora";
 "Shortcut" = "Atalho";
 "Shortcuts" = "Atalhos";
 "Show a button to close each window" = "Mostrar um botão para fechar cada janela";
@@ -393,6 +400,8 @@
 "Tab" = "Tab";
 "Tap the trackpad with three or four fingers to middle click." = "Toque no trackpad com três ou quatro dedos para clicar com o botão do meio.";
 "Tap with" = "Tocar com";
+"The delete key on a Mac keyboard, Backspace on other keyboards." = "A tecla Apagar de um teclado Mac, Backspace em outros teclados.";
+"The Delete key on keyboards made for Windows, or fn-Delete on a Mac keyboard." = "A tecla Delete dos teclados feitos para Windows, ou fn-Apagar em um teclado Mac.";
 "The Finder always keeps running" = "O Finder sempre continua aberto";
 "The new language is used once Estris opens again." = "O novo idioma será usado quando o Estris abrir de novo.";
 "The window under the pointer comes to the front and gets the focus." = "A janela sob o ponteiro vem para a frente e recebe o foco.";
@@ -433,7 +442,9 @@
 "Width" = "Largura";
 "Window Snapping" = "Encaixe de janelas";
 "Windows & Apps" = "Janelas e apps";
+"Without going to the Trash, where the app can, like Delete Immediately in Finder. Off, Shift-Delete is left as it is." = "Sem passar pelo Lixo, onde o app permite, como Apagar Imediatamente no Finder. Desligado, Shift-Apagar fica como está.";
 "Without it, Auto Quit can't do anything." = "Sem ela, o Encerramento automático não pode fazer nada.";
+"Without it, Delete to Trash can't do anything." = "Sem ela, Apagar para o Lixo não pode fazer nada.";
 "Without it, Dock Preview can't do anything." = "Sem ela, a Pré-visualização do Dock não pode fazer nada.";
 "Without it, each window shows its app's icon instead of a thumbnail." = "Sem ela, cada janela mostra o ícone do app em vez de uma miniatura.";
 "Without it, Focus Follows Mouse can't do anything." = "Sem ela, o Foco sob o ponteiro não pode fazer nada.";
@@ -444,3 +455,4 @@
 "Without it, the output and the microphone still work, but not each app's sound." = "Sem ela, a saída e o microfone continuam funcionando, mas não o som de cada app.";
 "Without it, Window Snapping can't do anything." = "Sem ela, o Encaixe de janelas não pode fazer nada.";
 "§ (Section)" = "§ (Seção)";
+"Works in apps with a command on ⌘⌫ in their menus, like Move to Trash or Delete. While typing, Delete deletes text as usual. Holding it down deletes once. In Finder's Trash, it deletes immediately." = "Funciona nos apps com um comando em ⌘⌫ nos menus, como Mover para o Lixo ou Apagar. Enquanto você digita, Apagar apaga texto como sempre. Mantida pressionada, apaga uma só vez. No Lixo do Finder, apaga na hora.";
