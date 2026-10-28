@@ -115,6 +115,7 @@
 "Delete entries" = "Einträge löschen";
 "Delete from history" = "Aus dem Verlauf löschen";
 "Delete this entry" = "Diesen Eintrag löschen";
+"Delete to Trash" = "In den Papierkorb";
 "Developer" = "Entwickler";
 "development build" = "Entwicklungsversion";
 "Device" = "Gerät";
@@ -147,6 +148,7 @@
 "Force Quit Applications" = "Programme sofort beenden";
 "Format" = "Format";
 "Forward Delete" = "Vorwärts löschen";
+"Forward Delete too" = "Auch Entfernen";
 "Four fingers" = "Vier Finger";
 "Frosted preview" = "Milchglas-Vorschau";
 "Function Keys" = "Funktionstasten";
@@ -190,6 +192,7 @@
 "Keypad %@" = "Ziffernblock %@";
 "Keypad Clear" = "Löschen (Ziffernblock)";
 "Keypad Enter" = "Enter (Ziffernblock)";
+"Keys" = "Tasten";
 "Language" = "Sprache";
 "Language & Region" = "Sprache & Region";
 "Launchpad" = "Launchpad";
@@ -258,6 +261,7 @@
 "Only to move and resize windows." = "Nur um Fenster zu bewegen und ihre Größe zu ändern.";
 "Only to paste the entry you pick into the app you're working in." = "Nur um den gewählten Eintrag in die App einzufügen, in der du arbeitest.";
 "Only to read and change the keys and buttons you map." = "Nur um die von dir zugewiesenen Tasten und Knöpfe zu lesen und zu ändern.";
+"Only to see the Delete key and whether you're typing." = "Nur, um die Löschtaste zu erkennen und ob du gerade tippst.";
 "Only to see when an app's last window closes." = "Nur um zu sehen, wann das letzte Fenster einer App geschlossen wird.";
 "Only to send the middle click." = "Nur um den Mittelklick zu senden.";
 "Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Nur um eine Miniatur dessen zu zeigen, was jedes Fenster zeigt. Nichts wird gespeichert oder gesendet.";
@@ -286,6 +290,7 @@
 "Power source" = "Stromquelle";
 "Press a key or button on %@" = "Drücke eine Taste auf %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Drücke den Kurzbefehl erneut für die genaue Größe oder halte beim Ziehen ⌘ gedrückt.";
+"Press Delete in Finder to move the selected files to the Trash, without ⌘." = "Drücke im Finder die Löschtaste, um die ausgewählten Dateien in den Papierkorb zu legen, ohne ⌘.";
 "Press keys…" = "Tasten drücken …";
 "Press the new shortcut, or Esc to cancel" = "Neuen Kurzbefehl drücken oder Esc zum Abbrechen";
 "Previews" = "Vorschauen";
@@ -396,6 +401,7 @@
 "The Finder always keeps running" = "Der Finder läuft immer weiter";
 "The new language is used once Estris opens again." = "Die neue Sprache wird verwendet, sobald Estris wieder geöffnet ist.";
 "The window under the pointer comes to the front and gets the focus." = "Das Fenster unter dem Zeiger kommt nach vorne und erhält den Fokus.";
+"The ⌦ key, or fn-Delete on a laptop." = "Die Taste ⌦, oder fn-Löschtaste auf einem Laptop.";
 "They replace your current settings, and Estris opens again to apply them." = "Sie ersetzen deine aktuellen Einstellungen, und Estris wird neu geöffnet, um sie anzuwenden.";
 "Thirds" = "Drittel";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "Diese Taste erreicht macOS, ohne zu sagen, welches Gerät sie gesendet hat, daher gilt nur die Belegung auf %@.";
@@ -430,10 +436,12 @@
 "Volume Up" = "Lauter";
 "Website" = "Website";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "Wenn aus, behält der Verlauf die Reihenfolge des Kopierens, und ⌘V setzt weiter den zuletzt kopierten Text ein.";
+"While renaming a file or typing in a search field, Delete deletes text as usual. Holding it down moves the files once." = "Beim Umbenennen einer Datei oder Tippen in einem Suchfeld löscht die Löschtaste wie gewohnt Text. Gedrückt gehalten legt sie die Dateien nur einmal weg.";
 "Width" = "Breite";
 "Window Snapping" = "Fenster einrasten";
 "Windows & Apps" = "Fenster & Apps";
 "Without it, Auto Quit can't do anything." = "Ohne sie kann „Automatisch beenden“ nichts tun.";
+"Without it, Delete to Trash can't do anything." = "Ohne sie kann In den Papierkorb nichts tun.";
 "Without it, Dock Preview can't do anything." = "Ohne sie kann die Dock-Vorschau nichts tun.";
 "Without it, each window shows its app's icon instead of a thumbnail." = "Ohne sie zeigt jedes Fenster das Symbol seiner App statt einer Miniatur.";
 "Without it, Focus Follows Mouse can't do anything." = "Ohne sie kann „Fokus folgt der Maus“ nichts tun.";

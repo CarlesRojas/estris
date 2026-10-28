@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New utility, Delete to Trash: in Finder, Delete (and Forward Delete) moves the selected files to the Trash, without ⌘. Renaming and typing in a search field work as usual. Off by default.
+
 ## 0.1.14 - 2026-10-23
 
 - Clipboard keeps text plain: it is recorded, shown and pasted without its styling, so the **Paste as plain text** setting is gone. This also fixes Estris freezing for up to half a minute when it opens, while the history held text copied from some web pages.

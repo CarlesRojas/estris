@@ -115,6 +115,7 @@
 "Delete entries" = "Delete entries";
 "Delete from history" = "Delete from history";
 "Delete this entry" = "Delete this entry";
+"Delete to Trash" = "Delete to Trash";
 "Developer" = "Developer";
 "development build" = "development build";
 "Device" = "Device";
@@ -147,6 +148,7 @@
 "Force Quit Applications" = "Force Quit Applications";
 "Format" = "Format";
 "Forward Delete" = "Forward Delete";
+"Forward Delete too" = "Forward Delete too";
 "Four fingers" = "Four fingers";
 "Frosted preview" = "Frosted preview";
 "Function Keys" = "Function Keys";
@@ -190,6 +192,7 @@
 "Keypad %@" = "Keypad %@";
 "Keypad Clear" = "Keypad Clear";
 "Keypad Enter" = "Keypad Enter";
+"Keys" = "Keys";
 "Language" = "Language";
 "Language & Region" = "Language & Region";
 "Launchpad" = "Launchpad";
@@ -258,6 +261,7 @@
 "Only to move and resize windows." = "Only to move and resize windows.";
 "Only to paste the entry you pick into the app you're working in." = "Only to paste the entry you pick into the app you're working in.";
 "Only to read and change the keys and buttons you map." = "Only to read and change the keys and buttons you map.";
+"Only to see the Delete key and whether you're typing." = "Only to see the Delete key and whether you're typing.";
 "Only to see when an app's last window closes." = "Only to see when an app's last window closes.";
 "Only to send the middle click." = "Only to send the middle click.";
 "Only to show a thumbnail of what each window shows. Nothing is saved or sent." = "Only to show a thumbnail of what each window shows. Nothing is saved or sent.";
@@ -286,6 +290,7 @@
 "Power source" = "Power source";
 "Press a key or button on %@" = "Press a key or button on %@";
 "Press a shortcut again for the exact size, or hold ⌘ while dragging." = "Press a shortcut again for the exact size, or hold ⌘ while dragging.";
+"Press Delete in Finder to move the selected files to the Trash, without ⌘." = "Press Delete in Finder to move the selected files to the Trash, without ⌘.";
 "Press keys…" = "Press keys…";
 "Press the new shortcut, or Esc to cancel" = "Press the new shortcut, or Esc to cancel";
 "Previews" = "Previews";
@@ -396,6 +401,7 @@
 "The Finder always keeps running" = "The Finder always keeps running";
 "The new language is used once Estris opens again." = "The new language is used once Estris opens again.";
 "The window under the pointer comes to the front and gets the focus." = "The window under the pointer comes to the front and gets the focus.";
+"The ⌦ key, or fn-Delete on a laptop." = "The ⌦ key, or fn-Delete on a laptop.";
 "They replace your current settings, and Estris opens again to apply them." = "They replace your current settings, and Estris opens again to apply them.";
 "Thirds" = "Thirds";
 "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies." = "This button reaches macOS without saying which device sent it, so only the mapping on %@ applies.";
@@ -430,10 +436,12 @@
 "Volume Up" = "Volume Up";
 "Website" = "Website";
 "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text." = "When off, the history keeps the order things were copied in, and ⌘V keeps pasting the last copied text.";
+"While renaming a file or typing in a search field, Delete deletes text as usual. Holding it down moves the files once." = "While renaming a file or typing in a search field, Delete deletes text as usual. Holding it down moves the files once.";
 "Width" = "Width";
 "Window Snapping" = "Window Snapping";
 "Windows & Apps" = "Windows & Apps";
 "Without it, Auto Quit can't do anything." = "Without it, Auto Quit can't do anything.";
+"Without it, Delete to Trash can't do anything." = "Without it, Delete to Trash can't do anything.";
 "Without it, Dock Preview can't do anything." = "Without it, Dock Preview can't do anything.";
 "Without it, each window shows its app's icon instead of a thumbnail." = "Without it, each window shows its app's icon instead of a thumbnail.";
 "Without it, Focus Follows Mouse can't do anything." = "Without it, Focus Follows Mouse can't do anything.";

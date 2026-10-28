@@ -9,6 +9,7 @@ import RoundedCorners from "./RoundedCorners.astro";
 import Remap from "./Remap.astro";
 import MiddleClick from "./MiddleClick.astro";
 import AutoQuit from "./AutoQuit.astro";
+import DeleteToTrash from "./DeleteToTrash.astro";
 
 /** Each feature's spot, by feature id. */
 export const spots: Record<string, any> = {
@@ -23,4 +24,5 @@ export const spots: Record<string, any> = {
   remap: Remap,
   "middle-click": MiddleClick,
   "auto-quit": AutoQuit,
+  "delete-to-trash": DeleteToTrash,
 };
