@@ -460,10 +460,7 @@
 "Automatic" = "Automàtica";
 "Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator." = "Automàtica segueix la data: neu a l'hivern, pètals a la primavera, sorra a l'estiu i fulles a la tardor, a l'inrevés al sud de l'equador.";
 "Autumn: leaves" = "Tardor: fulles";
-"Behind windows" = "Darrere les finestres";
 "Effect" = "Efecte";
-"Falls" = "Cau";
-"In front of windows" = "Davant les finestres";
 "On a screen showing a full screen app" = "En una pantalla amb una app a pantalla completa";
 "On battery or in Low Power Mode" = "Amb bateria o en mode de baix consum";
 "On each window" = "A cada finestra";
@@ -490,3 +487,9 @@
 "Show Start and Stop Falling button" = "Mostra el botó Comença o Atura la caiguda";
 "Start Falling" = "Comença a caure";
 "Stop Falling" = "Atura la caiguda";
+"It falls behind your windows; what you push, dig out or shake off a window comes in front until it lands." = "Cau darrere les finestres; el que empenys, desenterres o fas caure sacsejant una finestra passa al davant fins que aterra.";
+"Particle Size" = "Mida de les partícules";
+"Snow" = "Neu";
+"Petals" = "Pètals";
+"Sand" = "Sorra";
+"Leaves" = "Fulles";

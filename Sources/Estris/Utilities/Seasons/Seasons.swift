@@ -60,27 +60,16 @@ final class Seasons {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.applySeason() }
             .store(in: &observers)
-        settings.$layer
+        settings.$snowSize.map { _ in () }
+            .merge(with: settings.$petalSize.map { _ in () }, settings.$sandSize.map { _ in () }, settings.$leafSize.map { _ in () })
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                guard let self else { return }
-                for scene in scenes { scene.setLevel(level) }
-            }
+            .sink { [weak self] in self?.applySize() }
             .store(in: &observers)
     }
 
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
         SeasonsPane(settings: settings)
-    }
-
-    private var level: NSWindow.Level {
-        switch settings.layer {
-        // Above other apps' windows and floating panels, below the Dock and the menu bar.
-        case .inFront: NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.dockWindow)) - 1)
-        // Above the desktop and its icons, below every window.
-        case .behind: NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopIconWindow)) + 1)
-        }
     }
 
     /// Whether it should be playing now: on, the screens awake, and not paused for power.
@@ -118,7 +107,7 @@ final class Seasons {
         let season = settings.season.season
         self.season = season
         scenes = NSScreen.screens.map { screen in
-            SeasonScene(screen: screen, style: .of(season, scale: screen.backingScaleFactor), level: level)
+            SeasonScene(screen: screen, style: style(of: season, scale: screen.backingScaleFactor))
         }
         if !shouldRun {
             for scene in scenes { scene.setHidden(true) }
@@ -130,11 +119,25 @@ final class Seasons {
         let season = settings.season.season
         guard season != self.season else { return }
         self.season = season
-        let screens = NSScreen.screens
         for scene in scenes {
-            let scale = screens.first { $0.frame == scene.screenFrame }?.backingScaleFactor ?? 2
-            scene.setStyle(.of(season, scale: scale))
+            scene.setStyle(style(of: season, scale: scale(of: scene)))
         }
+    }
+
+    /// A particle size changed: what falls from now on is that size.
+    private func applySize() {
+        guard let season else { return }
+        for scene in scenes {
+            scene.resize(style(of: season, scale: scale(of: scene)))
+        }
+    }
+
+    private func style(of season: Season, scale: CGFloat) -> SeasonStyle {
+        .of(season, scale: scale, size: CGFloat(settings.size(of: season)))
+    }
+
+    private func scale(of scene: SeasonScene) -> CGFloat {
+        NSScreen.screens.first { $0.frame == scene.screenFrame }?.backingScaleFactor ?? 2
     }
 
     private func startTimer() {
@@ -176,7 +179,7 @@ final class Seasons {
         if now - lastPoll >= Self.pollInterval {
             let interval = CGFloat(min(now - lastPoll, 0.5))
             lastPoll = now
-            let snapshot = WindowSnapshot.read()
+            let snapshot = WindowSnapshot.read(excluding: Set(scenes.flatMap(\.ownWindowIDs)))
             for scene in scenes {
                 scene.update(with: snapshot, interval: interval, windowLimit: windowLimit, bottomLimit: bottomLimit, hidesInFullScreen: settings.pausesInFullScreen)
             }

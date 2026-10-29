@@ -22,12 +22,6 @@ struct SeasonsPane: View {
                         }
                     }
                     .resetMenu($settings.season, to: SeasonsSettings.defaultSeason)
-                    Picker("Falls", selection: $settings.layer) {
-                        ForEach(SeasonsLayer.allCases) { layer in
-                            Text(layer.title).tag(layer)
-                        }
-                    }
-                    .resetMenu($settings.layer, to: SeasonsSettings.defaultLayer)
                     LabeledContent("Density") {
                         slider($settings.density, in: SeasonsSettings.densityRange, step: 0.05) {
                             "\(Int((settings.density * 100).rounded()))%"
@@ -47,8 +41,11 @@ struct SeasonsPane: View {
                 } header: {
                     Text("Effect")
                 } footer: {
-                    Text("Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator.")
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator.")
+                        Text("It falls behind your windows; what you push, dig out or shake off a window comes in front until it lands.")
+                    }
+                    .foregroundStyle(.secondary)
                 }
                 Section {
                     LabeledContent("On each window") {
@@ -69,6 +66,14 @@ struct SeasonsPane: View {
                     Text("The most that stays in a pile; past that, leaves and petals melt away and snow and sand fall off. Moving or shaking a window drops what is on it.")
                         .foregroundStyle(.secondary)
                 }
+                Section {
+                    sizeRow("Snow", $settings.snowSize)
+                    sizeRow("Petals", $settings.petalSize)
+                    sizeRow("Sand", $settings.sandSize)
+                    sizeRow("Leaves", $settings.leafSize)
+                } header: {
+                    Text("Particle Size")
+                }
                 Section("Pause") {
                     Toggle("On battery or in Low Power Mode", isOn: $settings.pausesOnBattery)
                         .resetMenu($settings.pausesOnBattery, to: SeasonsSettings.defaultPausesOnBattery)
@@ -84,6 +89,16 @@ struct SeasonsPane: View {
             .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    /// One kind of particle's size, as a share of its usual size.
+    private func sizeRow(_ title: LocalizedStringKey, _ value: Binding<Double>) -> some View {
+        LabeledContent(title) {
+            slider(value, in: SeasonsSettings.sizeRange, step: 0.05) {
+                "\(Int((value.wrappedValue * 100).rounded()))%"
+            }
+        }
+        .resetMenu(value, to: SeasonsSettings.defaultSize)
     }
 
     /// The wind's slider, which fills from calm in the middle, with its value.

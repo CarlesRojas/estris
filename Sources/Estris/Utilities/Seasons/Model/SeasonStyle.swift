@@ -5,7 +5,7 @@ struct SeasonStyle {
     /// Drawn particles to pick from, each a square image.
     let sprites: [CGImage]
     /// Side of a particle, in points.
-    let size: ClosedRange<CGFloat>
+    var size: ClosedRange<CGFloat>
     /// Speed it falls at in still air, in points per second.
     let fallSpeed: ClosedRange<CGFloat>
     /// How far it drifts side to side, as a speed, and how quickly it sways.
@@ -33,7 +33,20 @@ struct SeasonStyle {
         debris.first ?? self
     }
 
-    static func of(_ season: Season, scale: CGFloat) -> SeasonStyle {
+    /// A season's look, its particles `size` times their usual size.
+    static func of(_ season: Season, scale: CGFloat, size: CGFloat = 1) -> SeasonStyle {
+        base(season, scale: scale).scaled(size)
+    }
+
+    /// The same with every particle, and what drifts break into, `factor` times the size.
+    private func scaled(_ factor: CGFloat) -> SeasonStyle {
+        var style = self
+        style.size = (size.lowerBound * factor)...(size.upperBound * factor)
+        style.debris = debris.map { $0.scaled(factor) }
+        return style
+    }
+
+    private static func base(_ season: Season, scale: CGFloat) -> SeasonStyle {
         switch season {
         case .winter:
             // Snow knocked off a pile falls in clumps, heavier than flakes.
@@ -68,7 +81,7 @@ struct SeasonStyle {
         case .autumn:
             return SeasonStyle(
                 sprites: leaves(scale: scale),
-                size: 8.5...13, fallSpeed: 35...65, sway: 40, swayRate: 0.6...1.4, spin: 2.5, drag: 1.1,
+                size: 11...17, fallSpeed: 35...65, sway: 40, swayRate: 0.6...1.4, spin: 2.5, drag: 1.1,
                 rate: 9, thickness: 0.2, pile: .stacked, repose: 3.5
             )
         }
@@ -78,7 +91,7 @@ struct SeasonStyle {
     private static func snow(scale: CGFloat) -> [CGImage] {
         let opacities: [CGFloat] = [0.95, 0.85, 0.7]
         return opacities.map { opacity in
-            sprite(side: 8, scale: scale) { context, rect in
+            sprite(side: 16, scale: scale) { context, rect in
                 let colors = [NSColor.white.withAlphaComponent(opacity).cgColor, NSColor.white.withAlphaComponent(0).cgColor] as CFArray
                 let locations: [CGFloat] = [0.45, 1]
                 guard let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB), colors: colors, locations: locations) else { return }
@@ -97,7 +110,7 @@ struct SeasonStyle {
                     radius: CGFloat.random(in: 0.14...0.24)
                 )
             }
-            return sprite(side: 12, scale: scale) { context, rect in
+            return sprite(side: 28, scale: scale) { context, rect in
                 let side = rect.width
                 // A cool shade below, then the bright tops.
                 context.setFillColor(CGColor(srgbRed: 0.72, green: 0.78, blue: 0.88, alpha: 1))
@@ -120,7 +133,7 @@ struct SeasonStyle {
         let colors = [("FDE6EF", "F2A9C4"), ("FBD9E6", "EE9AB8"), ("FFF0F5", "F6BBD0"), ("F8C8DC", "E58AAE")]
         return colors.map { pair -> CGImage in
             let (tip, base) = pair
-            return sprite(side: 16, scale: scale) { context, rect in
+            return sprite(side: 32, scale: scale) { context, rect in
                 let w = rect.width
                 let h = rect.height
                 let path = CGMutablePath()
@@ -158,7 +171,7 @@ struct SeasonStyle {
             return (0..<2).map { _ -> CGImage in
                 let corners = Int.random(in: 6...8)
                 let radii = (0..<corners).map { _ in CGFloat.random(in: 0.32...0.46) }
-                return sprite(side: 4, scale: scale) { context, rect in
+                return sprite(side: 8, scale: scale) { context, rect in
                     let side = rect.width
                     let path = CGMutablePath()
                     for (index, radius) in radii.enumerated() {
@@ -195,7 +208,7 @@ struct SeasonStyle {
         return shapes.flatMap { shape in
             colors.map { pair -> CGImage in
                 let (middle, edge) = pair
-                return sprite(side: 24, scale: scale) { context, rect in
+                return sprite(side: 44, scale: scale) { context, rect in
                     let size = rect.width
                     var transform = CGAffineTransform(scaleX: size, y: size)
                     guard let outline = shape.outline.copy(using: &transform) else { return }

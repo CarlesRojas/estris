@@ -68,9 +68,8 @@ final class DriftLayer {
     }
 
     /// Draws the drift from its depth in each column, lying on `base` (below 0 down a
-    /// rounded corner), `hidden` telling which points (from its top edge's left end) a window
-    /// in front hides, asked only when there is one.
-    func draw(heights: [CGFloat], base: [CGFloat], columnWidth: CGFloat, hasOccluders: Bool, hidden: (CGFloat, CGFloat) -> Bool) {
+    /// rounded corner).
+    func draw(heights: [CGFloat], base: [CGFloat], columnWidth: CGFloat) {
         lastDraw = CACurrentMediaTime()
         let count = heights.count
         let deepest = heights.max() ?? 0
@@ -107,7 +106,6 @@ final class DriftLayer {
             let lastRow = min(rows - 1, Int(top))
             guard firstRow <= lastRow else { continue }
             for row in firstRow...lastRow {
-                if hasOccluders, hidden(point, (CGFloat(row) + 0.5) / scale - drop) { continue }
                 // Soft at the top, and at the bottom where it follows a corner's curve.
                 var coverage = min(1, top - Float(row)) * min(1, Float(row) + 1 - bottom)
                 guard coverage > 0 else { continue }
@@ -163,8 +161,7 @@ final class DriftLayer {
         for sparkle in sparkles {
             let column = min(count - 1, Int(sparkle.along * CGFloat(count)))
             let height = heights[column]
-            let sparkleY = base[column] + max(0.5, min(height - 0.4, height * (1 - sparkle.depth)))
-            sparkle.layer.isHidden = height < 1.5 || (hasOccluders && hidden((CGFloat(column) + 0.5) * columnWidth, sparkleY))
+            sparkle.layer.isHidden = height < 1.5
             // On a whole pixel, so it stays one sharp point.
             let x = (sparkle.along * CGFloat(count) * columnWidth * scale).rounded(.down) + 0.5
             let y = ((base[column] + max(0.5, min(height - 0.4, height * (1 - sparkle.depth)))) * scale).rounded(.down) + 0.5

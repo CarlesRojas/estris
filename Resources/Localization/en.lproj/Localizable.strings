@@ -460,10 +460,7 @@
 "Automatic" = "Automatic";
 "Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator." = "Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator.";
 "Autumn: leaves" = "Autumn: leaves";
-"Behind windows" = "Behind windows";
 "Effect" = "Effect";
-"Falls" = "Falls";
-"In front of windows" = "In front of windows";
 "On a screen showing a full screen app" = "On a screen showing a full screen app";
 "On battery or in Low Power Mode" = "On battery or in Low Power Mode";
 "On each window" = "On each window";
@@ -490,3 +487,9 @@
 "Show Start and Stop Falling button" = "Show Start and Stop Falling button";
 "Start Falling" = "Start Falling";
 "Stop Falling" = "Stop Falling";
+"It falls behind your windows; what you push, dig out or shake off a window comes in front until it lands." = "It falls behind your windows; what you push, dig out or shake off a window comes in front until it lands.";
+"Particle Size" = "Particle Size";
+"Snow" = "Snow";
+"Petals" = "Petals";
+"Sand" = "Sand";
+"Leaves" = "Leaves";

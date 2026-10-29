@@ -73,26 +73,10 @@ enum Season {
     ]
 }
 
-/// Where the particles fall.
-enum SeasonsLayer: String, CaseIterable, Identifiable {
-    case inFront
-    case behind
-
-    var id: Self { self }
-
-    var title: String {
-        switch self {
-        case .inFront: String(localized: "In front of windows")
-        case .behind: String(localized: "Behind windows")
-        }
-    }
-}
-
 /// Seasons preferences, persisted in UserDefaults.
 @MainActor
 final class SeasonsSettings: ObservableObject {
     static let defaultSeason = SeasonChoice.automatic
-    static let defaultLayer = SeasonsLayer.inFront
     static let defaultDensity: Double = 1
     static let densityRange: ClosedRange<Double> = 0.1...4
     static let defaultWindowLimit: Double = 500
@@ -104,6 +88,9 @@ final class SeasonsSettings: ObservableObject {
     static let windRange: ClosedRange<Double> = -1...1
     /// The strongest wind, in points per second.
     static let strongestWind: Double = 140
+    /// Each season's particles' size, as a share of their usual size.
+    static let defaultSize: Double = 1
+    static let sizeRange: ClosedRange<Double> = 0.5...2.5
     static let defaultPausesOnBattery = true
     static let defaultPausesInFullScreen = true
 
@@ -115,10 +102,6 @@ final class SeasonsSettings: ObservableObject {
 
     @Published var season: SeasonChoice {
         didSet { defaults.set(season.rawValue, forKey: Keys.season) }
-    }
-
-    @Published var layer: SeasonsLayer {
-        didSet { defaults.set(layer.rawValue, forKey: Keys.layer) }
     }
 
     /// How much falls, as a multiple of the season's own rate.
@@ -135,6 +118,32 @@ final class SeasonsSettings: ObservableObject {
     /// The wind, from strongest to the left (-1) to strongest to the right (1).
     @Published var wind: Double {
         didSet { defaults.set(wind, forKey: Keys.wind) }
+    }
+
+    @Published var snowSize: Double {
+        didSet { defaults.set(snowSize, forKey: Keys.snowSize) }
+    }
+
+    @Published var petalSize: Double {
+        didSet { defaults.set(petalSize, forKey: Keys.petalSize) }
+    }
+
+    @Published var sandSize: Double {
+        didSet { defaults.set(sandSize, forKey: Keys.sandSize) }
+    }
+
+    @Published var leafSize: Double {
+        didSet { defaults.set(leafSize, forKey: Keys.leafSize) }
+    }
+
+    /// The size of a season's particles, as a share of their usual size.
+    func size(of season: Season) -> Double {
+        switch season {
+        case .winter: snowSize
+        case .spring: petalSize
+        case .summer: sandSize
+        case .autumn: leafSize
+        }
     }
 
     /// How many particles a window's top edge holds; more melt away the oldest.
@@ -166,10 +175,13 @@ final class SeasonsSettings: ObservableObject {
             Keys.pausesOnBattery: Self.defaultPausesOnBattery,
             Keys.pausesInFullScreen: Self.defaultPausesInFullScreen,
             Keys.isFalling: true,
+            Keys.snowSize: Self.defaultSize,
+            Keys.petalSize: Self.defaultSize,
+            Keys.sandSize: Self.defaultSize,
+            Keys.leafSize: Self.defaultSize,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         season = SeasonChoice(rawValue: defaults.string(forKey: Keys.season) ?? "") ?? Self.defaultSeason
-        layer = SeasonsLayer(rawValue: defaults.string(forKey: Keys.layer) ?? "") ?? Self.defaultLayer
         density = defaults.double(forKey: Keys.density)
         windowLimit = defaults.double(forKey: Keys.windowLimit)
         bottomLimit = defaults.double(forKey: Keys.bottomLimit)
@@ -177,13 +189,20 @@ final class SeasonsSettings: ObservableObject {
         pausesInFullScreen = defaults.bool(forKey: Keys.pausesInFullScreen)
         isFalling = defaults.bool(forKey: Keys.isFalling)
         wind = defaults.double(forKey: Keys.wind)
+        snowSize = defaults.double(forKey: Keys.snowSize)
+        petalSize = defaults.double(forKey: Keys.petalSize)
+        sandSize = defaults.double(forKey: Keys.sandSize)
+        leafSize = defaults.double(forKey: Keys.leafSize)
     }
 
     /// Back to the defaults; the on/off switch and whether it is falling stay.
     func reset() {
         season = Self.defaultSeason
         wind = Self.defaultWind
-        layer = Self.defaultLayer
+        snowSize = Self.defaultSize
+        petalSize = Self.defaultSize
+        sandSize = Self.defaultSize
+        leafSize = Self.defaultSize
         density = Self.defaultDensity
         windowLimit = Self.defaultWindowLimit
         bottomLimit = Self.defaultBottomLimit
@@ -194,7 +213,6 @@ final class SeasonsSettings: ObservableObject {
     private enum Keys {
         static let isEnabled = "seasonsEnabled"
         static let season = "seasonsSeason"
-        static let layer = "seasonsLayer"
         static let density = "seasonsDensity"
         static let windowLimit = "seasonsWindowLimit"
         static let bottomLimit = "seasonsBottomLimit"
@@ -202,5 +220,9 @@ final class SeasonsSettings: ObservableObject {
         static let pausesInFullScreen = "seasonsPausesInFullScreen"
         static let isFalling = "seasonsFalling"
         static let wind = "seasonsWind"
+        static let snowSize = "seasonsSnowSize"
+        static let petalSize = "seasonsPetalSize"
+        static let sandSize = "seasonsSandSize"
+        static let leafSize = "seasonsLeafSize"
     }
 }
