@@ -1,0 +1,221 @@
+---
+import Cursor from "../Cursor.astro";
+import { pointer, presses, EASE } from "../../lib/motion";
+/** A window on a dark screen while the seasons go by: snow, then pink petals, sand and autumn
+    leaves fall and pile up on the window's top edge and the bottom of the screen. In winter the
+    pointer grabs the window and shakes it, and the snow on it falls off. Each season's piles
+    melt away as the next one starts, so it loops. */
+const { d } = Astro.props;
+
+// Each season's share of the loop, in %, and how its particles look.
+const seasons = [
+  { id: "winter", name: "Winter", from: 0, to: 34, color: "#f5f7ff", count: 60, size: [0.35, 0.8], shape: "50%", spin: 0, sway: 1.5 },
+  { id: "spring", name: "Spring", from: 34, to: 56, color: "#f6b3cc", count: 30, size: [0.9, 1.3], shape: "70% 0", spin: 360, sway: 3 },
+  { id: "summer", name: "Summer", from: 56, to: 78, color: "#e3c58f", count: 70, size: [0.25, 0.45], shape: "50%", spin: 0, sway: 0.6 },
+  { id: "autumn", name: "Autumn", from: 78, to: 100, color: "#e0892f", count: 22, size: [1.5, 2.1], shape: "0 70%", spin: 540, sway: 4 },
+];
+const leafColors = ["#e0892f", "#c8552a", "#e8b23a", "#9c5a2c"];
+
+// The same particles on every build.
+let seed = 7;
+const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+
+// Leaves and petals drawn as the app draws them, one picture per colour.
+const svg = (body: string) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'>${body}</svg>`)}")`;
+// A maple leaf, as the app draws it: shaded darker toward its edge, with a stem and veins.
+const leafEdges: Record<string, string> = { "#e0892f": "#9a4416", "#c8552a": "#7a2410", "#e8b23a": "#b06a18", "#9c5a2c": "#552a12" };
+const leaf = (color: string) =>
+  svg(`<defs><radialGradient id='g' cx='.5' cy='.45' r='.55'><stop offset='0' stop-color='${color}'/><stop offset='1' stop-color='${leafEdges[color] ?? color}'/></radialGradient></defs><path d='M10 19.6V15.6' stroke='${leafEdges[color] ?? color}' stroke-width='.8' stroke-linecap='round'/><path d='M10.0 15.6 7.8 16.6 8.0 14.6 3.4 14.2 4.8 12.6 0.8 10.0 2.8 9.2 2.0 6.8 5.2 7.6 5.6 5.8 7.6 7.2 7.0 3.2 8.8 4.0 10.0 0.4 11.2 4.0 13.0 3.2 12.4 7.2 14.4 5.8 14.8 7.6 18.0 6.8 17.2 9.2 19.2 10.0 15.2 12.6 16.6 14.2 12.0 14.6 12.2 16.6z' fill='url(#g)' stroke='rgba(0,0,0,.2)' stroke-width='.25'/><path d='M10 15.6L10.0 1.2M10 15.6L1.6 9.6M10 15.6L18.4 9.6M10 15.6L4.0 14.0M10 15.6L16.0 14.0' stroke='rgba(0,0,0,.22)' stroke-width='.35' fill='none'/>`);
+const petal = (color: string) => svg(`<path d='M10 1C1 7 2 19 8.4 19L10 17.2 11.6 19C18 19 19 7 10 1z' fill='${color}'/>`);
+const petalColors = ["#f8c8dc", "#f4a7c3", "#fbd9e6", "#ee9ab8"];
+const shapeOf = (id: string, color: string) => (id === "autumn" ? leaf(color) : petal(color));
+const colorOf = (id: string) => (id === "autumn" ? leafColors : petalColors)[Math.floor(random() * 4)];
+
+/** Leaves and petals pile up one by one, each landing at its own moment and lying almost flat,
+    the later ones on top; they melt away together when the season ends. */
+const pileItems = seasons
+  .filter((s) => s.id === "spring" || s.id === "autumn")
+  .flatMap((s) =>
+    (["top", "bottom"] as const).flatMap((where) => {
+      const count = where === "top" ? (s.id === "autumn" ? 40 : 55) : s.id === "autumn" ? 70 : 90;
+      return Array.from({ length: count }, (_, n) => {
+        const share = n / count;
+        const land = s.from + 2 + share * (s.to - s.from - 8);
+        const size = s.id === "autumn" ? 1.4 + random() * 0.6 : 0.9 + random() * 0.4;
+        // Higher in the middle of the pile than at its ends, and higher as it fills.
+        const left = where === "top" ? 2 + random() * 94 : -2 + random() * 104;
+        const middle = 1 - Math.abs(left - 50) / 55;
+        const lift = share * middle * (where === "top" ? 1.6 : 2.8) + random() * 0.4;
+        return { season: s.id, where, left, size, lift, land, end: s.to - 2, angle: (random() < 0.5 ? 90 : -90) + (random() - 0.5) * 70, image: shapeOf(s.id, colorOf(s.id)), name: `ss-${s.id}-${where}-${n}` };
+      });
+    }),
+  );
+
+// Each falls in a whole number of loops per `--d`, so the loop ends as it starts.
+const particles = seasons.flatMap((season) =>
+  Array.from({ length: season.count }, () => {
+    const size = season.size[0] + random() * (season.size[1] - season.size[0]);
+    const flat = season.id === "autumn" || season.id === "spring";
+    const color = season.id === "autumn" ? leafColors[Math.floor(random() * leafColors.length)] : season.id === "spring" ? petalColors[Math.floor(random() * 4)] : season.color;
+    return { season: season.id, left: random() * 100, size, color, image: flat ? shapeOf(season.id, color) : "", tumble: 6 + Math.floor(random() * 10), falls: 5 + Math.floor(random() * 4), delay: random(), spin: season.spin * (random() < 0.5 ? -1 : 1), sway: season.sway, shape: season.shape };
+  }),
+);
+
+/** A season's particles show only during it, fading in and out. */
+const visible = (s: (typeof seasons)[number]) =>
+  s.from === 0
+    ? // Snow comes back as autumn ends, so the loop joins up.
+      `@keyframes ss-${s.id}-on { 0%, ${s.to - 1}% { opacity: 1; } ${s.to + 1}%, 97% { opacity: 0; } 100% { opacity: 1; } }`
+    : `@keyframes ss-${s.id}-on { 0%, ${s.from - 1}% { opacity: 0; } ${s.from + 1}%, ${Math.min(s.to - 1, 97)}% { opacity: 1; } ${Math.min(s.to + 1, 100)}%, 100% { opacity: 0; } }`;
+
+/** A pile that grows over its season and melts as the next starts. Winter's on the window falls
+    off when it is shaken instead. */
+const pile = (name: string, from: number, full: number, to: number) => `@keyframes ${name} {
+  0%, ${from}% { transform: scaleY(0); opacity: 1; }
+  ${full}% { transform: scaleY(1); opacity: 1; }
+  ${to}% { transform: scaleY(1); opacity: 1; }
+  ${Math.min(to + 3, 100)}%, 100% { transform: scaleY(.6); opacity: 0; }
+}`;
+
+// The window's bar is at (50%, 32.5%) of the screen; it is shaken from 22 % to 30 %.
+const css = [
+  pointer("ss-cursor", [[0, 86, 92], [12, 86, 92], [20, 50, 32.5], [22, 50, 32.5], [23, 45, 32.5], [24, 55, 32.5], [25, 45, 32.5], [26, 55, 32.5], [27, 45, 32.5], [28, 55, 32.5], [30, 50, 32.5], [32, 50, 32.5], [42, 86, 92], [100, 86, 92]]),
+  presses("ss-press", [], [[21, 30]]),
+  `@keyframes ss-shake {
+    0%, 22% { transform: none; }
+    23% { transform: translateX(-4.4cqw) rotate(-1deg); }
+    24% { transform: translateX(4.4cqw) rotate(1deg); }
+    25% { transform: translateX(-4.4cqw) rotate(-1deg); }
+    26% { transform: translateX(4.4cqw) rotate(1deg); }
+    27% { transform: translateX(-4.4cqw) rotate(-1deg); }
+    28% { transform: translateX(4.4cqw) rotate(1deg); }
+    30%, 100% { transform: none; }
+  }`,
+  // Shaken off: drops and breaks up.
+  `@keyframes ss-top-winter {
+    0% { transform: scaleY(0); opacity: 1; }
+    18%, 23% { transform: scaleY(1); opacity: 1; animation-timing-function: ${EASE.exit}; }
+    27% { transform: translateY(14cqw) scaleY(.7); opacity: 0; }
+    100% { transform: scaleY(0); opacity: 0; }
+  }`,
+  `@keyframes ss-crumbs {
+    0%, 23% { opacity: 0; transform: none; animation-timing-function: ${EASE.exit}; }
+    24% { opacity: 1; transform: none; animation-timing-function: ${EASE.exit}; }
+    31% { opacity: 0; transform: translateY(30cqw); }
+    100% { opacity: 0; transform: translateY(30cqw); }
+  }`,
+  pile("ss-bottom-winter", 2, 30, 34),
+  pile("ss-top-summer", 57, 72, 76),
+  pile("ss-bottom-summer", 57, 74, 76),
+  ...pileItems.map((p) => `@keyframes ${p.name} {
+    0%, ${p.land.toFixed(2)}% { opacity: 0; transform: translateY(-4cqw) rotate(${(p.angle + 50).toFixed(0)}deg); }
+    ${p.land.toFixed(2)}% { animation-timing-function: ${EASE.snap}; }
+    ${(p.land + 1.8).toFixed(2)}%, ${p.end}% { opacity: 1; transform: rotate(${p.angle.toFixed(0)}deg); }
+    ${p.end}% { animation-timing-function: ${EASE.exit}; }
+    ${Math.min(p.end + 3, 100)}%, 100% { opacity: 0; transform: translateY(.4cqw) rotate(${p.angle.toFixed(0)}deg) scale(.8); }
+  }`),
+  `@keyframes ss-tumble { 0%, 100% { transform: rotateX(-55deg) rotateY(20deg); animation-timing-function: ${EASE.sine}; } 50% { transform: rotateX(55deg) rotateY(-20deg); animation-timing-function: ${EASE.sine}; } }`,
+  ...seasons.map(visible),
+  ...seasons.map((s) => `@keyframes ss-label-${s.id} {
+    0%, ${Math.max(0, s.from - 0.1)}% { opacity: 0; transform: translateY(1.5cqw) scale(.85); }
+    ${s.from}% { animation-timing-function: ${EASE.back}; }
+    ${s.from + 3}%, ${s.to - 2}% { opacity: 1; transform: none; }
+    ${s.to - 2}% { animation-timing-function: ${EASE.exit}; }
+    ${s.to}%, 100% { opacity: 0; transform: scale(.94); }
+  }`),
+  `@keyframes ss-fall { from { transform: translateY(0) rotate(0); } to { transform: translateY(var(--h)) rotate(var(--spin)); } }`,
+  `@keyframes ss-sway { 0%, 100% { margin-left: calc(var(--sway) * -1); animation-timing-function: ${EASE.sine}; } 50% { margin-left: var(--sway); animation-timing-function: ${EASE.sine}; } }`,
+].join("\n");
+---
+<div class="spot s-ss" style={`--d:${d}s`}>
+  <div class="screen ss-screen">
+    {seasons.map((s) => (
+      <div class={`ss-flakes ss-flakes-${s.id}`}>
+        {particles.filter((p) => p.season === s.id).map((p) => (
+          <i class={p.image ? "flat" : ""} style={`left:${p.left.toFixed(2)}%;--s:${p.size.toFixed(2)}cqw;${p.image ? `--img:${p.image};--tumble:calc(var(--d) / ${p.tumble})` : `background:${p.color};border-radius:${p.shape}`};--spin:${p.spin}deg;--sway:${p.sway}cqw;--t:calc(var(--d) / ${p.falls});animation-delay:calc(var(--t) * -${p.delay.toFixed(3)})`}><b></b></i>
+        ))}
+      </div>
+    ))}
+    <div class="ss-wrap">
+      {seasons.filter((s) => s.id === "winter" || s.id === "summer").map((s) => <div class={`ss-pile ss-top ss-top-${s.id}`}></div>)}
+      <div class="ss-items ss-items-top">
+        {pileItems.filter((p) => p.where === "top").map((p) => <i style={`left:${p.left.toFixed(2)}%;bottom:${p.lift.toFixed(2)}cqw;--s:${p.size.toFixed(2)}cqw;background-image:${p.image};animation-name:${p.name}`}></i>)}
+      </div>
+      <div class="ss-crumbs"><b></b><b></b><b></b><b></b><b></b><b></b></div>
+      <div class="win ss-win">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="ss-lines"><b></b><b></b><b></b></div>
+      </div>
+    </div>
+    {seasons.filter((s) => s.id === "winter" || s.id === "summer").map((s) => <div class={`ss-pile ss-bottom ss-bottom-${s.id}`}></div>)}
+    <div class="ss-items ss-items-bottom">
+      {pileItems.filter((p) => p.where === "bottom").map((p) => <i style={`left:${p.left.toFixed(2)}%;bottom:${p.lift.toFixed(2)}cqw;--s:${p.size.toFixed(2)}cqw;background-image:${p.image};animation-name:${p.name}`}></i>)}
+    </div>
+    <Cursor class="ss-cursor" />
+  </div>
+  <div class="ss-labels">
+    {seasons.map((s) => <span class={`pill ss-label ss-label-${s.id}`}>{s.name}</span>)}
+  </div>
+</div>
+
+<style is:global>
+  .s-ss { --winter: #f5f7ff; --spring: #f6b3cc; --summer: #e3c58f; --autumn: #d9782c; }
+  .s-ss .ss-flakes { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; }
+  .s-ss .ss-flakes-winter { opacity: 1; }
+  /* Each particle: an outer element that sways, an inner one that falls the screen's height. */
+  .s-ss .ss-flakes i {
+    position: absolute; top: calc(var(--s) * -2); width: var(--s); height: var(--s); display: block;
+    --h: 70cqw; transform: translateY(0);
+  }
+  .s-ss .ss-flakes i b { display: none; }
+  /* Leaves and petals tumble as they fall, turning edge-on and back. */
+  .s-ss .ss-flakes i.flat { perspective: 10cqw; }
+  .s-ss .ss-flakes i.flat b { display: block; width: 100%; height: 100%; background: var(--img) center / contain no-repeat; }
+  /* Pile items: each a leaf or petal lying on the pile, nearly on its side. */
+  .s-ss .ss-items { position: absolute; pointer-events: none; }
+  .s-ss .ss-items-top { left: 0; right: 0; bottom: 100%; height: 3cqw; margin-bottom: -0.6cqw; }
+  .s-ss .ss-items-bottom { left: 0; right: 0; bottom: -0.6cqw; height: 5cqw; z-index: 4; }
+  .s-ss .ss-items i { position: absolute; width: var(--s); height: var(--s); margin-left: calc(var(--s) / -2); background: center / contain no-repeat; opacity: 0; }
+  .s-ss .ss-wrap { position: absolute; left: 18%; top: 30%; width: 64%; height: 46%; z-index: 2; }
+  .s-ss .ss-win { inset: 0; }
+  .s-ss .ss-lines { position: absolute; left: 8%; right: 8%; top: 22%; display: flex; flex-direction: column; gap: 1.4cqw; }
+  .s-ss .ss-lines b { display: block; height: 1.3cqw; border-radius: 1cqw; background: rgba(255, 255, 255, .1); }
+  .s-ss .ss-lines b:first-child { width: 45%; background: #8fb8ff; }
+  .s-ss .ss-lines b:nth-child(2) { width: 70%; }
+  .s-ss .ss-lines b:last-child { width: 55%; }
+  /* Piles: a mound with soft ends, growing up from where it rests. */
+  .s-ss .ss-pile { position: absolute; transform-origin: bottom; transform: scaleY(0); border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+  .s-ss .ss-top { left: 1%; right: 1%; bottom: 100%; height: 2.4cqw; margin-bottom: -0.3cqw; }
+  .s-ss .ss-bottom { left: -3%; right: -3%; bottom: 0; height: 4.6cqw; z-index: 4; border-radius: 40% 60% 0 0 / 100% 100% 0 0; }
+  .s-ss .ss-top-winter, .s-ss .ss-bottom-winter { background: var(--winter); box-shadow: inset 0 -0.4cqw 0.6cqw rgba(140, 160, 200, .35); }
+  .s-ss .ss-top-summer, .s-ss .ss-bottom-summer { background: radial-gradient(circle, rgba(150, 110, 60, .35) 0 18%, transparent 20%) 0 0 / 0.8cqw 0.8cqw, var(--summer); }
+  .s-ss .ss-crumbs { position: absolute; left: 0; right: 0; bottom: 100%; height: 2cqw; opacity: 0; }
+  .s-ss .ss-crumbs b { position: absolute; bottom: 0; width: 1.6cqw; height: 1.2cqw; border-radius: 50%; background: var(--winter); }
+  .s-ss .ss-crumbs b:nth-child(1) { left: 6%; } .s-ss .ss-crumbs b:nth-child(2) { left: 22%; margin-bottom: 2cqw; }
+  .s-ss .ss-crumbs b:nth-child(3) { left: 40%; } .s-ss .ss-crumbs b:nth-child(4) { left: 58%; margin-bottom: 3cqw; }
+  .s-ss .ss-crumbs b:nth-child(5) { left: 76%; } .s-ss .ss-crumbs b:nth-child(6) { left: 92%; margin-bottom: 1cqw; }
+  .s-ss .ss-cursor { left: 86%; top: 92%; z-index: 6; }
+  .s-ss .ss-labels { position: absolute; left: 0; right: 0; top: 79%; display: grid; justify-items: center; }
+  .s-ss .ss-label { grid-area: 1 / 1; opacity: 0; font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
+
+  .s-ss.playing .ss-flakes i { animation: ss-fall var(--t) linear infinite, ss-sway calc(var(--t) / 2) infinite; }
+  .s-ss.playing .ss-cursor { animation: ss-cursor-x var(--d) both, ss-cursor-y var(--d) both; }
+  .s-ss.playing .ss-cursor .press { animation: ss-press var(--d) both; }
+  .s-ss.playing .ss-wrap { animation: ss-shake var(--d) both; }
+  .s-ss.playing .ss-crumbs { animation: ss-crumbs var(--d) both; }
+  .s-ss.playing .ss-top-winter { animation: ss-top-winter var(--d) both; }
+  .s-ss.playing .ss-bottom-winter { animation: ss-bottom-winter var(--d) both; }
+  .s-ss.playing .ss-items i { animation-duration: var(--d); animation-fill-mode: both; }
+  .s-ss.playing .ss-flakes i.flat b { animation: ss-tumble var(--tumble) linear infinite; }
+  .s-ss.playing .ss-top-summer { animation: ss-top-summer var(--d) both; }
+  .s-ss.playing .ss-bottom-summer { animation: ss-bottom-summer var(--d) both; }
+  .s-ss.playing .ss-flakes-winter { animation: ss-winter-on var(--d) both; }
+  .s-ss.playing .ss-flakes-spring { animation: ss-spring-on var(--d) both; }
+  .s-ss.playing .ss-flakes-summer { animation: ss-summer-on var(--d) both; }
+  .s-ss.playing .ss-flakes-autumn { animation: ss-autumn-on var(--d) both; }
+  .s-ss.playing .ss-label-winter { animation: ss-label-winter var(--d) both; }
+  .s-ss.playing .ss-label-spring { animation: ss-label-spring var(--d) both; }
+  .s-ss.playing .ss-label-summer { animation: ss-label-summer var(--d) both; }
+  .s-ss.playing .ss-label-autumn { animation: ss-label-autumn var(--d) both; }
+</style>
+<Fragment set:html={`<style>${css}</style>`} />

@@ -2,8 +2,8 @@ import AppKit
 import SwiftUI
 
 /// What clicking the menu bar icon shows, in the clipboard overlay's default frosted look: an
-/// update when one is out, the Volume Mixer, the Clipboard and the Color Picker while each is on (the parts chosen in
-/// Settings > Menu Bar), then Settings and Quit side by side.
+/// update when one is out, the Volume Mixer, the Clipboard, the Color Picker and Seasons while
+/// each is on (the parts chosen in Settings > Menu Bar), then Settings and Quit side by side.
 struct MenuBarMenu: View {
     static let width: CGFloat = 360
 
@@ -14,6 +14,7 @@ struct MenuBarMenu: View {
     @ObservedObject var clipboardSettings: ClipboardSettings
     @ObservedObject var history: ClipboardHistory
     @ObservedObject var colorPickerSettings: ColorPickerSettings
+    @ObservedObject var seasonsSettings: SeasonsSettings
     let paste: (ClipItem) -> Void
     let clearHistory: () -> Void
     let pickColor: () -> Void
@@ -29,7 +30,8 @@ struct MenuBarMenu: View {
             && ((settings.showsSystem && (settings.showsOutput || settings.showsInput)) || settings.showsApps)
         let clipboard = clipboardSettings.isEnabled && (settings.showsClipboardHistory || settings.showsClearHistory)
         let colorPicker = colorPickerSettings.isEnabled && (settings.showsColorPicker || settings.showsRecentColors)
-        return mixer || clipboard || colorPicker || updates.availableVersion != nil
+        let seasons = seasonsSettings.isEnabled && settings.showsSeasons
+        return mixer || clipboard || colorPicker || seasons || updates.availableVersion != nil
     }
 
     var body: some View {
@@ -93,6 +95,11 @@ struct MenuBarMenu: View {
                     if settings.showsColorPicker {
                         menuButton("Pick a Color", symbol: "eyedropper", action: pickColor)
                     }
+                }
+            }
+            if seasonsSettings.isEnabled && settings.showsSeasons {
+                group("Seasons") {
+                    SeasonsMenuRows(seasons: seasonsSettings, settings: settings)
                 }
             }
             HStack(spacing: 8) {
@@ -212,5 +219,93 @@ private struct HistoryEntryButton: View {
         }
         .buttonStyle(.plain)
         .onHover { isHovered = $0 }
+    }
+}
+
+/// Seasons in the menu: the season to pick and a button to start and stop the falling, then
+/// the intensity and the wind, each part as chosen in Settings > Menu Bar.
+private struct SeasonsMenuRows: View {
+    @ObservedObject var seasons: SeasonsSettings
+    @ObservedObject var settings: MenuBarSettings
+
+    var body: some View {
+        if settings.showsSeasonsSeason || settings.showsSeasonsFalling {
+            HStack(spacing: 8) {
+                if settings.showsSeasonsSeason {
+                    Image(systemName: seasons.season.season.symbol)
+                        .frame(width: 18)
+                    Picker("Season", selection: $seasons.season) {
+                        ForEach(SeasonChoice.allCases) { choice in
+                            Text(choice.title).tag(choice)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .fixedSize()
+                }
+                Spacer(minLength: 8)
+                if settings.showsSeasonsFalling {
+                    Button {
+                        seasons.isFalling.toggle()
+                    } label: {
+                        Label {
+                            Text(fallingTitle)
+                        } icon: {
+                            // Small beside the words, as an icon on a button.
+                            Image(systemName: fallingSymbol)
+                                .font(.system(size: 9, weight: .bold))
+                        }
+                            .padding(.horizontal, 12)
+                            .frame(minHeight: 24)
+                            .contentShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .background(Color.primary.opacity(0.1), in: Capsule())
+                }
+            }
+        }
+        if settings.showsSeasonsIntensity {
+            row("Intensity", value: "\(Int((seasons.density * 100).rounded()))%") {
+                Slider(value: $seasons.density, in: SeasonsSettings.densityRange)
+            }
+        }
+        if settings.showsSeasonsWind {
+            row("Wind", value: windText) {
+                WindSlider(
+                    value: Binding(get: { seasons.wind }, set: { seasons.wind = abs($0) < 0.06 ? 0 : $0 }),
+                    range: SeasonsSettings.windRange,
+                    fill: .controlAccentColor
+                )
+            }
+        }
+    }
+
+    /// A slider with its name on the left and its value on the right.
+    private func row<Content: View>(_ title: LocalizedStringKey, value: String, @ViewBuilder slider: () -> Content) -> some View {
+        HStack(spacing: 10) {
+            Text(title)
+                .frame(width: 64, alignment: .leading)
+            slider()
+                .controlSize(.small)
+            Text(verbatim: value)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .frame(width: 52, alignment: .trailing)
+        }
+    }
+
+    private var fallingTitle: String {
+        seasons.isFalling ? String(localized: "Stop Falling") : String(localized: "Start Falling")
+    }
+
+    /// Pause while falling, play while stopped.
+    private var fallingSymbol: String {
+        seasons.isFalling ? "pause.fill" : "play.fill"
+    }
+
+    private var windText: String {
+        let percent = Int((abs(seasons.wind) * 100).rounded())
+        guard percent > 0 else { return String(localized: "Calm") }
+        return seasons.wind < 0 ? "← \(percent)%" : "\(percent)% →"
     }
 }
