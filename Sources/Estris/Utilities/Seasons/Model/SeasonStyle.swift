@@ -22,7 +22,8 @@ struct SeasonStyle {
     /// Whether particles stay themselves on a pile or merge into a drift.
     let pile: PileKind
     /// The steepest a pile gets: the most one column (3 points wide) stands above the next
-    /// before what lands on it rolls down (about 34° for sand; snow holds steeper).
+    /// before what lands on it rolls down (about 23° for sand, which flows; snow a little
+    /// steeper).
     let repose: CGFloat
     /// What a drift breaks into when dug or shaken off, when it differs from what falls.
     var debris: [SeasonStyle] = []
@@ -39,12 +40,12 @@ struct SeasonStyle {
             let clumps = SeasonStyle(
                 sprites: clumps(scale: scale),
                 size: 5...11, fallSpeed: 90...150, sway: 4, swayRate: 1...2, spin: 1.5, drag: 2.2,
-                rate: 0, thickness: 0.9, pile: .snow, repose: 5
+                rate: 0, thickness: 0.9, pile: .snow, repose: 2.5
             )
             return SeasonStyle(
                 sprites: snow(scale: scale),
                 size: 2.5...6, fallSpeed: 30...65, sway: 16, swayRate: 0.6...1.6, spin: 0, drag: 1.6,
-                rate: 70, thickness: 0.9, pile: .snow, repose: 5, debris: [clumps]
+                rate: 70, thickness: 0.9, pile: .snow, repose: 2.5, debris: [clumps]
             )
         case .spring:
             return SeasonStyle(
@@ -57,12 +58,12 @@ struct SeasonStyle {
             let grains = SeasonStyle(
                 sprites: sand(scale: scale),
                 size: 1.3...2.2, fallSpeed: 120...200, sway: 3, swayRate: 1...3, spin: 0, drag: 3.5,
-                rate: 0, thickness: 0.8, pile: .sand, repose: 2
+                rate: 0, thickness: 0.8, pile: .sand, repose: 1.3
             )
             return SeasonStyle(
                 sprites: sand(scale: scale),
                 size: 2...3.5, fallSpeed: 110...170, sway: 6, swayRate: 1...3, spin: 0, drag: 3,
-                rate: 80, thickness: 0.8, pile: .sand, repose: 2, debris: [grains]
+                rate: 80, thickness: 0.8, pile: .sand, repose: 1.3, debris: [grains]
             )
         case .autumn:
             return SeasonStyle(

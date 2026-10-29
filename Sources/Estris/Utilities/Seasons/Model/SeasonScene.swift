@@ -88,6 +88,8 @@ final class Surface {
     /// When, in the scene's time, it starts collecting: a window that just moved collects
     /// nothing until it has been still a moment, so a dragged or shaken window stays clear.
     var collectsFrom: CGFloat = 0
+    /// A window's drift that holds all it may: what falls on it carries on past.
+    var isFull = false
     private(set) var minX: CGFloat
     private(set) var y: CGFloat
     private(set) var columns: [[Particle]]
@@ -163,10 +165,14 @@ final class Surface {
         heights.reduce(0, +)
     }
 
-    /// Adds to a drift, spread over the column where it lands and its neighbours.
+    /// Adds to a drift, spread over the column where it lands and its neighbours: snow wider,
+    /// as it settles softly.
     func deposit(_ amount: CGFloat, at column: Int) {
         let ceiling = DriftLayer.height - 10
-        for (offset, share) in [(-1, 0.25), (0, 0.5), (1, 0.25)] as [(Int, CGFloat)] {
+        let spread: [(Int, CGFloat)] = kind == .snow
+            ? [(-2, 0.1), (-1, 0.2), (0, 0.4), (1, 0.2), (2, 0.1)]
+            : [(-1, 0.25), (0, 0.5), (1, 0.25)]
+        for (offset, share) in spread {
             let target = min(columns.count - 1, max(0, column + offset))
             heights[target] = min(ceiling, heights[target] + amount * share)
         }
@@ -178,6 +184,7 @@ final class Surface {
     func dig(_ amount: CGFloat, at column: Int) {
         heights[column] = max(0, heights[column] - amount)
         dug += amount
+        isFull = false
         isSettling = true
         needsDraw = true
     }
@@ -225,17 +232,23 @@ final class Surface {
             }
             moved += amount
         }
-        if count > 2 {
-            // Evens out, keeping all it has: snow into soft curves, sand just enough that
-            // single grains don't show as spikes.
-            let smoothing: CGFloat = sticky ? 0.05 : 0.025
+        // Evens out, keeping all it has, until the surface is smooth: snow into soft
+        // curves with no peaks, sand easing into any hollow beside it.
+        // Each pair of neighbours trades a share of their difference, so nothing is made or
+        // lost, at the ends too.
+        var smoothed: CGFloat = 0
+        if count > 1 {
+            let smoothing: CGFloat = sticky ? 0.12 : 0.05
             let before = heights
-            for column in 1..<(count - 1) {
-                heights[column] += smoothing * (before[column - 1] + before[column + 1] - 2 * before[column])
+            for column in 0..<(count - 1) {
+                let flow = smoothing * (before[column] - before[column + 1])
+                heights[column] -= flow
+                heights[column + 1] += flow
+                smoothed = max(smoothed, abs(flow))
             }
         }
-        if moved > 0 { needsDraw = true }
-        if moved < 0.01 { isSettling = false }
+        if moved > 0 || smoothed > 0.002 { needsDraw = true }
+        if moved < 0.01, smoothed < 0.002 { isSettling = false }
     }
 
     /// Lets go of every particle, which fall from where they are.
@@ -506,7 +519,7 @@ final class SeasonScene {
     private func land(_ particle: Particle, from previous: CGPoint, on surfaces: [Surface], windowLimit: Int, bottomLimit: Int) {
         guard particle.velocity.dy < 0 else { return }
         var best: (surface: Surface, column: Int, top: CGFloat)?
-        for surface in surfaces where surface.collectsFrom <= time {
+        for surface in surfaces where surface.collectsFrom <= time && !surface.isFull {
             guard let column = surface.column(at: particle.position.x) else { continue }
             let top = surface.top(column)
             guard previous.y >= top - 0.5, particle.position.y < top,
@@ -528,7 +541,12 @@ final class SeasonScene {
         if surface.kind != .stacked {
             // Snow and sand join the drift and are no longer particles of their own.
             surface.deposit(particle.thickness, at: landing)
-            surface.shrink(to: CGFloat(limit) * unit)
+            if surface.isFloor {
+                // The bottom of the screen settles lower as it fills.
+                surface.shrink(to: CGFloat(limit) * unit)
+            } else {
+                surface.isFull = surface.volume >= CGFloat(limit) * unit
+            }
             particle.isGone = true
             return
         }
@@ -627,7 +645,7 @@ final class SeasonScene {
     /// falling grains, and draws what changed.
     private func settleDrifts() {
         for surface in [floor] + Array(tops.values) where surface.kind != .stacked {
-            for _ in 0..<(surface.kind == .sand ? 2 : 1) {
+            for _ in 0..<(surface.kind == .sand ? 3 : 1) {
                 surface.settle(repose: style.repose)
             }
             while surface.spilledLeft >= pieceUnit {
@@ -687,6 +705,7 @@ final class SeasonScene {
     private func trim(_ surface: Surface, to limit: Int) {
         if surface.kind != .stacked {
             surface.shrink(to: CGFloat(limit) * unit)
+            surface.isFull = !surface.isFloor && surface.volume >= CGFloat(limit) * unit * 0.98
             return
         }
         while surface.settled.count > limit, let oldest = surface.settled.first {

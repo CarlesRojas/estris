@@ -130,38 +130,59 @@ private final class WidgetPanel: NSPanel {
     override var canBecomeKey: Bool { true }
 }
 
-/// The widget's face: the season and a start/stop button on top, then intensity and wind.
+/// The widget's face, in the manner of a macOS desktop widget: the season large with its
+/// symbol in its colour, what it is doing, and a round start/stop button; then intensity and
+/// wind. Frosted glass over whatever lies behind it.
 struct WeatherWidgetView: View {
+    static let cornerRadius: CGFloat = 22
+
     @ObservedObject var seasons: SeasonsSettings
     @ObservedObject var settings: WeatherWidgetSettings
 
+    private var season: Season { seasons.season.season }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: seasons.season.season.symbol)
-                    .font(.system(size: 17, weight: .medium))
-                    .frame(width: 22)
-                if settings.showsSeason {
-                    Picker("Season", selection: $seasons.season) {
-                        ForEach(SeasonChoice.allCases) { choice in
-                            Text(choice.title).tag(choice)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 10) {
+                Image(systemName: season.symbol)
+                    .font(.system(size: 26, weight: .medium))
+                    .foregroundStyle(season.accent)
+                    .frame(width: 34)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(season.title)
+                        .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    if settings.showsSeason {
+                        Menu {
+                            Picker("Season", selection: $seasons.season) {
+                                ForEach(SeasonChoice.allCases) { choice in
+                                    Text(choice.title).tag(choice)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                            .labelsHidden()
+                        } label: {
+                            Text(status)
                         }
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.visible)
+                        .fixedSize()
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.secondary)
+                    } else {
+                        Text(status)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(.secondary)
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .fixedSize()
-                } else {
-                    Text(seasons.season.season.title)
-                        .font(.headline)
                 }
-                Spacer(minLength: 4)
+                Spacer(minLength: 8)
                 Button {
                     seasons.isFalling.toggle()
                 } label: {
                     Image(systemName: fallingSymbol)
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(width: 30, height: 30)
-                        .background(Circle().fill(Color.primary.opacity(0.12)))
+                        .font(.system(size: 14, weight: .bold))
+                        .frame(width: 36, height: 36)
+                        .background(Circle().fill(.thinMaterial))
+                        .overlay(Circle().strokeBorder(Color.white.opacity(0.18)))
                         .contentShape(Circle())
                 }
                 .buttonStyle(.plain)
@@ -170,47 +191,57 @@ struct WeatherWidgetView: View {
             // Dragging the top row moves the widget.
             .background(WindowDragArea())
 
-            if settings.showsIntensity {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Intensity")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Slider(value: $seasons.density, in: SeasonsSettings.densityRange) {
-                        Text("Intensity")
-                    } minimumValueLabel: {
-                        Image(systemName: "aqi.low")
-                    } maximumValueLabel: {
-                        Image(systemName: "aqi.high")
+            if settings.showsIntensity || settings.showsWind {
+                VStack(spacing: 8) {
+                    if settings.showsIntensity {
+                        control("Intensity") {
+                            Slider(value: $seasons.density, in: SeasonsSettings.densityRange)
+                        } value: {
+                            "\(Int((seasons.density * 100).rounded()))%"
+                        }
                     }
-                    .labelsHidden()
-                }
-            }
-            if settings.showsWind {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("Wind")
-                        Spacer()
-                        Text(windText)
-                            .monospacedDigit()
+                    if settings.showsWind {
+                        control("Wind") {
+                            Slider(value: wind, in: SeasonsSettings.windRange)
+                        } value: {
+                            windText
+                        }
                     }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    Slider(value: wind, in: SeasonsSettings.windRange) {
-                        Text("Wind")
-                    } minimumValueLabel: {
-                        Image(systemName: "arrow.left")
-                    } maximumValueLabel: {
-                        Image(systemName: "arrow.right")
-                    }
-                    .labelsHidden()
                 }
             }
         }
-        .padding(14)
-        .frame(width: 240)
-        .background(VisualEffect())
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white.opacity(0.12)))
+        .tint(season.accent)
+        .padding(16)
+        .frame(width: 330)
+        .background(VisualEffect(cornerRadius: Self.cornerRadius))
+        .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.14), lineWidth: 0.5)
+        )
+    }
+
+    /// A row with its name on the left, the slider, and its value on the right.
+    private func control<Content: View>(_ title: LocalizedStringKey, @ViewBuilder slider: () -> Content, value: () -> String) -> some View {
+        let text = value()
+        return HStack(spacing: 10) {
+            Text(title)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(.secondary)
+                .frame(width: 64, alignment: .leading)
+            slider()
+                .controlSize(.small)
+            Text(verbatim: text)
+                .font(.system(size: 12, weight: .medium).monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(width: 48, alignment: .trailing)
+        }
+    }
+
+    /// Whether it is set to follow the date, and what the weather is doing.
+    private var status: String {
+        let doing = seasons.isFalling ? season.falling : String(localized: "Paused")
+        return seasons.season == .automatic ? String(localized: "Automatic · \(doing)") : doing
     }
 
     /// Pause while falling, play while stopped.
@@ -233,13 +264,23 @@ struct WeatherWidgetView: View {
     }
 }
 
-/// The frosted background of a HUD.
+/// Frosted glass showing what lies behind the window, blurred, rounded like a widget.
 private struct VisualEffect: NSViewRepresentable {
+    let cornerRadius: CGFloat
+
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
-        view.material = .hudWindow
+        view.material = .popover
         view.blendingMode = .behindWindow
         view.state = .active
+        // A mask keeps the glass itself rounded: clipping the view alone leaves square
+        // corners of blur.
+        view.maskImage = NSImage(size: NSSize(width: cornerRadius * 2 + 1, height: cornerRadius * 2 + 1), flipped: false) { rect in
+            NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius).fill()
+            return true
+        }
+        view.maskImage?.capInsets = NSEdgeInsets(top: cornerRadius, left: cornerRadius, bottom: cornerRadius, right: cornerRadius)
+        view.maskImage?.resizingMode = .stretch
         return view
     }
 
