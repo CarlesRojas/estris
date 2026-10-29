@@ -14,6 +14,10 @@ final class Particle {
     var velocity: CGVector
     var angle: CGFloat
     var spin: CGFloat
+    /// Leaves and petals tumble as they fall: how far turned edge-on, and how fast.
+    let tumbles: Bool
+    var flip: CGFloat
+    let flipRate: CGFloat
     let size: CGFloat
     let fallSpeed: CGFloat
     let swayRate: CGFloat
@@ -39,6 +43,10 @@ final class Particle {
         velocity = CGVector(dx: 0, dy: -fallSpeed)
         angle = style.spin > 0 ? CGFloat.random(in: 0...(2 * .pi)) : 0
         spin = style.spin > 0 ? CGFloat.random(in: -style.spin...style.spin) : 0
+        tumbles = style.spin > 0
+        flip = CGFloat.random(in: 0...(2 * .pi))
+        let flipDirection: CGFloat = Bool.random() ? 1 : -1
+        flipRate = CGFloat.random(in: 1.5...4) * flipDirection
         layer.contents = style.sprites.randomElement()
         layer.contentsGravity = .resizeAspect
         layer.bounds = CGRect(x: 0, y: 0, width: size, height: size)
@@ -47,7 +55,11 @@ final class Particle {
     /// Moves its layer to where it is, `origin` being the screen's bottom left corner.
     func place(from origin: CGPoint) {
         layer.position = CGPoint(x: position.x - origin.x, y: position.y - origin.y)
-        if angle != 0 {
+        if tumbles {
+            // Turning edge-on and back: foreshortened across, never quite to a line.
+            let facing = max(0.15, abs(cos(flip)))
+            layer.setAffineTransform(CGAffineTransform(rotationAngle: angle).scaledBy(x: facing, y: 1))
+        } else if angle != 0 {
             layer.setAffineTransform(CGAffineTransform(rotationAngle: angle))
         }
     }
@@ -106,6 +118,12 @@ final class Surface {
         particle.column = column
         particle.state = .resting
         particle.velocity = .zero
+        if particle.tumbles {
+            // Lying down: on its side, seen a little from above.
+            let side: CGFloat = Bool.random() ? .pi / 2 : -.pi / 2
+            particle.angle = side + CGFloat.random(in: -0.45...0.45)
+            particle.flip = CGFloat.random(in: 0...0.9)
+        }
     }
 
     /// Takes a particle out of the pile; those above it sink into its place.
@@ -288,6 +306,11 @@ final class SeasonScene {
             }
             particle.spin *= 1 - min(1, 0.5 * dt)
             particle.angle += particle.spin * dt
+            if particle.tumbles {
+                // Faster through the air it moves through, as a leaf catches it.
+                let speed = (particle.velocity.dx * particle.velocity.dx + particle.velocity.dy * particle.velocity.dy).squareRoot()
+                particle.flip += particle.flipRate * dt * (0.6 + speed / 150)
+            }
 
             let previous = particle.position
             particle.position.x += particle.velocity.dx * dt
