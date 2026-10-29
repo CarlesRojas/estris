@@ -1,6 +1,7 @@
 import AppKit
 
 /// One falling or resting particle: a flake, a petal, a grain or a leaf.
+@MainActor
 final class Particle {
     enum State {
         case falling
@@ -30,6 +31,9 @@ final class Particle {
     weak var surface: Pile?
     var column = 0
     var isGone = false
+    /// The window it is drawn in, and where that window's bottom left corner is.
+    fileprivate weak var host: OverlayWindow?
+    private var origin = CGPoint.zero
 
     init(position: CGPoint, style: SeasonStyle) {
         let size = CGFloat.random(in: style.size)
@@ -52,8 +56,24 @@ final class Particle {
         layer.bounds = CGRect(x: 0, y: 0, width: size, height: size)
     }
 
-    /// Moves its layer to where it is, `origin` being the screen's bottom left corner.
-    func place(from origin: CGPoint) {
+    /// Whether it is drawn in front of every window, as what the pointer or a moving window
+    /// touched is until it lands.
+    fileprivate func isIn(_ window: OverlayWindow) -> Bool {
+        host === window
+    }
+
+    /// Draws it in another window, where it is.
+    fileprivate func move(to window: OverlayWindow) {
+        guard host !== window else { return }
+        layer.removeFromSuperlayer()
+        window.root.addSublayer(layer)
+        host = window
+        origin = window.frame.origin
+        place()
+    }
+
+    /// Moves its layer to where it is in its window.
+    func place() {
         layer.position = CGPoint(x: position.x - origin.x, y: position.y - origin.y)
         if tumbles {
             // Turning edge-on and back: foreshortened across, never quite to a line.
@@ -104,10 +124,16 @@ final class Pile {
     let capacity: [CGFloat]
     /// Resting particles, oldest first: the first to melt once the pile is full.
     private(set) var settled: [Particle] = []
-    /// Parts hidden by windows in front, as ranges of x: nothing lands or shows there.
-    var occluders: [Occluder] = []
+    /// Where its particles and drift are drawn: for a window's top, a window of its own kept
+    /// just in front of that window, so it hides and is hidden as that window is; for the
+    /// bottom of the screen, behind every window.
+    fileprivate var host: OverlayWindow
+    /// How far back its window is, 0 for the front one: windows in front of it keep the
+    /// pointer from reaching it.
+    var depth = 0
 
-    init(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, kind: PileKind, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) {
+    fileprivate init(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, kind: PileKind, host: OverlayWindow, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) {
+        self.host = host
         self.minX = minX
         self.y = y
         self.isFloor = isFloor
@@ -163,10 +189,6 @@ final class Pile {
         return min(columns.count - 1, Int((x - minX) / Self.columnWidth))
     }
 
-    func isCovered(_ point: CGPoint) -> Bool {
-        occluders.contains { $0.contains(point) }
-    }
-
     /// The pile's top in a column.
     func top(_ column: Int) -> CGFloat {
         y + elevation(column)
@@ -182,6 +204,7 @@ final class Pile {
         settled.append(particle)
         particle.surface = self
         particle.column = column
+        particle.move(to: host)
         particle.state = .resting
         particle.velocity = .zero
         if particle.tumbles {
@@ -193,13 +216,13 @@ final class Pile {
     }
 
     /// Takes a particle out of the pile; those above it sink into its place.
-    func remove(_ particle: Particle, origin: CGPoint) {
+    func remove(_ particle: Particle) {
         let column = particle.column
         if let index = columns[column].firstIndex(where: { $0 === particle }) {
             columns[column].remove(at: index)
             for above in columns[column][index...] {
                 above.position.y -= particle.thickness
-                above.place(from: origin)
+                above.place()
             }
             heights[column] = max(0, heights[column] - particle.thickness)
         }
@@ -375,43 +398,60 @@ final class Pile {
     }
 }
 
-/// The effect on one screen: a click-through window holding a layer per particle, and the
-/// piles on the screen's bottom and on the top edges of windows.
+/// The effect on one screen. What falls is drawn behind every window, in a click-through
+/// window over the desktop, as is the pile at the bottom of the screen; a pile on a window's
+/// top edge is drawn in a window of its own kept just in front of that window, so it is on
+/// that window's plane. What the pointer or a moving window touches is drawn in front of
+/// everything until it lands.
 @MainActor
 final class SeasonScene {
     let screenFrame: CGRect
     private let visibleFrame: CGRect
-    private let window: OverlayWindow
+    private let back: OverlayWindow
+    private let front: OverlayWindow
+    /// For each window with a pile on its top edge, the window that pile is drawn in.
+    private var pileWindows: [CGWindowID: OverlayWindow] = [:]
     private var style: SeasonStyle
     private let scale: CGFloat
     private var particles: [Particle] = []
     private var floor: Pile
     private var tops: [CGWindowID: Pile] = [:]
+    /// The windows, front first, as last read.
+    private var windows: [WindowSnapshot.Window] = []
     private var spawnDebt = 0.0
     private var time: CGFloat = 0
+    /// Piles made on the next look at the windows start partly filled: when it is turned on
+    /// or the season changes, the weather looks as if it had been going on for a while.
+    private var startsFilled = true
     /// Hidden while a full screen app shows on it.
     private(set) var isHidden = false
 
     /// How far the pointer reaches, in points.
     private static let pointerReach: CGFloat = 70
     private static let meltTime: CGFloat = 1.5
+    /// How full piles start, as a share of their limit.
+    private static let startingFill = 0.35
 
-    init(screen: NSScreen, style: SeasonStyle, level: NSWindow.Level) {
+    init(screen: NSScreen, style: SeasonStyle) {
         screenFrame = screen.frame
         visibleFrame = screen.visibleFrame
         self.style = style
         scale = screen.backingScaleFactor
-        window = OverlayWindow(frame: screen.frame)
-        window.level = level
-        // The very bottom of the screen; in front of windows, the Dock hides what lies behind it.
-        floor = Pile(minX: screenFrame.minX, maxX: screenFrame.maxX, y: screenFrame.minY, isFloor: true, kind: style.pile)
+        // Above the desktop and its icons, below every window.
+        back = OverlayWindow(frame: screen.frame, level: NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopIconWindow)) + 1))
+        // Above every window and floating panel, below the Dock and the menu bar.
+        front = OverlayWindow(frame: screen.frame, level: NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.dockWindow)) - 1))
+        // The very bottom of the screen, behind the windows and the Dock.
+        floor = Pile(minX: screenFrame.minX, maxX: screenFrame.maxX, y: screenFrame.minY, isFloor: true, kind: style.pile, host: back)
         attachDrift(to: floor)
-        window.orderFrontRegardless()
+        back.orderFrontRegardless()
+        front.orderFrontRegardless()
     }
 
-    var origin: CGPoint { screenFrame.origin }
-
-    private var rootLayer: CALayer? { window.contentView?.layer }
+    /// The windows piles are drawn in, which aren't windows to pile up on.
+    var ownWindowIDs: [CGWindowID] {
+        pileWindows.values.map { CGWindowID($0.windowNumber) }
+    }
 
     /// How much one particle adds to a drift, on average.
     private var unit: CGFloat {
@@ -425,9 +465,21 @@ final class SeasonScene {
         return (pieces.size.lowerBound + pieces.size.upperBound) / 2 * pieces.thickness
     }
 
-    /// A pile for the current season; a drift is drawn under everything falling.
-    private func makeSurface(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, quietFor: CGFloat = 0, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) -> Pile {
-        let surface = Pile(minX: minX, maxX: maxX, y: y, isFloor: isFloor, kind: style.pile, leftRadius: leftRadius, rightRadius: rightRadius)
+    /// A pile on a window's top edge for the current season, in that window's pile window.
+    private func makeTop(for window: CGWindowID, minX: CGFloat, maxX: CGFloat, y: CGFloat, quietFor: CGFloat = 0, leftRadius: CGFloat, rightRadius: CGFloat) -> Pile {
+        // Room for the corners' drop below the edge, leaves lying over the ends, and the
+        // tallest drift above.
+        let frame = CGRect(x: minX - 40, y: y - max(leftRadius, rightRadius) - 4, width: maxX - minX + 80, height: DriftLayer.height + max(leftRadius, rightRadius) + 24)
+        let host: OverlayWindow
+        if let existing = pileWindows[window] {
+            host = existing
+            host.setFrame(frame, display: false)
+        } else {
+            host = OverlayWindow(frame: frame, level: .normal)
+            pileWindows[window] = host
+        }
+        host.order(.above, relativeTo: Int(window))
+        let surface = Pile(minX: minX, maxX: maxX, y: y, isFloor: false, kind: style.pile, host: host, leftRadius: leftRadius, rightRadius: rightRadius)
         surface.collectsFrom = time + quietFor
         attachDrift(to: surface)
         return surface
@@ -435,9 +487,10 @@ final class SeasonScene {
 
     private func attachDrift(to surface: Pile) {
         guard surface.kind != .stacked else { return }
-        let drift = DriftLayer(kind: surface.kind, width: surface.maxX - surface.minX, scale: scale, screenX: surface.minX - origin.x)
+        let origin = surface.host.frame.origin
+        let drift = DriftLayer(kind: surface.kind, width: surface.maxX - surface.minX, scale: scale, screenX: surface.minX - screenFrame.minX)
         drift.root.position = CGPoint(x: surface.minX - origin.x, y: surface.y - origin.y)
-        rootLayer?.insertSublayer(drift.root, at: 0)
+        surface.host.root.insertSublayer(drift.root, at: 0)
         surface.drift = drift
     }
 
@@ -447,28 +500,33 @@ final class SeasonScene {
     }
 
     func close() {
-        window.close()
-    }
-
-    func setLevel(_ level: NSWindow.Level) {
-        window.level = level
+        back.close()
+        front.close()
+        for window in pileWindows.values { window.close() }
+        pileWindows = [:]
     }
 
     func setHidden(_ hidden: Bool) {
         guard hidden != isHidden else { return }
         isHidden = hidden
-        if hidden {
+        for window in [back, front] + Array(pileWindows.values) where hidden {
             window.orderOut(nil)
-        } else {
-            window.orderFrontRegardless()
+        }
+        guard !hidden else { return }
+        back.orderFrontRegardless()
+        front.orderFrontRegardless()
+        // Each pile's window back just in front of its own.
+        for (id, window) in pileWindows {
+            window.order(.above, relativeTo: Int(id))
         }
     }
 
-    /// Another season: what is there melts away and the new one starts falling.
+    /// Another season: what is there melts away and the new one starts, its piles already
+    /// part way up.
     func setStyle(_ style: SeasonStyle) {
         for surface in [floor] + Array(tops.values) {
             for particle in surface.settled {
-                surface.remove(particle, origin: origin)
+                surface.remove(particle)
                 melt(particle)
             }
             discard(surface)
@@ -477,15 +535,24 @@ final class SeasonScene {
             melt(particle)
         }
         self.style = style
-        floor = makeSurface(minX: screenFrame.minX, maxX: screenFrame.maxX, y: screenFrame.minY, isFloor: true)
+        floor = Pile(minX: screenFrame.minX, maxX: screenFrame.maxX, y: screenFrame.minY, isFloor: true, kind: style.pile, host: back)
+        attachDrift(to: floor)
         // Window tops start again on the next look at the windows.
         tops = [:]
+        startsFilled = true
+    }
+
+    /// The same season, its particles another size: those already there keep theirs.
+    func resize(_ style: SeasonStyle) {
+        self.style = style
     }
 
     /// Follows the windows: piles on windows that moved or closed fall, new top edges start
-    /// collecting, and parts hidden by windows in front are left alone.
+    /// collecting, and each pile's window stays just in front of its own.
     func update(with snapshot: WindowSnapshot, interval: CGFloat, windowLimit: Int, bottomLimit: Int, hidesInFullScreen: Bool) {
         setHidden(hidesInFullScreen && snapshot.hasFullScreenWindow(on: screenFrame))
+        windows = snapshot.windows
+        if startsFilled { fill(floor, limit: bottomLimit) }
         var seen = Set<CGWindowID>()
         for (index, info) in snapshot.windows.enumerated() {
             let top = info.frame.maxY
@@ -505,27 +572,38 @@ final class SeasonScene {
                         dy: max(-1500, min(1500, (top - surface.y) / interval))
                     )
                     scatter(surface, velocity: velocity)
-                    tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false, quietFor: 0.3, leftRadius: leftRadius, rightRadius: rightRadius)
+                    tops[info.id] = makeTop(for: info.id, minX: minX, maxX: maxX, y: top, quietFor: 0.3, leftRadius: leftRadius, rightRadius: rightRadius)
+                } else if !isHidden, let host = pileWindows[info.id], !snapshot.isJustInFront(CGWindowID(host.windowNumber), of: info.id) {
+                    // Its window was brought forward or sent back: the pile goes with it.
+                    host.order(.above, relativeTo: Int(info.id))
                 }
             } else {
-                tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false, leftRadius: leftRadius, rightRadius: rightRadius)
+                let surface = makeTop(for: info.id, minX: minX, maxX: maxX, y: top, leftRadius: leftRadius, rightRadius: rightRadius)
+                tops[info.id] = surface
+                if startsFilled { fill(surface, limit: windowLimit) }
             }
             if let surface = tops[info.id] {
-                let occluders = snapshot.occluders(ofTopOf: index)
-                if occluders != surface.occluders { surface.needsDraw = true }
-                surface.occluders = occluders
-                for particle in surface.settled {
-                    particle.layer.isHidden = surface.isCovered(particle.position)
-                }
+                surface.depth = index
                 trim(surface, to: windowLimit)
             }
         }
-        // Closed, minimized or on another Space: its pile falls.
+        // Closed, minimized or on another Space: its pile falls, and its window goes.
         for (id, surface) in tops where !seen.contains(id) {
             scatter(surface, velocity: .zero)
             tops[id] = nil
         }
+        for (id, window) in pileWindows where !seen.contains(id) {
+            window.close()
+            pileWindows[id] = nil
+        }
         trim(floor, to: bottomLimit)
+        startsFilled = false
+    }
+
+    /// Whether a point is behind a window: the pointer there can't reach what falls or lies
+    /// behind every window. `depth` limits it to the windows in front of that one.
+    private func isBehindWindow(_ point: CGPoint, inFrontOf depth: Int? = nil) -> Bool {
+        windows.prefix(depth ?? windows.count).contains { $0.frame.contains(point) }
     }
 
     /// Moves everything on by `dt` seconds.
@@ -542,6 +620,8 @@ final class SeasonScene {
         let pull = min(1, 6 * dt)
         let drag = min(1, style.drag * dt)
         let surfaces = windowLimit > 0 ? [floor] + Array(tops.values) : [floor]
+        // Over a window, the pointer is in front of what falls behind it.
+        let pointerOnDesktop = !isBehindWindow(pointer)
         for particle in particles {
             switch particle.state {
             case .resting:
@@ -558,11 +638,12 @@ final class SeasonScene {
             let sway = style.sway * sin(time * particle.swayRate + particle.phase)
             particle.velocity.dx += (wind + sway - particle.velocity.dx) * drag
             particle.velocity.dy += (-particle.fallSpeed - particle.velocity.dy) * drag
-            // The pointer pushes what it passes through and carries it along.
+            // The pointer pushes what it passes through and carries it along, bringing it in
+            // front of the windows until it lands; not what falls behind a window.
             let dx = particle.position.x - pointer.x
             let dy = particle.position.y - pointer.y
             let distance = (dx * dx + dy * dy).squareRoot()
-            if distance < reach {
+            if distance < reach, particle.isIn(front) || (pointerOnDesktop && !isBehindWindow(particle.position)) {
                 let force = 1 - distance / reach
                 let away = 300 * force * dt / max(distance, 1)
                 particle.velocity.dx += pointerVelocity.dx * force * pull + dx * away
@@ -570,6 +651,7 @@ final class SeasonScene {
                 if style.spin > 0 {
                     particle.spin += pointerVelocity.dx * force * 0.004
                 }
+                particle.move(to: front)
             }
             particle.spin *= 1 - min(1, 0.5 * dt)
             particle.angle += particle.spin * dt
@@ -589,7 +671,7 @@ final class SeasonScene {
                 || particle.position.y < screenFrame.minY - 40 {
                 particle.isGone = true
             }
-            particle.place(from: origin)
+            particle.place()
         }
         kickPiles(near: pointer, velocity: pointerVelocity)
         let windShare = wind / CGFloat(SeasonsSettings.strongestWind)
@@ -598,7 +680,7 @@ final class SeasonScene {
 
         if particles.contains(where: \.isGone) {
             for particle in particles where particle.isGone {
-                if let surface = particle.surface { surface.remove(particle, origin: origin) }
+                if let surface = particle.surface { surface.remove(particle) }
                 particle.layer.removeFromSuperlayer()
             }
             particles.removeAll(where: \.isGone)
@@ -619,8 +701,7 @@ final class SeasonScene {
                 y: screenFrame.maxY + style.size.upperBound
             )
             let particle = Particle(position: start, style: style)
-            particle.place(from: origin)
-            rootLayer?.addSublayer(particle.layer)
+            particle.move(to: back)
             particles.append(particle)
             falling += 1
         }
@@ -633,10 +714,7 @@ final class SeasonScene {
         for surface in surfaces where surface.collectsFrom <= time && !surface.isFull {
             guard let column = surface.column(at: particle.position.x) else { continue }
             let top = surface.top(column)
-            guard previous.y >= top - 0.5, particle.position.y < top,
-                  !surface.isCovered(CGPoint(x: particle.position.x, y: top)),
-                  top > (best?.top ?? -.infinity)
-            else { continue }
+            guard previous.y >= top - 0.5, particle.position.y < top, top > (best?.top ?? -.infinity) else { continue }
             best = (surface, column, top)
         }
         guard let best else { return }
@@ -661,10 +739,21 @@ final class SeasonScene {
             particle.isGone = true
             return
         }
+        if surface.settled.count >= limit, let oldest = surface.settled.first {
+            surface.remove(oldest)
+            melt(oldest)
+        }
+        if !rest(particle, on: surface, near: landing) {
+            // Rolled off a window's edge: it falls on beside it, behind the windows again.
+            particle.move(to: back)
+        }
+    }
 
-        // Lands a column either side of where it hit, so piles fill out evenly, then rolls
-        // down while its column stands too far above a neighbour. Past a window's edge, it
-        // falls off.
+    /// Lays a leaf or petal on its pile: a column either side of where it landed, so piles
+    /// fill out evenly, then down while its column stands too far above a neighbour. Past a
+    /// window's edge it falls off, moving on beside that edge; then it isn't laid, and this
+    /// says so.
+    private func rest(_ particle: Particle, on surface: Pile, near landing: Int) -> Bool {
         var column = min(surface.columns.count - 1, max(0, landing + Int.random(in: -1...1)))
         for _ in 0..<60 {
             let height = surface.elevation(column)
@@ -677,20 +766,43 @@ final class SeasonScene {
             if next < 0 || next >= surface.columns.count {
                 particle.position = CGPoint(x: step < 0 ? surface.minX - 2 : surface.maxX + 2, y: surface.y + height)
                 particle.velocity = CGVector(dx: CGFloat(step) * 30, dy: 0)
-                return
+                return false
             }
             column = next
         }
-        if surface.settled.count >= limit, let oldest = surface.settled.first {
-            surface.remove(oldest, origin: origin)
-            melt(oldest)
-        }
         surface.add(particle, at: column)
         particle.spin = 0
-        particle.layer.isHidden = surface.isCovered(particle.position)
+        return true
     }
 
-    /// A quick pointer sweeping through a pile scatters it.
+    /// A new pile as if it had been snowing a while: part way to its limit, settled into
+    /// shape.
+    private func fill(_ surface: Pile, limit: Int) {
+        let count = Int(Double(limit) * Self.startingFill)
+        guard count > 0, !surface.columns.isEmpty else { return }
+        if surface.kind == .stacked {
+            for _ in 0..<count {
+                let column = Int.random(in: 0..<surface.columns.count)
+                let particle = Particle(position: CGPoint(x: surface.minX, y: surface.y), style: style)
+                guard rest(particle, on: surface, near: column) else { continue }
+                particles.append(particle)
+            }
+        } else {
+            for _ in 0..<count {
+                surface.deposit(unit, at: Int.random(in: 0..<surface.columns.count))
+            }
+            for _ in 0..<400 {
+                surface.settle(repose: style.repose)
+            }
+            // What settling slid off the ends isn't thrown in the air at the start.
+            surface.spilledLeft = 0
+            surface.spilledRight = 0
+            surface.needsDraw = true
+        }
+    }
+
+    /// A quick pointer sweeping through a pile scatters it, unless a window in front of the
+    /// pile is in the way.
     private func kickPiles(near pointer: CGPoint, velocity: CGVector) {
         let speed = (velocity.dx * velocity.dx + velocity.dy * velocity.dy).squareRoot()
         // Sand gives way to a slow hand; snow and leaves need a quick sweep.
@@ -698,6 +810,7 @@ final class SeasonScene {
         let reach = Self.pointerReach * 0.6
         for surface in [floor] + Array(tops.values) {
             guard pointer.y > surface.y - reach, pointer.x > surface.minX - reach, pointer.x < surface.maxX + reach,
+                  !isBehindWindow(pointer, inFrontOf: surface.isFloor ? nil : surface.depth),
                   let first = surface.column(at: max(surface.minX, pointer.x - reach)),
                   let last = surface.column(at: min(surface.maxX - 0.01, pointer.x + reach))
             else { continue }
@@ -710,15 +823,16 @@ final class SeasonScene {
                     let dx = particle.position.x - pointer.x
                     let dy = particle.position.y - pointer.y
                     let distance = (dx * dx + dy * dy).squareRoot()
-                    guard distance < reach, !particle.layer.isHidden else { continue }
+                    guard distance < reach else { continue }
                     let force = 1 - distance / reach
-                    surface.remove(particle, origin: origin)
+                    surface.remove(particle)
                     particle.state = .falling
                     particle.velocity = CGVector(
                         dx: velocity.dx * 0.5 * force + .random(in: -30...30),
                         dy: abs(velocity.dy) * 0.3 * force + speed * 0.15 * force + .random(in: 20...60)
                     )
                     if style.spin > 0 { particle.spin = .random(in: -style.spin...style.spin) * 2 }
+                    particle.move(to: front)
                 }
             }
         }
@@ -732,7 +846,7 @@ final class SeasonScene {
             let dx = x - pointer.x
             let dy = top - pointer.y
             let distance = (dx * dx + dy * dy).squareRoot()
-            guard distance < reach, surface.heights[column] > 0, !surface.isCovered(CGPoint(x: x, y: top)) else { continue }
+            guard distance < reach, surface.heights[column] > 0 else { continue }
             let force = 1 - distance / reach
             surface.dig(min(surface.heights[column], force * 6 * min(1.5, speed / 400)), at: column)
             var thrown = 0
@@ -744,7 +858,8 @@ final class SeasonScene {
                     velocity: CGVector(
                         dx: velocity.dx * 0.5 * force + .random(in: -40...40),
                         dy: abs(velocity.dy) * 0.3 * force + speed * 0.15 * force + .random(in: 20...70)
-                    )
+                    ),
+                    inFront: true
                 )
             }
         }
@@ -769,7 +884,7 @@ final class SeasonScene {
                 flying += 1
                 let column = Int.random(in: 0..<surface.heights.count)
                 let x = surface.minX + (CGFloat(column) + 0.5) * Pile.columnWidth
-                guard surface.heights[column] > 0.5, !surface.isCovered(CGPoint(x: x, y: surface.top(column))) else { continue }
+                guard surface.heights[column] > 0.5 else { continue }
                 emit(
                     at: CGPoint(x: x, y: surface.top(column) + 0.5),
                     velocity: CGVector(dx: wind * .random(in: 0.6...1.1), dy: .random(in: 10...45)),
@@ -787,22 +902,22 @@ final class SeasonScene {
             }
             if surface.needsDraw, let drift = surface.drift, drift.canDraw {
                 surface.needsDraw = false
-                let corner = CGPoint(x: surface.minX, y: surface.y)
-                let occluders = surface.occluders
-                drift.draw(heights: surface.heights, base: surface.base, columnWidth: Pile.columnWidth, hasOccluders: !occluders.isEmpty) { x, y in
-                    let point = CGPoint(x: corner.x + x, y: corner.y + y)
-                    return occluders.contains { $0.contains(point) }
-                }
+                drift.draw(heights: surface.heights, base: surface.base, columnWidth: Pile.columnWidth)
             }
         }
     }
 
     /// A pile whose window moved, closed or went away: a stacked one lets its particles fall;
-    /// a drift breaks up into grains or clumps, flung along with the window.
+    /// a drift breaks up into grains or clumps, flung along with the window, in front of the
+    /// windows until they land.
     private func scatter(_ surface: Pile, velocity: CGVector) {
         defer { discard(surface) }
         guard surface.kind != .stacked else {
-            fall(surface.releaseAll(velocity: velocity))
+            let released = surface.releaseAll(velocity: velocity)
+            for particle in released {
+                particle.move(to: front)
+            }
+            fall(released)
             return
         }
         let deepest = surface.heights.max() ?? 0
@@ -815,10 +930,10 @@ final class SeasonScene {
                 column = Int.random(in: 0..<surface.heights.count)
             }
             let x = surface.minX + (CGFloat(column) + 0.5) * Pile.columnWidth
-            guard !surface.isCovered(CGPoint(x: x, y: surface.top(column))) else { continue }
             emit(
                 at: CGPoint(x: x, y: surface.y + surface.base[column] + CGFloat.random(in: 0...max(0.1, surface.heights[column]))),
-                velocity: CGVector(dx: velocity.dx + .random(in: -25...25), dy: velocity.dy + .random(in: 0...40))
+                velocity: CGVector(dx: velocity.dx + .random(in: -25...25), dy: velocity.dy + .random(in: 0...40)),
+                inFront: true
             )
         }
     }
@@ -830,22 +945,22 @@ final class SeasonScene {
         guard chance > 0 else { return }
         for surface in [floor] + Array(tops.values) {
             for column in 0..<surface.columns.count {
-                guard let top = surface.columns[column].last, !top.layer.isHidden, CGFloat.random(in: 0...1) < chance else { continue }
-                surface.remove(top, origin: origin)
+                guard let top = surface.columns[column].last, CGFloat.random(in: 0...1) < chance else { continue }
+                surface.remove(top)
                 top.state = .falling
                 top.velocity = CGVector(dx: wind * .random(in: 0.5...0.9), dy: .random(in: 30...90))
                 top.spin = .random(in: -style.spin...style.spin) * 2
+                top.move(to: back)
             }
         }
     }
 
     /// A new falling piece of a drift: a clump of snow or a grain of sand, or what the
-    /// wind lifts.
-    private func emit(at point: CGPoint, velocity: CGVector, style: SeasonStyle? = nil) {
+    /// wind lifts. In front of the windows when the pointer or a moving window threw it.
+    private func emit(at point: CGPoint, velocity: CGVector, style: SeasonStyle? = nil, inFront: Bool = false) {
         let particle = Particle(position: point, style: style ?? self.style.pieces)
         particle.velocity = velocity
-        particle.place(from: origin)
-        rootLayer?.addSublayer(particle.layer)
+        particle.move(to: inFront ? front : back)
         particles.append(particle)
     }
 
@@ -857,7 +972,7 @@ final class SeasonScene {
             return
         }
         while surface.settled.count > limit, let oldest = surface.settled.first {
-            surface.remove(oldest, origin: origin)
+            surface.remove(oldest)
             melt(oldest)
         }
     }
@@ -875,23 +990,31 @@ final class SeasonScene {
     }
 }
 
-/// A click-through window over a whole screen, for the particles' layers.
+/// A click-through window for particles' layers: over a whole screen, or around a pile.
 private final class OverlayWindow: NSWindow {
-    init(frame: CGRect) {
+    init(frame: CGRect, level: NSWindow.Level) {
         super.init(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
         isReleasedWhenClosed = false
         isOpaque = false
         backgroundColor = .clear
         hasShadow = false
         ignoresMouseEvents = true
-        collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
+        self.level = level
+        // On every desktop, left out of Mission Control and the window cycle.
+        collectionBehavior = [.canJoinAllSpaces, .transient, .fullScreenAuxiliary, .ignoresCycle]
+        isExcludedFromWindowsMenu = true
         let view = NSView()
         view.wantsLayer = true
         contentView = view
         setFrame(frame, display: false)
     }
 
-    /// Kept exactly over the screen: macOS would push a window off the menu bar.
+    /// Where the layers go.
+    var root: CALayer {
+        contentView!.layer!
+    }
+
+    /// Kept exactly where it is put: macOS would push a window off the menu bar.
     override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect {
         frameRect
     }

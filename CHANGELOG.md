@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Seasons now falls behind your windows, with the piles on each window's own plane; what you push, dig out or shake off a window comes in front until it lands. It starts with piles already there, leaves are bigger, and each kind of particle has its own size slider. The setting to have it fall in front of windows is gone.
+
 ## 0.2.0 - 2026-10-29
 
 - New utility, Seasons: snow in winter, pink petals in spring, sand in summer and leaves in autumn fall over your screens and pile up at the bottom and on top of windows. Push them around with the pointer, or move or shake a window to drop what's on it. Choose the season or let the date pick, have it fall in front of or behind windows, and set the density and how much piles up. Wind blows what falls and the piles. Pauses on battery and in full screen apps. Off by default.

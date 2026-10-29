@@ -460,10 +460,7 @@
 "Automatic" = "Automatique";
 "Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator." = "Automatique suit la date : neige en hiver, pétales au printemps, sable en été et feuilles en automne, inversé au sud de l'équateur.";
 "Autumn: leaves" = "Automne : feuilles";
-"Behind windows" = "Derrière les fenêtres";
 "Effect" = "Effet";
-"Falls" = "Tombe";
-"In front of windows" = "Devant les fenêtres";
 "On a screen showing a full screen app" = "Sur un écran affichant une app en plein écran";
 "On battery or in Low Power Mode" = "Sur batterie ou en mode économie d'énergie";
 "On each window" = "Sur chaque fenêtre";
@@ -490,3 +487,9 @@
 "Show Start and Stop Falling button" = "Afficher le bouton Lancer ou Arrêter la chute";
 "Start Falling" = "Lancer la chute";
 "Stop Falling" = "Arrêter la chute";
+"It falls behind your windows; what you push, dig out or shake off a window comes in front until it lands." = "Il tombe derrière vos fenêtres ; ce que vous poussez, déterrez ou faites tomber en secouant une fenêtre passe devant jusqu'à ce qu'il se pose.";
+"Particle Size" = "Taille des particules";
+"Snow" = "Neige";
+"Petals" = "Pétales";
+"Sand" = "Sable";
+"Leaves" = "Feuilles";
