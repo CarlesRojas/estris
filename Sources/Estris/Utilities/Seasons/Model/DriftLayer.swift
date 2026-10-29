@@ -19,7 +19,7 @@ enum PileKind {
 @MainActor
 final class DriftLayer {
     /// Tallest a drift is drawn, in points.
-    static let height: CGFloat = 140
+    nonisolated static let height: CGFloat = 140
     /// Drawn again at most this often, in seconds.
     private static let drawInterval: CFTimeInterval = 1.0 / 20
 
@@ -34,12 +34,12 @@ final class DriftLayer {
     /// The texture's value at each pixel, rows from the bottom, made as tall as needed.
     private var texture: [Float] = []
     private var textureRows = 0
-    private var sparkles: [Sparkle] = []
+    private var sparkles: [Glint] = []
     private var lastDraw: CFTimeInterval = 0
 
     /// A point of light in the snow, kept at the same place along the drift and the same
     /// share of the way down from its top.
-    private struct Sparkle {
+    private struct Glint {
         let layer: CALayer
         let along: CGFloat
         let depth: CGFloat
@@ -236,7 +236,7 @@ final class DriftLayer {
             fade.repeatCount = .infinity
             layer.add(fade, forKey: "fade")
             root.addSublayer(layer)
-            sparkles.append(Sparkle(layer: layer, along: .random(in: 0...1), depth: .random(in: 0.02...0.95)))
+            sparkles.append(Glint(layer: layer, along: .random(in: 0...1), depth: .random(in: 0.02...0.95)))
         }
     }
 
