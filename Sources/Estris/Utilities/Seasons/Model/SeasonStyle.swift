@@ -19,35 +19,56 @@ struct SeasonStyle {
     let rate: Double
     /// How thick it lies on a pile, as a part of its size.
     let thickness: CGFloat
+    /// Whether particles stay themselves on a pile or merge into a drift.
+    let pile: PileKind
     /// The steepest a pile gets: the most one column (3 points wide) stands above the next
-    /// before what lands on it rolls down.
+    /// before what lands on it rolls down (about 34° for sand; snow holds steeper).
     let repose: CGFloat
+    /// What a drift breaks into when dug or shaken off, when it differs from what falls.
+    var debris: [SeasonStyle] = []
+
+    /// The pieces a drift breaks into.
+    var pieces: SeasonStyle {
+        debris.first ?? self
+    }
 
     static func of(_ season: Season, scale: CGFloat) -> SeasonStyle {
         switch season {
         case .winter:
+            // Snow knocked off a pile falls in clumps, heavier than flakes.
+            let clumps = SeasonStyle(
+                sprites: clumps(scale: scale),
+                size: 5...11, fallSpeed: 90...150, sway: 4, swayRate: 1...2, spin: 1.5, drag: 2.2,
+                rate: 0, thickness: 0.9, pile: .snow, repose: 5
+            )
             return SeasonStyle(
                 sprites: snow(scale: scale),
-                size: 1.5...4, fallSpeed: 30...65, sway: 16, swayRate: 0.6...1.6, spin: 0, drag: 1.6,
-                rate: 90, thickness: 0.55, repose: 2.5
+                size: 2.5...6, fallSpeed: 30...65, sway: 16, swayRate: 0.6...1.6, spin: 0, drag: 1.6,
+                rate: 70, thickness: 0.9, pile: .snow, repose: 5, debris: [clumps]
             )
         case .spring:
             return SeasonStyle(
                 sprites: petals(scale: scale),
-                size: 3.5...6, fallSpeed: 28...55, sway: 30, swayRate: 0.8...2, spin: 3, drag: 1.3,
-                rate: 22, thickness: 0.25, repose: 3
+                size: 5...8.5, fallSpeed: 28...55, sway: 30, swayRate: 0.8...2, spin: 3, drag: 1.3,
+                rate: 18, thickness: 0.22, pile: .stacked, repose: 3
             )
         case .summer:
+            // Sand knocked off a pile scatters as fine grains.
+            let grains = SeasonStyle(
+                sprites: sand(scale: scale),
+                size: 0.5...1.1, fallSpeed: 120...200, sway: 3, swayRate: 1...3, spin: 0, drag: 3.5,
+                rate: 0, thickness: 1.2, pile: .sand, repose: 2
+            )
             return SeasonStyle(
                 sprites: sand(scale: scale),
-                size: 0.8...1.8, fallSpeed: 110...170, sway: 6, swayRate: 1...3, spin: 0, drag: 3,
-                rate: 120, thickness: 0.7, repose: 1.6
+                size: 1.2...2.5, fallSpeed: 110...170, sway: 6, swayRate: 1...3, spin: 0, drag: 3,
+                rate: 100, thickness: 1.2, pile: .sand, repose: 2, debris: [grains]
             )
         case .autumn:
             return SeasonStyle(
                 sprites: leaves(scale: scale),
-                size: 6...10, fallSpeed: 35...65, sway: 40, swayRate: 0.6...1.4, spin: 2.5, drag: 1.1,
-                rate: 10, thickness: 0.2, repose: 3.5
+                size: 8.5...13, fallSpeed: 35...65, sway: 40, swayRate: 0.6...1.4, spin: 2.5, drag: 1.1,
+                rate: 9, thickness: 0.2, pile: .stacked, repose: 3.5
             )
         }
     }
@@ -62,6 +83,32 @@ struct SeasonStyle {
                 guard let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB), colors: colors, locations: locations) else { return }
                 let center = CGPoint(x: rect.midX, y: rect.midY)
                 context.drawRadialGradient(gradient, startCenter: center, startRadius: 0, endCenter: center, endRadius: rect.width / 2, options: [])
+            }
+        }
+    }
+
+    /// Clumps of snow: a few soft balls stuck together, shaded a little underneath.
+    private static func clumps(scale: CGFloat) -> [CGImage] {
+        (0..<4).map { _ -> CGImage in
+            let balls: [(center: CGPoint, radius: CGFloat)] = (0..<Int.random(in: 4...7)).map { _ in
+                (
+                    center: CGPoint(x: CGFloat.random(in: 0.3...0.7), y: CGFloat.random(in: 0.3...0.7)),
+                    radius: CGFloat.random(in: 0.14...0.24)
+                )
+            }
+            return sprite(side: 12, scale: scale) { context, rect in
+                let side = rect.width
+                // A cool shade below, then the bright tops.
+                context.setFillColor(CGColor(srgbRed: 0.72, green: 0.78, blue: 0.88, alpha: 1))
+                for ball in balls {
+                    let r = ball.radius * side
+                    context.fillEllipse(in: CGRect(x: ball.center.x * side - r, y: (ball.center.y - 0.03) * side - r, width: r * 2, height: r * 2))
+                }
+                context.setFillColor(CGColor(srgbRed: 1, green: 1, blue: 1, alpha: 1))
+                for ball in balls {
+                    let r = ball.radius * side
+                    context.fillEllipse(in: CGRect(x: ball.center.x * side - r * 0.92, y: ball.center.y * side - r * 0.85, width: r * 1.84, height: r * 1.84))
+                }
             }
         }
     }
