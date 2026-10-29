@@ -480,14 +480,11 @@
 "Above windows" = "Above windows";
 "Autumn" = "Autumn";
 "Calm" = "Calm";
-"Controls" = "Controls";
 "Falling" = "Falling";
 "Intensity" = "Intensity";
 "Move Back to the Corner" = "Move Back to the Corner";
 "On the desktop" = "On the desktop";
-"Placement" = "Placement";
 "Position" = "Position";
-"Shows while Seasons is on." = "Shows while Seasons is on.";
 "Sits" = "Sits";
 "Snow and the rest pile up on it" = "Snow and the rest pile up on it";
 "Spring" = "Spring";
@@ -504,3 +501,7 @@
 "Petals falling" = "Petals falling";
 "Sand blowing" = "Sand blowing";
 "Snowing" = "Snowing";
+"Show intensity" = "Show intensity";
+"Show season" = "Show season";
+"Show the weather widget" = "Show the weather widget";
+"Show wind" = "Show wind";

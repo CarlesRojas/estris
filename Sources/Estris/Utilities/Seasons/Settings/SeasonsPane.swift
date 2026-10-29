@@ -1,9 +1,11 @@
 import SwiftUI
 
 /// The Seasons settings pane: the on/off switch, the season, where it falls, how much, how
-/// much piles up, and when it pauses.
+/// much piles up, when it pauses, and the weather widget.
 struct SeasonsPane: View {
     @ObservedObject var settings: SeasonsSettings
+    @ObservedObject var widget: WeatherWidgetSettings
+    let resetWidgetPosition: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -76,7 +78,42 @@ struct SeasonsPane: View {
                         .resetMenu($settings.pausesInFullScreen, to: SeasonsSettings.defaultPausesInFullScreen)
                 }
                 Section {
-                    Button("Reset to Defaults") { settings.reset() }
+                    Toggle("Show the weather widget", isOn: $widget.isShown)
+                        .resetMenu($widget.isShown, to: false)
+                    Group {
+                        Toggle("Show season", isOn: $widget.showsSeason)
+                            .resetMenu($widget.showsSeason, to: WeatherWidgetSettings.Default.showsSeason)
+                        Toggle("Show intensity", isOn: $widget.showsIntensity)
+                            .resetMenu($widget.showsIntensity, to: WeatherWidgetSettings.Default.showsIntensity)
+                        Toggle("Show wind", isOn: $widget.showsWind)
+                            .resetMenu($widget.showsWind, to: WeatherWidgetSettings.Default.showsWind)
+                        Picker("Sits", selection: $widget.placement) {
+                            ForEach(WidgetPlacement.allCases) { placement in
+                                Text(placement.title).tag(placement)
+                            }
+                        }
+                        .resetMenu($widget.placement, to: WeatherWidgetSettings.Default.placement)
+                        Toggle("Snow and the rest pile up on it", isOn: $widget.collectsWeather)
+                            .resetMenu($widget.collectsWeather, to: WeatherWidgetSettings.Default.collectsWeather)
+                        LabeledContent("Position") {
+                            Button("Move Back to the Corner", action: resetWidgetPosition)
+                        }
+                    }
+                    .disabled(!widget.isShown)
+                } header: {
+                    Text("Weather Widget")
+                } footer: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("A small panel on your desktop to start and stop the falling and change the wind and how much falls.")
+                        Text("The button to start and stop the falling is always there. What you change on the widget is kept when Estris quits.")
+                    }
+                    .foregroundStyle(.secondary)
+                }
+                Section {
+                    Button("Reset to Defaults") {
+                        settings.reset()
+                        widget.reset()
+                    }
                 }
             }
             .formStyle(.grouped)

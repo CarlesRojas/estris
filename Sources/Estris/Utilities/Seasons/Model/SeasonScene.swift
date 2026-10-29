@@ -85,6 +85,8 @@ final class Surface {
     var spilledLeft: CGFloat = 0
     var spilledRight: CGFloat = 0
     var dug: CGFloat = 0
+    /// Drift the wind lifted into the air, not yet turned into flying grains or flakes.
+    var blown: CGFloat = 0
     /// When, in the scene's time, it starts collecting: a window that just moved collects
     /// nothing until it has been still a moment, so a dragged or shaken window stays clear.
     var collectsFrom: CGFloat = 0
@@ -118,11 +120,15 @@ final class Surface {
             let x = (CGFloat(column) + 0.5) * Self.columnWidth
             return min(Self.corner(radius: leftRadius, at: x), Self.corner(radius: rightRadius, at: width - x))
         }
-        let base = self.base
+        // The slope of the edge itself across each column, from the curve: steepest at the
+        // very end of a corner, where the column next to it alone wouldn't tell.
+        func profile(_ x: CGFloat) -> CGFloat {
+            let x = max(0, min(width, x))
+            return min(Self.corner(radius: leftRadius, at: x), Self.corner(radius: rightRadius, at: width - x))
+        }
         capacity = (0..<count).map { column in
-            let before = base[max(0, column - 1)]
-            let after = base[min(count - 1, column + 1)]
-            let slope = abs(after - before) / (2 * Self.columnWidth)
+            let x = (CGFloat(column) + 0.5) * Self.columnWidth
+            let slope = abs(profile(x + 0.5) - profile(x - 0.5))
             return Self.capacity(on: slope, kind: kind)
         }
     }
@@ -311,6 +317,44 @@ final class Surface {
         }
         if moved > 0 || smoothed > 0.002 { needsDraw = true }
         if moved < 0.01, smoothed < 0.002 { isSettling = false }
+    }
+
+    /// The wind carries the top of a drift along, once it blows harder than a light breeze:
+    /// the loose top few points of each column move downwind, some of it lifted into the
+    /// air. Off a window's downwind end it blows away; at the screen's edge it drifts up
+    /// against it. `wind` is a share of the strongest, negative to the left.
+    func blow(_ wind: CGFloat, dt: CGFloat) {
+        let calm: CGFloat = kind == .snow ? 0.15 : 0.2
+        let strength = abs(wind) - calm
+        let count = heights.count
+        guard strength > 0, count > 1 else { return }
+        let step = wind > 0 ? 1 : -1
+        let rate = min(0.5, strength * (kind == .snow ? 1.5 : 2.5) * dt)
+        // Downwind first, so each bit moves one column a step.
+        let order: [Int] = step > 0 ? Array((0..<count).reversed()) : Array(0..<count)
+        var moved: CGFloat = 0
+        for column in order {
+            let carried = min(heights[column], 3) * rate
+            guard carried > 0.0001 else { continue }
+            heights[column] -= carried
+            let lifted = carried * 0.25
+            blown += lifted
+            let next = column + step
+            if next >= 0, next < count {
+                heights[next] += carried - lifted
+            } else if isFloor {
+                heights[column] += carried - lifted
+            } else if step < 0 {
+                spilledLeft += carried - lifted
+            } else {
+                spilledRight += carried - lifted
+            }
+            moved += carried
+        }
+        if moved > 0 {
+            isSettling = true
+            needsDraw = true
+        }
     }
 
     /// Lets go of every particle, which fall from where they are.
@@ -548,7 +592,9 @@ final class SeasonScene {
             particle.place(from: origin)
         }
         kickPiles(near: pointer, velocity: pointerVelocity)
-        settleDrifts()
+        let windShare = wind / CGFloat(SeasonsSettings.strongestWind)
+        settleDrifts(dt: dt, wind: wind, windShare: windShare)
+        blowStacks(dt: dt, wind: wind, windShare: windShare)
 
         if particles.contains(where: \.isGone) {
             for particle in particles where particle.isGone {
@@ -708,11 +754,29 @@ final class SeasonScene {
 
     /// Lets each drift settle toward its slope, turns what slid off a window's edge into
     /// falling grains, and draws what changed.
-    private func settleDrifts() {
+    private func settleDrifts(dt: CGFloat, wind: CGFloat, windShare: CGFloat) {
         for surface in [floor] + Array(tops.values) where surface.kind != .stacked {
+            surface.blow(windShare, dt: dt)
             for _ in 0..<(surface.kind == .sand ? 3 : 1) {
                 surface.settle(repose: style.repose)
             }
+            // What the wind lifts flies off: fine snow as flakes, sand as grains.
+            let lifted = surface.kind == .snow ? style : style.pieces
+            let liftedUnit = (lifted.size.lowerBound + lifted.size.upperBound) / 2 * lifted.thickness
+            var flying = 0
+            while surface.blown >= liftedUnit, flying < 10 {
+                surface.blown -= liftedUnit
+                flying += 1
+                let column = Int.random(in: 0..<surface.heights.count)
+                let x = surface.minX + (CGFloat(column) + 0.5) * Surface.columnWidth
+                guard surface.heights[column] > 0.5, !surface.isCovered(x) else { continue }
+                emit(
+                    at: CGPoint(x: x, y: surface.top(column) + 0.5),
+                    velocity: CGVector(dx: wind * .random(in: 0.6...1.1), dy: .random(in: 10...45)),
+                    style: lifted
+                )
+            }
+            surface.blown = min(surface.blown, liftedUnit * 4)
             while surface.spilledLeft >= pieceUnit {
                 surface.spilledLeft -= pieceUnit
                 emit(at: CGPoint(x: surface.minX - 1, y: surface.top(0)), velocity: CGVector(dx: -CGFloat.random(in: 8...30), dy: 0))
@@ -757,9 +821,26 @@ final class SeasonScene {
         }
     }
 
-    /// A new falling piece of a drift: a clump of snow or a grain of sand.
-    private func emit(at point: CGPoint, velocity: CGVector) {
-        let particle = Particle(position: point, style: style.pieces)
+    /// Strong wind picks the top leaves and petals off their piles and blows them away.
+    private func blowStacks(dt: CGFloat, wind: CGFloat, windShare: CGFloat) {
+        guard style.pile == .stacked else { return }
+        let chance = (abs(windShare) - 0.25) * 0.8 * dt
+        guard chance > 0 else { return }
+        for surface in [floor] + Array(tops.values) {
+            for column in 0..<surface.columns.count {
+                guard let top = surface.columns[column].last, !top.layer.isHidden, CGFloat.random(in: 0...1) < chance else { continue }
+                surface.remove(top, origin: origin)
+                top.state = .falling
+                top.velocity = CGVector(dx: wind * .random(in: 0.5...0.9), dy: .random(in: 30...90))
+                top.spin = .random(in: -style.spin...style.spin) * 2
+            }
+        }
+    }
+
+    /// A new falling piece of a drift: a clump of snow or a grain of sand, or what the
+    /// wind lifts.
+    private func emit(at point: CGPoint, velocity: CGVector, style: SeasonStyle? = nil) {
+        let particle = Particle(position: point, style: style ?? self.style.pieces)
         particle.velocity = velocity
         particle.place(from: origin)
         rootLayer?.addSublayer(particle.layer)

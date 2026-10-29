@@ -73,7 +73,9 @@ final class Seasons {
 
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
-        SeasonsPane(settings: settings)
+        SeasonsPane(settings: settings, widget: widget.settings) { [weak self] in
+            self?.widget.resetPosition()
+        }
     }
 
     private var level: NSWindow.Level {

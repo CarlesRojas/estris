@@ -17,7 +17,6 @@ enum SettingsPane: String, CaseIterable, Identifiable {
     case keepAwake
     case roundedCorners
     case seasons
-    case weatherWidget
     case colorPicker
     case volumeMixer
     /// Hidden until unlocked from the version in General > About.
@@ -40,7 +39,6 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .keepAwake: String(localized: "Keep Awake")
         case .roundedCorners: String(localized: "Rounded Corners")
         case .seasons: String(localized: "Seasons")
-        case .weatherWidget: String(localized: "Weather Widget")
         case .colorPicker: String(localized: "Color Picker")
         case .volumeMixer: String(localized: "Volume Mixer")
         case .developer: String(localized: "Developer")
@@ -62,7 +60,6 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .keepAwake: "cup.and.saucer"
         case .roundedCorners: "display"
         case .seasons: "snowflake"
-        case .weatherWidget: "cloud.snow"
         case .colorPicker: "eyedropper"
         case .volumeMixer: "speaker.wave.2"
         case .developer: "hammer"
@@ -89,9 +86,7 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         case .roundedCorners:
             ["corners", "round", "radius", "screen", "display", "black"]
         case .seasons:
-            ["season", "snow", "winter", "spring", "petals", "flowers", "summer", "sand", "beach", "autumn", "fall", "leaves", "particles", "fun", "wind", "density"]
-        case .weatherWidget:
-            ["widget", "weather", "wind", "intensity", "snow", "desktop", "panel", "pause", "season"]
+            ["season", "snow", "winter", "spring", "petals", "flowers", "summer", "sand", "beach", "autumn", "fall", "leaves", "particles", "fun", "wind", "density", "widget", "weather", "intensity", "desktop", "panel", "pause"]
         case .dockPreview:
             ["dock", "preview", "thumbnail", "window", "hover", "close", "desktop", "screen recording"]
         case .focusFollowsMouse:
@@ -139,7 +134,7 @@ enum SettingsGroup: CaseIterable, Identifiable {
     var panes: [SettingsPane] {
         switch self {
         case .app: [.general, .menuBar, .developer]
-        case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake, .roundedCorners, .seasons, .weatherWidget]
+        case .tools: [.clipboard, .colorPicker, .volumeMixer, .keepAwake, .roundedCorners, .seasons]
         case .windows: [.windowSnapping, .focusFollowsMouse, .dockPreview, .autoQuit]
         case .input: [.remap, .middleClick, .deleteToTrash]
         }
@@ -207,7 +202,6 @@ struct SettingsSidebar: View {
     @ObservedObject var keepAwakeSettings: KeepAwakeSettings
     @ObservedObject var roundedCornersSettings: RoundedCornersSettings
     @ObservedObject var seasonsSettings: SeasonsSettings
-    @ObservedObject var weatherWidgetSettings: WeatherWidgetSettings
     @ObservedObject var colorPickerSettings: ColorPickerSettings
     @ObservedObject var volumeMixerSettings: VolumeMixerSettings
 
@@ -263,7 +257,6 @@ struct SettingsSidebar: View {
         case .keepAwake: keepAwakeSettings.isEnabled
         case .roundedCorners: roundedCornersSettings.isEnabled
         case .seasons: seasonsSettings.isEnabled
-        case .weatherWidget: weatherWidgetSettings.isShown
         case .colorPicker: colorPickerSettings.isEnabled
         case .volumeMixer: volumeMixerSettings.isEnabled
         case .developer: nil
@@ -322,8 +315,6 @@ struct SettingsDetail: View {
                     roundedCorners.settingsPane()
                 case .seasons:
                     seasons.settingsPane()
-                case .weatherWidget:
-                    seasons.widget.settingsPane()
                 case .colorPicker:
                     colorPicker.settingsPane()
                 case .volumeMixer:

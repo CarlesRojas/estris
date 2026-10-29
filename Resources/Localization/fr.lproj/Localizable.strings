@@ -480,14 +480,11 @@
 "Above windows" = "Au-dessus des fenêtres";
 "Autumn" = "Automne";
 "Calm" = "Calme";
-"Controls" = "Commandes";
 "Falling" = "En train de tomber";
 "Intensity" = "Intensité";
 "Move Back to the Corner" = "Remettre dans le coin";
 "On the desktop" = "Sur le bureau";
-"Placement" = "Emplacement";
 "Position" = "Position";
-"Shows while Seasons is on." = "S'affiche quand Saisons est activé.";
 "Sits" = "Se place";
 "Snow and the rest pile up on it" = "La neige et le reste s'y accumulent";
 "Spring" = "Printemps";
@@ -504,3 +501,7 @@
 "Petals falling" = "Pétales qui tombent";
 "Sand blowing" = "Sable au vent";
 "Snowing" = "Il neige";
+"Show intensity" = "Afficher l'intensité";
+"Show season" = "Afficher la saison";
+"Show the weather widget" = "Afficher le widget météo";
+"Show wind" = "Afficher le vent";

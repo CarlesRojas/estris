@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- New utility, Seasons: snow in winter, pink petals in spring, sand in summer and leaves in autumn fall over your screens and pile up at the bottom and on top of windows. Push them around with the pointer, or move or shake a window to drop what's on it. Choose the season or let the date pick, have it fall in front of or behind windows, and set the density and how much piles up. Pauses on battery and in full screen apps. Off by default.
-- Seasons has an optional weather widget for your desktop: start and stop the falling, change the wind, the intensity and the season. What you change is kept when Estris quits. Set it up in Settings > Weather Widget.
+- New utility, Seasons: snow in winter, pink petals in spring, sand in summer and leaves in autumn fall over your screens and pile up at the bottom and on top of windows. Push them around with the pointer, or move or shake a window to drop what's on it. Choose the season or let the date pick, have it fall in front of or behind windows, and set the density and how much piles up. Wind blows what falls and the piles. Pauses on battery and in full screen apps. Off by default.
+- Seasons has an optional weather widget for your desktop: start and stop the falling, change the wind, the intensity and the season. What you change is kept when Estris quits. Set it up in Settings > Seasons.
 
 ## 0.1.15 - 2026-10-28
 

@@ -12,6 +12,9 @@ final class WeatherWidget {
     private var panel: WidgetPanel?
     private var observers: Set<AnyCancellable> = []
     private var frameTokens: [NSObjectProtocol] = []
+    private var screenToken: NSObjectProtocol?
+    /// The room it keeps from the edges of the screen, the menu bar and the Dock.
+    static let screenGap: CGFloat = 16
     /// Where its top left corner is: it stays there as controls are shown or hidden.
     private var topLeft = CGPoint.zero
     private var size = CGSize.zero
@@ -28,12 +31,9 @@ final class WeatherWidget {
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.update() }
             .store(in: &observers)
-    }
-
-    /// The pane shown for the widget in Settings.
-    func settingsPane() -> some View {
-        WeatherWidgetPane(settings: settings, seasons: seasons) { [weak self] in
-            self?.resetPosition()
+        // Screens added, removed or resized: it moves to the nearest place that fits.
+        screenToken = NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.keepOnScreen() }
         }
     }
 
@@ -80,11 +80,13 @@ final class WeatherWidget {
     }
 
     /// Dragged: remembered where it is left. Resized: kept at the same top left corner.
+    /// Either way, kept clear of the screen's edges.
     private func frameChanged() {
         guard let panel else { return }
         if panel.frame.size != size {
             size = panel.frame.size
             panel.setFrameTopLeftPoint(topLeft)
+            keepOnScreen()
             return
         }
         let corner = CGPoint(x: panel.frame.minX, y: panel.frame.maxY)
@@ -93,18 +95,45 @@ final class WeatherWidget {
         settings.topLeft = corner
     }
 
-    /// Where it was left, if that is still on a screen; otherwise near the top right of the
-    /// main screen.
-    private func startingTopLeft(size: CGSize) -> CGPoint {
-        if let saved = settings.topLeft,
-           NSScreen.screens.contains(where: { $0.visibleFrame.insetBy(dx: -20, dy: -20).contains(saved) }) {
-            return saved
+    /// Moves it, if it has to, to the nearest place on a screen with room around it.
+    private func keepOnScreen() {
+        guard let panel else { return }
+        let origin = Self.keptOnScreen(panel.frame)
+        if origin != panel.frame.origin {
+            panel.setFrameOrigin(origin)
         }
-        let area = NSScreen.main?.visibleFrame ?? .zero
-        return CGPoint(x: area.maxX - max(size.width, 240) - 24, y: area.maxY - 24)
     }
 
-    private func resetPosition() {
+    /// Where a frame goes to be on a screen, `screenGap` clear of its edges, the menu bar
+    /// and the Dock: the screen under its middle, or else the nearest one.
+    static func keptOnScreen(_ frame: CGRect) -> CGPoint {
+        let screens = NSScreen.screens
+        let middle = CGPoint(x: frame.midX, y: frame.midY)
+        func distance(to rect: CGRect) -> CGFloat {
+            let dx = max(rect.minX - middle.x, 0, middle.x - rect.maxX)
+            let dy = max(rect.minY - middle.y, 0, middle.y - rect.maxY)
+            return dx * dx + dy * dy
+        }
+        guard let screen = screens.first(where: { $0.frame.contains(middle) }) ?? screens.min(by: { distance(to: $0.frame) < distance(to: $1.frame) })
+        else { return frame.origin }
+        let area = screen.visibleFrame.insetBy(dx: screenGap, dy: screenGap)
+        return CGPoint(
+            x: min(max(frame.minX, area.minX), max(area.minX, area.maxX - frame.width)),
+            y: min(max(frame.minY, area.minY), max(area.minY, area.maxY - frame.height))
+        )
+    }
+
+    /// Where it was left, moved onto a screen if that is no longer there; at first, the top
+    /// right of the main screen.
+    private func startingTopLeft(size: CGSize) -> CGPoint {
+        let area = NSScreen.main?.visibleFrame ?? .zero
+        let corner = settings.topLeft ?? CGPoint(x: area.maxX - size.width - Self.screenGap, y: area.maxY - Self.screenGap)
+        let origin = Self.keptOnScreen(CGRect(x: corner.x, y: corner.y - size.height, width: size.width, height: size.height))
+        return CGPoint(x: origin.x, y: origin.y + size.height)
+    }
+
+    /// Back to the top right corner of the main screen.
+    func resetPosition() {
         settings.topLeft = nil
         guard let panel else { return }
         topLeft = startingTopLeft(size: panel.frame.size)
@@ -188,8 +217,6 @@ struct WeatherWidgetView: View {
                 .buttonStyle(.plain)
                 .help(seasons.isFalling ? String(localized: "Stop falling") : String(localized: "Start falling"))
             }
-            // Dragging the top row moves the widget.
-            .background(WindowDragArea())
 
             if settings.showsIntensity || settings.showsWind {
                 VStack(spacing: 8) {
@@ -213,6 +240,8 @@ struct WeatherWidgetView: View {
         .tint(season.accent)
         .padding(16)
         .frame(width: 330)
+        // Dragging anywhere but its controls moves it.
+        .background(WindowDragArea())
         .background(VisualEffect(cornerRadius: Self.cornerRadius))
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
         .overlay(
@@ -358,7 +387,7 @@ private struct VisualEffect: NSViewRepresentable {
     func updateNSView(_ view: NSVisualEffectView, context: Context) {}
 }
 
-/// An area that moves its window when dragged.
+/// An area that moves its window when dragged, kept clear of the screen's edges all the way.
 private struct WindowDragArea: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
         DragView()
@@ -367,10 +396,23 @@ private struct WindowDragArea: NSViewRepresentable {
     func updateNSView(_ view: NSView, context: Context) {}
 
     private final class DragView: NSView {
-        override var mouseDownCanMoveWindow: Bool { true }
+        private var start: (pointer: CGPoint, origin: CGPoint)?
 
         override func mouseDown(with event: NSEvent) {
-            window?.performDrag(with: event)
+            guard let window else { return }
+            start = (NSEvent.mouseLocation, window.frame.origin)
+        }
+
+        override func mouseDragged(with event: NSEvent) {
+            guard let window, let start else { return }
+            let pointer = NSEvent.mouseLocation
+            var frame = window.frame
+            frame.origin = CGPoint(x: start.origin.x + pointer.x - start.pointer.x, y: start.origin.y + pointer.y - start.pointer.y)
+            window.setFrameOrigin(WeatherWidget.keptOnScreen(frame))
+        }
+
+        override func mouseUp(with event: NSEvent) {
+            start = nil
         }
     }
 }
