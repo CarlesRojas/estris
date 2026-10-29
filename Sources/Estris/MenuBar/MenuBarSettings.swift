@@ -18,7 +18,7 @@ final class MenuBarSettings: ObservableObject {
         static let showsColorPicker = true
         static let showsRecentColors = false
         static let showsSeasonsFalling = true
-        static let showsSeasonsSeason = true
+        static let showsSeasonsSeason = false
         static let showsSeasonsIntensity = true
         static let showsSeasonsWind = true
     }

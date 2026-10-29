@@ -77,7 +77,7 @@ Then **Settings** and **Quit** side by side at the bottom, as capsules, set apar
 - **Volume Mixer**: **Show System Volume**, with **Show Output** and **Show Microphone** under it (they do nothing while it is off), **Show Apps Volume**, **Show device pickers** (all on) and **Show volume percentages** (off).
 - **Clipboard**: **Show recent entries** (off) and how many (**Entries**, 1 to 10, default 5), **Show Clear History button** (on).
 - **Color Picker**: **Show Pick a Color button** (on) and **Show recent colors** (off).
-- **Seasons**: **Show Start and Stop Falling button**, **Show season**, **Show intensity** and **Show wind** (all on).
+- **Seasons**: **Show Start and Stop Falling button** (on), **Show season** (off), **Show intensity** and **Show wind** (on).
 
 **Reset to Defaults** puts the icon and all of these back.
 
