@@ -49,20 +49,20 @@ struct SeasonStyle {
         case .spring:
             return SeasonStyle(
                 sprites: petals(scale: scale),
-                size: 5...8.5, fallSpeed: 28...55, sway: 30, swayRate: 0.8...2, spin: 3, drag: 1.3,
+                size: 8...13, fallSpeed: 28...55, sway: 30, swayRate: 0.8...2, spin: 3, drag: 1.3,
                 rate: 18, thickness: 0.22, pile: .stacked, repose: 3
             )
         case .summer:
             // Sand knocked off a pile scatters as fine grains.
             let grains = SeasonStyle(
                 sprites: sand(scale: scale),
-                size: 0.5...1.1, fallSpeed: 120...200, sway: 3, swayRate: 1...3, spin: 0, drag: 3.5,
-                rate: 0, thickness: 1.2, pile: .sand, repose: 2
+                size: 1.3...2.2, fallSpeed: 120...200, sway: 3, swayRate: 1...3, spin: 0, drag: 3.5,
+                rate: 0, thickness: 0.8, pile: .sand, repose: 2
             )
             return SeasonStyle(
                 sprites: sand(scale: scale),
-                size: 1.2...2.5, fallSpeed: 110...170, sway: 6, swayRate: 1...3, spin: 0, drag: 3,
-                rate: 100, thickness: 1.2, pile: .sand, repose: 2, debris: [grains]
+                size: 2...3.5, fallSpeed: 110...170, sway: 6, swayRate: 1...3, spin: 0, drag: 3,
+                rate: 80, thickness: 0.8, pile: .sand, repose: 2, debris: [grains]
             )
         case .autumn:
             return SeasonStyle(
@@ -113,11 +113,13 @@ struct SeasonStyle {
         }
     }
 
-    /// A petal: rounded at the tip, narrowing to its base, with a small notch.
+    /// A cherry blossom petal: rounded at the tip, narrowing to its base, with a small notch;
+    /// pale at the tip, deeper pink toward the base, with faint veins.
     private static func petals(scale: CGFloat) -> [CGImage] {
-        let colors = ["F8C8DC", "F4A7C3", "FBD9E6", "EE9AB8"]
-        return colors.map { hex in
-            sprite(side: 10, scale: scale) { context, rect in
+        let colors = [("FDE6EF", "F2A9C4"), ("FBD9E6", "EE9AB8"), ("FFF0F5", "F6BBD0"), ("F8C8DC", "E58AAE")]
+        return colors.map { pair -> CGImage in
+            let (tip, base) = pair
+            return sprite(side: 16, scale: scale) { context, rect in
                 let w = rect.width
                 let h = rect.height
                 let path = CGMutablePath()
@@ -127,19 +129,55 @@ struct SeasonStyle {
                 path.addLine(to: CGPoint(x: w * 0.58, y: h * 0.95))
                 path.addCurve(to: CGPoint(x: w * 0.5, y: h * 0.05), control1: CGPoint(x: w * 0.9, y: h * 0.95), control2: CGPoint(x: w * 0.95, y: h * 0.35))
                 context.addPath(path)
-                context.setFillColor(color(hex))
-                context.fillPath()
+                context.clip()
+                let gradient = CGGradient(
+                    colorsSpace: CGColorSpace(name: CGColorSpace.sRGB),
+                    colors: [color(base), color(tip)] as CFArray,
+                    locations: nil
+                )
+                if let gradient {
+                    context.drawLinearGradient(gradient, start: CGPoint(x: w * 0.5, y: h * 0.05), end: CGPoint(x: w * 0.5, y: h * 0.9), options: [])
+                }
+                context.setStrokeColor(color(base).copy(alpha: 0.35)!)
+                context.setLineWidth(w * 0.012)
+                for spread in [-0.16, -0.07, 0, 0.07, 0.16] as [CGFloat] {
+                    context.move(to: CGPoint(x: w * 0.5, y: h * 0.08))
+                    context.addQuadCurve(to: CGPoint(x: w * (0.5 + spread * 1.6), y: h * 0.82), control: CGPoint(x: w * (0.5 + spread * 1.2), y: h * 0.4))
+                }
+                context.strokePath()
             }
         }
     }
 
-    /// Grains in a few sand tones.
+    /// Grains in a few sand tones: irregular, rounded by the sea, lit from the upper left.
     private static func sand(scale: CGFloat) -> [CGImage] {
-        let colors = ["E8D3A2", "D9BC85", "F1E2B8", "C9A66B", "B8925A"]
-        return colors.map { hex in
-            sprite(side: 4, scale: scale) { context, rect in
-                context.setFillColor(color(hex))
-                context.fillEllipse(in: rect.insetBy(dx: rect.width * 0.08, dy: rect.width * 0.08))
+        let colors = [("E8D3A2", "A88A58"), ("D9BC85", "8F6F42"), ("F1E2B8", "B8A074"), ("C9A66B", "7E5E34"), ("9C7A4C", "5A4428"), ("EFE6D2", "A89C84")]
+        return colors.flatMap { pair -> [CGImage] in
+            let (light, dark) = pair
+            return (0..<2).map { _ -> CGImage in
+                let corners = Int.random(in: 6...8)
+                let radii = (0..<corners).map { _ in CGFloat.random(in: 0.32...0.46) }
+                return sprite(side: 4, scale: scale) { context, rect in
+                    let side = rect.width
+                    let path = CGMutablePath()
+                    for (index, radius) in radii.enumerated() {
+                        let angle = CGFloat(index) / CGFloat(corners) * 2 * .pi
+                        let point = CGPoint(x: side / 2 + cos(angle) * radius * side, y: side / 2 + sin(angle) * radius * side)
+                        if index == 0 { path.move(to: point) } else { path.addLine(to: point) }
+                    }
+                    path.closeSubpath()
+                    context.addPath(path)
+                    context.clip()
+                    let gradient = CGGradient(
+                        colorsSpace: CGColorSpace(name: CGColorSpace.sRGB),
+                        colors: [color(light), color(dark)] as CFArray,
+                        locations: nil
+                    )
+                    if let gradient {
+                        let highlight = CGPoint(x: side * 0.35, y: side * 0.65)
+                        context.drawRadialGradient(gradient, startCenter: highlight, startRadius: 0, endCenter: CGPoint(x: side / 2, y: side / 2), endRadius: side * 0.5, options: [.drawsAfterEndLocation])
+                    }
+                }
             }
         }
     }

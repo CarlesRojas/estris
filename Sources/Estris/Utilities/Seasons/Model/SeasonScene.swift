@@ -85,6 +85,9 @@ final class Surface {
     var spilledLeft: CGFloat = 0
     var spilledRight: CGFloat = 0
     var dug: CGFloat = 0
+    /// When, in the scene's time, it starts collecting: a window that just moved collects
+    /// nothing until it has been still a moment, so a dragged or shaken window stays clear.
+    var collectsFrom: CGFloat = 0
     private(set) var minX: CGFloat
     private(set) var y: CGFloat
     private(set) var columns: [[Particle]]
@@ -304,15 +307,16 @@ final class SeasonScene {
     }
 
     /// A pile for the current season; a drift is drawn under everything falling.
-    private func makeSurface(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool) -> Surface {
+    private func makeSurface(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, quietFor: CGFloat = 0) -> Surface {
         let surface = Surface(minX: minX, maxX: maxX, y: y, isFloor: isFloor, kind: style.pile)
+        surface.collectsFrom = time + quietFor
         attachDrift(to: surface)
         return surface
     }
 
     private func attachDrift(to surface: Surface) {
         guard surface.kind != .stacked else { return }
-        let drift = DriftLayer(kind: surface.kind, width: surface.maxX - surface.minX, scale: scale)
+        let drift = DriftLayer(kind: surface.kind, width: surface.maxX - surface.minX, scale: scale, screenX: surface.minX - origin.x)
         drift.root.position = CGPoint(x: surface.minX - origin.x, y: surface.y - origin.y)
         rootLayer?.insertSublayer(drift.root, at: 0)
         surface.drift = drift
@@ -379,7 +383,7 @@ final class SeasonScene {
                         dy: max(-1500, min(1500, (top - surface.y) / interval))
                     )
                     scatter(surface, velocity: velocity)
-                    tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false)
+                    tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false, quietFor: 0.3)
                 }
             } else {
                 tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false)
@@ -496,7 +500,7 @@ final class SeasonScene {
     private func land(_ particle: Particle, from previous: CGPoint, on surfaces: [Surface], windowLimit: Int, bottomLimit: Int) {
         guard particle.velocity.dy < 0 else { return }
         var best: (surface: Surface, column: Int, top: CGFloat)?
-        for surface in surfaces {
+        for surface in surfaces where surface.collectsFrom <= time {
             guard let column = surface.column(at: particle.position.x) else { continue }
             let top = surface.top(column)
             guard previous.y >= top - 0.5, particle.position.y < top,
@@ -628,7 +632,7 @@ final class SeasonScene {
                 surface.spilledRight -= pieceUnit
                 emit(at: CGPoint(x: surface.maxX + 1, y: surface.top(surface.heights.count - 1)), velocity: CGVector(dx: CGFloat.random(in: 8...30), dy: 0))
             }
-            if surface.needsDraw, let drift = surface.drift {
+            if surface.needsDraw, let drift = surface.drift, drift.canDraw {
                 surface.needsDraw = false
                 let minX = surface.minX
                 drift.draw(heights: surface.heights, columnWidth: Surface.columnWidth) { column in
