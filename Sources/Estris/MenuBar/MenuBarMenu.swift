@@ -248,7 +248,13 @@ private struct SeasonsMenuRows: View {
                     Button {
                         seasons.isFalling.toggle()
                     } label: {
-                        Label(fallingTitle, systemImage: fallingSymbol)
+                        Label {
+                            Text(fallingTitle)
+                        } icon: {
+                            // Small beside the words, as an icon on a button.
+                            Image(systemName: fallingSymbol)
+                                .font(.system(size: 9, weight: .bold))
+                        }
                             .padding(.horizontal, 12)
                             .frame(minHeight: 24)
                             .contentShape(Capsule())
