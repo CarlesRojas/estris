@@ -185,8 +185,8 @@ final class SeasonScene {
         self.style = style
         window = OverlayWindow(frame: screen.frame)
         window.level = level
-        // The bottom of the screen, or the top of the Dock when it sits there.
-        floor = Surface(minX: screenFrame.minX, maxX: screenFrame.maxX, y: visibleFrame.minY, isFloor: true)
+        // The very bottom of the screen; in front of windows, the Dock hides what lies behind it.
+        floor = Surface(minX: screenFrame.minX, maxX: screenFrame.maxX, y: screenFrame.minY, isFloor: true)
         window.orderFrontRegardless()
     }
 
@@ -266,10 +266,10 @@ final class SeasonScene {
     }
 
     /// Moves everything on by `dt` seconds.
-    func step(_ dt: CGFloat, pointer: CGPoint, pointerVelocity: CGVector, amount: Double, wind: CGFloat, windowLimit: Int, bottomLimit: Int) {
+    func step(_ dt: CGFloat, pointer: CGPoint, pointerVelocity: CGVector, density: Double, wind: CGFloat, windowLimit: Int, bottomLimit: Int) {
         guard !isHidden else { return }
         time += dt
-        spawn(dt, amount: amount)
+        spawn(dt, density: density)
 
         let reach = Self.pointerReach
         let pull = min(1, 6 * dt)
@@ -335,9 +335,9 @@ final class SeasonScene {
         }
     }
 
-    private func spawn(_ dt: CGFloat, amount: Double) {
-        spawnDebt += style.rate * amount * Double(screenFrame.width / 1440) * Double(dt)
-        let cap = Int(500 * amount)
+    private func spawn(_ dt: CGFloat, density: Double) {
+        spawnDebt += style.rate * density * Double(screenFrame.width / 1440) * Double(dt)
+        let cap = Int(500 * density)
         var falling = particles.reduce(0) { $0 + ($1.state == .falling ? 1 : 0) }
         while spawnDebt >= 1 {
             spawnDebt -= 1
@@ -378,9 +378,10 @@ final class SeasonScene {
             return
         }
 
-        // Rolls down while its column stands too far above a neighbour. Past a window's
-        // edge, it falls off.
-        var column = landing
+        // Lands a column either side of where it hit, so piles fill out evenly, then rolls
+        // down while its column stands too far above a neighbour. Past a window's edge, it
+        // falls off.
+        var column = min(surface.columns.count - 1, max(0, landing + Int.random(in: -1...1)))
         for _ in 0..<60 {
             let height = surface.heights[column]
             let edge: CGFloat = surface.isFloor ? height : 0

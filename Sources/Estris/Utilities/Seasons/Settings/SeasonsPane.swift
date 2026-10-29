@@ -28,12 +28,12 @@ struct SeasonsPane: View {
                         }
                     }
                     .resetMenu($settings.layer, to: SeasonsSettings.defaultLayer)
-                    LabeledContent("Amount") {
-                        slider($settings.amount, in: SeasonsSettings.amountRange, step: 0.25) {
-                            "\(Int((settings.amount * 100).rounded()))%"
+                    LabeledContent("Density") {
+                        slider($settings.density, in: SeasonsSettings.densityRange, step: 0.05) {
+                            "\(Int((settings.density * 100).rounded()))%"
                         }
                     }
-                    .resetMenu($settings.amount, to: SeasonsSettings.defaultAmount)
+                    .resetMenu($settings.density, to: SeasonsSettings.defaultDensity)
                 } header: {
                     Text("Effect")
                 } footer: {
@@ -42,13 +42,13 @@ struct SeasonsPane: View {
                 }
                 Section {
                     LabeledContent("On each window") {
-                        slider($settings.windowLimit, in: SeasonsSettings.windowLimitRange, step: 10) {
+                        slider($settings.windowLimit, in: SeasonsSettings.windowLimitRange, step: 50) {
                             "\(Int(settings.windowLimit))"
                         }
                     }
                     .resetMenu($settings.windowLimit, to: SeasonsSettings.defaultWindowLimit)
                     LabeledContent("At the bottom") {
-                        slider($settings.bottomLimit, in: SeasonsSettings.bottomLimitRange, step: 50) {
+                        slider($settings.bottomLimit, in: SeasonsSettings.bottomLimitRange, step: 250) {
                             "\(Int(settings.bottomLimit))"
                         }
                     }

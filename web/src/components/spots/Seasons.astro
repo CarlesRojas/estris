@@ -9,10 +9,10 @@ const { d } = Astro.props;
 
 // Each season's share of the loop, in %, and how its particles look.
 const seasons = [
-  { id: "winter", name: "Winter", from: 0, to: 34, color: "#f5f7ff", count: 34, size: [0.7, 1.4], shape: "50%", spin: 0, sway: 1.5 },
-  { id: "spring", name: "Spring", from: 34, to: 56, color: "#f6b3cc", count: 22, size: [1.5, 2.1], shape: "70% 0", spin: 360, sway: 3 },
-  { id: "summer", name: "Summer", from: 56, to: 78, color: "#e3c58f", count: 40, size: [0.45, 0.7], shape: "50%", spin: 0, sway: 0.6 },
-  { id: "autumn", name: "Autumn", from: 78, to: 100, color: "#e0892f", count: 16, size: [2.4, 3.2], shape: "0 70%", spin: 540, sway: 4 },
+  { id: "winter", name: "Winter", from: 0, to: 34, color: "#f5f7ff", count: 60, size: [0.35, 0.8], shape: "50%", spin: 0, sway: 1.5 },
+  { id: "spring", name: "Spring", from: 34, to: 56, color: "#f6b3cc", count: 30, size: [0.9, 1.3], shape: "70% 0", spin: 360, sway: 3 },
+  { id: "summer", name: "Summer", from: 56, to: 78, color: "#e3c58f", count: 70, size: [0.25, 0.45], shape: "50%", spin: 0, sway: 0.6 },
+  { id: "autumn", name: "Autumn", from: 78, to: 100, color: "#e0892f", count: 22, size: [1.5, 2.1], shape: "0 70%", spin: 540, sway: 4 },
 ];
 const leafColors = ["#e0892f", "#c8552a", "#e8b23a", "#9c5a2c"];
 
@@ -22,7 +22,10 @@ const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 
 // Leaves and petals drawn as the app draws them, one picture per colour.
 const svg = (body: string) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'>${body}</svg>`)}")`;
-const leaf = (color: string) => svg(`<path d='M10 19.2Q.4 11 10 2.8Q19.6 11 10 19.2z' fill='${color}'/><path d='M10 19.6V4.5' stroke='rgba(0,0,0,.28)' stroke-width='.9'/>`);
+// A maple leaf, as the app draws it: shaded darker toward its edge, with a stem and veins.
+const leafEdges: Record<string, string> = { "#e0892f": "#9a4416", "#c8552a": "#7a2410", "#e8b23a": "#b06a18", "#9c5a2c": "#552a12" };
+const leaf = (color: string) =>
+  svg(`<defs><radialGradient id='g' cx='.5' cy='.45' r='.55'><stop offset='0' stop-color='${color}'/><stop offset='1' stop-color='${leafEdges[color] ?? color}'/></radialGradient></defs><path d='M10 19.6V15.6' stroke='${leafEdges[color] ?? color}' stroke-width='.8' stroke-linecap='round'/><path d='M10.0 15.6 7.8 16.6 8.0 14.6 3.4 14.2 4.8 12.6 0.8 10.0 2.8 9.2 2.0 6.8 5.2 7.6 5.6 5.8 7.6 7.2 7.0 3.2 8.8 4.0 10.0 0.4 11.2 4.0 13.0 3.2 12.4 7.2 14.4 5.8 14.8 7.6 18.0 6.8 17.2 9.2 19.2 10.0 15.2 12.6 16.6 14.2 12.0 14.6 12.2 16.6z' fill='url(#g)' stroke='rgba(0,0,0,.2)' stroke-width='.25'/><path d='M10 15.6L10.0 1.2M10 15.6L1.6 9.6M10 15.6L18.4 9.6M10 15.6L4.0 14.0M10 15.6L16.0 14.0' stroke='rgba(0,0,0,.22)' stroke-width='.35' fill='none'/>`);
 const petal = (color: string) => svg(`<path d='M10 1C1 7 2 19 8.4 19L10 17.2 11.6 19C18 19 19 7 10 1z' fill='${color}'/>`);
 const petalColors = ["#f8c8dc", "#f4a7c3", "#fbd9e6", "#ee9ab8"];
 const shapeOf = (id: string, color: string) => (id === "autumn" ? leaf(color) : petal(color));
@@ -34,11 +37,11 @@ const pileItems = seasons
   .filter((s) => s.id === "spring" || s.id === "autumn")
   .flatMap((s) =>
     (["top", "bottom"] as const).flatMap((where) => {
-      const count = where === "top" ? (s.id === "autumn" ? 22 : 30) : s.id === "autumn" ? 34 : 46;
+      const count = where === "top" ? (s.id === "autumn" ? 40 : 55) : s.id === "autumn" ? 70 : 90;
       return Array.from({ length: count }, (_, n) => {
         const share = n / count;
         const land = s.from + 2 + share * (s.to - s.from - 8);
-        const size = s.id === "autumn" ? 2.2 + random() * 1 : 1.4 + random() * 0.6;
+        const size = s.id === "autumn" ? 1.4 + random() * 0.6 : 0.9 + random() * 0.4;
         // Higher in the middle of the pile than at its ends, and higher as it fills.
         const left = where === "top" ? 2 + random() * 94 : -2 + random() * 104;
         const middle = 1 - Math.abs(left - 50) / 55;

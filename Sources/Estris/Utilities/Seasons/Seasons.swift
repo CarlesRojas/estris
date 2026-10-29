@@ -184,7 +184,7 @@ final class Seasons {
             }
         }
         for scene in scenes {
-            scene.step(dt, pointer: pointer, pointerVelocity: pointerVelocity, amount: settings.amount, wind: wind, windowLimit: windowLimit, bottomLimit: bottomLimit)
+            scene.step(dt, pointer: pointer, pointerVelocity: pointerVelocity, density: settings.density, wind: wind, windowLimit: windowLimit, bottomLimit: bottomLimit)
         }
         CATransaction.commit()
     }

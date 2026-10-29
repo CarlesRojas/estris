@@ -456,7 +456,6 @@
 "Without it, Window Snapping can't do anything." = "Senza, Aggancio finestre non può fare nulla.";
 "§ (Section)" = "§ (Paragrafo)";
 "Works in apps with a command on ⌘⌫ in their menus, like Move to Trash or Delete. While typing, Delete deletes text as usual. Holding it down deletes once. In Finder's Trash, it deletes immediately." = "Funziona nelle app con un comando su ⌘⌫ nei loro menu, come Sposta nel Cestino o Elimina. Mentre scrivi, Elimina cancella il testo come sempre. Tenendolo premuto, elimina una sola volta. Nel Cestino del Finder, elimina subito.";
-"Amount" = "Quantità";
 "At the bottom" = "In basso";
 "Automatic" = "Automatica";
 "Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator." = "Automatica segue la data: neve in inverno, petali in primavera, sabbia in estate e foglie in autunno, al contrario a sud dell'equatore.";
@@ -476,3 +475,4 @@
 "Summer: sand" = "Estate: sabbia";
 "The most that stays in a pile; past that, the oldest melts away. Moving or shaking a window drops what is on it." = "Il massimo che resta in un mucchio; oltre, il più vecchio si scioglie. Spostare o scuotere una finestra fa cadere ciò che c'è sopra.";
 "Winter: snow" = "Inverno: neve";
+"Density" = "Densità";

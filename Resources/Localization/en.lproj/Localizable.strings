@@ -456,7 +456,6 @@
 "Without it, Window Snapping can't do anything." = "Without it, Window Snapping can't do anything.";
 "§ (Section)" = "§ (Section)";
 "Works in apps with a command on ⌘⌫ in their menus, like Move to Trash or Delete. While typing, Delete deletes text as usual. Holding it down deletes once. In Finder's Trash, it deletes immediately." = "Works in apps with a command on ⌘⌫ in their menus, like Move to Trash or Delete. While typing, Delete deletes text as usual. Holding it down deletes once. In Finder's Trash, it deletes immediately.";
-"Amount" = "Amount";
 "At the bottom" = "At the bottom";
 "Automatic" = "Automatic";
 "Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator." = "Automatic follows the date: snow in winter, petals in spring, sand in summer and leaves in autumn, flipped south of the equator.";
@@ -476,3 +475,4 @@
 "Summer: sand" = "Summer: sand";
 "The most that stays in a pile; past that, the oldest melts away. Moving or shaking a window drops what is on it." = "The most that stays in a pile; past that, the oldest melts away. Moving or shaking a window drops what is on it.";
 "Winter: snow" = "Winter: snow";
+"Density" = "Density";

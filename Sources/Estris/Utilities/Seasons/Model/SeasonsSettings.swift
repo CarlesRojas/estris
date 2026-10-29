@@ -75,12 +75,12 @@ enum SeasonsLayer: String, CaseIterable, Identifiable {
 final class SeasonsSettings: ObservableObject {
     static let defaultSeason = SeasonChoice.automatic
     static let defaultLayer = SeasonsLayer.inFront
-    static let defaultAmount: Double = 1
-    static let amountRange: ClosedRange<Double> = 0.25...3
-    static let defaultWindowLimit: Double = 150
-    static let windowLimitRange: ClosedRange<Double> = 0...600
-    static let defaultBottomLimit: Double = 800
-    static let bottomLimitRange: ClosedRange<Double> = 0...3000
+    static let defaultDensity: Double = 1
+    static let densityRange: ClosedRange<Double> = 0.1...4
+    static let defaultWindowLimit: Double = 500
+    static let windowLimitRange: ClosedRange<Double> = 0...2000
+    static let defaultBottomLimit: Double = 3000
+    static let bottomLimitRange: ClosedRange<Double> = 0...10000
     static let defaultPausesOnBattery = true
     static let defaultPausesInFullScreen = true
 
@@ -99,8 +99,8 @@ final class SeasonsSettings: ObservableObject {
     }
 
     /// How much falls, as a multiple of the season's own rate.
-    @Published var amount: Double {
-        didSet { defaults.set(amount, forKey: Keys.amount) }
+    @Published var density: Double {
+        didSet { defaults.set(density, forKey: Keys.density) }
     }
 
     /// How many particles a window's top edge holds; more melt away the oldest.
@@ -126,7 +126,7 @@ final class SeasonsSettings: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
-            Keys.amount: Self.defaultAmount,
+            Keys.density: Self.defaultDensity,
             Keys.windowLimit: Self.defaultWindowLimit,
             Keys.bottomLimit: Self.defaultBottomLimit,
             Keys.pausesOnBattery: Self.defaultPausesOnBattery,
@@ -135,7 +135,7 @@ final class SeasonsSettings: ObservableObject {
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         season = SeasonChoice(rawValue: defaults.string(forKey: Keys.season) ?? "") ?? Self.defaultSeason
         layer = SeasonsLayer(rawValue: defaults.string(forKey: Keys.layer) ?? "") ?? Self.defaultLayer
-        amount = defaults.double(forKey: Keys.amount)
+        density = defaults.double(forKey: Keys.density)
         windowLimit = defaults.double(forKey: Keys.windowLimit)
         bottomLimit = defaults.double(forKey: Keys.bottomLimit)
         pausesOnBattery = defaults.bool(forKey: Keys.pausesOnBattery)
@@ -146,7 +146,7 @@ final class SeasonsSettings: ObservableObject {
     func reset() {
         season = Self.defaultSeason
         layer = Self.defaultLayer
-        amount = Self.defaultAmount
+        density = Self.defaultDensity
         windowLimit = Self.defaultWindowLimit
         bottomLimit = Self.defaultBottomLimit
         pausesOnBattery = Self.defaultPausesOnBattery
@@ -157,7 +157,7 @@ final class SeasonsSettings: ObservableObject {
         static let isEnabled = "seasonsEnabled"
         static let season = "seasonsSeason"
         static let layer = "seasonsLayer"
-        static let amount = "seasonsAmount"
+        static let density = "seasonsDensity"
         static let windowLimit = "seasonsWindowLimit"
         static let bottomLimit = "seasonsBottomLimit"
         static let pausesOnBattery = "seasonsPausesOnBattery"
