@@ -15,7 +15,7 @@ enum PileKind {
 /// the drift there, darker where the drift meets what it lies on, over a texture kept fixed
 /// to the screen so it doesn't shimmer as the drift grows: sand as grains of a few tones with
 /// dark and bright specks, snow as a fine, faintly blue grain with a soft, uneven top and
-/// glints that flash on its surface.
+/// pure white points that fade slowly in and out, as snow catches the light.
 @MainActor
 final class DriftLayer {
     /// Tallest a drift is drawn, in points.
@@ -37,7 +37,8 @@ final class DriftLayer {
     private var sparkles: [Sparkle] = []
     private var lastDraw: CFTimeInterval = 0
 
-    /// A glint on the snow, kept at the same place along the drift and depth under its top.
+    /// A point of light in the snow, kept at the same place along the drift and the same
+    /// share of the way down from its top.
     private struct Sparkle {
         let layer: CALayer
         let along: CGFloat
@@ -115,9 +116,10 @@ final class DriftLayer {
                     // A little bluer deeper in, where less light reaches.
                     light *= 1 - 0.14 * min(1, depth / 30)
                     light *= 1 + (grain - 0.5) * 0.09
-                    red = 0.66 + (0.98 - 0.66) * light
-                    green = 0.73 + (0.985 - 0.73) * light
-                    blue = 0.86 + (1 - 0.86) * light
+                    // A little short of white, so the points of light stand out.
+                    red = 0.62 + (0.89 - 0.62) * light
+                    green = 0.69 + (0.915 - 0.69) * light
+                    blue = 0.82 + (0.96 - 0.82) * light
                     // A soft, uneven top, as fresh snow has.
                     if depth < 1 { coverage *= 0.6 + 0.4 * grain }
                 case .sand, .stacked:
@@ -149,8 +151,11 @@ final class DriftLayer {
         for sparkle in sparkles {
             let column = min(count - 1, Int(sparkle.along * CGFloat(count)))
             let height = heights[column]
-            sparkle.layer.isHidden = height < sparkle.depth + 1.5 || covered(column)
-            sparkle.layer.position = CGPoint(x: (CGFloat(column) + 0.5) * columnWidth, y: height - sparkle.depth)
+            sparkle.layer.isHidden = height < 1.5 || covered(column)
+            // On a whole pixel, so it stays one sharp point.
+            let x = (sparkle.along * CGFloat(count) * columnWidth * scale).rounded(.down) + 0.5
+            let y = (max(0.5, min(height - 0.4, height * (1 - sparkle.depth))) * scale).rounded(.down) + 0.5
+            sparkle.layer.position = CGPoint(x: x / scale, y: y / scale)
         }
     }
 
@@ -197,52 +202,29 @@ final class DriftLayer {
         textureRows = made
     }
 
-    /// Glints scattered along the drift, each flashing briefly on its own beat.
+    /// Points of light scattered through the snow, the way it catches the light: single pure
+    /// white pixels (now and then two), each fading slowly in and out on its own rhythm.
     private func addSparkles() {
-        let image = Self.glint(scale: scale)
-        for _ in 0..<max(1, Int(width / 10)) {
+        let pixel = 1 / scale
+        for _ in 0..<max(1, Int(width / 5)) {
             let layer = CALayer()
-            let side = CGFloat.random(in: 3...6)
+            let side = pixel * (Int.random(in: 0..<5) == 0 ? 2 : 1)
             layer.bounds = CGRect(x: 0, y: 0, width: side, height: side)
-            layer.contents = image
+            layer.backgroundColor = NSColor.white.cgColor
             layer.opacity = 0
             layer.isHidden = true
-            let flash = CAKeyframeAnimation(keyPath: "opacity")
-            flash.values = [0, 0, 1, 0, 0]
-            flash.keyTimes = [0, 0.45, 0.5, 0.56, 1]
-            flash.duration = .random(in: 1.2...4.5)
-            flash.timeOffset = .random(in: 0...flash.duration)
-            flash.repeatCount = .infinity
-            layer.add(flash, forKey: "flash")
+            let fade = CAKeyframeAnimation(keyPath: "opacity")
+            let peak = Float.random(in: 0.6...1)
+            fade.values = [0, 0, peak, 0, 0]
+            fade.keyTimes = [0, 0.25, 0.5, 0.75, 1]
+            fade.timingFunctions = Array(repeating: CAMediaTimingFunction(name: .easeInEaseOut), count: 4)
+            fade.duration = .random(in: 3...8)
+            fade.timeOffset = .random(in: 0...fade.duration)
+            fade.repeatCount = .infinity
+            layer.add(fade, forKey: "fade")
             root.addSublayer(layer)
-            sparkles.append(Sparkle(layer: layer, along: .random(in: 0...1), depth: .random(in: 0.3...3)))
+            sparkles.append(Sparkle(layer: layer, along: .random(in: 0...1), depth: .random(in: 0.02...0.95)))
         }
-    }
-
-    /// A tiny point of light with a faint glow and short, thin rays.
-    private static func glint(scale: CGFloat) -> CGImage {
-        let side: CGFloat = 6
-        let pixels = Int(side * scale)
-        let context = CGContext(
-            data: nil, width: pixels, height: pixels, bitsPerComponent: 8, bytesPerRow: 0,
-            space: CGColorSpace(name: CGColorSpace.sRGB)!,
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        )!
-        context.scaleBy(x: scale, y: scale)
-        let center = CGPoint(x: side / 2, y: side / 2)
-        let glow = [NSColor.white.cgColor, NSColor.white.withAlphaComponent(0.35).cgColor, NSColor.white.withAlphaComponent(0).cgColor] as CFArray
-        let locations: [CGFloat] = [0, 0.2, 1]
-        if let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB), colors: glow, locations: locations) {
-            context.drawRadialGradient(gradient, startCenter: center, startRadius: 0, endCenter: center, endRadius: side * 0.42, options: [])
-        }
-        context.setStrokeColor(NSColor.white.withAlphaComponent(0.5).cgColor)
-        context.setLineWidth(0.35)
-        context.move(to: CGPoint(x: 0.5, y: center.y))
-        context.addLine(to: CGPoint(x: side - 0.5, y: center.y))
-        context.move(to: CGPoint(x: center.x, y: 0.5))
-        context.addLine(to: CGPoint(x: center.x, y: side - 0.5))
-        context.strokePath()
-        return context.makeImage()!
     }
 
     /// A pixel, premultiplied, its bytes in RGBA order.
