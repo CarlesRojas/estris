@@ -8,7 +8,14 @@ struct WindowSnapshot {
         let id: CGWindowID
         /// In AppKit's global coordinates (origin at the bottom left of the main screen).
         let frame: CGRect
+        /// How round its top corners are.
+        var cornerRadius: CGFloat = WindowSnapshot.windowCornerRadius
     }
+
+    /// The corners of macOS's windows: rounder since macOS 26.
+    static let windowCornerRadius: CGFloat = ProcessInfo.processInfo.isOperatingSystemAtLeast(
+        OperatingSystemVersion(majorVersion: 26, minorVersion: 0, patchVersion: 0)
+    ) ? 16 : 10
 
     /// Normal windows (not the menu bar, the Dock or panels above them), front first.
     let windows: [Window]
@@ -36,8 +43,8 @@ struct WindowSnapshot {
 
     /// The same windows with one more, such as the weather widget: in front of them all, or
     /// behind them.
-    func including(_ frame: CGRect, id: CGWindowID, inFront: Bool) -> WindowSnapshot {
-        let window = Window(id: id, frame: frame)
+    func including(_ frame: CGRect, id: CGWindowID, cornerRadius: CGFloat, inFront: Bool) -> WindowSnapshot {
+        let window = Window(id: id, frame: frame, cornerRadius: cornerRadius)
         return WindowSnapshot(windows: inFront ? [window] + windows : windows + [window])
     }
 

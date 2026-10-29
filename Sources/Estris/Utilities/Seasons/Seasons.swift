@@ -180,7 +180,7 @@ final class Seasons {
             lastPoll = now
             var snapshot = WindowSnapshot.read()
             if let widget = widget.collectingFrame {
-                snapshot = snapshot.including(widget.frame, id: widget.id, inFront: widget.isAboveWindows)
+                snapshot = snapshot.including(widget.frame, id: widget.id, cornerRadius: WeatherWidgetView.cornerRadius, inFront: widget.isAboveWindows)
             }
             for scene in scenes {
                 scene.update(with: snapshot, interval: interval, windowLimit: windowLimit, bottomLimit: bottomLimit, hidesInFullScreen: settings.pausesInFullScreen)

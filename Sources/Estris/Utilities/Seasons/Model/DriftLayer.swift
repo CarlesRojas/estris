@@ -67,8 +67,9 @@ final class DriftLayer {
         CACurrentMediaTime() - lastDraw >= Self.drawInterval
     }
 
-    /// Draws the drift from its heights, `covered` telling which columns are hidden.
-    func draw(heights: [CGFloat], columnWidth: CGFloat, covered: (Int) -> Bool) {
+    /// Draws the drift from its depth in each column, lying on `base` (below 0 down a
+    /// rounded corner), `covered` telling which columns are hidden.
+    func draw(heights: [CGFloat], base: [CGFloat], columnWidth: CGFloat, covered: (Int) -> Bool) {
         lastDraw = CACurrentMediaTime()
         let count = heights.count
         let deepest = heights.max() ?? 0
@@ -77,7 +78,11 @@ final class DriftLayer {
             for sparkle in sparkles { sparkle.layer.isHidden = true }
             return
         }
-        let rows = min(Int(Self.height * scale), Int(((deepest + 2) * scale).rounded(.up)))
+        let tops = zip(base, heights).map { $0 + $1 }
+        // The picture starts at the lowest point a corner drops to.
+        let drop = -(base.min() ?? 0)
+        let rows = min(Int(Self.height * scale), Int(((drop + (tops.max() ?? 0) + 2) * scale).rounded(.up)))
+        let lift = Float(drop)
         makeTexture(rows: rows)
         var pixels = [UInt32](repeating: 0, count: pixelWidth * rows)
         let pixelScale = Float(scale)
@@ -90,18 +95,24 @@ final class DriftLayer {
             guard !covered(column) else { continue }
             // The surface between column centres, and its slope there, measured across a
             // column either side so it changes smoothly.
-            let surface = Self.surface(heights, at: point, columnWidth: columnWidth)
-            guard surface > 0.05 else { continue }
-            let slope = (Self.surface(heights, at: point + columnWidth, columnWidth: columnWidth)
-                - Self.surface(heights, at: point - columnWidth, columnWidth: columnWidth)) / Float(2 * columnWidth)
+            let surface = Self.surface(tops, at: point, columnWidth: columnWidth) + lift
+            let ground = Self.surface(base, at: point, columnWidth: columnWidth) + lift
+            guard surface - ground > 0.05 else { continue }
+            let slope = (Self.surface(tops, at: point + columnWidth, columnWidth: columnWidth)
+                - Self.surface(tops, at: point - columnWidth, columnWidth: columnWidth)) / Float(2 * columnWidth)
             // How squarely the surface faces the light: 1 where flat.
             let surfaceFacing = max(0, (-slope * lightX + lightY) / (slope * slope + 1).squareRoot()) / lightY
             let top = surface * pixelScale
-            for row in 0...min(rows - 1, Int(top)) {
-                var coverage = min(1, top - Float(row))
+            let bottom = ground * pixelScale
+            let firstRow = max(0, Int(bottom))
+            let lastRow = min(rows - 1, Int(top))
+            guard firstRow <= lastRow else { continue }
+            for row in firstRow...lastRow {
+                // Soft at the top, and at the bottom where it follows a corner's curve.
+                var coverage = min(1, top - Float(row)) * min(1, Float(row) + 1 - bottom)
                 guard coverage > 0 else { continue }
-                let height = (Float(row) + 0.5) / pixelScale
-                let depth = surface - height
+                let height = (Float(row) + 0.5) / pixelScale - ground
+                let depth = surface - (Float(row) + 0.5) / pixelScale
                 let grain = texture[row * pixelWidth + x]
                 // The slope's light shows near the surface and fades deeper in.
                 let facing = 1 + (surfaceFacing - 1) * exp(-depth / 4)
@@ -146,6 +157,7 @@ final class DriftLayer {
               )
         else { return }
         picture.bounds = CGRect(x: 0, y: 0, width: CGFloat(pixelWidth) / scale, height: CGFloat(rows) / scale)
+        picture.position = CGPoint(x: 0, y: -drop)
         picture.contents = image
 
         for sparkle in sparkles {
@@ -154,7 +166,7 @@ final class DriftLayer {
             sparkle.layer.isHidden = height < 1.5 || covered(column)
             // On a whole pixel, so it stays one sharp point.
             let x = (sparkle.along * CGFloat(count) * columnWidth * scale).rounded(.down) + 0.5
-            let y = (max(0.5, min(height - 0.4, height * (1 - sparkle.depth))) * scale).rounded(.down) + 0.5
+            let y = ((base[column] + max(0.5, min(height - 0.4, height * (1 - sparkle.depth)))) * scale).rounded(.down) + 0.5
             sparkle.layer.position = CGPoint(x: x / scale, y: y / scale)
         }
     }

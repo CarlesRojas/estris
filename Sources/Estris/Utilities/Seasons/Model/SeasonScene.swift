@@ -94,12 +94,15 @@ final class Surface {
     private(set) var y: CGFloat
     private(set) var columns: [[Particle]]
     private(set) var heights: [CGFloat]
+    /// What it lies on, below its top edge, in each column: 0 along a flat edge, dropping
+    /// down a window's rounded corners, so what lands there slides off as it would.
+    let base: [CGFloat]
     /// Resting particles, oldest first: the first to melt once the pile is full.
     private(set) var settled: [Particle] = []
     /// Parts hidden by windows in front, as ranges of x: nothing lands or shows there.
     var covered: [ClosedRange<CGFloat>] = []
 
-    init(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, kind: PileKind) {
+    init(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, kind: PileKind, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) {
         self.minX = minX
         self.y = y
         self.isFloor = isFloor
@@ -107,6 +110,24 @@ final class Surface {
         let count = max(1, Int((maxX - minX) / Self.columnWidth))
         columns = Array(repeating: [], count: count)
         heights = Array(repeating: 0, count: count)
+        let width = CGFloat(count) * Self.columnWidth
+        base = (0..<count).map { column in
+            let x = (CGFloat(column) + 0.5) * Self.columnWidth
+            return min(Self.corner(radius: leftRadius, at: x), Self.corner(radius: rightRadius, at: width - x))
+        }
+    }
+
+    /// How far a rounded corner of `radius` drops below the top edge, `distance` in from the
+    /// side.
+    private static func corner(radius: CGFloat, at distance: CGFloat) -> CGFloat {
+        guard radius > 0, distance < radius else { return 0 }
+        let across = radius - distance
+        return -(radius - (radius * radius - across * across).squareRoot())
+    }
+
+    /// Where the pile's top is in a column, from its top edge: what it lies on and its depth.
+    func elevation(_ column: Int) -> CGFloat {
+        base[column] + heights[column]
     }
 
     var maxX: CGFloat { minX + CGFloat(columns.count) * Self.columnWidth }
@@ -122,7 +143,7 @@ final class Surface {
 
     /// The pile's top in a column.
     func top(_ column: Int) -> CGFloat {
-        y + heights[column]
+        y + elevation(column)
     }
 
     func add(_ particle: Particle, at column: Int) {
@@ -198,31 +219,37 @@ final class Surface {
         needsDraw = true
     }
 
-    /// One step of a drift settling: where two neighbouring columns differ by more than
-    /// `repose`, some of the higher slides onto the lower. Sand slides freely and pours off a
-    /// window's edge; snow sticks, holds steeper sides, rounds off over the edge and
-    /// smooths into soft mounds. The screen's edges are walls.
+    /// One step of a drift settling: where two neighbouring columns' tops differ by more
+    /// than `repose`, some of the higher slides onto the lower, down a rounded corner too.
+    /// Sand slides freely and pours off a window's edge; snow sticks, holds steeper sides,
+    /// clings a little over the edge and smooths into soft mounds. The screen's edges are
+    /// walls.
     func settle(repose: CGFloat) {
         guard isSettling else { return }
         let count = heights.count
         let sticky = kind == .snow
         let rate: CGFloat = sticky ? 0.2 : 0.4
         var moved: CGFloat = 0
-        func outside(_ height: CGFloat) -> CGFloat {
-            isFloor ? height : sticky ? height * 0.55 : 0
+        // Beyond the ends: a wall at the screen's edges; off a window's side, a drop that
+        // snow clings to a little.
+        func outside(_ column: Int) -> CGFloat {
+            isFloor ? elevation(column) : base[column] + (sticky ? heights[column] * 0.55 : 0)
         }
         // Alternating sweeps, so nothing drifts one way.
         let forward = Bool.random()
         for step in 0...count {
             let left = forward ? step - 1 : count - 1 - step
             let right = left + 1
-            let a = left >= 0 ? heights[left] : outside(heights[0])
-            let b = right < count ? heights[right] : outside(heights[count - 1])
+            let a = left >= 0 ? elevation(left) : outside(0)
+            let b = right < count ? elevation(right) : outside(count - 1)
             let difference = a - b
             guard abs(difference) > repose else { continue }
-            let amount = (abs(difference) - repose) * rate
+            // No more than the higher column holds: a bare slope has nothing to slide.
+            let giver = difference > 0 ? left : right
+            guard giver >= 0, giver < count else { continue }
+            let amount = min(heights[giver], (abs(difference) - repose) * rate)
+            guard amount > 0 else { continue }
             if difference > 0 {
-                guard left >= 0 else { continue }
                 heights[left] -= amount
                 if right < count { heights[right] += amount } else { spilledRight += amount }
             } else {
@@ -239,9 +266,10 @@ final class Surface {
         var smoothed: CGFloat = 0
         if count > 1 {
             let smoothing: CGFloat = sticky ? 0.12 : 0.05
-            let before = heights
+            let before = (0..<count).map(elevation)
             for column in 0..<(count - 1) {
-                let flow = smoothing * (before[column] - before[column + 1])
+                var flow = smoothing * (before[column] - before[column + 1])
+                flow = flow > 0 ? min(flow, heights[column]) : max(flow, -heights[column + 1])
                 heights[column] -= flow
                 heights[column + 1] += flow
                 smoothed = max(smoothed, abs(flow))
@@ -320,8 +348,8 @@ final class SeasonScene {
     }
 
     /// A pile for the current season; a drift is drawn under everything falling.
-    private func makeSurface(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, quietFor: CGFloat = 0) -> Surface {
-        let surface = Surface(minX: minX, maxX: maxX, y: y, isFloor: isFloor, kind: style.pile)
+    private func makeSurface(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, quietFor: CGFloat = 0, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) -> Surface {
+        let surface = Surface(minX: minX, maxX: maxX, y: y, isFloor: isFloor, kind: style.pile, leftRadius: leftRadius, rightRadius: rightRadius)
         surface.collectsFrom = time + quietFor
         attachDrift(to: surface)
         return surface
@@ -388,6 +416,9 @@ final class SeasonScene {
             // Its top edge on this screen, below the menu bar, which would hide its pile.
             guard top > visibleFrame.minY, top < visibleFrame.maxY - 4, maxX - minX >= 20 else { continue }
             seen.insert(info.id)
+            // Its corners are rounded where its side is on this screen.
+            let leftRadius = info.frame.minX >= screenFrame.minX ? info.cornerRadius : 0
+            let rightRadius = info.frame.maxX <= screenFrame.maxX ? info.cornerRadius : 0
             if let surface = tops[info.id] {
                 if abs(surface.y - top) > 0.5 || abs(surface.minX - minX) > 0.5 || abs(surface.maxX - maxX) > Surface.columnWidth {
                     // Moved or resized: its pile falls, flung along when it was shaken.
@@ -396,10 +427,10 @@ final class SeasonScene {
                         dy: max(-1500, min(1500, (top - surface.y) / interval))
                     )
                     scatter(surface, velocity: velocity)
-                    tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false, quietFor: 0.3)
+                    tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false, quietFor: 0.3, leftRadius: leftRadius, rightRadius: rightRadius)
                 }
             } else {
-                tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false)
+                tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false, leftRadius: leftRadius, rightRadius: rightRadius)
             }
             if let surface = tops[info.id] {
                 let covered = snapshot.coveredParts(ofTopOf: index)
@@ -556,10 +587,10 @@ final class SeasonScene {
         // falls off.
         var column = min(surface.columns.count - 1, max(0, landing + Int.random(in: -1...1)))
         for _ in 0..<60 {
-            let height = surface.heights[column]
-            let edge: CGFloat = surface.isFloor ? height : 0
-            let left = column > 0 ? surface.heights[column - 1] : edge
-            let right = column < surface.columns.count - 1 ? surface.heights[column + 1] : edge
+            let height = surface.elevation(column)
+            let edge: CGFloat = surface.isFloor ? height : surface.base[column] - 1
+            let left = column > 0 ? surface.elevation(column - 1) : edge
+            let right = column < surface.columns.count - 1 ? surface.elevation(column + 1) : edge
             guard height - min(left, right) > style.repose else { break }
             let step = left < right ? -1 : right < left ? 1 : Bool.random() ? -1 : 1
             let next = column + step
@@ -659,7 +690,7 @@ final class SeasonScene {
             if surface.needsDraw, let drift = surface.drift, drift.canDraw {
                 surface.needsDraw = false
                 let minX = surface.minX
-                drift.draw(heights: surface.heights, columnWidth: Surface.columnWidth) { column in
+                drift.draw(heights: surface.heights, base: surface.base, columnWidth: Surface.columnWidth) { column in
                     surface.isCovered(minX + (CGFloat(column) + 0.5) * Surface.columnWidth)
                 }
             }
@@ -686,7 +717,7 @@ final class SeasonScene {
             let x = surface.minX + (CGFloat(column) + 0.5) * Surface.columnWidth
             guard !surface.isCovered(x) else { continue }
             emit(
-                at: CGPoint(x: x, y: surface.y + CGFloat.random(in: 0...max(0.1, surface.heights[column]))),
+                at: CGPoint(x: x, y: surface.y + surface.base[column] + CGFloat.random(in: 0...max(0.1, surface.heights[column]))),
                 velocity: CGVector(dx: velocity.dx + .random(in: -25...25), dy: velocity.dy + .random(in: 0...40))
             )
         }
