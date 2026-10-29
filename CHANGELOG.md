@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 0.2.0 - 2026-10-29
+
 - New utility, Seasons: snow in winter, pink petals in spring, sand in summer and leaves in autumn fall over your screens and pile up at the bottom and on top of windows. Push them around with the pointer, or move or shake a window to drop what's on it. Choose the season or let the date pick, have it fall in front of or behind windows, and set the density and how much piles up. Wind blows what falls and the piles. Pauses on battery and in full screen apps. Off by default.
 - Seasons can be controlled from the menu bar menu: pick the season, start and stop the falling, and change the intensity and the wind. Choose what shows in Settings > Menu Bar.
+- Performance improvements and bug fixes.
 
 ## 0.1.15 - 2026-10-28
 
