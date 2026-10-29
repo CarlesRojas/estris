@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 
 /// Which season's effect plays: the one of today's date, or one chosen.
 enum SeasonChoice: String, CaseIterable, Identifiable {
@@ -44,26 +44,6 @@ enum Season {
         case .spring: String(localized: "Spring")
         case .summer: String(localized: "Summer")
         case .autumn: String(localized: "Autumn")
-        }
-    }
-
-    /// What it is doing while it falls, for the weather widget.
-    var falling: String {
-        switch self {
-        case .winter: String(localized: "Snowing")
-        case .spring: String(localized: "Petals falling")
-        case .summer: String(localized: "Sand blowing")
-        case .autumn: String(localized: "Leaves falling")
-        }
-    }
-
-    /// Its colour on the weather widget.
-    var accent: Color {
-        switch self {
-        case .winter: Color(red: 0.56, green: 0.79, blue: 1)
-        case .spring: Color(red: 0.96, green: 0.65, blue: 0.77)
-        case .summer: Color(red: 0.96, green: 0.77, blue: 0.32)
-        case .autumn: Color(red: 0.91, green: 0.54, blue: 0.23)
         }
     }
 
@@ -147,7 +127,7 @@ final class SeasonsSettings: ObservableObject {
     }
 
     /// Whether anything falls; what is already there stays. Started and stopped from the
-    /// weather widget or the pane.
+    /// menu bar or the pane.
     @Published var isFalling: Bool {
         didSet { defaults.set(isFalling, forKey: Keys.isFalling) }
     }

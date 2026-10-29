@@ -70,6 +70,16 @@ struct MenuBarPane: View {
                     Toggle("Show recent colors", isOn: $settings.showsRecentColors)
                         .resetMenu($settings.showsRecentColors, to: MenuBarSettings.Default.showsRecentColors)
                 }
+                Section("Seasons") {
+                    Toggle("Show Start and Stop Falling button", isOn: $settings.showsSeasonsFalling)
+                        .resetMenu($settings.showsSeasonsFalling, to: MenuBarSettings.Default.showsSeasonsFalling)
+                    Toggle("Show season", isOn: $settings.showsSeasonsSeason)
+                        .resetMenu($settings.showsSeasonsSeason, to: MenuBarSettings.Default.showsSeasonsSeason)
+                    Toggle("Show intensity", isOn: $settings.showsSeasonsIntensity)
+                        .resetMenu($settings.showsSeasonsIntensity, to: MenuBarSettings.Default.showsSeasonsIntensity)
+                    Toggle("Show wind", isOn: $settings.showsSeasonsWind)
+                        .resetMenu($settings.showsSeasonsWind, to: MenuBarSettings.Default.showsSeasonsWind)
+                }
                 Section {
                     Button("Reset to Defaults") { settings.reset() }
                 }

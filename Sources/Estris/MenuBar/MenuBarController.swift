@@ -15,13 +15,15 @@ final class MenuBarController: NSObject {
     private let volumeMixer: VolumeMixer
     private let clipboard: ClipboardManager
     private let colorPicker: ScreenColorPicker
+    private let seasons: Seasons
     private let openSettings: () -> Void
     private var statusItem: NSStatusItem?
     private var panel: MenuBarPanel?
     private var observers: Set<AnyCancellable> = []
     private var clickMonitors: [Any] = []
 
-    init(volumeMixer: VolumeMixer, clipboard: ClipboardManager, colorPicker: ScreenColorPicker, openSettings: @escaping () -> Void) {
+    init(volumeMixer: VolumeMixer, clipboard: ClipboardManager, colorPicker: ScreenColorPicker, seasons: Seasons, openSettings: @escaping () -> Void) {
+        self.seasons = seasons
         self.volumeMixer = volumeMixer
         self.clipboard = clipboard
         self.colorPicker = colorPicker
@@ -59,6 +61,7 @@ final class MenuBarController: NSObject {
             clipboardSettings: clipboard.settings,
             history: clipboard.history,
             colorPickerSettings: colorPicker.settings,
+            seasonsSettings: seasons.settings,
             paste: { [weak self] item in
                 // Closed first, so the paste goes to the app in front.
                 self?.close()

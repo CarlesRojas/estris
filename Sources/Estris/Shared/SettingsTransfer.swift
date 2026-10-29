@@ -10,7 +10,7 @@ enum SettingsTransfer {
     /// Not settings: what this Mac has seen or done once.
     private static let machineKeys: Set<String> = [
         "didSetUpLoginItem", "migratedFromPasteRing", "relaunchReopensSettings", "heardSystemAudio",
-        "dockPreviewRestoreAutohide", "remapDeviceLessInputs2", "seasonsWidgetX", "seasonsWidgetTop",
+        "dockPreviewRestoreAutohide", "remapDeviceLessInputs2",
     ]
 
     enum TransferError: LocalizedError {

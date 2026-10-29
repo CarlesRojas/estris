@@ -26,7 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Opened by macOS at login, rather than by the user.
     private var launchedAtLogin = false
     private var accessibilityWatch: Timer?
-    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer, clipboard: clipboard, colorPicker: colorPicker) { [weak self] in
+    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer, clipboard: clipboard, colorPicker: colorPicker, seasons: seasons) { [weak self] in
         self?.openSettings()
     }
 

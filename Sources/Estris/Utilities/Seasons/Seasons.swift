@@ -10,7 +10,6 @@ import SwiftUI
 @MainActor
 final class Seasons {
     let settings = SeasonsSettings()
-    private(set) lazy var widget = WeatherWidget(seasons: settings)
     private var scenes: [SeasonScene] = []
     private var season: Season?
     private var timer: Timer?
@@ -30,7 +29,6 @@ final class Seasons {
 
     func start() {
         power.start()
-        widget.start()
         let center = NotificationCenter.default
         tokens.append(center.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.rebuildScenes() }
@@ -73,9 +71,7 @@ final class Seasons {
 
     /// The pane shown for this utility in Settings.
     func settingsPane() -> some View {
-        SeasonsPane(settings: settings, widget: widget.settings) { [weak self] in
-            self?.widget.resetPosition()
-        }
+        SeasonsPane(settings: settings)
     }
 
     private var level: NSWindow.Level {
@@ -180,10 +176,7 @@ final class Seasons {
         if now - lastPoll >= Self.pollInterval {
             let interval = CGFloat(min(now - lastPoll, 0.5))
             lastPoll = now
-            var snapshot = WindowSnapshot.read()
-            if let widget = widget.collectingFrame {
-                snapshot = snapshot.including(widget.frame, id: widget.id, cornerRadius: WeatherWidgetView.cornerRadius, inFront: widget.isAboveWindows)
-            }
+            let snapshot = WindowSnapshot.read()
             for scene in scenes {
                 scene.update(with: snapshot, interval: interval, windowLimit: windowLimit, bottomLimit: bottomLimit, hidesInFullScreen: settings.pausesInFullScreen)
             }
