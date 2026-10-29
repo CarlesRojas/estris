@@ -122,6 +122,15 @@ export const features: Feature[] = [
     accent: "#ff7b72",
     icon: '<rect x="4" y="4" width="16" height="16" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   },
+  {
+    id: "seasons",
+    title: "Seasons",
+    tagline: "A little weather on your desktop.",
+    details: "Snow in winter, petals in spring, sand in summer and leaves in autumn fall over your screens and pile up on your windows. Shake a window to clear it.",
+    seconds: 12,
+    accent: "#9ed8f5",
+    icon: '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5M4.6 10.6l3.4-.9-.9-3.4M19.4 13.4l-3.4.9.9 3.4M4.6 13.4l3.4.9-.9 3.4M19.4 10.6l-3.4-.9.9-3.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  },
 ];
 
 /** How many tools, as a word ("eleven"), for copy that names the count. */

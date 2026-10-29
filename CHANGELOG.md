@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New utility, Seasons: snow in winter, pink petals in spring, sand in summer and leaves in autumn fall over your screens and pile up at the bottom and on top of windows. Push them around with the pointer, or move or shake a window to drop what's on it. Choose the season or let the date pick, have it fall in front of or behind windows, and set how much falls and how much piles up. Pauses on battery and in full screen apps. Off by default.
+
 ## 0.1.15 - 2026-10-28
 
 - New utility, Delete to Trash: Delete deletes what's selected, as on Windows, in Finder, Photos, Notes and any app with a ⌘⌫ command. Shift-Delete deletes without going to the Trash. Each key can be turned off, and apps excluded. Typing works as usual. Off by default.
