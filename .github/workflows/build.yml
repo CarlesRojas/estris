@@ -1,0 +1,31 @@
+# Builds the app on every pull request that touches its code, for both Apple silicon and
+# Intel as a release does, so a change that doesn't compile is caught before it is merged.
+name: Build
+
+on:
+  pull_request:
+    paths:
+      - "Sources/**"
+      - "Resources/**"
+      - "Package.swift"
+      - "Package.resolved"
+      - ".github/workflows/build.yml"
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # The same macOS and Xcode as a release.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Use the latest Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build
+        run: swift build -c release --arch arm64 --arch x86_64

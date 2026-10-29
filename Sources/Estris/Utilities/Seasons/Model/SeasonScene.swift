@@ -27,7 +27,7 @@ final class Particle {
     var state = State.falling
     var meltLeft: CGFloat = 0
     /// The pile it rests on, and in which column.
-    weak var surface: Surface?
+    weak var surface: Pile?
     var column = 0
     var isGone = false
 
@@ -71,7 +71,7 @@ final class Particle {
 /// it. Snow and sand become a drift instead: each column only a depth, the grains merged,
 /// settling every frame to the slope the material holds.
 @MainActor
-final class Surface {
+final class Pile {
     static let columnWidth: CGFloat = 3
 
     let isFloor: Bool
@@ -385,8 +385,8 @@ final class SeasonScene {
     private var style: SeasonStyle
     private let scale: CGFloat
     private var particles: [Particle] = []
-    private var floor: Surface
-    private var tops: [CGWindowID: Surface] = [:]
+    private var floor: Pile
+    private var tops: [CGWindowID: Pile] = [:]
     private var spawnDebt = 0.0
     private var time: CGFloat = 0
     /// Hidden while a full screen app shows on it.
@@ -404,7 +404,7 @@ final class SeasonScene {
         window = OverlayWindow(frame: screen.frame)
         window.level = level
         // The very bottom of the screen; in front of windows, the Dock hides what lies behind it.
-        floor = Surface(minX: screenFrame.minX, maxX: screenFrame.maxX, y: screenFrame.minY, isFloor: true, kind: style.pile)
+        floor = Pile(minX: screenFrame.minX, maxX: screenFrame.maxX, y: screenFrame.minY, isFloor: true, kind: style.pile)
         attachDrift(to: floor)
         window.orderFrontRegardless()
     }
@@ -426,14 +426,14 @@ final class SeasonScene {
     }
 
     /// A pile for the current season; a drift is drawn under everything falling.
-    private func makeSurface(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, quietFor: CGFloat = 0, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) -> Surface {
-        let surface = Surface(minX: minX, maxX: maxX, y: y, isFloor: isFloor, kind: style.pile, leftRadius: leftRadius, rightRadius: rightRadius)
+    private func makeSurface(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, quietFor: CGFloat = 0, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) -> Pile {
+        let surface = Pile(minX: minX, maxX: maxX, y: y, isFloor: isFloor, kind: style.pile, leftRadius: leftRadius, rightRadius: rightRadius)
         surface.collectsFrom = time + quietFor
         attachDrift(to: surface)
         return surface
     }
 
-    private func attachDrift(to surface: Surface) {
+    private func attachDrift(to surface: Pile) {
         guard surface.kind != .stacked else { return }
         let drift = DriftLayer(kind: surface.kind, width: surface.maxX - surface.minX, scale: scale, screenX: surface.minX - origin.x)
         drift.root.position = CGPoint(x: surface.minX - origin.x, y: surface.y - origin.y)
@@ -441,7 +441,7 @@ final class SeasonScene {
         surface.drift = drift
     }
 
-    private func discard(_ surface: Surface) {
+    private func discard(_ surface: Pile) {
         surface.drift?.root.removeFromSuperlayer()
         surface.drift = nil
     }
@@ -498,7 +498,7 @@ final class SeasonScene {
             let leftRadius = info.frame.minX >= screenFrame.minX ? info.cornerRadius : 0
             let rightRadius = info.frame.maxX <= screenFrame.maxX ? info.cornerRadius : 0
             if let surface = tops[info.id] {
-                if abs(surface.y - top) > 0.5 || abs(surface.minX - minX) > 0.5 || abs(surface.maxX - maxX) > Surface.columnWidth {
+                if abs(surface.y - top) > 0.5 || abs(surface.minX - minX) > 0.5 || abs(surface.maxX - maxX) > Pile.columnWidth {
                     // Moved or resized: its pile falls, flung along when it was shaken.
                     let velocity = CGVector(
                         dx: max(-1500, min(1500, (minX - surface.minX) / interval)),
@@ -627,9 +627,9 @@ final class SeasonScene {
     }
 
     /// Lands a particle that crossed the top of a pile on its way down.
-    private func land(_ particle: Particle, from previous: CGPoint, on surfaces: [Surface], windowLimit: Int, bottomLimit: Int) {
+    private func land(_ particle: Particle, from previous: CGPoint, on surfaces: [Pile], windowLimit: Int, bottomLimit: Int) {
         guard particle.velocity.dy < 0 else { return }
-        var best: (surface: Surface, column: Int, top: CGFloat)?
+        var best: (surface: Pile, column: Int, top: CGFloat)?
         for surface in surfaces where surface.collectsFrom <= time && !surface.isFull {
             guard let column = surface.column(at: particle.position.x) else { continue }
             let top = surface.top(column)
@@ -725,9 +725,9 @@ final class SeasonScene {
     }
 
     /// The pointer digs through a drift, throwing up clumps of snow or a spray of sand.
-    private func dig(_ surface: Surface, columns: ClosedRange<Int>, pointer: CGPoint, velocity: CGVector, speed: CGFloat, reach: CGFloat) {
+    private func dig(_ surface: Pile, columns: ClosedRange<Int>, pointer: CGPoint, velocity: CGVector, speed: CGFloat, reach: CGFloat) {
         for column in columns {
-            let x = surface.minX + (CGFloat(column) + 0.5) * Surface.columnWidth
+            let x = surface.minX + (CGFloat(column) + 0.5) * Pile.columnWidth
             let top = surface.top(column)
             let dx = x - pointer.x
             let dy = top - pointer.y
@@ -768,7 +768,7 @@ final class SeasonScene {
                 surface.blown -= liftedUnit
                 flying += 1
                 let column = Int.random(in: 0..<surface.heights.count)
-                let x = surface.minX + (CGFloat(column) + 0.5) * Surface.columnWidth
+                let x = surface.minX + (CGFloat(column) + 0.5) * Pile.columnWidth
                 guard surface.heights[column] > 0.5, !surface.isCovered(CGPoint(x: x, y: surface.top(column))) else { continue }
                 emit(
                     at: CGPoint(x: x, y: surface.top(column) + 0.5),
@@ -789,7 +789,7 @@ final class SeasonScene {
                 surface.needsDraw = false
                 let corner = CGPoint(x: surface.minX, y: surface.y)
                 let occluders = surface.occluders
-                drift.draw(heights: surface.heights, base: surface.base, columnWidth: Surface.columnWidth, hasOccluders: !occluders.isEmpty) { x, y in
+                drift.draw(heights: surface.heights, base: surface.base, columnWidth: Pile.columnWidth, hasOccluders: !occluders.isEmpty) { x, y in
                     let point = CGPoint(x: corner.x + x, y: corner.y + y)
                     return occluders.contains { $0.contains(point) }
                 }
@@ -799,7 +799,7 @@ final class SeasonScene {
 
     /// A pile whose window moved, closed or went away: a stacked one lets its particles fall;
     /// a drift breaks up into grains or clumps, flung along with the window.
-    private func scatter(_ surface: Surface, velocity: CGVector) {
+    private func scatter(_ surface: Pile, velocity: CGVector) {
         defer { discard(surface) }
         guard surface.kind != .stacked else {
             fall(surface.releaseAll(velocity: velocity))
@@ -814,7 +814,7 @@ final class SeasonScene {
             for _ in 0..<8 where surface.heights[column] < CGFloat.random(in: 0...deepest) {
                 column = Int.random(in: 0..<surface.heights.count)
             }
-            let x = surface.minX + (CGFloat(column) + 0.5) * Surface.columnWidth
+            let x = surface.minX + (CGFloat(column) + 0.5) * Pile.columnWidth
             guard !surface.isCovered(CGPoint(x: x, y: surface.top(column))) else { continue }
             emit(
                 at: CGPoint(x: x, y: surface.y + surface.base[column] + CGFloat.random(in: 0...max(0.1, surface.heights[column]))),
@@ -850,7 +850,7 @@ final class SeasonScene {
     }
 
     /// Melts the oldest of a pile until it holds no more than `limit`.
-    private func trim(_ surface: Surface, to limit: Int) {
+    private func trim(_ surface: Pile, to limit: Int) {
         if surface.kind != .stacked {
             surface.shrink(to: CGFloat(limit) * unit)
             surface.isFull = !surface.isFloor && surface.volume >= CGFloat(limit) * unit * 0.98
