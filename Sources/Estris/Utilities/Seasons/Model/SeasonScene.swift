@@ -714,7 +714,10 @@ final class SeasonScene {
         for surface in surfaces where surface.collectsFrom <= time && !surface.isFull {
             guard let column = surface.column(at: particle.position.x) else { continue }
             let top = surface.top(column)
-            guard previous.y >= top - 0.5, particle.position.y < top, top > (best?.top ?? -.infinity) else { continue }
+            guard previous.y >= top - 0.5,
+                  particle.position.y < top,
+                  top > (best?.top ?? -.infinity)
+            else { continue }
             best = (surface, column, top)
         }
         guard let best else { return }
