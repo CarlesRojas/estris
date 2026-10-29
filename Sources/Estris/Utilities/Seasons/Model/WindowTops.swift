@@ -54,15 +54,32 @@ struct WindowSnapshot {
             && abs($0.frame.width - screen.width) < 1 && abs($0.frame.height - screen.height) < 1 }
     }
 
-    /// The parts of a window's top edge hidden by windows in front of it, as ranges of x.
-    func coveredParts(ofTopOf index: Int) -> [ClosedRange<CGFloat>] {
-        let top = windows[index].frame
+    /// The windows in front of a window that reach where a pile on its top edge lies,
+    /// rounded corners and all.
+    func occluders(ofTopOf index: Int) -> [Occluder] {
+        let back = windows[index]
+        let top = back.frame.maxY
         return windows[..<index].compactMap { front in
-            // Covers the edge and a little above it, where a pile lies.
-            guard front.frame.minY <= top.maxY + 2, front.frame.maxY > top.maxY - 1,
-                  front.frame.maxX > top.minX, front.frame.minX < top.maxX
+            guard front.frame.minY < top + DriftLayer.height, front.frame.maxY > top - back.cornerRadius,
+                  front.frame.maxX > back.frame.minX, front.frame.minX < back.frame.maxX
             else { return nil }
-            return front.frame.minX...front.frame.maxX
+            return Occluder(frame: front.frame, radius: front.cornerRadius)
         }
+    }
+}
+
+/// A window in front, which hides whatever lies within its rounded outline.
+struct Occluder: Equatable {
+    let frame: CGRect
+    let radius: CGFloat
+
+    func contains(_ point: CGPoint) -> Bool {
+        guard frame.contains(point) else { return false }
+        // Inside, unless in a corner beyond its rounding.
+        let x = min(max(point.x, frame.minX + radius), frame.maxX - radius)
+        let y = min(max(point.y, frame.minY + radius), frame.maxY - radius)
+        let dx = point.x - x
+        let dy = point.y - y
+        return dx * dx + dy * dy <= radius * radius
     }
 }

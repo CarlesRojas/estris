@@ -192,8 +192,12 @@ final class Seasons {
         // already in the air comes down.
         let wind = CGFloat(settings.wind * SeasonsSettings.strongestWind)
         let density = settings.isFalling ? settings.density : 0
+        // While a button is held (dragging a window, say), the pointer leaves the weather
+        // alone: a window passing over another's pile, on its own plane, doesn't touch it.
+        let isPressing = NSEvent.pressedMouseButtons != 0
+        let reach = isPressing ? CGPoint(x: -100_000, y: -100_000) : pointer
         for scene in scenes {
-            scene.step(dt, pointer: pointer, pointerVelocity: pointerVelocity, density: density, wind: wind, windowLimit: windowLimit, bottomLimit: bottomLimit)
+            scene.step(dt, pointer: reach, pointerVelocity: isPressing ? .zero : pointerVelocity, density: density, wind: wind, windowLimit: windowLimit, bottomLimit: bottomLimit)
         }
         CATransaction.commit()
     }

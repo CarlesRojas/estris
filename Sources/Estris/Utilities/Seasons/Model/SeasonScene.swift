@@ -105,7 +105,7 @@ final class Surface {
     /// Resting particles, oldest first: the first to melt once the pile is full.
     private(set) var settled: [Particle] = []
     /// Parts hidden by windows in front, as ranges of x: nothing lands or shows there.
-    var covered: [ClosedRange<CGFloat>] = []
+    var occluders: [Occluder] = []
 
     init(minX: CGFloat, maxX: CGFloat, y: CGFloat, isFloor: Bool, kind: PileKind, leftRadius: CGFloat = 0, rightRadius: CGFloat = 0) {
         self.minX = minX
@@ -163,8 +163,8 @@ final class Surface {
         return min(columns.count - 1, Int((x - minX) / Self.columnWidth))
     }
 
-    func isCovered(_ x: CGFloat) -> Bool {
-        covered.contains { $0.contains(x) }
+    func isCovered(_ point: CGPoint) -> Bool {
+        occluders.contains { $0.contains(point) }
     }
 
     /// The pile's top in a column.
@@ -511,11 +511,11 @@ final class SeasonScene {
                 tops[info.id] = makeSurface(minX: minX, maxX: maxX, y: top, isFloor: false, leftRadius: leftRadius, rightRadius: rightRadius)
             }
             if let surface = tops[info.id] {
-                let covered = snapshot.coveredParts(ofTopOf: index)
-                if covered != surface.covered { surface.needsDraw = true }
-                surface.covered = covered
+                let occluders = snapshot.occluders(ofTopOf: index)
+                if occluders != surface.occluders { surface.needsDraw = true }
+                surface.occluders = occluders
                 for particle in surface.settled {
-                    particle.layer.isHidden = surface.isCovered(particle.position.x)
+                    particle.layer.isHidden = surface.isCovered(particle.position)
                 }
                 trim(surface, to: windowLimit)
             }
@@ -634,7 +634,7 @@ final class SeasonScene {
             guard let column = surface.column(at: particle.position.x) else { continue }
             let top = surface.top(column)
             guard previous.y >= top - 0.5, particle.position.y < top,
-                  !surface.isCovered(particle.position.x),
+                  !surface.isCovered(CGPoint(x: particle.position.x, y: top)),
                   top > (best?.top ?? -.infinity)
             else { continue }
             best = (surface, column, top)
@@ -687,7 +687,7 @@ final class SeasonScene {
         }
         surface.add(particle, at: column)
         particle.spin = 0
-        particle.layer.isHidden = surface.isCovered(particle.position.x)
+        particle.layer.isHidden = surface.isCovered(particle.position)
     }
 
     /// A quick pointer sweeping through a pile scatters it.
@@ -732,7 +732,7 @@ final class SeasonScene {
             let dx = x - pointer.x
             let dy = top - pointer.y
             let distance = (dx * dx + dy * dy).squareRoot()
-            guard distance < reach, surface.heights[column] > 0, !surface.isCovered(x) else { continue }
+            guard distance < reach, surface.heights[column] > 0, !surface.isCovered(CGPoint(x: x, y: top)) else { continue }
             let force = 1 - distance / reach
             surface.dig(min(surface.heights[column], force * 6 * min(1.5, speed / 400)), at: column)
             var thrown = 0
@@ -769,7 +769,7 @@ final class SeasonScene {
                 flying += 1
                 let column = Int.random(in: 0..<surface.heights.count)
                 let x = surface.minX + (CGFloat(column) + 0.5) * Surface.columnWidth
-                guard surface.heights[column] > 0.5, !surface.isCovered(x) else { continue }
+                guard surface.heights[column] > 0.5, !surface.isCovered(CGPoint(x: x, y: surface.top(column))) else { continue }
                 emit(
                     at: CGPoint(x: x, y: surface.top(column) + 0.5),
                     velocity: CGVector(dx: wind * .random(in: 0.6...1.1), dy: .random(in: 10...45)),
@@ -787,9 +787,11 @@ final class SeasonScene {
             }
             if surface.needsDraw, let drift = surface.drift, drift.canDraw {
                 surface.needsDraw = false
-                let minX = surface.minX
-                drift.draw(heights: surface.heights, base: surface.base, columnWidth: Surface.columnWidth) { column in
-                    surface.isCovered(minX + (CGFloat(column) + 0.5) * Surface.columnWidth)
+                let corner = CGPoint(x: surface.minX, y: surface.y)
+                let occluders = surface.occluders
+                drift.draw(heights: surface.heights, base: surface.base, columnWidth: Surface.columnWidth, hasOccluders: !occluders.isEmpty) { x, y in
+                    let point = CGPoint(x: corner.x + x, y: corner.y + y)
+                    return occluders.contains { $0.contains(point) }
                 }
             }
         }
@@ -813,7 +815,7 @@ final class SeasonScene {
                 column = Int.random(in: 0..<surface.heights.count)
             }
             let x = surface.minX + (CGFloat(column) + 0.5) * Surface.columnWidth
-            guard !surface.isCovered(x) else { continue }
+            guard !surface.isCovered(CGPoint(x: x, y: surface.top(column))) else { continue }
             emit(
                 at: CGPoint(x: x, y: surface.y + surface.base[column] + CGFloat.random(in: 0...max(0.1, surface.heights[column]))),
                 velocity: CGVector(dx: velocity.dx + .random(in: -25...25), dy: velocity.dy + .random(in: 0...40))
