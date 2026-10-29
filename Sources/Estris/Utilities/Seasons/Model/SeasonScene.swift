@@ -714,10 +714,10 @@ final class SeasonScene {
         for surface in surfaces where surface.collectsFrom <= time && !surface.isFull {
             guard let column = surface.column(at: particle.position.x) else { continue }
             let top = surface.top(column)
-            guard previous.y >= top - 0.5,
-                  particle.position.y < top,
-                  top > (best?.top ?? -.infinity)
-            else { continue }
+            // Crossed this pile's top on the way down, and higher than any other it crossed.
+            let crossed = previous.y >= top - 0.5 && particle.position.y < top
+            let isHighest = top > (best?.top ?? -.infinity)
+            guard crossed, isHighest else { continue }
             best = (surface, column, top)
         }
         guard let best else { return }
