@@ -10,6 +10,7 @@ import SwiftUI
 @MainActor
 final class Seasons {
     let settings = SeasonsSettings()
+    private(set) lazy var widget = WeatherWidget(seasons: settings)
     private var scenes: [SeasonScene] = []
     private var season: Season?
     private var timer: Timer?
@@ -22,8 +23,6 @@ final class Seasons {
     private lazy var power = PowerSource { [weak self] in self?.update() }
     private var observers: Set<AnyCancellable> = []
     private var tokens: [NSObjectProtocol] = []
-    /// Sideways air speed, in points per second. Still for now; to be set from Settings later.
-    private var wind: CGFloat = 0
 
     private static let frameInterval: TimeInterval = 1.0 / 60
     /// How often the windows are read again.
@@ -31,6 +30,7 @@ final class Seasons {
 
     func start() {
         power.start()
+        widget.start()
         let center = NotificationCenter.default
         tokens.append(center.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.rebuildScenes() }
@@ -178,13 +178,20 @@ final class Seasons {
         if now - lastPoll >= Self.pollInterval {
             let interval = CGFloat(min(now - lastPoll, 0.5))
             lastPoll = now
-            let snapshot = WindowSnapshot.read()
+            var snapshot = WindowSnapshot.read()
+            if let widget = widget.collectingFrame {
+                snapshot = snapshot.including(widget.frame, id: widget.id, inFront: widget.isAboveWindows)
+            }
             for scene in scenes {
                 scene.update(with: snapshot, interval: interval, windowLimit: windowLimit, bottomLimit: bottomLimit, hidesInFullScreen: settings.pausesInFullScreen)
             }
         }
+        // Sideways air speed, in points per second. Stopped, nothing new falls; what is
+        // already in the air comes down.
+        let wind = CGFloat(settings.wind * SeasonsSettings.strongestWind)
+        let density = settings.isFalling ? settings.density : 0
         for scene in scenes {
-            scene.step(dt, pointer: pointer, pointerVelocity: pointerVelocity, density: settings.density, wind: wind, windowLimit: windowLimit, bottomLimit: bottomLimit)
+            scene.step(dt, pointer: pointer, pointerVelocity: pointerVelocity, density: density, wind: wind, windowLimit: windowLimit, bottomLimit: bottomLimit)
         }
         CATransaction.commit()
     }

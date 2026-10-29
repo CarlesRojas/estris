@@ -34,6 +34,16 @@ struct SeasonsPane: View {
                         }
                     }
                     .resetMenu($settings.density, to: SeasonsSettings.defaultDensity)
+                    LabeledContent("Wind") {
+                        slider($settings.wind, in: SeasonsSettings.windRange, step: 0.05) {
+                            let percent = Int((abs(settings.wind) * 100).rounded())
+                            guard percent > 0 else { return String(localized: "Calm") }
+                            return settings.wind < 0 ? "← \(percent)%" : "\(percent)% →"
+                        }
+                    }
+                    .resetMenu($settings.wind, to: SeasonsSettings.defaultWind)
+                    Toggle("Falling", isOn: $settings.isFalling)
+                        .resetMenu($settings.isFalling, to: true)
                 } header: {
                     Text("Effect")
                 } footer: {
@@ -84,7 +94,7 @@ struct SeasonsPane: View {
             Text(verbatim: text)
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
-                .frame(width: 44, alignment: .trailing)
+                .frame(width: 56, alignment: .trailing)
         }
     }
 }

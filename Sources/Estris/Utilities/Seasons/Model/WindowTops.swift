@@ -34,6 +34,13 @@ struct WindowSnapshot {
         return WindowSnapshot(windows: windows)
     }
 
+    /// The same windows with one more, such as the weather widget: in front of them all, or
+    /// behind them.
+    func including(_ frame: CGRect, id: CGWindowID, inFront: Bool) -> WindowSnapshot {
+        let window = Window(id: id, frame: frame)
+        return WindowSnapshot(windows: inFront ? [window] + windows : windows + [window])
+    }
+
     /// Whether a window fills this screen, as a full screen app does.
     func hasFullScreenWindow(on screen: CGRect) -> Bool {
         windows.contains { abs($0.frame.minX - screen.minX) < 1 && abs($0.frame.minY - screen.minY) < 1

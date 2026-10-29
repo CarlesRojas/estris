@@ -410,7 +410,11 @@ final class SeasonScene {
     func step(_ dt: CGFloat, pointer: CGPoint, pointerVelocity: CGVector, density: Double, wind: CGFloat, windowLimit: Int, bottomLimit: Int) {
         guard !isHidden else { return }
         time += dt
-        spawn(dt, density: density)
+        // With wind, particles start upwind beyond the screen's edge, so it fills evenly,
+        // and may drift that far out before they are gone.
+        let meanFall = (style.fallSpeed.lowerBound + style.fallSpeed.upperBound) / 2
+        let margin = 40 + abs(wind) * screenFrame.height / meanFall
+        spawn(dt, density: density, wind: wind, margin: margin)
 
         let reach = Self.pointerReach
         let pull = min(1, 6 * dt)
@@ -459,7 +463,7 @@ final class SeasonScene {
             land(particle, from: previous, on: surfaces, windowLimit: windowLimit, bottomLimit: bottomLimit)
 
             if particle.state == .falling,
-               particle.position.x < screenFrame.minX - 40 || particle.position.x > screenFrame.maxX + 40
+               particle.position.x < screenFrame.minX - margin || particle.position.x > screenFrame.maxX + margin
                 || particle.position.y < screenFrame.minY - 40 {
                 particle.isGone = true
             }
@@ -477,15 +481,17 @@ final class SeasonScene {
         }
     }
 
-    private func spawn(_ dt: CGFloat, density: Double) {
-        spawnDebt += style.rate * density * Double(screenFrame.width / 1440) * Double(dt)
+    private func spawn(_ dt: CGFloat, density: Double, wind: CGFloat, margin: CGFloat) {
+        // Wider with wind, to cover where particles start upwind.
+        let span = screenFrame.width + (wind == 0 ? 0 : margin)
+        spawnDebt += style.rate * density * Double(span / 1440) * Double(dt)
         let cap = Int(500 * density)
         var falling = particles.reduce(0) { $0 + ($1.state == .falling ? 1 : 0) }
         while spawnDebt >= 1 {
             spawnDebt -= 1
             guard falling < cap else { continue }
             let start = CGPoint(
-                x: .random(in: (screenFrame.minX - 30)...(screenFrame.maxX + 30)),
+                x: .random(in: (screenFrame.minX - (wind > 0 ? margin : 30))...(screenFrame.maxX + (wind < 0 ? margin : 30))),
                 y: screenFrame.maxY + style.size.upperBound
             )
             let particle = Particle(position: start, style: style)

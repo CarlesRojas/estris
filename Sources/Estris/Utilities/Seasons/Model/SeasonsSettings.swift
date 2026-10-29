@@ -38,6 +38,24 @@ enum Season {
     case summer
     case autumn
 
+    var title: String {
+        switch self {
+        case .winter: String(localized: "Winter")
+        case .spring: String(localized: "Spring")
+        case .summer: String(localized: "Summer")
+        case .autumn: String(localized: "Autumn")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .winter: "snowflake"
+        case .spring: "camera.macro"
+        case .summer: "sun.max"
+        case .autumn: "leaf"
+        }
+    }
+
     /// The meteorological season of a date (whole months: winter is December to February in
     /// the north), flipped south of the equator, told by the Mac's region.
     static func current(_ date: Date = Date()) -> Season {
@@ -81,6 +99,11 @@ final class SeasonsSettings: ObservableObject {
     static let windowLimitRange: ClosedRange<Double> = 0...2000
     static let defaultBottomLimit: Double = 3000
     static let bottomLimitRange: ClosedRange<Double> = 0...10000
+    static let defaultWind: Double = 0
+    /// Wind as a share of the strongest: negative blows to the left.
+    static let windRange: ClosedRange<Double> = -1...1
+    /// The strongest wind, in points per second.
+    static let strongestWind: Double = 140
     static let defaultPausesOnBattery = true
     static let defaultPausesInFullScreen = true
 
@@ -101,6 +124,17 @@ final class SeasonsSettings: ObservableObject {
     /// How much falls, as a multiple of the season's own rate.
     @Published var density: Double {
         didSet { defaults.set(density, forKey: Keys.density) }
+    }
+
+    /// Whether anything falls; what is already there stays. Started and stopped from the
+    /// weather widget or the pane.
+    @Published var isFalling: Bool {
+        didSet { defaults.set(isFalling, forKey: Keys.isFalling) }
+    }
+
+    /// The wind, from strongest to the left (-1) to strongest to the right (1).
+    @Published var wind: Double {
+        didSet { defaults.set(wind, forKey: Keys.wind) }
     }
 
     /// How many particles a window's top edge holds; more melt away the oldest.
@@ -131,6 +165,7 @@ final class SeasonsSettings: ObservableObject {
             Keys.bottomLimit: Self.defaultBottomLimit,
             Keys.pausesOnBattery: Self.defaultPausesOnBattery,
             Keys.pausesInFullScreen: Self.defaultPausesInFullScreen,
+            Keys.isFalling: true,
         ])
         isEnabled = defaults.bool(forKey: Keys.isEnabled)
         season = SeasonChoice(rawValue: defaults.string(forKey: Keys.season) ?? "") ?? Self.defaultSeason
@@ -140,11 +175,14 @@ final class SeasonsSettings: ObservableObject {
         bottomLimit = defaults.double(forKey: Keys.bottomLimit)
         pausesOnBattery = defaults.bool(forKey: Keys.pausesOnBattery)
         pausesInFullScreen = defaults.bool(forKey: Keys.pausesInFullScreen)
+        isFalling = defaults.bool(forKey: Keys.isFalling)
+        wind = defaults.double(forKey: Keys.wind)
     }
 
-    /// Back to the defaults; the on/off switch stays.
+    /// Back to the defaults; the on/off switch and whether it is falling stay.
     func reset() {
         season = Self.defaultSeason
+        wind = Self.defaultWind
         layer = Self.defaultLayer
         density = Self.defaultDensity
         windowLimit = Self.defaultWindowLimit
@@ -162,5 +200,7 @@ final class SeasonsSettings: ObservableObject {
         static let bottomLimit = "seasonsBottomLimit"
         static let pausesOnBattery = "seasonsPausesOnBattery"
         static let pausesInFullScreen = "seasonsPausesInFullScreen"
+        static let isFalling = "seasonsFalling"
+        static let wind = "seasonsWind"
     }
 }
