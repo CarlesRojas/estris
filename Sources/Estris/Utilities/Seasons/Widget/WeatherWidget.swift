@@ -266,7 +266,7 @@ struct WeatherWidgetView: View {
 
 /// The system slider for the wind, which blows either way: its bar fills from calm in the
 /// middle toward the knob, with a small mark at calm, where the system's fills from the left.
-private struct WindSlider: NSViewRepresentable {
+struct WindSlider: NSViewRepresentable {
     @Binding var value: Double
     let range: ClosedRange<Double>
     let fill: NSColor

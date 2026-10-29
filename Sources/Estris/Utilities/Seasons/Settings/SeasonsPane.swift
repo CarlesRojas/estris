@@ -35,7 +35,7 @@ struct SeasonsPane: View {
                     }
                     .resetMenu($settings.density, to: SeasonsSettings.defaultDensity)
                     LabeledContent("Wind") {
-                        slider($settings.wind, in: SeasonsSettings.windRange, step: 0.05) {
+                        windSlider {
                             let percent = Int((abs(settings.wind) * 100).rounded())
                             guard percent > 0 else { return String(localized: "Calm") }
                             return settings.wind < 0 ? "← \(percent)%" : "\(percent)% →"
@@ -66,7 +66,7 @@ struct SeasonsPane: View {
                 } header: {
                     Text("Piles")
                 } footer: {
-                    Text("The most that stays in a pile; past that, the oldest melts away. Moving or shaking a window drops what is on it.")
+                    Text("The most that stays in a pile; past that, leaves and petals melt away and snow and sand fall off. Moving or shaking a window drops what is on it.")
                         .foregroundStyle(.secondary)
                 }
                 Section("Pause") {
@@ -84,6 +84,23 @@ struct SeasonsPane: View {
             .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    /// The wind's slider, which fills from calm in the middle, with its value.
+    private func windSlider(label: () -> String) -> some View {
+        let text = label()
+        return HStack {
+            WindSlider(
+                value: Binding(get: { settings.wind }, set: { settings.wind = abs($0) < 0.04 ? 0 : $0 }),
+                range: SeasonsSettings.windRange,
+                fill: .controlAccentColor
+            )
+            .frame(width: 200)
+            Text(verbatim: text)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .frame(width: 56, alignment: .trailing)
+        }
     }
 
     private func slider(_ value: Binding<Double>, in range: ClosedRange<Double>, step: Double, label: () -> String) -> some View {
