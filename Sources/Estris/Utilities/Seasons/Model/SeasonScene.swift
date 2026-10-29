@@ -97,6 +97,9 @@ final class Surface {
     /// What it lies on, below its top edge, in each column: 0 along a flat edge, dropping
     /// down a window's rounded corners, so what lands there slides off as it would.
     let base: [CGFloat]
+    /// The most a drift's column holds where it lies on a slope: nothing on the steep end of
+    /// a rounded corner, where it slides off; no limit where it lies flat.
+    let capacity: [CGFloat]
     /// Resting particles, oldest first: the first to melt once the pile is full.
     private(set) var settled: [Particle] = []
     /// Parts hidden by windows in front, as ranges of x: nothing lands or shows there.
@@ -115,6 +118,23 @@ final class Surface {
             let x = (CGFloat(column) + 0.5) * Self.columnWidth
             return min(Self.corner(radius: leftRadius, at: x), Self.corner(radius: rightRadius, at: width - x))
         }
+        let base = self.base
+        capacity = (0..<count).map { column in
+            let before = base[max(0, column - 1)]
+            let after = base[min(count - 1, column + 1)]
+            let slope = abs(after - before) / (2 * Self.columnWidth)
+            return Self.capacity(on: slope, kind: kind)
+        }
+    }
+
+    /// How deep a drift stays on a slope: sand slides off past about 30°, snow clings a
+    /// little more, to about 50°.
+    private static func capacity(on slope: CGFloat, kind: PileKind) -> CGFloat {
+        let (holds, bare): (CGFloat, CGFloat) = kind == .snow ? (0.7, 1.2) : (0.4, 0.6)
+        if slope <= holds { return .greatestFiniteMagnitude }
+        if slope >= bare { return 0 }
+        let cling: CGFloat = kind == .snow ? 3 : 1.5
+        return cling * (bare - slope) / (bare - holds)
     }
 
     /// How far a rounded corner of `radius` drops below the top edge, `distance` in from the
@@ -274,6 +294,20 @@ final class Surface {
                 heights[column + 1] += flow
                 smoothed = max(smoothed, abs(flow))
             }
+        }
+        // What a corner can't hold slides outward, and off the side.
+        for column in 0..<count where heights[column] > capacity[column] {
+            let excess = heights[column] - capacity[column]
+            heights[column] = capacity[column]
+            let outward = column < count / 2 ? column - 1 : column + 1
+            if outward < 0 {
+                spilledLeft += excess
+            } else if outward >= count {
+                spilledRight += excess
+            } else {
+                heights[outward] += excess
+            }
+            moved += excess
         }
         if moved > 0 || smoothed > 0.002 { needsDraw = true }
         if moved < 0.01, smoothed < 0.002 { isSettling = false }
