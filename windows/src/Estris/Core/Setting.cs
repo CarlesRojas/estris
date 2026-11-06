@@ -54,7 +54,7 @@ public sealed class SettingsStore
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
     public static string Folder { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Estris");
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EstrisWS");
 
     public static SettingsStore Shared { get; } = new();
 
