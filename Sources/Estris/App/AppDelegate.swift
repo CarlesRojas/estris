@@ -19,14 +19,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var dockPreview = DockPreview(log: log)
     private lazy var keepAwake = KeepAwake(log: log)
     private let roundedCorners = RoundedCorners()
-    private let seasons = Seasons()
     private let colorPicker = ScreenColorPicker()
     private lazy var volumeMixer = VolumeMixer(log: log)
     private var settingsWindow: SettingsWindowController?
     /// Opened by macOS at login, rather than by the user.
     private var launchedAtLogin = false
     private var accessibilityWatch: Timer?
-    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer, clipboard: clipboard, colorPicker: colorPicker, seasons: seasons) { [weak self] in
+    private lazy var menuBar = MenuBarController(volumeMixer: volumeMixer, clipboard: clipboard, colorPicker: colorPicker) { [weak self] in
         self?.openSettings()
     }
 
@@ -51,7 +50,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         dockPreview.start()
         keepAwake.start()
         roundedCorners.start()
-        seasons.start()
         colorPicker.start()
         volumeMixer.start()
         menuBar.start()
@@ -99,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func openSettings() {
         if settingsWindow == nil {
-            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, deleteToTrash: deleteToTrash, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, dockPreview: dockPreview, keepAwake: keepAwake, roundedCorners: roundedCorners, seasons: seasons, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
+            settingsWindow = SettingsWindowController(general: general, clipboard: clipboard, autoQuit: autoQuit, middleClick: middleClick, deleteToTrash: deleteToTrash, remap: remap, windowSnapping: windowSnapping, focusFollowsMouse: focusFollowsMouse, dockPreview: dockPreview, keepAwake: keepAwake, roundedCorners: roundedCorners, colorPicker: colorPicker, volumeMixer: volumeMixer, menuBarSettings: menuBar.settings, log: log)
         }
         settingsWindow?.show()
     }

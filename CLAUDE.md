@@ -1,5 +1,6 @@
 # Notes for Claude
 
+- Estris is built for both Mac and Windows. Every feature, change or fix goes into both apps in the same change, even when the request only mentions one; where something can't exist on one of them, keep as close to it as that platform allows and say what differs.
 - Project context (features, settings, behavior, project structure) lives in `PROJECT.md`. Read it for context, and keep it up to date whenever a feature or the structure changes.
 - `README.md` only covers how to develop: the commands and a short line for each. Keep it short.
 - Localization: every user-facing string must be localized in the same change that adds or edits it, in every supported language, with no exceptions and no follow-up PRs. A string is user-facing if it can appear on screen (labels, buttons, menus, alerts, help tooltips, placeholders, Event Viewer text). Log messages and identifiers are not localized.
