@@ -80,9 +80,12 @@ public static class LoginItem
     }
 }
 
+/// What looking for a new version found.
+public enum UpdateCheck { UpToDate, Available, Failed }
+
 /// Updates through Velopack, from the rolling windows-latest release: the same idea as the
 /// Mac's Sparkle. Looks at launch and every 6 hours; a new version shows at the top of the
-/// tray menu with an Update button.
+/// tray menu with an Update button, which opens the update window.
 public sealed class Updates
 {
     public static Updates Shared { get; } = new();
@@ -97,33 +100,46 @@ public sealed class Updates
     public bool IsInstalled => manager.IsInstalled;
     public string Version => manager.CurrentVersion?.ToString() ?? typeof(Updates).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
     public string? AvailableVersion => pending?.TargetFullRelease.Version.ToString();
+    /// The new version's notes, in Markdown, as the release workflow wrote them.
+    public string? AvailableNotes => pending?.TargetFullRelease.NotesMarkdown;
 
     public void Start()
     {
         if (IsInstalled) timer = new Timer(_ => _ = Check(), null, TimeSpan.FromSeconds(10), TimeSpan.FromHours(6));
     }
 
-    /// Whether a newer version was found.
-    public async Task<bool> Check()
+    public async Task<UpdateCheck> Check()
     {
+        if (!IsInstalled) return UpdateCheck.UpToDate;
         try
         {
-            if (!IsInstalled) return false;
             pending = await manager.CheckForUpdatesAsync();
             App.Ui.TryEnqueue(() => Changed?.Invoke());
-            return pending is not null;
+            return pending is null ? UpdateCheck.UpToDate : UpdateCheck.Available;
         }
         catch (Exception e)
         {
             App.Shared.Log.Add("Updates", $"Check failed: {e.Message}");
-            return false;
+            return UpdateCheck.Failed;
         }
     }
 
-    public async Task Install()
+    /// Downloads the new version, reporting 0 to 100, then installs it and opens Estris again.
+    /// False if it couldn't.
+    public async Task<bool> Install(Action<int> progress)
     {
-        if (pending is null) return;
-        await manager.DownloadUpdatesAsync(pending);
-        manager.ApplyUpdatesAndRestart(pending);
+        if (pending is null) return false;
+        try
+        {
+            await manager.DownloadUpdatesAsync(pending, progress);
+            App.Shared.ShutDown();
+            manager.ApplyUpdatesAndRestart(pending);
+            return true;
+        }
+        catch (Exception e)
+        {
+            App.Shared.Log.Add("Updates", $"Install failed: {e.Message}");
+            return false;
+        }
     }
 }

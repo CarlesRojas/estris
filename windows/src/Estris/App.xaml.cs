@@ -72,14 +72,21 @@ public partial class App : Application
 
     public void Quit()
     {
+        ShutDown();
+        Exit();
+    }
+
+    /// Stops the utilities, removes the tray icon and saves settings, before quitting or updating.
+    public void ShutDown()
+    {
         foreach (var utility in Utilities)
         {
             try { utility.Stop(); }
             catch (Exception e) { Log.Add(utility.Title, $"Failed to stop: {e}"); }
         }
         tray?.Dispose();
+        tray = null;
         InputHooks.Shutdown();
         SettingsStore.Shared.Flush();
-        Exit();
     }
 }

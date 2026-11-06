@@ -1,0 +1,14 @@
+"Software Update" = "Actualització de programari";
+"Checking for updates…" = "S'estan cercant actualitzacions…";
+"You're up to date!" = "Estàs al dia!";
+"Estris %@ is the newest version available." = "Estris %@ és la versió més recent.";
+"Couldn't check for updates" = "No s'han pogut cercar actualitzacions";
+"Check your internet connection and try again." = "Comprova la connexió a internet i torna-ho a provar.";
+"A new version of Estris is available!" = "Hi ha una nova versió d'Estris!";
+"Estris %@ is now available. You have %@. Would you like to install it now?" = "Estris %@ ja està disponible. Tens la %@. La vols instal·lar ara?";
+"Remind Me Later" = "Recorda-m'ho més tard";
+"Install Update" = "Instal·la l'actualització";
+"Downloading update…" = "S'està baixant l'actualització…";
+"Estris opens again by itself when it's done." = "Estris es tornarà a obrir sol quan acabi.";
+"Couldn't install the update" = "No s'ha pogut instal·lar l'actualització";
+"Release Notes:" = "Notes de la versió:";
