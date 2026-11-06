@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RootNamespace>Estris</RootNamespace>
+    <AssemblyName>Estris</AssemblyName>
+    <Version>0.0.0</Version>
+    <Product>Estris</Product>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <!-- Nothing to install first: .NET and the Windows App SDK ship inside the app. -->
+    <SelfContained>true</SelfContained>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Estris.ico</ApplicationIcon>
+    <!-- Program.cs starts the app, so Velopack can run first. -->
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.5" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+    <PackageReference Include="Velopack" Version="1.2.161" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
+    <PackageReference Include="System.Management" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- One file per area and language: Localization/<language>/<area>.strings -->
+    <EmbeddedResource Include="Localization\**\*.strings" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    <Content Include="Assets\Estris.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

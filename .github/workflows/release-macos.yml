@@ -1,0 +1,133 @@
+# Publishes a new version: bumps it, turns the changelog's Unreleased entries into its notes,
+# builds a signed and notarized Estris.dmg, commits, tags and creates the GitHub release.
+# Run it from Actions > Release macOS > Run workflow, on main. Signing secrets: DEVELOPER_ID_CERTIFICATE
+# (base64 .p12), DEVELOPER_ID_CERTIFICATE_PASSWORD, APPLE_ID, APPLE_APP_PASSWORD, APPLE_TEAM_ID;
+# without them the app is signed ad hoc and macOS warns when opening it. Updates: the
+# SPARKLE_PRIVATE_KEY secret and SPARKLE_PUBLIC_KEY variable (Sparkle's generate_keys); with
+# them the release also carries appcast.xml, which installed copies check.
+name: Release macOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version part to bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: write
+
+concurrency: release-macos
+
+jobs:
+  release:
+    # The newest macOS and Xcode: an app built with an older SDK gets the older look on new macOS.
+    runs-on: macos-26
+    defaults:
+      run:
+        working-directory: macos
+    steps:
+      - name: Only from main
+        if: github.ref != 'refs/heads/main'
+        working-directory: .
+        run: |
+          echo "::error::Run the release from main."
+          exit 1
+
+      - uses: actions/checkout@v5
+
+      - name: Use the latest Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Show the SDK
+        run: xcodebuild -version && xcrun --show-sdk-version
+
+      - name: Bump the version and the changelog
+        id: version
+        run: python3 scripts/release.py "${{ inputs.bump }}" build/release-notes.md >> "$GITHUB_OUTPUT"
+
+      - name: Import the Developer ID certificate
+        id: signing
+        env:
+          CERTIFICATE: ${{ secrets.DEVELOPER_ID_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+        run: |
+          if [[ -z "$CERTIFICATE" ]]; then
+            echo "::warning::No DEVELOPER_ID_CERTIFICATE secret: the app is signed ad hoc and not notarized."
+            exit 0
+          fi
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          echo "$CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          security import "$RUNNER_TEMP/certificate.p12" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          rm "$RUNNER_TEMP/certificate.p12"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | grep "Developer ID Application" | head -1 | awk '{print $2}')"
+          if [[ -z "$IDENTITY" ]]; then
+            echo "::error::The certificate isn't a Developer ID Application one."
+            exit 1
+          fi
+          echo "identity=$IDENTITY" >> "$GITHUB_OUTPUT"
+
+      - name: Build the app
+        env:
+          RELEASE: 1
+          SIGN_IDENTITY: ${{ steps.signing.outputs.identity || '-' }}
+          SPARKLE_PUBLIC_KEY: ${{ vars.SPARKLE_PUBLIC_KEY }}
+        run: ./scripts/build-app.sh
+
+      - name: Make the disk image
+        env:
+          SIGN_IDENTITY: ${{ steps.signing.outputs.identity || '-' }}
+        run: |
+          python3 -m pip install --break-system-packages dmgbuild
+          ./scripts/make-dmg.sh
+
+      - name: Notarize
+        if: steps.signing.outputs.identity != ''
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          xcrun notarytool submit build/Estris.dmg --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
+          xcrun stapler staple build/Estris.dmg
+
+      - name: Make the update feed
+        id: appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ vars.SPARKLE_PUBLIC_KEY }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [[ -z "$SPARKLE_PRIVATE_KEY" || -z "$SPARKLE_PUBLIC_KEY" ]]; then
+            echo "::warning::SPARKLE_PRIVATE_KEY secret or SPARKLE_PUBLIC_KEY variable missing: no update feed, so installed copies won't see this release."
+            exit 0
+          fi
+          SIGN_UPDATE="$(find .build/artifacts -type f -name sign_update | head -1)"
+          KEY_FILE="$RUNNER_TEMP/sparkle-key"
+          printf '%s' "$SPARKLE_PRIVATE_KEY" > "$KEY_FILE"
+          SIGNATURE="$("$SIGN_UPDATE" --ed-key-file "$KEY_FILE" build/Estris.dmg)"
+          rm "$KEY_FILE"
+          python3 scripts/make-appcast.py "$VERSION" "$SIGNATURE" build/release-notes.md > build/appcast.xml
+          echo "file=build/appcast.xml" >> "$GITHUB_OUTPUT"
+
+      - name: Commit, tag and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Release $VERSION"
+          git tag "v$VERSION"
+          git push origin HEAD:main "v$VERSION"
+          gh release create "v$VERSION" build/Estris.dmg ${{ steps.appcast.outputs.file }} --title "Estris $VERSION" --notes-file build/release-notes.md

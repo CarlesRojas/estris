@@ -64,6 +64,20 @@ h1, h2, p { margin: 0; }
 .button-large { min-height: 44px; padding: 0 22px; font-size: 16px; margin-top: clamp(2px, 0.5vh, 6px); }
 .button-large .button-icon { width: 18px; height: 18px; }
 .button:hover { opacity: 0.86; }
+/* Visitors see their own system's download. Others, who could want either, see both, Windows quieter. */
+.downloads { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.download-windows { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 22%, transparent); }
+[data-os="windows"] .download-windows { background: var(--button); color: var(--button-text); box-shadow: none; }
+[data-os="windows"] .download-mac, [data-os="mac"] .download-windows { display: none; }
+.note-mac + .note-windows::before { content: " · "; }
+[data-os="windows"] .note-mac, [data-os="mac"] .note-windows { display: none; }
+[data-os="windows"] .note-windows::before { content: none; }
+[data-os="windows"] [data-mac-only] { display: none; }
+[data-os] .only { display: none; }
+.for-windows { display: none; }
+[data-os="windows"] .for-windows { display: block; }
+[data-os="windows"] .for-mac { display: none; }
+.only { padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--muted); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted) 40%, transparent); }
 .button:active { transform: scale(0.97); }
 :focus-visible { outline: 3px solid #0a84ff; outline-offset: 3px; }
 

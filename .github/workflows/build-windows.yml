@@ -1,0 +1,37 @@
+# Builds the Windows app on every pull request that touches its code, for both architectures a
+# release ships, and checks its translations.
+name: Build Windows
+
+on:
+  pull_request:
+    paths:
+      - "windows/**"
+      - ".github/workflows/build-windows.yml"
+
+concurrency:
+  group: build-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-2025
+    strategy:
+      matrix:
+        arch: [x64, ARM64]
+    defaults:
+      run:
+        working-directory: windows
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Check translations
+        run: python scripts/check-localization.py
+        env:
+          PYTHONUTF8: 1
+
+      - name: Build
+        run: dotnet build src/Estris/Estris.csproj -c Release -p:Platform=${{ matrix.arch }} -r win-${{ matrix.arch == 'x64' && 'x64' || 'arm64' }}
