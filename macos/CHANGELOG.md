@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Windows resized together with the one you're dragging no longer jump around, as they did in 0.3.1.
+
 ## 0.3.1 - 2026-11-06
 
 - Windows resized together with the one you're dragging follow the pointer more smoothly, and a slow app no longer holds up the others.
