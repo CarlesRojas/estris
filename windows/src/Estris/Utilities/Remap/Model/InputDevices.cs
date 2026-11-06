@@ -8,8 +8,9 @@ namespace Estris.Utilities.Remap;
 
 public enum DeviceKind { Keyboard, Mouse }
 
-/// A keyboard or pointing device, made of one or more interfaces.
-public sealed record InputDevice(string Id, string Name, DeviceKind Kind, bool IsConnected = true)
+/// A keyboard or pointing device, made of one or more interfaces. HasKeyboard: one of them is a
+/// keyboard, as on receivers and many mice.
+public sealed record InputDevice(string Id, string Name, DeviceKind Kind, bool IsConnected = true, bool HasKeyboard = false)
 {
     private const string KeyboardGlyph = "", MouseGlyph = "", TouchpadGlyph = "";
 
@@ -114,7 +115,7 @@ public sealed partial class InputDevices(AppLog log)
                 var hasKeyboard = parts.Any(p => p.IsKeyboard);
                 var hasPointer = parts.Any(p => !p.IsKeyboard);
                 var isKeyboard = hasKeyboard && (!hasPointer || name.Contains("keyboard", StringComparison.OrdinalIgnoreCase));
-                var device = new InputDevice(id, name, isKeyboard ? DeviceKind.Keyboard : DeviceKind.Mouse);
+                var device = new InputDevice(id, name, isKeyboard ? DeviceKind.Keyboard : DeviceKind.Mouse, HasKeyboard: hasKeyboard);
                 devices.Add(device);
                 foreach (var part in parts) handles[part.Handle] = device;
             }

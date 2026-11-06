@@ -45,7 +45,7 @@ public static class InputHooks
     private static Thread? thread;
     private static uint threadId;
     private static nint keyHook, mouseHook;
-    private const uint WM_APP_UPDATE = 0x8001;
+    private const uint WM_APP_UPDATE = 0x8001, WM_APP_REINSTALL = 0x8004;
 
     public static void Subscribe(Action<KeyEvent> handler)
     {
@@ -100,6 +100,7 @@ public static class InputHooks
         while (GetMessage(out var message, 0, 0, 0) > 0)
         {
             if (message.message == WM_APP_UPDATE) Apply();
+            if (message.message == WM_APP_REINSTALL) Reinstall();
             TranslateMessage(ref message);
             DispatchMessage(ref message);
         }
@@ -119,6 +120,21 @@ public static class InputHooks
         if (!wantsKeys && keyHook != 0) { UnhookWindowsHookEx(keyHook); keyHook = 0; }
         if (wantsMouse && mouseHook == 0) mouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseProc, GetModuleHandle(null), 0);
         if (!wantsMouse && mouseHook != 0) { UnhookWindowsHookEx(mouseHook); mouseHook = 0; }
+    }
+
+    /// Installs the hooks again, first in line: Windows can stop calling a hook, or another
+    /// program's hook can keep events from it, and a utility that notices (Remap, through Raw
+    /// Input) asks for this.
+    public static void RequestReinstall()
+    {
+        if (thread is not null) PostThreadMessage(threadId, WM_APP_REINSTALL, 0, 0);
+    }
+
+    private static void Reinstall()
+    {
+        if (keyHook != 0) { UnhookWindowsHookEx(keyHook); keyHook = 0; }
+        if (mouseHook != 0) { UnhookWindowsHookEx(mouseHook); mouseHook = 0; }
+        Apply();
     }
 
     public static void Shutdown()

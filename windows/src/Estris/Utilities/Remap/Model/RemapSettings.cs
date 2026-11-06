@@ -124,10 +124,12 @@ public sealed class RemapSettings
     private void Store(string deviceId, DeviceMappings entry) =>
         Devices.Value = new Dictionary<string, DeviceMappings>(Devices.Value) { [deviceId] = entry };
 
-    /// What applies now. Mappings of the same device are read in order; only the first for an
-    /// input counts, and a row still missing its result leaves that input unmapped.
+    /// What applies now: the mappings of the devices plugged in, and the device-less ones of any
+    /// device. Mappings of the same device are read in order; only the first for an input counts,
+    /// and a row still missing its result leaves that input unmapped.
     public MappingTable BuildTable(IReadOnlyList<InputDevice> connected)
     {
+        var isConnected = connected.Select(d => d.Id).ToHashSet();
         var devices = new Dictionary<string, Dictionary<RemapInput, RemapOutput>>();
         var deviceLess = new Dictionary<RemapInput, RemapOutput>();
         foreach (var (id, entry) in Devices.Value.OrderBy(d => d.Value.Mappings.Min(m => m.Created) ?? DateTime.MinValue))
@@ -141,12 +143,9 @@ public sealed class RemapSettings
                 mappings[input] = output;
                 if (mapping.IsDeviceLess == true && ActiveDevice(input)?.Id == id) deviceLess[input] = output;
             }
-            devices[id] = mappings;
+            if (isConnected.Contains(id)) devices[id] = mappings;
         }
-        return new MappingTable(
-            devices,
-            deviceLess,
-            connected.Where(d => d.Kind == DeviceKind.Keyboard).Select(d => d.Id).ToList(),
-            connected.Select(d => d.Id).ToList());
+        foreach (var device in connected) devices.TryAdd(device.Id, []);
+        return new MappingTable(devices, deviceLess, connected.Where(d => d.Kind == DeviceKind.Keyboard).Select(d => d.Id).ToList());
     }
 }

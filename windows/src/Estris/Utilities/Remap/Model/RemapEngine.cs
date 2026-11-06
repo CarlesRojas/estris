@@ -16,20 +16,26 @@ public sealed record MaskMenu : Effect;
 public sealed record LogRow(RemapInput Input, int Vk, bool IsDown, string? DeviceId, nint Handle, bool IsPosted, RemapOutput? Output) : Effect;
 public sealed record Recorded(RemapInput Input, bool IsDeviceLess) : Effect;
 public sealed record Note(string Message) : Effect;
+/// Raw Input saw a key or button that the hook never did: Windows stopped calling it, or another
+/// program's hook keeps events from it.
+public sealed record HookMissed(RemapInput Input) : Effect;
 
 /// Decides what happens to each key and button: the mapping of the device that sent it, or the
 /// original. It has no Windows calls and takes the time as a function, so it can be tested.
 ///
-/// The hook can swallow but doesn't say the device; Raw Input says the device but comes from a
-/// later step inside Windows, and the two don't behave alike:
-/// - A mouse button reaches Raw Input even when swallowed, before or after the hook. So a mapped
-///   button is swallowed, and the original is sent again if its device has no mapping.
-/// - A key reaches Raw Input only if nothing swallowed it (the hook, or a hot key), and then only
-///   after the app got it, so a press can't be held back by its device. A key takes the keyboard
-///   that typed last: every unmapped key says which that is, and so does every release of a mapped
-///   key, which is let through for that (a lone release does nothing). When no keyboard typed
-///   lately, a key that differs between keyboards waits for its release, which says the keyboard;
-///   it stops waiting for another key or when held, going with the last keyboard.
+/// The hook can swallow but doesn't say the device; Raw Input says the device but comes from
+/// another step inside Windows, and the two don't behave alike:
+/// - A mouse button reaches Raw Input even when swallowed, usually before the hook. So a mapped
+///   button waits for it (or takes it if it came first), and the original is sent again if its
+///   device has no mapping; after a short wait it goes as if it had no device.
+/// - A key reaches Raw Input only if nothing swallowed it, and only after the hook, so a press
+///   can't wait for its device. When the keyboards plugged in all do the same with a key, it
+///   doesn't matter. Otherwise it goes by what Raw Input said before: the keyboard being typed
+///   on, unless only another kind of device (a mouse sending keys) has sent that key; when nobody
+///   is typing, the devices that have sent it. Such a guess lets the release through, so Raw
+///   Input says the device for next time (a lone release does nothing). With no guess, the key
+///   waits for its release, which says the device; another key or holding it stops the wait,
+///   going with the last keyboard.
 /// Keys with no mapping are never held back, and a key or button goes up the way it went down.
 public sealed class RemapEngine(Func<long> clock)
 {
@@ -43,6 +49,13 @@ public sealed class RemapEngine(Func<long> clock)
     public const long HoldWait = 200;
     /// How long after Raw Input's release the hook has to see it, or it never will.
     public const long MissedUpWait = 250;
+    /// How many different keys a device must send to count as a keyboard: a receiver doesn't look
+    /// like one, and a mouse may send a few keys.
+    public const int KeyboardKeys = 8;
+    private const long Forever = long.MaxValue;
+    /// The Ctrl that AltGr adds is made by Windows, so the hook may see it without Raw Input
+    /// agreeing on it; it doesn't count when checking the hook.
+    private static readonly RemapInput LeftControl = RemapInput.Key(0x1D);
 
     private enum Route { Waiting, Untouched, Original, Mapped }
 
@@ -69,14 +82,16 @@ public sealed class RemapEngine(Func<long> clock)
     private readonly Dictionary<RemapInput, Held> held = [];
     private readonly List<Held> waiting = [];
     private readonly List<(RawEvent Raw, long At)> recent = [];
+    /// The devices Raw Input has seen sending each key, and how many keys each sent.
+    private readonly Dictionary<RemapInput, HashSet<string>> senders = [];
+    private readonly Dictionary<string, int> keyCounts = [];
     private List<Effect> effects = [];
     private MappingTable table = MappingTable.Empty;
     private bool isViewing;
     private string? recording;
     private bool isRecording;
-    private readonly HashSet<string> typed = [];
     private string? lastKeyboard;
-    private long lastKeyboardAt;
+    private long lastKeyboardAt = long.MinValue / 2;
 
     /// Left clicks aren't logged, for the one on the Event Viewer's own button.
     public volatile bool MutesLeftClicks;
@@ -129,11 +144,11 @@ public sealed class RemapEngine(Func<long> clock)
     {
         lock (gate)
         {
-            var next = long.MaxValue;
+            var next = Forever;
             foreach (var press in waiting) next = Math.Min(next, press.Deadline);
             foreach (var press in held.Values)
                 if (press.RawUpAt is { } at) next = Math.Min(next, at + MissedUpWait);
-            return next == long.MaxValue ? -1 : (int)Math.Clamp(next - clock(), 0, int.MaxValue);
+            return next == Forever ? -1 : (int)Math.Clamp(next - clock(), 0, int.MaxValue);
         }
     }
 
@@ -161,12 +176,16 @@ public sealed class RemapEngine(Func<long> clock)
         {
             var now = clock();
             ForgetOldRaw(now);
-            if (!raw.Input.IsMouse && raw.DeviceId is not null)
+            if (!raw.Input.IsMouse && raw.DeviceId is { } id)
             {
-                lastKeyboard = raw.DeviceId;
-                typed.Add(raw.DeviceId);
+                lastKeyboard = id;
                 lastKeyboardAt = now;
+                if (!senders.TryGetValue(raw.Input, out var known)) senders[raw.Input] = known = [];
+                if (known.Add(id)) keyCounts[id] = keyCounts.GetValueOrDefault(id) + 1;
             }
+            // A key reaches Raw Input after the hook, so one going down unseen got past it.
+            if (!raw.Input.IsMouse && raw.IsDown && raw.Input != LeftControl && !held.ContainsKey(raw.Input))
+                effects.Add(new HookMissed(raw.Input));
 
             var pending = waiting.FirstOrDefault(p => p.Input == raw.Input);
             if (pending is not null)
@@ -203,7 +222,7 @@ public sealed class RemapEngine(Func<long> clock)
             }
             foreach (var press in held.Values.Where(p => p.RawUpAt + MissedUpWait <= now).ToList())
             {
-                effects.Add(new Note($"released {press.Input.Code:X}: the hook missed its release"));
+                effects.Add(new Note($"released 0x{press.Input.Code:X}: the hook missed its release"));
                 held.Remove(press.Input);
                 Finish(press, false);
             }
@@ -211,6 +230,7 @@ public sealed class RemapEngine(Func<long> clock)
     }
 
     /// Lets go of everything held, for turning off, quitting or anything that can hide a release.
+    /// A press still waiting is sent as it was.
     public void ReleaseAll()
     {
         lock (gate)
@@ -236,17 +256,18 @@ public sealed class RemapEngine(Func<long> clock)
     private bool NewPress(HookEvent e, long now)
     {
         var press = new Held(e.Input, e.Vk, e.IsPosted);
-        var isLeft = e.Input == RemapInput.LeftButton;
-        var wantsIt = !isLeft && (table.IsMapped(e.Input) || isRecording);
-        if (!e.IsPosted && !e.Input.IsMouse && !isRecording) DecideWaitingKeys(now);
-
+        held[e.Input] = press;
         if (e.IsPosted)
         {
-            // Programs have no device, and there's no Raw Input device to wait for.
-            press.IsSwallowed = false;
+            // Programs have no device. A button's Raw Input, which came first, says nothing more.
+            TakeRecentRaw(e.Input);
             Decide(press, null, 0, true);
+            return press.IsSwallowed;
         }
-        else if (!wantsIt && !isViewing)
+        if (!e.Input.IsMouse && !isRecording) DecideWaitingKeys();
+
+        var wantsIt = e.Input != RemapInput.LeftButton && (table.IsMapped(e.Input) || isRecording);
+        if (!wantsIt && !isViewing)
         {
             press.Route = Route.Untouched;
         }
@@ -256,30 +277,43 @@ public sealed class RemapEngine(Func<long> clock)
         }
         else if (e.Input.IsMouse || !wantsIt)
         {
+            // Its Raw Input is on the way; only a mapped button is held back for it.
             press.IsSwallowed = wantsIt;
             Wait(press, now + RawWait);
         }
         else if (isRecording)
         {
             press.IsSwallowed = press.PassesRelease = true;
-            Wait(press, long.MaxValue);
+            Wait(press, Forever);
         }
-        else if (table.SharedKeyboard(e.Input, lastKeyboard, typed) is { } keyboard)
+        else if (LikelyKeyboard(e.Input, now, out var isSure) is { } keyboard)
         {
+            press.PassesRelease = !isSure;
             Decide(press, keyboard, 0, true);
-        }
-        else if (now - lastKeyboardAt < ActiveKeyboardTime && lastKeyboard is not null)
-        {
-            press.PassesRelease = true;
-            Decide(press, lastKeyboard, 0, true);
         }
         else
         {
             press.IsSwallowed = press.PassesRelease = true;
             Wait(press, now + HoldWait);
         }
-        held[e.Input] = press;
         return press.IsSwallowed;
+    }
+
+    /// Which device a mapped key most likely came from, or null when nothing says. isSure: the
+    /// devices that may have sent it (keyboards, and those that map it or sent it) all do the same
+    /// with it.
+    private string? LikelyKeyboard(RemapInput input, long now, out bool isSure)
+    {
+        var known = senders.GetValueOrDefault(input) ?? [];
+        var keyboards = table.Keyboards.Concat(keyCounts.Where(c => c.Value >= KeyboardKeys).Select(c => c.Key)).ToList();
+        var any = table.Agreed(keyboards.Concat(table.Mappers(input)).Concat(known), input, lastKeyboard);
+        isSure = any is not null;
+        if (isSure) return any;
+        // A key a keyboard sends may come from the one being typed on; one that only another kind
+        // of device has sent, such as a mouse sending keys, comes from that device.
+        var isTyping = lastKeyboard is not null && now - lastKeyboardAt < ActiveKeyboardTime;
+        if (isTyping && (known.Count == 0 || known.Contains(lastKeyboard!) || known.Any(keyboards.Contains))) return lastKeyboard;
+        return table.Agreed(known, input, null) ?? (isTyping ? lastKeyboard : null);
     }
 
     private void Wait(Held press, long deadline)
@@ -289,7 +323,7 @@ public sealed class RemapEngine(Func<long> clock)
     }
 
     /// Another key is going through: keys waiting go first, so they stay in order.
-    private void DecideWaitingKeys(long now)
+    private void DecideWaitingKeys()
     {
         foreach (var press in waiting.Where(p => !p.Input.IsMouse && p.IsSwallowed).ToList())
         {
@@ -318,10 +352,11 @@ public sealed class RemapEngine(Func<long> clock)
             if (deviceId is null || deviceId == recording)
             {
                 isRecording = false;
-                effects.Add(new Recorded(press.Input, deviceId is null));
+                effects.Add(new Note($"recording: 0x{press.Input.Code:X} from {deviceId ?? (handle == 0 ? "no device" : "an unlisted device")}"));
+                effects.Add(new Recorded(press.Input, handle == 0));
                 output = RemapOutput.Nothing;
             }
-            else effects.Add(new Note($"recording: ignored {press.Input.Code:X} from {deviceId}, another device"));
+            else effects.Add(new Note($"recording: ignored 0x{press.Input.Code:X} from {deviceId}, another device"));
         }
         output ??= press.IsSwallowed || hookOpen ? table.Output(deviceId, press.Input) : null;
         press.Output = output;
@@ -372,8 +407,12 @@ public sealed class RemapEngine(Func<long> clock)
     {
         if (press.Route != Route.Waiting) return Finish(press, true);
         press.Queued.Add(false);
-        if (press.IsSwallowed && press.PassesRelease) press.Deadline = now + RawWait;
-        return press.IsSwallowed && !press.PassesRelease;
+        if (!press.IsSwallowed) return false;
+        if (!press.PassesRelease) return true;
+        // Goes on alone, for Raw Input to say the keyboard.
+        press.Deadline = now + RawWait;
+        MaskIfMenu(press.Input);
+        return false;
     }
 
     /// The press is over. hookOpen: the hook is holding its release, so it can go on instead of
@@ -384,12 +423,15 @@ public sealed class RemapEngine(Func<long> clock)
         switch (press.Route)
         {
             case Route.Original:
-                if (hookOpen && press.PassesRelease) return false;
+                if (hookOpen) return false;
                 effects.Add(new Press(press.Input, false, press.Vk));
                 return true;
             case Route.Mapped:
                 ReleaseOutput(press, false);
-                return !press.PassesRelease;
+                if (!press.PassesRelease) return true;
+                // Windows never saw it go down.
+                if (hookOpen) MaskIfMenu(press.Input);
+                return false;
             default:
                 return false;
         }
@@ -441,5 +483,10 @@ public sealed class RemapEngine(Func<long> clock)
         return raw;
     }
 
-    private void ForgetOldRaw(long now) => recent.RemoveAll(r => now - r.At > RawMemory);
+    /// A button's Raw Input comes first; one no hook event claimed in time got past the hook.
+    private void ForgetOldRaw(long now)
+    {
+        foreach (var (raw, _) in recent.Where(r => now - r.At > RawMemory)) effects.Add(new HookMissed(raw.Input));
+        recent.RemoveAll(r => now - r.At > RawMemory);
+    }
 }

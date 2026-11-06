@@ -14,6 +14,7 @@ public static partial class KeyCodes
     private const int NumLockCode = 0x45;
     private const int RightShiftCode = 0x36;
     private const int VkPause = 0x13, VkPrintScreen = 0x2C, VkNumLock = 0x90, VkRightShift = 0xA1;
+    private const int VkLeftControl = 0xA2, LeftControlCode = 0x1D;
     private const uint MAPVK_VK_TO_VSC_EX = 4, MAPVK_VSC_TO_VK_EX = 3, MAPVK_VK_TO_CHAR = 2;
     /// A key no layout uses: tapping it makes Windows forget a Win or Alt press was alone.
     private const int MaskKey = 0xE8;
@@ -69,6 +70,9 @@ public static partial class KeyCodes
         if (vk == 0) vk = VirtualKey(code);
         InputSender.Key(vk, isDown, code & 0xFF, (code & Extended) != 0);
     }
+
+    /// The Ctrl that Right Alt brings on layouts with AltGr.
+    public static void SendAltGrControl(bool isDown) => InputSender.Key(VkLeftControl, isDown, LeftControlCode);
 
     public static void TapMaskKey()
     {

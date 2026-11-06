@@ -11,6 +11,8 @@ public sealed record ChoiceSection<T>(string Title, IReadOnlyList<Choice<T>> Cho
 /// A searchable, sectioned list to pick a key, button or action from.
 public sealed class ChoiceList<T> : Grid
 {
+    private const double HeaderHeight = 36;
+
     private readonly IReadOnlyList<ChoiceSection<T>> sections;
     private readonly Action<T> choose;
     private readonly ListView list = new() { SelectionMode = ListViewSelectionMode.None, IsItemClickEnabled = true };
@@ -51,7 +53,12 @@ public sealed class ChoiceList<T> : Grid
                 ? section.Choices
                 : section.Choices.Where(c => c.Title.Contains(query, StringComparison.CurrentCultureIgnoreCase)).ToList();
             if (matches.Count == 0) continue;
-            list.Items.Add(new ListViewHeaderItem { Content = section.Title });
+            list.Items.Add(new ListViewHeaderItem
+            {
+                Content = new TextBlock { Text = section.Title, Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"] },
+                MinHeight = HeaderHeight,
+                Padding = new Thickness(12, 8, 12, 0),
+            });
             foreach (var choice in matches)
             {
                 var label = new TextBlock { Text = choice.Title };

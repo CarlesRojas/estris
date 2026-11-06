@@ -1,5 +1,6 @@
 using Estris.Ui;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
@@ -38,6 +39,14 @@ internal sealed class MappingsView
     private readonly RemapUtility remap;
     private readonly RemapSettings settings;
     private readonly StackPanel groups = new() { Spacing = Pane.RowSpacing };
+    /// Only with more than one device that can send keys, when which one sent a key matters.
+    private readonly TextBlock keyboardsNote = new()
+    {
+        Text = T("With more than one keyboard, keys go by the one you're typing on, as Windows only says which keyboard sent a key after apps get it. Right after switching keyboards, a key that differs between them may act as on the other one, or only when you let go of it. Mouse buttons always know their mouse."),
+        TextWrapping = TextWrapping.Wrap,
+        Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+        Margin = new Thickness(1, 2, 1, 6),
+    };
     private readonly Dictionary<string, FrameworkElement> headers = [];
     private bool? isBrightnessSupported;
     private string? scrollTarget;
@@ -46,8 +55,8 @@ internal sealed class MappingsView
     {
         this.remap = remap;
         settings = remap.Settings;
-        tab.Note(T("A window running as administrator keeps its keys: Windows doesn't let them be remapped while it has the focus."));
-        tab.Note(T("Windows only says which keyboard a key came from after apps get it, so keys go by the keyboard you last typed on. After changing keyboards, a key that differs between them can act when you let go of it, or once as on the other keyboard. Mouse buttons always know their mouse."));
+        tab.Note(T("Keys and buttons can't be remapped while a window running as administrator is in front: Windows keeps them from other apps."));
+        tab.Add(keyboardsNote);
         tab.Add(groups);
 
         void Rebuild() => App.Ui.TryEnqueue(this.Rebuild);
@@ -88,6 +97,7 @@ internal sealed class MappingsView
 
     private void Rebuild()
     {
+        keyboardsNote.Visibility = remap.Devices.Connected.Count(d => d.HasKeyboard) > 1 ? Visibility.Visible : Visibility.Collapsed;
         groups.Children.Clear();
         headers.Clear();
         foreach (var device in Listed())
@@ -147,6 +157,7 @@ internal sealed class MappingsView
         content.Children.Add(new FontIcon { Glyph = AddGlyph, FontSize = 12 });
         content.Children.Add(new TextBlock { Text = T("Add Mapping") });
         var button = new Button { Content = content, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 4, 0, 0) };
+        AutomationProperties.SetName(button, T("Add Mapping"));
         button.Click += (_, _) => settings.AddMapping(device);
         return button;
     }
@@ -268,7 +279,7 @@ internal sealed class MappingsView
             BorderThickness = new Thickness(0),
         };
         ToolTipService.SetToolTip(button, help);
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(button, help);
+        AutomationProperties.SetName(button, help);
         return button;
     }
 
@@ -285,7 +296,8 @@ internal sealed class MappingsView
     /// is given a way to close it.
     private static Flyout PickerFlyout(double height, Func<Action, FrameworkElement> build)
     {
-        var flyout = new Flyout { Placement = FlyoutPlacementMode.Bottom };
+        // Free to reach past the window, so it opens under its button even low on the page.
+        var flyout = new Flyout { Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft, ShouldConstrainToRootBounds = false };
         var style = new Style(typeof(FlyoutPresenter));
         style.Setters.Add(new Setter(Control.PaddingProperty, new Thickness(0)));
         style.Setters.Add(new Setter(FrameworkElement.MaxWidthProperty, FlyoutWidth + 2));
@@ -324,6 +336,7 @@ internal sealed class MappingsView
                 Margin = new Thickness(12, 12, 12, 0),
                 IsEnabled = device.IsConnected,
             };
+            AutomationProperties.SetName(record, T("Record from %@", device.Name));
             record.Click += (_, _) =>
             {
                 isRecording = true;

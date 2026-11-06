@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Estris.Core;
 using Estris.Ui;
 using Microsoft.UI.Xaml;
@@ -20,6 +21,7 @@ public sealed class RemapUtility : IUtility
 
     private static readonly double[] LookAgainSeconds = [5, 20];
     private const long UnknownDeviceLookInterval = 2000;
+    private const long ReinstallInterval = 3000;
 
     public RemapSettings Settings { get; } = new();
     public InputDevices Devices { get; }
@@ -32,14 +34,17 @@ public sealed class RemapUtility : IUtility
     private bool isViewing, isOnMappings;
     private Action<RemapInput, bool>? recordingDone;
     private volatile bool swallowsAltGrControl;
+    /// The Ctrl that came with the Right Alt being pressed or released was swallowed.
+    private bool tookAltGrControl;
     private int isSending;
     private long lastUnknownLook;
+    private long lastReinstall = long.MinValue / 2;
 
     public RemapUtility(AppLog log)
     {
         this.log = log;
         Devices = new InputDevices(log);
-        engine = new RemapEngine(() => Environment.TickCount64);
+        engine = new RemapEngine(() => Stopwatch.GetTimestamp() * 1000 / Stopwatch.Frequency);
         listener = new RawInputListener(DeviceOf, OnRaw, RefreshDevicesLater, engine.NextDeadline, OnDeadline);
     }
 
@@ -47,8 +52,8 @@ public sealed class RemapUtility : IUtility
     {
         Enabled.Changed += Apply;
         Settings.Devices.Changed += Apply;
-        Devices.Changed += () => App.Ui.TryEnqueue(Apply);
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => ReleaseEverything();
+        Devices.Changed += OnDevicesChanged;
+        AppDomain.CurrentDomain.ProcessExit += OnExit;
         wasEnabled = Enabled.Value;
         Apply();
     }
@@ -58,9 +63,15 @@ public sealed class RemapUtility : IUtility
     {
         Enabled.Changed -= Apply;
         Settings.Devices.Changed -= Apply;
+        Devices.Changed -= OnDevicesChanged;
+        AppDomain.CurrentDomain.ProcessExit -= OnExit;
         engine.SetTable(MappingTable.Empty);
         Wire(false, false, false);
     }
+
+    private void OnDevicesChanged() => App.Ui.TryEnqueue(Apply);
+
+    private void OnExit(object? sender, EventArgs e) => ReleaseEverything();
 
     public UIElement BuildPane() => RemapPane.Build(this);
 
@@ -195,15 +206,22 @@ public sealed class RemapUtility : IUtility
     private void OnKey(KeyEvent e)
     {
         if (e.IsOwn) return;
-        // Right Alt on such a layout: it brings its Ctrl again if it's sent on.
+        // On layouts with AltGr, Right Alt comes after a Ctrl of its own. While Right Alt is
+        // mapped that Ctrl is held back; a Right Alt that goes on unmapped gets it back, and one sent
+        // again brings its own.
         if (e.Scan == KeyCodes.AltGrControlScan)
         {
-            e.Handled = swallowsAltGrControl;
+            e.Handled = tookAltGrControl = swallowsAltGrControl;
             return;
         }
         var input = RemapInput.Key(KeyCodes.FromHook(e.Vk, e.Scan, e.IsExtended));
         e.Handled = engine.OnHook(new HookEvent(input, e.IsDown, e.Vk, e.IsInjected));
         Sent();
+        if (input.Code == KeyCodes.RightAlt && tookAltGrControl)
+        {
+            tookAltGrControl = false;
+            if (!e.Handled) KeyCodes.SendAltGrControl(e.IsDown);
+        }
     }
 
     private void OnMouse(MouseEvent e)
@@ -281,6 +299,9 @@ public sealed class RemapUtility : IUtility
             case Note note:
                 log.Add("Remap", note.Message);
                 break;
+            case HookMissed missed:
+                ReinstallHooks(missed.Input);
+                break;
             case Recorded recorded:
                 App.Ui.TryEnqueue(() => FinishRecording(recorded));
                 break;
@@ -288,6 +309,18 @@ public sealed class RemapUtility : IUtility
                 App.Ui.TryEnqueue(() => AddRow(row));
                 break;
         }
+    }
+
+    /// At most every few seconds, so a program that keeps events from the hooks on purpose
+    /// doesn't make this run all the time.
+    private void ReinstallHooks(RemapInput input)
+    {
+        if (!(input.IsMouse ? isHookingMouse : isHookingKeys)) return;
+        var now = Environment.TickCount64;
+        if (now - Interlocked.Read(ref lastReinstall) < ReinstallInterval) return;
+        Interlocked.Exchange(ref lastReinstall, now);
+        log.Add("Remap", $"the hook missed {(input.IsMouse ? "button" : "key")} 0x{input.Code:X}; installing it again");
+        InputHooks.RequestReinstall();
     }
 
     private void FinishRecording(Recorded recorded)

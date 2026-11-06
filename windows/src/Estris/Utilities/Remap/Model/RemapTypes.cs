@@ -11,6 +11,7 @@ public readonly record struct RemapInput(bool IsMouse, int Code)
     public static RemapInput Button(int number) => new(true, number);
 
     /// Win and Alt: releasing one alone opens Start or the menu bar.
+    [JsonIgnore]
     public bool OpensMenu => !IsMouse && Code is 0x15B or 0x15C or 0x38 or 0x138;
 }
 
@@ -35,33 +36,33 @@ public sealed record RemapOutput(OutputKind Kind, int Code = 0, SystemAction? Ac
     public static RemapOutput Run(SystemAction action) => new(OutputKind.Action, 0, action);
 
     /// Whether holding the key repeats it, like the real volume and brightness keys.
+    [JsonIgnore]
     public bool Repeats => Action is SystemAction.VolumeUp or SystemAction.VolumeDown or SystemAction.BrightnessUp or SystemAction.BrightnessDown;
 }
 
-/// The mappings that apply right now, read on the hook thread, so never changed once made.
-/// Only the first mapping for an input on a device counts.
+/// The mappings that apply right now, read on the hook thread, so never changed once made: those
+/// of the devices plugged in, and what a press with no device takes. Only the first mapping for
+/// an input on a device counts.
 public sealed class MappingTable
 {
-    public static readonly MappingTable Empty = new(new Dictionary<string, Dictionary<RemapInput, RemapOutput>>(), new Dictionary<RemapInput, RemapOutput>(), [], []);
+    public static readonly MappingTable Empty = new(new Dictionary<string, Dictionary<RemapInput, RemapOutput>>(), new Dictionary<RemapInput, RemapOutput>(), []);
 
     private readonly IReadOnlyDictionary<string, Dictionary<RemapInput, RemapOutput>> devices;
     private readonly IReadOnlyDictionary<RemapInput, RemapOutput> deviceLess;
     private readonly IReadOnlyList<string> keyboards;
-    private readonly IReadOnlyList<string> connected;
     private readonly HashSet<RemapInput> mapped = [];
 
-    /// devices: each one's mappings, oldest device first. deviceLess: what a press with no device
-    /// takes. keyboards and connected: what is plugged in now, to tell if the device matters.
+    /// devices: each connected one's mappings, oldest first, including those with none.
+    /// deviceLess: what a press with no device takes. keyboards: the connected devices that look
+    /// like keyboards.
     public MappingTable(
         IReadOnlyDictionary<string, Dictionary<RemapInput, RemapOutput>> devices,
         IReadOnlyDictionary<RemapInput, RemapOutput> deviceLess,
-        IReadOnlyList<string> keyboards,
-        IReadOnlyList<string> connected)
+        IReadOnlyList<string> keyboards)
     {
         this.devices = devices;
         this.deviceLess = deviceLess;
         this.keyboards = keyboards;
-        this.connected = connected;
         foreach (var mappings in devices.Values) mapped.UnionWith(mappings.Keys);
         mapped.UnionWith(deviceLess.Keys);
     }
@@ -69,24 +70,29 @@ public sealed class MappingTable
     public bool HasKeys => mapped.Any(i => !i.IsMouse);
     public bool HasButtons => mapped.Any(i => i.IsMouse);
     public bool IsMapped(RemapInput input) => mapped.Contains(input);
+    public IReadOnlyList<string> Keyboards => keyboards;
 
     public RemapOutput? Output(string? deviceId, RemapInput input) => deviceId is null
         ? deviceLess.GetValueOrDefault(input)
         : devices.GetValueOrDefault(deviceId)?.GetValueOrDefault(input);
 
-    /// A device that maps this input, for when nothing says which one sent it.
+    /// The first device that maps this input, for when nothing says which one sent it.
     public string? DeviceMapping(RemapInput input) =>
         devices.FirstOrDefault(d => d.Value.ContainsKey(input)).Key;
 
-    /// When every keyboard plugged in, anything else plugged in that maps this key, and whatever
-    /// has typed (a receiver doesn't look like a keyboard) do the same with it, so it doesn't
-    /// matter which sent it: one of them, preferably the given one.
-    public string? SharedKeyboard(RemapInput input, string? preferred, IReadOnlySet<string> typed)
+    /// The connected devices that map this input.
+    public IEnumerable<string> Mappers(RemapInput input) =>
+        devices.Where(d => d.Value.ContainsKey(input)).Select(d => d.Key);
+
+    /// One of these devices, the preferred one if it is among them, when every one of them that is
+    /// connected does the same with the input, so it doesn't matter which sent it. Null when they
+    /// differ or none is connected.
+    public string? Agreed(IEnumerable<string> candidates, RemapInput input, string? preferred)
     {
-        var relevant = keyboards.Union(connected.Where(d => Output(d, input) is not null)).Union(typed).ToList();
-        if (relevant.Count == 0) return null;
-        var first = Output(relevant[0], input);
-        if (relevant.Any(k => Output(k, input) != first)) return null;
-        return relevant.Contains(preferred ?? "") ? preferred : relevant[0];
+        var connected = candidates.Where(devices.ContainsKey).Distinct().ToList();
+        if (connected.Count == 0) return null;
+        var first = Output(connected[0], input);
+        if (connected.Any(d => Output(d, input) != first)) return null;
+        return preferred is not null && connected.Contains(preferred) ? preferred : connected[0];
     }
 }

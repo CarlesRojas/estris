@@ -10,7 +10,10 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
 {
     private const ushort GenericDesktop = 1, MouseUsage = 2, KeyboardUsage = 6;
     private const uint RIDEV_REMOVE = 0x1, RIDEV_INPUTSINK = 0x100, RIDEV_DEVNOTIFY = 0x2000;
-    private const uint WM_INPUT = 0xFF, WM_INPUT_DEVICE_CHANGE = 0xFE, WM_APP_WAKE = 0x8002, WM_APP_MOUSE = 0x8003;
+    private const uint WM_INPUT = 0xFF, WM_INPUT_DEVICE_CHANGE = 0xFE, WM_DEVICECHANGE = 0x219, WM_APP_WAKE = 0x8002, WM_APP_MOUSE = 0x8003;
+    private const int DBT_DEVICEARRIVAL = 0x8000, DBT_DEVICEREMOVECOMPLETE = 0x8004, DBT_DEVTYP_DEVICEINTERFACE = 5;
+    /// Every HID interface, mice included: Raw Input only reports changes to what it listens to.
+    private static readonly Guid HidInterfaces = new("4D1E55B2-F16F-11CF-88CB-001111000030");
     private const uint RID_INPUT = 0x10000003, RIM_TYPEMOUSE = 0, RIM_TYPEKEYBOARD = 1;
     private const ushort RI_KEY_BREAK = 1, RI_KEY_E0 = 2;
     private const uint QS_ALLINPUT = 0x4FF, MWMO_INPUTAVAILABLE = 4, PM_REMOVE = 1, INFINITE = 0xFFFFFFFF;
@@ -35,6 +38,9 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
         public string ClassName;
         public nint SmallIcon;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DEV_BROADCAST_DEVICEINTERFACE { public int Size, DeviceType, Reserved; public Guid ClassGuid; public short Name; }
 
     [StructLayout(LayoutKind.Sequential)]
     private struct RAWINPUTDEVICE { public ushort UsagePage, Usage; public uint Flags; public nint Target; }
@@ -74,6 +80,12 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
 
     [DllImport("user32")]
     private static extern int GetSystemMetrics(int index);
+
+    [DllImport("user32", EntryPoint = "RegisterDeviceNotificationW")]
+    private static extern nint RegisterDeviceNotification(nint recipient, ref DEV_BROADCAST_DEVICEINTERFACE filter, uint flags);
+
+    [DllImport("user32")]
+    private static extern bool UnregisterDeviceNotification(nint handle);
 
     private const string ClassName = "EstrisRawInput";
     private static readonly int HeaderSize = Marshal.SizeOf<RAWINPUTHEADER>();
@@ -120,6 +132,8 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
         window = CreateWindowEx(0, ClassName, "", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, instance, 0);
         if (window == 0 || !Register(KeyboardUsage, RIDEV_INPUTSINK | RIDEV_DEVNOTIFY, window))
             log.Add("Remap", $"can't listen to Raw Input (error {Marshal.GetLastWin32Error()})");
+        var filter = new DEV_BROADCAST_DEVICEINTERFACE { Size = Marshal.SizeOf<DEV_BROADCAST_DEVICEINTERFACE>(), DeviceType = DBT_DEVTYP_DEVICEINTERFACE, ClassGuid = HidInterfaces };
+        var notification = RegisterDeviceNotification(window, ref filter, 0);
         ready.Set();
 
         while (!isQuitting)
@@ -134,6 +148,7 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
             onDeadline();
         }
 
+        if (notification != 0) UnregisterDeviceNotification(notification);
         Register(KeyboardUsage, RIDEV_REMOVE, 0);
         if (listensToMouse) Register(MouseUsage, RIDEV_REMOVE, 0);
         listensToMouse = false;
@@ -154,6 +169,9 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
             case WM_INPUT_DEVICE_CHANGE:
                 onDevicesChanged();
                 return 0;
+            case WM_DEVICECHANGE:
+                if (wParam is DBT_DEVICEARRIVAL or DBT_DEVICEREMOVECOMPLETE) onDevicesChanged();
+                return 1;
             case WM_APP_MOUSE:
                 var wants = wParam != 0;
                 if (wants != listensToMouse && Register(MouseUsage, wants ? RIDEV_INPUTSINK : RIDEV_REMOVE, wants ? hwnd : 0)) listensToMouse = wants;
