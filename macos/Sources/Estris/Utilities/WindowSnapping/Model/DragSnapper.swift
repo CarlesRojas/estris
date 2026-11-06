@@ -21,8 +21,6 @@ final class DragSnapper {
     private static let sharedEdgeTolerance: CGFloat = 4
     /// Smallest size a neighbour is resized down to.
     private static let minimumNeighbourSize: CGFloat = 120
-    /// How far ahead of the window an edge following the pointer may get.
-    private static let pointerLead: CGFloat = 48
     /// How tall the title bar and toolbar of Estris's windows are, where they are dragged.
     private static let ownTitleBarHeight: CGFloat = 52
 
@@ -62,8 +60,6 @@ final class DragSnapper {
     private var mode = Mode.undecided
     private var target: (action: SnapAction, screen: NSScreen)?
     private var neighbours: [Neighbour]?
-    /// The edges the resize has moved so far.
-    private var draggedEdges: Set<Edge> = []
     /// The tiled windows on each screen the drag has passed over, for filling space.
     private var tiled: [NSScreen: [NSRect]] = [:]
 
@@ -155,34 +151,10 @@ final class DragSnapper {
             updateTarget()
         case .resizing:
             guard settings.resizesTogether, let frame = currentFrame else { return }
-            resizeNeighbours(to: pointerFrame(following: frame))
+            resizeNeighbours(to: frame)
         case .undecided:
             break
         }
-    }
-
-    /// The window's frame with its dragged edges where the pointer is: the frame the window
-    /// server has only changes when the app has drawn its new size, and the pointer gets there
-    /// first and more often. An edge the pointer has left behind, as at the app's smallest
-    /// size, stays where the window really is.
-    private func pointerFrame(following frame: NSRect) -> NSRect {
-        if frame.minX != startFrame.minX { draggedEdges.insert(.left) }
-        if frame.maxX != startFrame.maxX { draggedEdges.insert(.right) }
-        if frame.minY != startFrame.minY { draggedEdges.insert(.bottom) }
-        if frame.maxY != startFrame.maxY { draggedEdges.insert(.top) }
-        let point = NSEvent.mouseLocation
-        let deltaX = point.x - startPoint.x
-        let deltaY = point.y - startPoint.y
-        func position(_ edge: Edge, from start: CGFloat, by delta: CGFloat, now: CGFloat) -> CGFloat {
-            guard draggedEdges.contains(edge) else { return now }
-            let wanted = (start + delta).rounded()
-            return abs(wanted - now) > Self.pointerLead ? now : wanted
-        }
-        let left = position(.left, from: startFrame.minX, by: deltaX, now: frame.minX)
-        let right = position(.right, from: startFrame.maxX, by: deltaX, now: frame.maxX)
-        let bottom = position(.bottom, from: startFrame.minY, by: deltaY, now: frame.minY)
-        let top = position(.top, from: startFrame.maxY, by: deltaY, now: frame.maxY)
-        return NSRect(x: left, y: bottom, width: right - left, height: top - bottom)
     }
 
     private func mouseUp() {
@@ -215,7 +187,6 @@ final class DragSnapper {
         mode = .undecided
         target = nil
         neighbours = nil
-        draggedEdges = []
         tiled = [:]
         preview.hide()
     }
