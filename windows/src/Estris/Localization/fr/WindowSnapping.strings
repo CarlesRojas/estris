@@ -1,7 +1,6 @@
 "%lld px" = "%lld px";
 "Also set for %@, which takes priority, so this one won't work." = "Aussi attribué à %@, qui est prioritaire : celui-ci ne fonctionnera pas.";
 "Also set for %@. This one takes priority." = "Aussi attribué à %@. Celui-ci est prioritaire.";
-"Another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Une autre app utilise ce raccourci. Estris le prend tant que Ancrage des fenêtres est activé, ou choisissez une autre touche.";
 "Arrange All Windows" = "Organiser toutes les fenêtres";
 "Auto Arrange All Windows" = "Organiser toutes les fenêtres";
 "Bottom Half" = "Moitié inférieure";
@@ -22,7 +21,6 @@
 "Left Two Thirds" = "Deux tiers gauches";
 "Left edge: left half" = "Bord gauche : moitié gauche";
 "Maximize" = "Agrandir";
-"On this keyboard Ctrl + Alt + %@ types “%@”. Pressing Ctrl and Alt runs this shortcut instead; the AltGr key keeps typing it." = "Sur ce clavier, Ctrl + Alt + %@ tape « %@ ». Avec Ctrl et Alt, c’est ce raccourci qui s’exécute ; la touche AltGr continue de le taper.";
 "One shortcut fits every window on the screen without overlaps, each near where it was." = "Un raccourci fait tenir toutes les fenêtres de l’écran sans chevauchement, chacune près de sa place.";
 "Open Multitasking Settings" = "Ouvrir les paramètres Multitâche";
 "Place all windows side by side" = "Placer toutes les fenêtres côte à côte";
@@ -45,3 +43,4 @@
 "Top left corner" = "Coin supérieur gauche";
 "Top right corner" = "Coin supérieur droit";
 "Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "L’ancrage de Windows réagit aux mêmes glissements. Désactivez « Ancrer les fenêtres » dans Paramètres > Système > Multitâche pour qu’ils n’agissent pas tous les deux.";
+"Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Windows ou une autre app utilise ce raccourci. Estris le prend tant que Window Snapping est activé, ou choisissez une autre touche.";

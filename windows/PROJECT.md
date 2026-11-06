@@ -2,7 +2,7 @@
 
 A native Windows app with a set of utilities: Clipboard, Color Picker, Rounded Corners, Window Snapping and Remap. `PROJECT.md` at the root of the repo says why the Mac's other utilities stay out. For building and running, see `README.md` there.
 
-The Mac app is the reference: `macos/PROJECT.md` describes how each utility behaves, and this file only says what is different here, plus how this app is built. ⌘ on the Mac is Ctrl here, ⌃⌥ is Ctrl+Alt.
+The Mac app is the reference: `macos/PROJECT.md` describes how each utility behaves, and this file only says what is different here, plus how this app is built. ⌘ on the Mac is Ctrl here. Window Snapping's ⌃⌥ is Win+Alt.
 
 It is written in C# on .NET 10 with WinUI 3 (Windows App SDK), unpackaged and self-contained: the installer carries .NET and WinUI, so there is nothing to install first. It runs on Windows 10 2004 or later; Mica needs Windows 11.
 
@@ -43,7 +43,7 @@ As on the Mac. The radius defaults to 8, Windows 11's window corners, so a maxim
 
 ## Window Snapping
 
-As on the Mac, with Ctrl+Alt for the shortcuts. Windows's own Snap should be off (Settings > System > Multitasking), and the pane says so with a link. Frames are the visible ones (`DWMWA_EXTENDED_FRAME_BOUNDS`, not the window's invisible resize borders), so snapped windows truly touch each other and the screen's edges. Cloaked, tool and always-on-top windows are left out.
+As on the Mac, with Win+Alt for the shortcuts, on the Mac's keys. Windows and Game Bar use many Win+Alt combinations (the arrows, D, F, G, K, R and T among the defaults); as the keyboard hook comes first, Estris gets them, and each row says when a key is taken, by trying to register it. A key nothing uses is tapped after each shortcut, or Windows would open Start on letting go of Win. Windows's own Snap should be off (Settings > System > Multitasking), and the pane says so with a link. Frames are the visible ones (`DWMWA_EXTENDED_FRAME_BOUNDS`, not the window's invisible resize borders), so snapped windows truly touch each other and the screen's edges. Cloaked, tool and always-on-top windows are left out.
 
 The preview is one style, not two: frosted like Windows's own Snap preview, with no border. The Mac's dark outline and its **Frosted preview** switch aren't here. Holding Ctrl while dragging previews and snaps the exact area, as ⌘ does on the Mac.
 

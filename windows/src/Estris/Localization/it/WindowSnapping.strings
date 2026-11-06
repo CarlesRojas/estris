@@ -1,7 +1,6 @@
 "%lld px" = "%lld px";
 "Also set for %@, which takes priority, so this one won't work." = "Assegnato anche a %@, che ha la priorità, quindi questo non funzionerà.";
 "Also set for %@. This one takes priority." = "Assegnato anche a %@. Questo ha la priorità.";
-"Another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Un’altra app usa questa scorciatoia. Estris la prende mentre Aggancio finestre è attivo, oppure scegli un altro tasto.";
 "Arrange All Windows" = "Disponi tutte le finestre";
 "Auto Arrange All Windows" = "Disponi tutte le finestre";
 "Bottom Half" = "Metà inferiore";
@@ -22,7 +21,6 @@
 "Left Two Thirds" = "Due terzi a sinistra";
 "Left edge: left half" = "Bordo sinistro: metà sinistra";
 "Maximize" = "Ingrandisci";
-"On this keyboard Ctrl + Alt + %@ types “%@”. Pressing Ctrl and Alt runs this shortcut instead; the AltGr key keeps typing it." = "Su questa tastiera Ctrl + Alt + %@ scrive “%@”. Premendo Ctrl e Alt si usa invece questa scorciatoia; il tasto AltGr continua a scriverlo.";
 "One shortcut fits every window on the screen without overlaps, each near where it was." = "Una scorciatoia sistema tutte le finestre dello schermo senza sovrapposizioni, ognuna vicino a dov’era.";
 "Open Multitasking Settings" = "Apri impostazioni Multitasking";
 "Place all windows side by side" = "Affianca tutte le finestre";
@@ -45,3 +43,4 @@
 "Top left corner" = "Angolo in alto a sinistra";
 "Top right corner" = "Angolo in alto a destra";
 "Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "Lo Snap di Windows reagisce agli stessi trascinamenti. Disattiva “Ancora finestre” in Impostazioni > Sistema > Multitasking perché non agiscano entrambi.";
+"Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Windows o un’altra app usa questa scorciatoia. Estris la prende finché Window Snapping è attivo, oppure scegli un altro tasto.";

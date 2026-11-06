@@ -1,7 +1,6 @@
 "%lld px" = "%lld px";
 "Also set for %@, which takes priority, so this one won't work." = "También asignado a %@, que tiene prioridad, así que este no funcionará.";
 "Also set for %@. This one takes priority." = "También asignado a %@. Este tiene prioridad.";
-"Another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Otra app usa este atajo. Estris lo toma mientras Ajuste de ventanas está activado; o elige otra tecla.";
 "Arrange All Windows" = "Organizar todas las ventanas";
 "Auto Arrange All Windows" = "Organizar todas las ventanas";
 "Bottom Half" = "Mitad inferior";
@@ -22,7 +21,6 @@
 "Left Two Thirds" = "Dos tercios izquierdos";
 "Left edge: left half" = "Borde izquierdo: mitad izquierda";
 "Maximize" = "Maximizar";
-"On this keyboard Ctrl + Alt + %@ types “%@”. Pressing Ctrl and Alt runs this shortcut instead; the AltGr key keeps typing it." = "En este teclado, Ctrl + Alt + %@ escribe «%@». Al pulsar Ctrl y Alt se usa este atajo; la tecla AltGr lo sigue escribiendo.";
 "One shortcut fits every window on the screen without overlaps, each near where it was." = "Un atajo encaja todas las ventanas de la pantalla sin que se solapen, cada una cerca de donde estaba.";
 "Open Multitasking Settings" = "Abrir Configuración de multitarea";
 "Place all windows side by side" = "Colocar todas las ventanas una al lado de otra";
@@ -45,3 +43,4 @@
 "Top left corner" = "Esquina superior izquierda";
 "Top right corner" = "Esquina superior derecha";
 "Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "El Ajuste propio de Windows reacciona a los mismos arrastres. Desactiva «Acoplar ventanas» en Configuración > Sistema > Multitarea para que no actúen los dos.";
+"Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Windows u otra app usa este atajo. Estris lo toma mientras Window Snapping está activado, o elige otra tecla.";

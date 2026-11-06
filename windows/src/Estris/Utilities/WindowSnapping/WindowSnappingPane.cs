@@ -102,7 +102,7 @@ public static partial class WindowSnappingPane
         setting.Changed += Sync;
     }
 
-    /// A shortcut: Ctrl + Alt and a menu to pick its key, with what else uses it right below.
+    /// A shortcut: Win + Alt and a menu to pick its key, with what else uses it right below.
     private static SettingsCard AddShortcut(Pane pane, WindowSnappingSettings settings, string id, string title, IconElement icon)
     {
         var keys = new ComboBox { MinWidth = 110 };
@@ -117,7 +117,7 @@ public static partial class WindowSnappingPane
         var content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         content.Children.Add(new TextBlock
         {
-            Text = "Ctrl + Alt +",
+            Text = "Win + Alt +",
             VerticalAlignment = VerticalAlignment.Center,
             Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
         });
@@ -157,10 +157,8 @@ public static partial class WindowSnappingPane
             else
                 yield return T("Also set for %@, which takes priority, so this one won't work.", TitleOf(sharing[0]));
         }
-        if (SnapKeys.TypedWithAltGr(key) is { } typed)
-            yield return T("On this keyboard Ctrl + Alt + %@ types “%@”. Pressing Ctrl and Alt runs this shortcut instead; the AltGr key keeps typing it.", KeyNames.Name(key), typed);
-        if (SnapKeys.IsTakenByAnotherApp(key))
-            yield return T("Another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key.");
+        if (SnapKeys.IsTaken(key))
+            yield return T("Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key.");
     }
 
     private static string TitleOf(string id) => SnapActions.FromId(id)?.Title() ?? T("Arrange All Windows");

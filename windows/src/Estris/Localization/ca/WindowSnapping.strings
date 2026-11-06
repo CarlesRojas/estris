@@ -1,7 +1,6 @@
 "%lld px" = "%lld px";
 "Also set for %@, which takes priority, so this one won't work." = "També assignat a %@, que té prioritat, així que aquest no funcionarà.";
 "Also set for %@. This one takes priority." = "També assignat a %@. Aquest té prioritat.";
-"Another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Una altra app fa servir aquesta drecera. L’Estris la pren mentre Ajust de finestres està activat; o tria una altra tecla.";
 "Arrange All Windows" = "Organitza totes les finestres";
 "Auto Arrange All Windows" = "Organitzar totes les finestres";
 "Bottom Half" = "Meitat inferior";
@@ -22,7 +21,6 @@
 "Left Two Thirds" = "Dos terços de l’esquerra";
 "Left edge: left half" = "Vora esquerra: meitat esquerra";
 "Maximize" = "Maximitza";
-"On this keyboard Ctrl + Alt + %@ types “%@”. Pressing Ctrl and Alt runs this shortcut instead; the AltGr key keeps typing it." = "En aquest teclat, Ctrl + Alt + %@ escriu «%@». En prémer Ctrl i Alt s’executa aquesta drecera; la tecla AltGr ho continua escrivint.";
 "One shortcut fits every window on the screen without overlaps, each near where it was." = "Una drecera encaixa totes les finestres de la pantalla sense que se solapin, cadascuna a prop d’on era.";
 "Open Multitasking Settings" = "Obre la configuració de multitasca";
 "Place all windows side by side" = "Col·locar totes les finestres una al costat de l’altra";
@@ -45,3 +43,4 @@
 "Top left corner" = "Cantonada superior esquerra";
 "Top right corner" = "Cantonada superior dreta";
 "Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "L’ajust propi del Windows reacciona als mateixos arrossegaments. Desactiva «Ajusta les finestres» a Configuració > Sistema > Multitasca perquè no actuïn tots dos.";
+"Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Windows o una altra app fa servir aquesta drecera. L’Estris la pren mentre Window Snapping està activat, o tria una altra tecla.";

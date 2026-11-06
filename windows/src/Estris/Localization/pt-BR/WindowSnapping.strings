@@ -1,7 +1,6 @@
 "%lld px" = "%lld px";
 "Also set for %@, which takes priority, so this one won't work." = "Também atribuído a %@, que tem prioridade, então este não funcionará.";
 "Also set for %@. This one takes priority." = "Também atribuído a %@. Este tem prioridade.";
-"Another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Outro app usa este atalho. O Estris o assume enquanto o Encaixe de janelas está ativado, ou escolha outra tecla.";
 "Arrange All Windows" = "Organizar todas as janelas";
 "Auto Arrange All Windows" = "Organizar todas as janelas";
 "Bottom Half" = "Metade inferior";
@@ -22,7 +21,6 @@
 "Left Two Thirds" = "Dois terços à esquerda";
 "Left edge: left half" = "Borda esquerda: metade esquerda";
 "Maximize" = "Maximizar";
-"On this keyboard Ctrl + Alt + %@ types “%@”. Pressing Ctrl and Alt runs this shortcut instead; the AltGr key keeps typing it." = "Neste teclado, Ctrl + Alt + %@ digita “%@”. Pressionar Ctrl e Alt executa este atalho; a tecla AltGr continua digitando.";
 "One shortcut fits every window on the screen without overlaps, each near where it was." = "Um atalho encaixa todas as janelas da tela sem sobreposição, cada uma perto de onde estava.";
 "Open Multitasking Settings" = "Abrir configurações de Multitarefas";
 "Place all windows side by side" = "Colocar todas as janelas lado a lado";
@@ -45,3 +43,4 @@
 "Top left corner" = "Canto superior esquerdo";
 "Top right corner" = "Canto superior direito";
 "Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "O Ajuste do próprio Windows reage aos mesmos arrastos. Desative “Ajustar janelas” em Configurações > Sistema > Multitarefas para que os dois não atuem.";
+"Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "O Windows ou outro app usa este atalho. O Estris assume enquanto o Window Snapping estiver ativado, ou escolha outra tecla.";

@@ -63,8 +63,7 @@ public static class SnapActions
         _ => T("Restore"),
     };
 
-    /// The key each starts out with, used with Ctrl and Alt, as on the Mac. Where Ctrl+Alt plus
-    /// one types a character (E is € on many keyboards), AltGr keeps typing it and the pane says so.
+    /// The key each starts out with, used with Win and Alt: the same keys as the Mac's ⌃⌥.
     public static int DefaultKey(this SnapAction action) => action switch
     {
         SnapAction.LeftHalf => 0x25,

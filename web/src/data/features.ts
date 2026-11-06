@@ -24,7 +24,7 @@ export const features: Feature[] = [
     title: "Window Snapping",
     tagline: "Every window, exactly where you want it.",
     details: "Drag a window to an edge or a corner, or use ⌃⌥ shortcuts for halves, thirds and corners. One shortcut lines up every window on the screen.",
-    windowsDetails: "Drag a window to an edge or a corner, or use Ctrl+Alt shortcuts for halves, thirds and corners. One shortcut lines up every window on the screen.",
+    windowsDetails: "Drag a window to an edge or a corner, or use Win+Alt shortcuts for halves, thirds and corners. One shortcut lines up every window on the screen.",
     seconds: 10,
     accent: "#6ea8fe",
     icon: '<rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 5v14" stroke="currentColor" stroke-width="1.8"/>',
