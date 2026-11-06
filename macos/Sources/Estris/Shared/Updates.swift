@@ -3,7 +3,7 @@ import Sparkle
 
 /// Updates through Sparkle. It reads the appcast published with each GitHub release, at launch
 /// and every few hours. A newer version shows as "Update Available" at the top of the menu
-/// bar menu instead of Sparkle's own window; installing opens Sparkle's window with the notes
+/// bar menu and in General > About instead of Sparkle's own window; installing opens Sparkle's window with the notes
 /// and Install Update, which replaces the app and opens it again. Builds without the update
 /// signing key in their Info.plist (local ones) don't check.
 @MainActor

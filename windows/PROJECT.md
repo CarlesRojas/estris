@@ -70,7 +70,7 @@ As on the Mac (a group of mappings per device with rename, Add Mapping, source a
 
 ## Updates
 
-Through Velopack (`Core/AppServices.cs`, `Ui/UpdateWindow.cs`), reading the rolling `windows-latest` release at launch and every 6 hours. A newer version shows at the top of the tray menu with **Update**; that, or **Check for Updates…** in General > About, opens a window with the release notes and **Install Update**, as Sparkle's on the Mac. Development builds don't check.
+Through Velopack (`Core/AppServices.cs`, `Ui/UpdateWindow.cs`), reading the rolling `windows-latest` release at launch and every 6 hours. A newer version shows at the top of the tray menu and in General > About, under the version, with **Update**; that, or **Check for Updates…** in General > About, opens a window with the release notes and **Install Update**, as Sparkle's on the Mac. Development builds don't check.
 
 ## Project structure
 
