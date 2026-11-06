@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Seasons now falls behind your windows, with the piles on each window's own plane; what you push, dig out or shake off a window comes in front until it lands. It starts with piles already there, leaves are bigger, and each kind of particle has its own size slider. The setting to have it fall in front of windows is gone.
+- Seasons has been removed.
 
 ## 0.2.0 - 2026-10-29
 
