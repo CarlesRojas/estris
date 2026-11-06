@@ -1,11 +1,9 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Microsoft.Win32;
+using Estris.Ui;
 using Windows.UI;
 using Windows.UI.Composition;
 using Windows.UI.Composition.Desktop;
-using Windows.UI.ViewManagement;
-using WinRT;
 using static Estris.Core.Native;
 
 namespace Estris.Utilities.WindowSnapping;
@@ -39,7 +37,7 @@ public sealed partial class SnapPreview : IDisposable
         compositor ??= new Compositor();
         if (!overlays.TryGetValue(screen.Work, out var overlay))
             overlay = overlays[screen.Work] = new Overlay(compositor, screen.Work);
-        overlay.Show(frame, window, screen.Scale, Look.Current(), Animates);
+        overlay.Show(frame, window, screen.Scale, GlassLook.Current(), Animates);
         shown = overlay;
     }
 
@@ -83,24 +81,6 @@ public sealed partial class SnapPreview : IDisposable
         };
     }
 
-    /// The colors of Windows' preview in the system's theme, measured from it: a grey over the
-    /// blurred backdrop, or solid with transparency effects off.
-    private readonly record struct Look(Color Tint, float ShadowOpacity)
-    {
-        private const string ThemeKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
-        private static readonly Color LightTint = Color.FromArgb(184, 249, 249, 249), DarkTint = Color.FromArgb(199, 73, 73, 73);
-        private static readonly Color LightSolid = Color.FromArgb(255, 237, 237, 237), DarkSolid = Color.FromArgb(255, 64, 64, 64);
-        private const float LightShadowOpacity = 0.4f, DarkShadowOpacity = 0.75f;
-
-        public static Look Current()
-        {
-            var isLight = Registry.GetValue(ThemeKey, "SystemUsesLightTheme", 0) is int value && value != 0;
-            var isFrosted = new UISettings().AdvancedEffectsEnabled;
-            var tint = isFrosted ? (isLight ? LightTint : DarkTint) : (isLight ? LightSolid : DarkSolid);
-            return new Look(tint, isLight ? LightShadowOpacity : DarkShadowOpacity);
-        }
-    }
-
     /// A see-through, click-through window over one screen's work area, with the preview drawn
     /// in it by the compositor: a shadow, the blurred backdrop and the tint over it, clipped to
     /// a rounded rectangle whose place and size are animated as one.
@@ -117,7 +97,6 @@ public sealed partial class SnapPreview : IDisposable
         private const float CasterInset = 0.3f;
         private static readonly TimeSpan GrowDuration = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan ShrinkDuration = TimeSpan.FromMilliseconds(150);
-        private static readonly Guid CompositorDesktopInterop = new("29E691FA-4567-4DCA-B319-D0F207EB6807");
 
         private static readonly WindowProc Proc = Dispatch;
         private static bool isRegistered;
@@ -151,7 +130,7 @@ public sealed partial class SnapPreview : IDisposable
             // A plain window gets the blurred backdrop only when it asks for it.
             var useBackdrop = 1;
             DwmSetWindowAttribute(hwnd, DWMWA_USE_HOSTBACKDROPBRUSH, ref useBackdrop, sizeof(int));
-            target = CreateTarget(compositor, hwnd);
+            target = GlassCompositor.CreateTarget(compositor, hwnd);
 
             grow = compositor.CreateCubicBezierEasingFunction(new Vector2(0, 0), new Vector2(0, 1));
             shrink = compositor.CreateCubicBezierEasingFunction(new Vector2(0.7f, 0), new Vector2(1, 0.5f));
@@ -187,7 +166,7 @@ public sealed partial class SnapPreview : IDisposable
 
         /// Shows the preview at a frame in screen pixels, just behind the window: grown out of
         /// the window if it wasn't showing, glided there if it was.
-        public void Show(RECT frame, TopWindow window, double scale, Look look, bool animates)
+        public void Show(RECT frame, TopWindow window, double scale, GlassLook look, bool animates)
         {
             generation++;
             var radius = (float)(CornerRadius * scale);
@@ -261,22 +240,6 @@ public sealed partial class SnapPreview : IDisposable
         {
             target.Dispose();
             DestroyWindow(hwnd);
-        }
-
-        /// The compositor's visuals hosted in a plain window, through its desktop interop.
-        private static unsafe DesktopWindowTarget CreateTarget(Compositor compositor, nint hwnd)
-        {
-            var unknown = ((IWinRTObject)compositor).NativeObject.ThisPtr;
-            Marshal.ThrowExceptionForHR(Marshal.QueryInterface(unknown, in CompositorDesktopInterop, out var interop));
-            try
-            {
-                nint result;
-                var create = (delegate* unmanaged[Stdcall]<nint, nint, int, nint*, int>)(*(nint**)interop)[3];
-                Marshal.ThrowExceptionForHR(create(interop, hwnd, 0, &result));
-                try { return DesktopWindowTarget.FromAbi(result); }
-                finally { Marshal.Release(result); }
-            }
-            finally { Marshal.Release(interop); }
         }
 
         private static void Register()

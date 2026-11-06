@@ -129,7 +129,8 @@ internal sealed partial class Loupe : IDisposable
     private const int Cells = 15;
     private const int LoupeSize = 128, ShadowRoom = 12, ShadowDrop = 3;
     private const double ShadowOpacity = 0.35;
-    private const int RingWidth = 2;
+    private const int RingWidth = 1;
+    private const int RingAlpha = 46;
     private const uint SRCCOPY = 0xCC0020, CAPTUREBLT = 0x40000000;
     private const uint OpaqueAlpha = 0xFF000000;
 
@@ -221,7 +222,7 @@ internal sealed partial class Loupe : IDisposable
         graphics.SmoothingMode = SmoothingMode.AntiAlias;
         graphics.PixelOffsetMode = PixelOffsetMode.Half;
         var ringWidth = RingWidth * scale;
-        using var ring = new Pen(Color.FromArgb(217, 255, 255, 255), ringWidth);
+        using var ring = new Pen(Color.FromArgb(RingAlpha, 255, 255, 255), ringWidth);
         graphics.DrawEllipse(ring, room + ringWidth / 2, room + ringWidth / 2, diameter - ringWidth, diameter - ringWidth);
 
         graphics.SmoothingMode = SmoothingMode.None;

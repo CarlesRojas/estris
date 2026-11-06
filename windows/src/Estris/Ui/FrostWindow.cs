@@ -44,21 +44,10 @@ public sealed class FrostBackdrop : Microsoft.UI.Xaml.Media.SystemBackdrop
         controller?.Dispose();
         controller = null;
     }
-
-    /// Applies a changed tint to what's showing.
-    public void Update(Color tint, float opacity)
-    {
-        Tint = tint;
-        TintOpacity = opacity;
-        if (controller is null) return;
-        controller.TintColor = tint;
-        controller.TintOpacity = opacity;
-        controller.FallbackColor = tint;
-    }
 }
 
-/// A borderless window for floating things: the tray menu, pills, the overlay's panels. It has
-/// no title bar, stays out of the taskbar and Alt-Tab, and keeps Windows 11's rounded corners.
+/// A borderless window for what takes the focus, like the tray menu; see GlassPanel otherwise. It
+/// has no title bar, stays out of the taskbar and Alt-Tab, and keeps Windows 11's rounded corners.
 public class FrostWindow : Window
 {
     public nint Hwnd { get; }

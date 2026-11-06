@@ -211,7 +211,7 @@ internal sealed class PositionPill : Surface
 
     private readonly TextBlock text;
 
-    public PositionPill(SurfaceLook look) : base(look, SurfaceLook.CardRadius)
+    public PositionPill(SurfaceLook look) : base(look, PillHeight / 2)
     {
         text = new TextBlock { FontSize = FontSize, Foreground = look.Secondary, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(SidePadding, 0, SidePadding, 0) };
         Height = PillHeight;

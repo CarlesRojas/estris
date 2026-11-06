@@ -29,8 +29,7 @@ public partial class App : Application
         DispatcherShutdownMode = DispatcherShutdownMode.OnExplicitShutdown;
         UnhandledException += (_, e) =>
         {
-            Log.Add("App", $"Unhandled: {e.Exception}");
-            File.AppendAllText(Path.Combine(SettingsStore.Folder, "crash.log"), $"{DateTime.Now:s} {e.Exception}{Environment.NewLine}");
+            Fail("App", "Unhandled", e.Exception);
         };
     }
 
@@ -39,7 +38,7 @@ public partial class App : Application
         try { Launch(); }
         catch (Exception e)
         {
-            File.AppendAllText(Path.Combine(SettingsStore.Folder, "crash.log"), $"{DateTime.Now:s} {e}{Environment.NewLine}");
+            Fail("App", "Failed to launch", e);
             throw;
         }
     }
@@ -51,7 +50,7 @@ public partial class App : Application
         foreach (var utility in Utilities)
         {
             try { utility.Start(); }
-            catch (Exception e) { Log.Add(utility.Title, $"Failed to start: {e}"); }
+            catch (Exception e) { Fail(utility.Title, "Failed to start", e); }
         }
 
         tray = new TrayIcon(TraySettings, Utilities);
@@ -61,6 +60,13 @@ public partial class App : Application
         LoginItem.ApplyOnFirstLaunch();
 
         if (!openedAtLogin) OpenSettings();
+    }
+
+    /// To Developer > Logs and to a file, which outlives the app.
+    private void Fail(string source, string what, Exception error)
+    {
+        Log.Add(source, $"{what}: {error}");
+        File.AppendAllText(Path.Combine(SettingsStore.Folder, "crash.log"), $"{DateTime.Now:s} {source}: {what}: {error}{Environment.NewLine}");
     }
 
     public void OpenSettings(string? pane = null)

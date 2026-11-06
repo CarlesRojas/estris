@@ -16,8 +16,8 @@ public enum SurfaceState { Normal, Hovered }
 /// settings and the Windows theme. Brushes are changed in place, so surfaces pick it up live.
 internal sealed class SurfaceLook
 {
-    /// Windows 11's own radius for cards and flyouts, which windows have too.
-    public const double CardRadius = 8;
+    /// The same in the overlay and its preview in Settings.
+    public const double CardRadius = 16;
     private const double PreviewShadowRadius = 16;
     public const double ShadowOpacity = 0.22;
 
@@ -31,27 +31,25 @@ internal sealed class SurfaceLook
     };
 
     private readonly AcrylicBrush frost = new() { TintOpacity = 0.45, TintLuminosityOpacity = 0.7 };
-    private readonly bool isOverAcrylic;
+    private readonly bool isOverGlass;
 
-    /// The material under the tint. Over a window's real Acrylic there's none to draw.
-    public Brush? Frost => isOverAcrylic ? null : frost;
-    public Color BaseColor { get; private set; }
-    public SolidColorBrush Stroke { get; } = new();
+    /// The material under the tint. Over real glass there's none to draw.
+    public Brush? Frost => isOverGlass ? null : frost;
     public SolidColorBrush Primary { get; } = new();
     public SolidColorBrush Secondary { get; } = new();
 
-    /// isOverAcrylic is for surfaces filling a window of real Acrylic, whose shadow is the window's;
-    /// the others, in the settings preview, draw both themselves.
-    public SurfaceLook(AppearanceSettings appearance, bool isOverAcrylic = false)
+    /// isOverGlass is for surfaces on a GlassPanel, which draws the frost and the shadow; the
+    /// others, in the settings preview, draw both themselves.
+    public SurfaceLook(AppearanceSettings appearance, bool isOverGlass = false)
     {
         this.appearance = appearance;
-        this.isOverAcrylic = isOverAcrylic;
+        this.isOverGlass = isOverGlass;
         appearance.TintOpacity.Changed += ApplyTint;
         appearance.Tint.Changed += ApplyTint;
         ApplyTheme();
     }
 
-    public double ShadowRadius => isOverAcrylic ? 0 : PreviewShadowRadius;
+    public double ShadowRadius => isOverGlass ? 0 : PreviewShadowRadius;
 
     public Brush Tint(SurfaceState state) => tints[state];
 
@@ -60,12 +58,10 @@ internal sealed class SurfaceLook
     {
         var background = new UISettings().GetColorValue(UIColorType.Background);
         var isDark = background.R < 128;
-        BaseColor = isDark ? DarkBase : LightBase;
-        frost.TintColor = BaseColor;
-        frost.FallbackColor = BaseColor;
+        frost.TintColor = isDark ? DarkBase : LightBase;
+        frost.FallbackColor = frost.TintColor;
         Primary.Color = isDark ? Colors.White : Color.FromArgb(0xE4, 0, 0, 0);
         Secondary.Color = isDark ? Color.FromArgb(0xC8, 255, 255, 255) : Color.FromArgb(0x9E, 0, 0, 0);
-        Stroke.Color = isDark ? Color.FromArgb(0x18, 255, 255, 255) : Color.FromArgb(0x14, 0, 0, 0);
         ApplyTint();
     }
 
@@ -96,7 +92,7 @@ internal class Surface : Grid
         this.look = look;
         this.radius = radius;
         var corners = new CornerRadius(radius);
-        tint = new Border { CornerRadius = corners, BorderBrush = look.Stroke, BorderThickness = new Thickness(1), Background = look.Tint(state) };
+        tint = new Border { CornerRadius = corners, Background = look.Tint(state) };
         Children.Add(shadow);
         Children.Add(new Border { CornerRadius = corners, Background = look.Frost });
         Children.Add(tint);

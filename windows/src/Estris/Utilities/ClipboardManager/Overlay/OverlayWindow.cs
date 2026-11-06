@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using Estris.Core;
 using Estris.Ui;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using static Estris.Core.Native;
@@ -61,51 +60,15 @@ internal sealed partial class DimWindow
     [DllImport("user32")] private static extern bool ShowWindow(nint hwnd, int command);
 }
 
-/// A window of real Acrylic holding one surface, blurring what's behind it live. It fades through
-/// the window's own transparency, as the blur belongs to the window and not to what's in it.
-internal sealed class OverlayPanel : FrostWindow
-{
-    private const uint LWA_ALPHA = 2;
-    /// Windows's own minimum would otherwise widen a small panel.
-    private const int SmallestSize = 1;
-
-    public FrostBackdrop Backdrop { get; }
-    private (int X, int Y, int Width, int Height) placed;
-
-    public OverlayPanel(UIElement content) : this(content, new FrostBackdrop()) { }
-
-    private OverlayPanel(UIElement content, FrostBackdrop backdrop) : base(takesFocus: false, backdrop)
-    {
-        Backdrop = backdrop;
-        Content = content;
-        var presenter = (OverlappedPresenter)AppWindow.Presenter;
-        presenter.PreferredMinimumWidth = SmallestSize;
-        presenter.PreferredMinimumHeight = SmallestSize;
-        SetWindowLongPtr(Hwnd, GWL_EXSTYLE, GetWindowLongPtr(Hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-        SetAlpha(0);
-    }
-
-    public void SetAlpha(byte alpha) => SetLayeredWindowAttributes(Hwnd, 0, alpha, LWA_ALPHA);
-
-    /// Only when something changed, as stepping through entries calls this for each one.
-    public void Place(int x, int y, int width, int height)
-    {
-        if (placed == (x, y, width, height)) return;
-        placed = (x, y, width, height);
-        PlaceContentAt(x, y, width, height);
-    }
-
-    public void Forget() => placed = default;
-}
-
 /// The overlay, on the screen with the pointer and never activated: the dim, then the card and the
-/// "2 of 12" over it as windows of their own. All of it is live, nothing is a picture of the screen.
+/// "2 of 12" over it, on the same glass as Window Snapping's preview. All of it is live, nothing
+/// is a picture of the screen.
 internal sealed class OverlayWindow
 {
     private const double PillGap = 12;
     /// A window shows what it last drew until it draws again: wait this many frames.
     private const int FramesToDraw = 2;
-    private const float FrostOpacity = 0.45f;
+    private const double CardShadow = 32, PillShadow = 16;
     private const byte Opaque = 255;
     private static readonly TimeSpan FadeStep = TimeSpan.FromMilliseconds(16);
 
@@ -113,7 +76,7 @@ internal sealed class OverlayWindow
     private readonly SurfaceLook look;
     private readonly ClipCard card;
     private readonly PositionPill pill;
-    private readonly OverlayPanel cardPanel, pillPanel;
+    private readonly GlassPanel cardPanel, pillPanel;
     private readonly DimWindow dim = new();
     private readonly DispatcherQueueTimer fadeTimer;
     private RECT bounds;
@@ -124,11 +87,11 @@ internal sealed class OverlayWindow
     public OverlayWindow(AppearanceSettings appearance)
     {
         this.appearance = appearance;
-        look = new SurfaceLook(appearance, isOverAcrylic: true);
+        look = new SurfaceLook(appearance, isOverGlass: true);
         card = new ClipCard(look, CardMetrics.Entry, fitsImageInside: false);
         pill = new PositionPill(look);
-        cardPanel = new OverlayPanel(card);
-        pillPanel = new OverlayPanel(pill);
+        cardPanel = new GlassPanel(card, SurfaceLook.CardRadius, CardShadow);
+        pillPanel = new GlassPanel(pill, PositionPill.PillHeight / 2, PillShadow);
 
         fadeTimer = App.Ui.CreateTimer();
         fadeTimer.Interval = FadeStep;
@@ -171,15 +134,15 @@ internal sealed class OverlayWindow
     {
         (bounds, _) = FrostWindow.ScreenUnderPointer();
         look.ApplyTheme();
-        cardPanel.Backdrop.Update(look.BaseColor, FrostOpacity);
-        pillPanel.Backdrop.Update(look.BaseColor, FrostOpacity);
+        cardPanel.RefreshLook();
+        pillPanel.RefreshLook();
         opacity = 0;
         isOnScreen = true;
         if (!isWarming) dim.Show(bounds);
         ApplyOpacity();
         Place();
-        cardPanel.AppWindow.Show(false);
-        if (showsPill) pillPanel.AppWindow.Show(false);
+        cardPanel.Show();
+        if (showsPill) pillPanel.Show();
         framesLeft = FramesToDraw;
         Render(true);
     }
@@ -200,7 +163,7 @@ internal sealed class OverlayWindow
         pill.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
         var pillWidth = (int)Math.Ceiling(Math.Max(pill.DesiredSize.Width, PositionPill.PillHeight) * scale);
         pillPanel.Place(left + (width - pillWidth) / 2, top, pillWidth, pillHeight);
-        if (showsPill) pillPanel.AppWindow.Show(false);
+        if (showsPill) pillPanel.Show();
         else pillPanel.Hide();
     }
 
@@ -248,9 +211,8 @@ internal sealed class OverlayWindow
 
     private void ApplyOpacity()
     {
-        var alpha = (byte)Math.Round(Opaque * opacity);
-        cardPanel.SetAlpha(alpha);
-        pillPanel.SetAlpha(alpha);
+        cardPanel.SetOpacity(opacity);
+        pillPanel.SetOpacity(opacity);
         dim.SetAlpha((byte)Math.Round(Opaque * opacity * appearance.BackdropDim.Value));
     }
 

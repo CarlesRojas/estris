@@ -11,24 +11,25 @@ using static Estris.Core.Native;
 
 namespace Estris.Utilities.ColorPicker;
 
-/// A frosted pill with the color in a circle at the left and its value to the right: live under
-/// the loupe, then saying "Copied" for a moment before it fades out. Lets clicks through. Its
-/// height is fixed and both lines fit in it, so nothing moves when "Copied" appears.
-internal sealed partial class ColorPill : FrostWindow
+/// A pill of glass, as Window Snapping's preview, with the color in a circle at the left and its
+/// value to the right: live under the loupe, then saying "Copied" for a moment before it fades out.
+/// Lets clicks through. Its height is fixed and both lines fit in it, so nothing moves when
+/// "Copied" appears.
+internal sealed class ColorPill
 {
     private const double SwatchSize = 30, PillPadding = 7, MinimumTextWidth = 80;
     private const double PillHeight = SwatchSize + 2 * PillPadding;
     /// The value and "Copied" lines, with the gap between them, fill the swatch's height.
     private const double ValueSize = 12, ValueLine = 16, CopiedSize = 11, CopiedLine = 13, LineGap = 1;
-    private const uint LWA_ALPHA = 2;
-    private const byte Opaque = 255;
+    private const double ShadowBlur = 16;
     private static readonly TimeSpan VisibleFor = TimeSpan.FromSeconds(1.6);
     private static readonly TimeSpan FadeStep = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan FadeDuration = TimeSpan.FromSeconds(0.3);
-    /// Alpha lost each step, so it fades out in FadeDuration.
-    private static readonly int FadeAmount = (int)Math.Ceiling(Opaque * FadeStep / FadeDuration);
+    /// Opacity lost each step, so it fades out in FadeDuration.
+    private static readonly double FadeAmount = FadeStep / FadeDuration;
 
-    private readonly Grid root = new() { Padding = new Thickness(PillPadding), Height = PillHeight, ColumnSpacing = 10, RequestedTheme = ElementTheme.Dark };
+    private readonly Grid root = new() { Padding = new Thickness(PillPadding), Height = PillHeight, ColumnSpacing = 10 };
+    private readonly GlassPanel panel;
     private readonly Ellipse swatch = new()
     {
         Width = SwatchSize,
@@ -54,17 +55,16 @@ internal sealed partial class ColorPill : FrostWindow
         LineHeight = CopiedLine,
         LineStackingStrategy = LineStackingStrategy.BlockLineHeight,
         HorizontalAlignment = HorizontalAlignment.Center,
-        // Fluent's secondary text on dark, as the pill is always dark.
-        Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(197, 255, 255, 255)),
+        Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
         Visibility = Visibility.Collapsed,
     };
     private readonly DispatcherQueueTimer hideTimer = App.Ui.CreateTimer();
     private readonly DispatcherQueueTimer fadeTimer = App.Ui.CreateTimer();
     private bool isVisible;
-    private int alpha = Opaque;
+    private double opacity = 1;
     private int anchorX, anchorY, aboveAnchorY;
 
-    public ColorPill() : base(takesFocus: false)
+    public ColorPill()
     {
         root.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         root.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -74,10 +74,7 @@ internal sealed partial class ColorPill : FrostWindow
         text.Children.Add(copied);
         Grid.SetColumn(text, 1);
         root.Children.Add(text);
-        Content = root;
-
-        SetWindowLongPtr(Hwnd, GWL_EXSTYLE, GetWindowLongPtr(Hwnd, GWL_EXSTYLE) | WS_EX_LAYERED | WS_EX_TRANSPARENT);
-        SetLayeredWindowAttributes(Hwnd, 0, Opaque, LWA_ALPHA);
+        panel = new GlassPanel(root, PillHeight / 2, ShadowBlur, clickThrough: true);
 
         hideTimer.IsRepeating = false;
         hideTimer.Interval = VisibleFor;
@@ -91,7 +88,7 @@ internal sealed partial class ColorPill : FrostWindow
     {
         hideTimer.Stop();
         fadeTimer.Stop();
-        SetAlpha(Opaque);
+        SetOpacity(1);
         swatch.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(255, color.R, color.G, color.B));
         value.Text = text;
         copied.Visibility = isCopied ? Visibility.Visible : Visibility.Collapsed;
@@ -108,29 +105,19 @@ internal sealed partial class ColorPill : FrostWindow
     private void Place()
     {
         root.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-        var scale = Scale;
-        var (frameWidth, frameHeight) = Frame();
-        var width = (int)Math.Ceiling(Math.Max(root.DesiredSize.Width, 2 * SwatchSize) * scale) + frameWidth;
-        var height = (int)Math.Ceiling(PillHeight * scale) + frameHeight;
+        var scale = panel.Scale;
+        var width = (int)Math.Ceiling(Math.Max(root.DesiredSize.Width, 2 * SwatchSize) * scale);
+        var height = (int)Math.Ceiling(PillHeight * scale);
         var work = WorkAreaAt(anchorX, anchorY);
         var top = anchorY + height > work.Bottom ? aboveAnchorY - height : anchorY;
         var left = Math.Clamp(anchorX - width / 2, work.Left, Math.Max(work.Left, work.Right - width));
-        if (!isVisible)
-        {
-            isVisible = true;
-            ShowAt(left, top, width, height);
-            // A window that hasn't shown yet can't measure its content: place it again once it can.
-            App.Ui.TryEnqueue(DispatcherQueuePriority.Low, Place);
-            return;
-        }
-        SetWindowPos(Hwnd, HWND_TOPMOST, left, top, width, height, SWP_NOACTIVATE);
-    }
-
-    /// The invisible border around the content, which the window's size must leave room for.
-    private (int Width, int Height) Frame()
-    {
-        if (!GetWindowRect(Hwnd, out var window) || !GetClientRect(Hwnd, out var client) || window.Width == 0) return (0, 0);
-        return (window.Width - client.Width, window.Height - client.Height);
+        panel.Place(left, top, width, height);
+        if (isVisible) return;
+        isVisible = true;
+        panel.RefreshLook();
+        panel.Show();
+        // A window that hasn't shown yet can't measure its content: place it again once it can.
+        App.Ui.TryEnqueue(DispatcherQueuePriority.Low, Place);
     }
 
     private static RECT WorkAreaAt(int x, int y)
@@ -142,8 +129,8 @@ internal sealed partial class ColorPill : FrostWindow
 
     private void Fade()
     {
-        SetAlpha(alpha - FadeAmount);
-        if (alpha > 0) return;
+        SetOpacity(opacity - FadeAmount);
+        if (opacity > 0) return;
         fadeTimer.Stop();
         Dismiss();
     }
@@ -154,15 +141,13 @@ internal sealed partial class ColorPill : FrostWindow
         hideTimer.Stop();
         fadeTimer.Stop();
         isVisible = false;
-        Hide();
-        SetAlpha(Opaque);
+        panel.Hide();
+        SetOpacity(1);
     }
 
-    private void SetAlpha(int value)
+    private void SetOpacity(double value)
     {
-        alpha = Math.Max(value, 0);
-        SetLayeredWindowAttributes(Hwnd, 0, (byte)alpha, LWA_ALPHA);
+        opacity = Math.Max(value, 0);
+        panel.SetOpacity(opacity);
     }
-
-    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool GetClientRect(nint hwnd, out RECT rect);
 }

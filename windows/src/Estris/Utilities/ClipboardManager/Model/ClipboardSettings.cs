@@ -110,7 +110,7 @@ public sealed class AppearanceSettings
     private const double HoverTint = 0.1;
 
     public Setting<string> Tint { get; } = Store.Get("clipboardTint", "#808080");
-    public Setting<double> TintOpacity { get; } = Store.Get("clipboardTintOpacity", 0.2);
+    public Setting<double> TintOpacity { get; } = Store.Get("clipboardTintOpacity", 0.0);
     public Setting<double> BackdropDim { get; } = Store.Get("clipboardBackdropDim", 0.5);
 
     public IEnumerable<ISetting> All => [Tint, TintOpacity, BackdropDim];
