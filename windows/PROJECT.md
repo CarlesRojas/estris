@@ -53,7 +53,18 @@ The drag is followed from the dragged window's own move events (as PowerToys' Fa
 
 ## Remap
 
-As on the Mac, with a very different engine, since Windows has no per-device key mapping: a low-level hook can swallow input but doesn't say which device sent it, and Raw Input says the device but can't swallow anything. So the two are matched up (`Utilities/Remap/`): a key or button with a mapping on any device is held back in the hook until its Raw Input event tells which device it came from, then that device's mapping applies, or it is sent on unchanged if that device has none. Input with no mapping anywhere isn't touched or delayed.
+As on the Mac (a group of mappings per device with rename, Add Mapping, source and result pickers with Record, swap, "Already mapped above", the Event Viewer), with a very different engine, since Windows has no per-device key mapping: the low-level hook can swallow input but doesn't say which device sent it, and Raw Input (on a thread of its own, with a message-only window) says the device but can't swallow anything. `Utilities/Remap/Model/RemapEngine.cs` matches the two up; it has no Windows calls and takes the clock as a function, so it can be tested.
+
+- Mouse buttons reach Raw Input before the hook, even when swallowed. A button with a mapping on any device waits in the hook for its Raw Input event (or takes one that came first); then that device's mapping applies, or the original is sent again. After 25 ms with none, it goes as if it had no device.
+- Keys reach Raw Input only after the hook, and only if nothing swallowed them, so a key can't wait for its device. When every device that may have sent it does the same with it, it doesn't matter (always the case with one keyboard). Otherwise it goes by what Raw Input said before: the keyboard being typed on (in the last 1.5 s), unless only another kind of device, such as a mouse sending keys, has sent that key; with nobody typing, the devices that have sent it. A guessed key lets its release through, so Raw Input says the device for next time; with no guess the key waits for its release, or 200 ms held. Receivers look like mice, so a device that has sent 8 different keys counts as a keyboard too. With more than one device that can send keys, Mappings says this in a note.
+- Keys and buttons with no mapping anywhere aren't touched or delayed. A key or button goes up the way it went down, even if mappings changed meanwhile; turning Remap off, quitting, locking or sleeping lets go of everything held.
+- Raw Input also checks the hook: when it sees a key or button the hook never did (Windows can stop calling a hook, or another program's hook can keep events from it), the hooks are installed again, first in line (`InputHooks.RequestReinstall`), at most every 3 seconds.
+- Win and Alt as sources: when a release goes on alone, a key no layout uses is tapped first, so Start and the menu bar stay shut. On AltGr layouts, the Ctrl Windows sends before Right Alt is held back while Right Alt has a mapping, and given back to a Right Alt that goes on unmapped.
+- A press sent by another program has no device and takes the device-less mappings; recording one makes a device-less mapping, as on the Mac. The Event Viewer shows it as "Posted by another app" (Windows doesn't say which).
+- Results: another key (by scan code, with the virtual key of the layout in use), a mouse button, nothing, or a system action: Task View, Show Desktop, Start Menu (for the Mac's Launchpad), next or previous desktop, volume, mute, media, display brightness (WMI for built-in screens, DDC/CI for monitors; the row says when no display supports it), sleep display, lock screen, Search, Screenshot Tools (Win+Shift+S), Screenshot of Screen (Win+Print Screen), Emoji and Symbols (Win+.) and Task Manager. There's no App Windows or keyboard brightness: Windows has neither.
+- Devices come from `GetRawInputDeviceList` with the HID vendor, product, maker and product name (Device Manager's name for those that give none); every interface of a device counts as it. Identified by vendor, product and name, so mappings survive reconnects and identical devices share them. Listed again when one connects or disconnects, 5 and 20 seconds after Remap starts listening, and when a press comes from an interface not listed yet (at most every 2 seconds).
+- Event Viewer: Down and Up rows with the name, the scan code and virtual key (or button number) and the device; a remapped one shows an arrow and the result in the accent colour. Hovering a row shows Create Mapping. It follows new events unless scrolled up, and logs only while open.
+- Keys and buttons can't be remapped while a window running as administrator is in front (Windows keeps its input from other programs); the pane says so.
 
 ## Updates
 
@@ -80,7 +91,7 @@ windows/
 
 To add a utility: a folder in `Utilities/` with a class implementing `IUtility`, added to `UtilityList`, with its pane in `BuildPane` and, if it shows in the tray menu, `BuildTrayGroup`.
 
-Input hook handlers (`Core/InputHooks.cs`) run on one shared thread and must be quick: Windows silently drops a hook that takes too long.
+Input hook handlers (`Core/InputHooks.cs`) run on one shared thread and must be quick: Windows silently drops a hook that takes too long. A utility that notices its hook went quiet (Remap does, through Raw Input) calls `InputHooks.RequestReinstall`, which installs the hooks again, first in line.
 
 ## Releases
 
