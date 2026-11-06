@@ -114,7 +114,7 @@ public sealed partial class InputDevices(AppLog log)
             {
                 var hasKeyboard = parts.Any(p => p.IsKeyboard);
                 var hasPointer = parts.Any(p => !p.IsKeyboard);
-                var isKeyboard = hasKeyboard && (!hasPointer || name.Contains("keyboard", StringComparison.OrdinalIgnoreCase));
+                var isKeyboard = hasKeyboard && (!hasPointer || name.Contains("keyboard", StringComparison.OrdinalIgnoreCase) || parts.MinBy(InterfaceNumber)!.IsKeyboard);
                 var device = new InputDevice(id, name, isKeyboard ? DeviceKind.Keyboard : DeviceKind.Mouse, HasKeyboard: hasKeyboard);
                 devices.Add(device);
                 foreach (var part in parts) handles[part.Handle] = device;
@@ -193,6 +193,14 @@ public sealed partial class InputDevices(AppLog log)
         return read(device, text, HidStringBytes) ? text.ToString().Trim() : "";
     }
 
+    /// A USB device's main function comes first: a wireless keyboard's receiver and a mouse's both
+    /// offer a keyboard and a pointer, but only the first has the keyboard as its interface 0.
+    private static int InterfaceNumber(Interface part)
+    {
+        var match = InterfaceNumberPattern().Match(part.Path);
+        return match.Success ? Convert.ToInt32(match.Groups[1].Value, 16) : int.MaxValue;
+    }
+
     private static (int Vendor, int Product) IdsInPath(string path)
     {
         var match = VendorProductPattern().Match(path);
@@ -211,4 +219,7 @@ public sealed partial class InputDevices(AppLog log)
 
     [GeneratedRegex("VID[_&](?:[0-9A-Fa-f]{4})?([0-9A-Fa-f]{4}).*?PID[_&]([0-9A-Fa-f]{4})", RegexOptions.IgnoreCase)]
     private static partial Regex VendorProductPattern();
+
+    [GeneratedRegex("MI_([0-9A-Fa-f]{2})", RegexOptions.IgnoreCase)]
+    private static partial Regex InterfaceNumberPattern();
 }
