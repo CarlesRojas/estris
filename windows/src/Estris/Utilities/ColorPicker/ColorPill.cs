@@ -12,18 +12,23 @@ using static Estris.Core.Native;
 namespace Estris.Utilities.ColorPicker;
 
 /// A frosted pill with the color in a circle at the left and its value to the right: live under
-/// the loupe, then saying "Copied" for a moment before it fades out. Lets clicks through.
+/// the loupe, then saying "Copied" for a moment before it fades out. Lets clicks through. Its
+/// height is fixed and both lines fit in it, so nothing moves when "Copied" appears.
 internal sealed partial class ColorPill : FrostWindow
 {
     private const double SwatchSize = 30, PillPadding = 7, MinimumTextWidth = 80;
+    private const double PillHeight = SwatchSize + 2 * PillPadding;
+    /// The value and "Copied" lines, with the gap between them, fill the swatch's height.
+    private const double ValueSize = 12, ValueLine = 16, CopiedSize = 11, CopiedLine = 13, LineGap = 1;
     private const uint LWA_ALPHA = 2;
     private const byte Opaque = 255;
     private static readonly TimeSpan VisibleFor = TimeSpan.FromSeconds(1.6);
     private static readonly TimeSpan FadeStep = TimeSpan.FromMilliseconds(16);
-    /// Alpha lost each step, so it fades out in about 0.3 seconds.
-    private const int FadeAmount = 16;
+    private static readonly TimeSpan FadeDuration = TimeSpan.FromSeconds(0.3);
+    /// Alpha lost each step, so it fades out in FadeDuration.
+    private static readonly int FadeAmount = (int)Math.Ceiling(Opaque * FadeStep / FadeDuration);
 
-    private readonly Grid root = new() { Padding = new Thickness(PillPadding), ColumnSpacing = 10, RequestedTheme = ElementTheme.Dark };
+    private readonly Grid root = new() { Padding = new Thickness(PillPadding), Height = PillHeight, ColumnSpacing = 10, RequestedTheme = ElementTheme.Dark };
     private readonly Ellipse swatch = new()
     {
         Width = SwatchSize,
@@ -35,16 +40,22 @@ internal sealed partial class ColorPill : FrostWindow
     private readonly TextBlock value = new()
     {
         FontFamily = new FontFamily("Cascadia Mono, Consolas"),
-        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+        FontWeight = Microsoft.UI.Text.FontWeights.Medium,
+        FontSize = ValueSize,
+        LineHeight = ValueLine,
+        LineStackingStrategy = LineStackingStrategy.BlockLineHeight,
         TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
     };
     private readonly TextBlock copied = new()
     {
         Text = T("Copied"),
-        FontSize = 12,
+        FontSize = CopiedSize,
+        LineHeight = CopiedLine,
+        LineStackingStrategy = LineStackingStrategy.BlockLineHeight,
         HorizontalAlignment = HorizontalAlignment.Center,
-        Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(180, 255, 255, 255)),
+        // Fluent's secondary text on dark, as the pill is always dark.
+        Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(197, 255, 255, 255)),
         Visibility = Visibility.Collapsed,
     };
     private readonly DispatcherQueueTimer hideTimer = App.Ui.CreateTimer();
@@ -58,7 +69,7 @@ internal sealed partial class ColorPill : FrostWindow
         root.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         root.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         root.Children.Add(swatch);
-        var text = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center, MinWidth = MinimumTextWidth, Margin = new Thickness(0, 0, SwatchSize / 2, 0) };
+        var text = new StackPanel { Spacing = LineGap, VerticalAlignment = VerticalAlignment.Center, MinWidth = MinimumTextWidth, Margin = new Thickness(0, 0, SwatchSize / 2, 0) };
         text.Children.Add(value);
         text.Children.Add(copied);
         Grid.SetColumn(text, 1);
@@ -98,8 +109,9 @@ internal sealed partial class ColorPill : FrostWindow
     {
         root.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
         var scale = Scale;
-        var width = (int)Math.Ceiling(Math.Max(root.DesiredSize.Width, 2 * SwatchSize) * scale);
-        var height = (int)Math.Ceiling(Math.Max(root.DesiredSize.Height, SwatchSize + 2 * PillPadding) * scale);
+        var (frameWidth, frameHeight) = Frame();
+        var width = (int)Math.Ceiling(Math.Max(root.DesiredSize.Width, 2 * SwatchSize) * scale) + frameWidth;
+        var height = (int)Math.Ceiling(PillHeight * scale) + frameHeight;
         var work = WorkAreaAt(anchorX, anchorY);
         var top = anchorY + height > work.Bottom ? aboveAnchorY - height : anchorY;
         var left = Math.Clamp(anchorX - width / 2, work.Left, Math.Max(work.Left, work.Right - width));
@@ -112,6 +124,13 @@ internal sealed partial class ColorPill : FrostWindow
             return;
         }
         SetWindowPos(Hwnd, HWND_TOPMOST, left, top, width, height, SWP_NOACTIVATE);
+    }
+
+    /// The invisible border around the content, which the window's size must leave room for.
+    private (int Width, int Height) Frame()
+    {
+        if (!GetWindowRect(Hwnd, out var window) || !GetClientRect(Hwnd, out var client) || window.Width == 0) return (0, 0);
+        return (window.Width - client.Width, window.Height - client.Height);
     }
 
     private static RECT WorkAreaAt(int x, int y)
@@ -146,4 +165,5 @@ internal sealed partial class ColorPill : FrostWindow
     }
 
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool SetLayeredWindowAttributes(nint hwnd, uint key, byte alpha, uint flags);
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool GetClientRect(nint hwnd, out RECT rect);
 }
