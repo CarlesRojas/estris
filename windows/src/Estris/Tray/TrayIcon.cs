@@ -97,6 +97,7 @@ public sealed partial class TrayIcon : IDisposable
         Shell_NotifyIcon(NIM_ADD, ref data);
         data.uVersion = NOTIFYICON_VERSION_4;
         Shell_NotifyIcon(NIM_SETVERSION, ref data);
+        TrayPromotion.PromoteWhenListed();
     }
 
     private void RenderIcon()
