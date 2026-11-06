@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Draws src/Estris/Assets/Estris.ico: the bento box in white on a blue Fluent tile.
+"""Draws src/Estris/Assets/Estris.ico: the bento box in white on the Mac icon's dark grey gradient,
+as a Windows tile: gently rounded corners, the box filling more of it so it reads at 16 px.
 
     uv run --with pillow windows/scripts/make-icon.py
 """
@@ -8,7 +9,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 OUT = Path(__file__).resolve().parent.parent / "src/Estris/Assets/Estris.ico"
-TOP, BOTTOM = (0x2B, 0x7F, 0xE8), (0x12, 0x4E, 0xB8)
+TOP, BOTTOM = (0x2C, 0x2C, 0x2E), (0x14, 0x14, 0x16)
 SIZES = [16, 20, 24, 32, 40, 48, 64, 128, 256]
 
 
