@@ -1,4 +1,3 @@
-using System.Runtime;
 using System.Runtime.InteropServices;
 using static Estris.Core.Native;
 
@@ -35,9 +34,9 @@ public sealed class MouseEvent
 /// The low-level keyboard and mouse hooks, one thread shared by every utility. Each hook is
 /// only installed while something listens. Handlers run on the hook thread, in the order they
 /// subscribed, and must be quick: Windows drops a hook that takes too long (about 300 ms), without
-/// saying so. Marshal anything slow to another thread, and never touch UI from them. A pause in
-/// .NET counts too, as a call waits for it before reaching any code here, so the collector is
-/// asked to avoid long ones, and a hook that went quiet anyway is put back within seconds.
+/// saying so, so one that went quiet is put back within seconds. Marshal anything slow to another
+/// thread, and never touch UI from them. While Estris is in front and listens to Raw Input,
+/// Windows gives its keys to that and skips these hooks: see RawInputListener.
 public static class InputHooks
 {
     private static readonly object Gate = new();
@@ -84,7 +83,6 @@ public static class InputHooks
         {
             if (thread is null)
             {
-                GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
                 using var ready = new ManualResetEventSlim();
                 thread = new Thread(() =>
                 {
@@ -155,11 +153,20 @@ public static class InputHooks
     /// moving the mouse also looks like this, which is why it only costs a harmless reinstall.
     private static void ReinstallIfMissingInput()
     {
-        if (keyHook == 0 && mouseHook == 0) return;
+        if ((keyHook == 0 && mouseHook == 0) || IsOwnWindowInFront) return;
         var input = new LASTINPUTINFO { cbSize = (uint)Marshal.SizeOf<LASTINPUTINFO>() };
         if (!GetLastInputInfo(ref input) || unchecked((int)input.dwTime - lastHookCall) < MissedInputMilliseconds) return;
         if (keyHook != 0 && mouseHook != 0) App.Shared.Log.Add("Input", "Hooks missed input: installing them again");
         Reinstall();
+    }
+
+    public static bool IsOwnWindowInFront
+    {
+        get
+        {
+            GetWindowThreadProcessId(GetForegroundWindow(), out var process);
+            return process == Environment.ProcessId;
+        }
     }
 
     public static void Shutdown()

@@ -6,11 +6,11 @@ namespace Estris.Utilities.Remap;
 
 /// Raw Input on a thread of its own, apart from the hook thread: says which device sent each key
 /// and button and when devices change. Also what wakes the engine at its deadlines.
-public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEvent> onRaw, Action onDevicesChanged, Func<int> nextDeadline, Action onDeadline)
+public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEvent> onRaw, Action<bool> onHooksSkipped, Action onDevicesChanged, Func<int> nextDeadline, Action onDeadline)
 {
     private const ushort GenericDesktop = 1, MouseUsage = 2, KeyboardUsage = 6;
     private const uint RIDEV_REMOVE = 0x1, RIDEV_INPUTSINK = 0x100, RIDEV_DEVNOTIFY = 0x2000;
-    private const uint WM_INPUT = 0xFF, WM_INPUT_DEVICE_CHANGE = 0xFE, WM_DEVICECHANGE = 0x219, WM_APP_WAKE = 0x8002, WM_APP_MOUSE = 0x8003;
+    private const uint WM_INPUT = 0xFF, WM_INPUT_DEVICE_CHANGE = 0xFE, WM_DEVICECHANGE = 0x219, WM_APP_WAKE = 0x8002, WM_APP_MOUSE = 0x8003, WM_APP_IN_FRONT = 0x8006, EVENT_SYSTEM_FOREGROUND = 3, WINEVENT_OUTOFCONTEXT = 0;
     private const int DBT_DEVICEARRIVAL = 0x8000, DBT_DEVICEREMOVECOMPLETE = 0x8004, DBT_DEVTYP_DEVICEINTERFACE = 5;
     /// Every HID interface, mice included: Raw Input only reports changes to what it listens to.
     private static readonly Guid HidInterfaces = new("4D1E55B2-F16F-11CF-88CB-001111000030");
@@ -96,6 +96,8 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
     private volatile nint window;
     private volatile bool isQuitting;
     private bool listensToMouse;
+    private bool listensToKeyboard, listensInFront, wantsMouse;
+    private WinEventProc? keptForegroundProc;
 
     public void Start(AppLog log)
     {
@@ -123,6 +125,23 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
     /// Whether to listen to mice, which send thousands of moves: only while something needs them.
     public void ListenToMouse(bool value) => PostMessage(window, WM_APP_MOUSE, value ? 1 : 0, 0);
 
+    /// While a process in front listens to Raw Input, Windows skips its low-level hooks, whatever the
+    /// flags: Estris's own windows would get no shortcuts, and keys pressed in them no mapping. So it
+    /// stops listening while it is in front, except when told to: the Event Viewer and recording
+    /// want the device, and live with the hooks being skipped, which onHooksSkipped reports.
+    public void ListenInFront(bool value) => PostMessage(window, WM_APP_IN_FRONT, value ? 1 : 0, 0);
+
+    private void ApplyListening()
+    {
+        var isOwnInFront = InputHooks.IsOwnWindowInFront;
+        var listens = !isOwnInFront || listensInFront;
+        if (listens != listensToKeyboard && Register(KeyboardUsage, listens ? RIDEV_INPUTSINK | RIDEV_DEVNOTIFY : RIDEV_REMOVE, listens ? window : 0))
+            listensToKeyboard = listens;
+        var mouse = wantsMouse && listens;
+        if (mouse != listensToMouse && Register(MouseUsage, mouse ? RIDEV_INPUTSINK : RIDEV_REMOVE, mouse ? window : 0)) listensToMouse = mouse;
+        onHooksSkipped(isOwnInFront && listensToKeyboard);
+    }
+
     private void Run(ManualResetEventSlim ready, AppLog log)
     {
         keptProc ??= OnMessage;
@@ -130,8 +149,10 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
         var windowClass = new WNDCLASSEX { Size = Marshal.SizeOf<WNDCLASSEX>(), Proc = keptProc, Instance = instance, ClassName = ClassName };
         RegisterClassEx(ref windowClass);
         window = CreateWindowEx(0, ClassName, "", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, instance, 0);
-        if (window == 0 || !Register(KeyboardUsage, RIDEV_INPUTSINK | RIDEV_DEVNOTIFY, window))
-            log.Add("Remap", $"can't listen to Raw Input (error {Marshal.GetLastWin32Error()})");
+        if (window == 0) log.Add("Remap", $"can't listen to Raw Input (error {Marshal.GetLastWin32Error()})");
+        keptForegroundProc ??= (_, _, _, _, _, _, _) => ApplyListening();
+        var foregroundHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, 0, keptForegroundProc, 0, 0, WINEVENT_OUTOFCONTEXT);
+        ApplyListening();
         var filter = new DEV_BROADCAST_DEVICEINTERFACE { Size = Marshal.SizeOf<DEV_BROADCAST_DEVICEINTERFACE>(), DeviceType = DBT_DEVTYP_DEVICEINTERFACE, ClassGuid = HidInterfaces };
         var notification = RegisterDeviceNotification(window, ref filter, 0);
         ready.Set();
@@ -149,12 +170,22 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
         }
 
         if (notification != 0) UnregisterDeviceNotification(notification);
-        Register(KeyboardUsage, RIDEV_REMOVE, 0);
+        UnhookWinEvent(foregroundHook);
+        if (listensToKeyboard) Register(KeyboardUsage, RIDEV_REMOVE, 0);
         if (listensToMouse) Register(MouseUsage, RIDEV_REMOVE, 0);
-        listensToMouse = false;
+        listensToKeyboard = listensToMouse = false;
+        onHooksSkipped(false);
         DestroyWindow(window);
         window = 0;
     }
+
+    private delegate void WinEventProc(nint hook, uint eventType, nint hwnd, int idObject, int idChild, uint thread, uint time);
+
+    [DllImport("user32")]
+    private static extern nint SetWinEventHook(uint first, uint last, nint module, WinEventProc proc, uint process, uint thread, uint flags);
+
+    [DllImport("user32")]
+    private static extern bool UnhookWinEvent(nint hook);
 
     private static bool Register(ushort usage, uint flags, nint target) =>
         RegisterRawInputDevices([new RAWINPUTDEVICE { UsagePage = GenericDesktop, Usage = usage, Flags = flags, Target = target }], 1, (uint)Marshal.SizeOf<RAWINPUTDEVICE>());
@@ -173,8 +204,12 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
                 if (wParam is DBT_DEVICEARRIVAL or DBT_DEVICEREMOVECOMPLETE) onDevicesChanged();
                 return 1;
             case WM_APP_MOUSE:
-                var wants = wParam != 0;
-                if (wants != listensToMouse && Register(MouseUsage, wants ? RIDEV_INPUTSINK : RIDEV_REMOVE, wants ? hwnd : 0)) listensToMouse = wants;
+                wantsMouse = wParam != 0;
+                ApplyListening();
+                return 0;
+            case WM_APP_IN_FRONT:
+                listensInFront = wParam != 0;
+                ApplyListening();
                 return 0;
             case WM_APP_WAKE:
                 return 0;
@@ -200,7 +235,7 @@ public sealed class RawInputListener(Func<nint, string?> deviceOf, Action<RawEve
     {
         if (key.ExtraInformation == (uint)InputSender.Tag) return;
         if (KeyCodes.FromRaw(key.VKey, key.MakeCode, (key.Flags & RI_KEY_E0) != 0) is not { } code) return;
-        onRaw(new RawEvent(RemapInput.Key(code), (key.Flags & RI_KEY_BREAK) == 0, deviceOf(device), device));
+        onRaw(new RawEvent(RemapInput.Key(code), (key.Flags & RI_KEY_BREAK) == 0, deviceOf(device), device, key.VKey));
     }
 
     private void ReadMouse(RAWMOUSE mouse, nint device)

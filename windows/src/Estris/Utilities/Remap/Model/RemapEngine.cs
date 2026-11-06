@@ -5,7 +5,7 @@ public readonly record struct HookEvent(RemapInput Input, bool IsDown, int Vk, b
 
 /// A key or button as Raw Input saw it. A null DeviceId is a device not listed, or, with no
 /// Handle either, none at all.
-public readonly record struct RawEvent(RemapInput Input, bool IsDown, string? DeviceId, nint Handle);
+public readonly record struct RawEvent(RemapInput Input, bool IsDown, string? DeviceId, nint Handle, int Vk = 0);
 
 /// What the engine decided should happen, in order.
 public abstract record Effect;
@@ -88,6 +88,7 @@ public sealed class RemapEngine(Func<long> clock)
     private List<Effect> effects = [];
     private MappingTable table = MappingTable.Empty;
     private bool isViewing;
+    private bool areHooksSkipped;
     private string? recording;
     private bool isRecording;
     private string? lastKeyboard;
@@ -104,6 +105,12 @@ public sealed class RemapEngine(Func<long> clock)
     public void SetViewing(bool value)
     {
         lock (gate) isViewing = value;
+    }
+
+    /// Windows is skipping the hooks: Raw Input is all there is, for logging and recording keys.
+    public bool AreHooksSkipped
+    {
+        set { lock (gate) areHooksSkipped = value; }
     }
 
     /// The next press on the device, or from software with no device, is reported as Recorded.
@@ -183,6 +190,11 @@ public sealed class RemapEngine(Func<long> clock)
                 if (!senders.TryGetValue(raw.Input, out var known)) senders[raw.Input] = known = [];
                 if (known.Add(id)) keyCounts[id] = keyCounts.GetValueOrDefault(id) + 1;
             }
+            if (areHooksSkipped && !raw.Input.IsMouse)
+            {
+                OnRawAlone(raw);
+                return;
+            }
             // A key reaches Raw Input after the hook, so one going down unseen got past it.
             if (!raw.Input.IsMouse && raw.IsDown && raw.Input != LeftControl && !held.ContainsKey(raw.Input))
                 effects.Add(new HookMissed(raw.Input));
@@ -203,6 +215,17 @@ public sealed class RemapEngine(Func<long> clock)
             }
             else if (raw.IsDown && (table.IsMapped(raw.Input) || isViewing || isRecording)) recent.Add((raw, now));
         }
+    }
+
+    /// A key while the hooks are skipped: it can't be swallowed or mapped, only seen.
+    private void OnRawAlone(RawEvent raw)
+    {
+        if (isRecording && raw.IsDown && (raw.DeviceId is null || raw.DeviceId == recording))
+        {
+            isRecording = false;
+            effects.Add(new Recorded(raw.Input, raw.DeviceId is null));
+        }
+        else if (isViewing) effects.Add(new LogRow(raw.Input, raw.Vk, raw.IsDown, raw.DeviceId, raw.Handle, raw.Handle == 0, null));
     }
 
     /// Runs when NextDeadline says so: gives up waiting for Raw Input, so nothing is lost.

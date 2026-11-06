@@ -45,7 +45,7 @@ public sealed class RemapUtility : IUtility
         this.log = log;
         Devices = new InputDevices(log);
         engine = new RemapEngine(() => Stopwatch.GetTimestamp() * 1000 / Stopwatch.Frequency);
-        listener = new RawInputListener(DeviceOf, OnRaw, RefreshDevicesLater, engine.NextDeadline, OnDeadline);
+        listener = new RawInputListener(DeviceOf, OnRaw, OnHooksSkipped, RefreshDevicesLater, engine.NextDeadline, OnDeadline);
     }
 
     public void Start()
@@ -147,7 +147,11 @@ public sealed class RemapUtility : IUtility
             RefreshDevicesLater();
             foreach (var delay in LookAgainSeconds) _ = LookAgain(delay);
         }
-        if (isListening) listener.ListenToMouse(wantsMouse);
+        if (isListening)
+        {
+            listener.ListenToMouse(wantsMouse);
+            listener.ListenInFront(isViewing || isRecording);
+        }
 
         if (wantsKeys != isHookingKeys)
         {
@@ -238,6 +242,8 @@ public sealed class RemapUtility : IUtility
         engine.OnRaw(raw);
         Drain();
     }
+
+    private void OnHooksSkipped(bool value) => engine.AreHooksSkipped = value;
 
     private void OnDeadline()
     {
