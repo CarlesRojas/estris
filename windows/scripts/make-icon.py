@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draws src/Estris/Assets/Estris.ico: the bento box in white on the Mac icon's dark grey gradient,
+"""Draws src/Estris/Assets/Estris.ico, and Estris.png at 256 px for the app's own pages: the bento box in white on the Mac icon's dark grey gradient,
 as a Windows tile: gently rounded corners, the box filling more of it so it reads at 16 px.
 
     uv run --with pillow windows/scripts/make-icon.py
@@ -30,3 +30,4 @@ def icon(size):
 
 icons = [icon(size) for size in SIZES]
 icons[-1].save(OUT, sizes=[(s, s) for s in SIZES], append_images=icons[:-1])
+icons[-1].save(OUT.with_suffix(".png"))

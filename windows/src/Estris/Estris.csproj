@@ -28,12 +28,12 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.5" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
     <PackageReference Include="Velopack" Version="1.2.161" />
-    <PackageReference Include="NAudio.Wasapi" Version="3.3.0" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- One file per area and language: Localization/<language>/<area>.strings -->
     <EmbeddedResource Include="Localization\**\*.strings" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     <Content Include="Assets\Estris.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Estris.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
