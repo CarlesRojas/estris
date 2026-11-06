@@ -48,17 +48,22 @@ public static class TrayIcons
         return bitmap.GetHicon();
     }
 
-    /// One tall compartment and two small ones, square as on the Mac. Every edge lands on a whole
-    /// pixel, mirrored around the middle, so nothing blurs and the two columns stay equal.
+    /// One tall compartment and two small square ones, as on the Mac: the compartments three
+    /// to four times the gap, filling more of the icon and with tighter corners, since at this
+    /// size the same proportions read as dots. Every edge lands on a whole pixel.
     private static void DrawBento(Graphics g, Color color, int size)
     {
         using var brush = new SolidBrush(color);
-        var radius = 1.25f * size / GridSize;
-        int Edge(float position) => (int)MathF.Floor(position * size / GridSize + 0.49f);
-        int Mirrored(float position) => size - Edge(GridSize - position);
-        Fill(g, brush, Edge(2), Edge(2), Edge(7), Mirrored(14), radius);
-        Fill(g, brush, Mirrored(9), Edge(2), Mirrored(14), Edge(7), radius);
-        Fill(g, brush, Mirrored(9), Mirrored(9), Mirrored(14), Mirrored(14), radius);
+        var inset = (int)MathF.Round(size / GridSize, MidpointRounding.AwayFromZero);
+        var span = size - 2 * inset;
+        var gap = Math.Max(2, 2 * (int)MathF.Round(span / 18f));
+        gap += (span - gap) % 2;
+        var column = (span - gap) / 2;
+        var radius = column / 6f;
+        var (near, far) = (inset + column, inset + column + gap);
+        Fill(g, brush, inset, inset, near, size - inset, radius);
+        Fill(g, brush, far, inset, size - inset, near, radius);
+        Fill(g, brush, far, far, size - inset, size - inset, radius);
     }
 
     private static void Fill(Graphics g, Brush brush, int left, int top, int right, int bottom, float radius)
