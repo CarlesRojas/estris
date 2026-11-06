@@ -35,8 +35,6 @@ public static class UtilityList
         new ColorPicker.ColorPickerUtility(log),
         new RoundedCorners.RoundedCornersUtility(log),
         new WindowSnapping.WindowSnappingUtility(log),
-        new FocusFollowsMouse.FocusFollowsMouseUtility(log),
-        new AutoQuit.AutoQuitUtility(log),
         new Remap.RemapUtility(log),
     ];
 }

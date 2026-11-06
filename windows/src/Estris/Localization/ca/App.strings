@@ -1,7 +1,6 @@
 "12-hour" = "12 hores";
 "24-hour" = "24 hores";
 "About" = "Quant a";
-"Auto Quit" = "Tancament automàtic";
 "Cancel" = "Cancel·la";
 "Change what keys and mouse buttons do, per device." = "Canvia el que fan les tecles i els botons del ratolí, per dispositiu.";
 "Check for Updates…" = "Cerca actualitzacions…";
@@ -18,13 +17,11 @@
 "Entries" = "Entrades";
 "Export & Import" = "Exportar i importar";
 "Export Settings…" = "Exporta la configuració…";
-"Focus Follows Mouse" = "Focus sota el punter";
 "General" = "General";
 "Hide Developer Settings" = "Amaga la configuració de desenvolupador";
 "Home" = "Inici";
 "Icon" = "Icona";
 "Import Settings…" = "Importa una configuració…";
-"Keep Awake" = "Mantén despert";
 "Keyboard & Mouse" = "Teclat i ratolí";
 "Language" = "Idioma";
 "Language & Region" = "Idioma i regió";
@@ -43,16 +40,10 @@
 "Search apps" = "Cerca apps";
 "Search logs" = "Cerca als registres";
 "Settings" = "Configuració";
-"Show Apps Volume" = "Mostra Volum de les apps";
 "Show Clear History button" = "Mostra el botó Esborra l'historial";
-"Show Microphone" = "Mostra Micròfon";
-"Show Output" = "Mostra Sortida";
 "Show Pick a Color button" = "Mostra el botó Tria un color";
-"Show System Volume" = "Mostra Volum del sistema";
-"Show device pickers" = "Mostra els selectors de dispositiu";
 "Show recent colors" = "Mostra els colors recents";
 "Show recent entries" = "Mostra les entrades recents";
-"Show volume percentages" = "Mostra els percentatges de volum";
 "Space" = "Espai";
 "Startup" = "Inici";
 "System" = "Sistema";
@@ -60,7 +51,6 @@
 "Tools" = "Eines";
 "Update" = "Actualitza";
 "Version %@" = "Versió %@";
-"Volume Mixer" = "Mesclador de volum";
 "Website" = "Lloc web";
 "Window Snapping" = "Ajust de finestres";
 "Windows & Apps" = "Finestres i apps";

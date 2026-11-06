@@ -18,14 +18,6 @@ public static class TrayPane
         pane.Toggle(T("Custom color"), settings.UsesCustomColor, T("Draws the icon in a color of your choice instead of the taskbar's own."));
         pane.ColorChoice(T("Color"), settings.CustomColor);
 
-        pane.Section(T("Volume Mixer"));
-        pane.Toggle(T("Show System Volume"), settings.ShowsSystem);
-        pane.Toggle(T("Show Output"), settings.ShowsOutput);
-        pane.Toggle(T("Show Microphone"), settings.ShowsMicrophone);
-        pane.Toggle(T("Show Apps Volume"), settings.ShowsApps);
-        pane.Toggle(T("Show device pickers"), settings.ShowsDevicePickers);
-        pane.Toggle(T("Show volume percentages"), settings.ShowsPercentages);
-
         pane.Section(T("Clipboard"));
         pane.Toggle(T("Show recent entries"), settings.ShowsClipboardHistory);
         pane.Slider(T("Entries"), settings.ClipboardEntries, 1, TraySettings.MaxClipboardEntries, 1, v => ((int)v).ToString());
