@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.3.1 - 2026-11-06
+
 - Windows resized together with the one you're dragging follow the pointer more smoothly, and a slow app no longer holds up the others.
+- Performance improvements and bug fixes.
 
 ## 0.3.0 - 2026-11-06
 
