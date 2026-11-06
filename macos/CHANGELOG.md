@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Windows resized together with the one you're dragging follow the pointer more smoothly, and a slow app no longer holds up the others.
+
 ## 0.3.0 - 2026-11-06
 
 - Seasons has been removed.

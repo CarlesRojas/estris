@@ -11,7 +11,7 @@ public static class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        VelopackApp.Build().Run();
+        VelopackApp.Build().OnBeforeUninstallFastCallback(_ => Core.LoginItem.Forget()).Run();
         if (!Core.SingleInstance.TryBecomeFirst())
         {
             Core.SingleInstance.AskFirstToOpenSettings();
