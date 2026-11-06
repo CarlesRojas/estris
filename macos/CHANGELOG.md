@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 0.3.0 - 2026-11-06
+
 - Seasons has been removed.
 - Window Snapping is smooth: the preview glides without stutter, and windows resized together keep up with the pointer.
+- Performance improvements and bug fixes.
 
 ## 0.2.0 - 2026-10-29
 
