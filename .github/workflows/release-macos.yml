@@ -1,11 +1,11 @@
 # Publishes a new version: bumps it, turns the changelog's Unreleased entries into its notes,
 # builds a signed and notarized Estris.dmg, commits, tags and creates the GitHub release.
-# Run it from Actions > Release > Run workflow, on main. Signing secrets: DEVELOPER_ID_CERTIFICATE
+# Run it from Actions > Release macOS > Run workflow, on main. Signing secrets: DEVELOPER_ID_CERTIFICATE
 # (base64 .p12), DEVELOPER_ID_CERTIFICATE_PASSWORD, APPLE_ID, APPLE_APP_PASSWORD, APPLE_TEAM_ID;
 # without them the app is signed ad hoc and macOS warns when opening it. Updates: the
 # SPARKLE_PRIVATE_KEY secret and SPARKLE_PUBLIC_KEY variable (Sparkle's generate_keys); with
 # them the release also carries appcast.xml, which installed copies check.
-name: Release
+name: Release macOS
 
 on:
   workflow_dispatch:
@@ -19,15 +19,19 @@ on:
 permissions:
   contents: write
 
-concurrency: release
+concurrency: release-macos
 
 jobs:
   release:
     # The newest macOS and Xcode: an app built with an older SDK gets the older look on new macOS.
     runs-on: macos-26
+    defaults:
+      run:
+        working-directory: macos
     steps:
       - name: Only from main
         if: github.ref != 'refs/heads/main'
+        working-directory: .
         run: |
           echo "::error::Run the release from main."
           exit 1

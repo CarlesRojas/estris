@@ -1,18 +1,15 @@
 # Builds the app on every pull request that touches its code, for both Apple silicon and
 # Intel as a release does, so a change that doesn't compile is caught before it is merged.
-name: Build
+name: Build macOS
 
 on:
   pull_request:
     paths:
-      - "Sources/**"
-      - "Resources/**"
-      - "Package.swift"
-      - "Package.resolved"
-      - ".github/workflows/build.yml"
+      - "macos/**"
+      - ".github/workflows/build-macos.yml"
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: build-macos-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -27,5 +24,6 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Build
+      - name: Build macOS
+        working-directory: macos
         run: swift build -c release --arch arm64 --arch x86_64
