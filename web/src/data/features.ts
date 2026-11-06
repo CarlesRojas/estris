@@ -9,7 +9,7 @@ export interface Feature {
   /** Replace those for visitors on Windows, where the wording differs. */
   windowsTagline?: string;
   windowsDetails?: string;
-  /** Windows has this built in, so Estris for Windows doesn't. */
+  /** Not in Estris for Windows: PROJECT.md's table says why. */
   macOnly?: boolean;
   seconds: number;
   /** The colour of its glow on the page. */
@@ -44,7 +44,7 @@ export const features: Feature[] = [
     title: "Volume Mixer",
     tagline: "A volume knob for every app.",
     details: "Turn the music up and the browser down, mute one app, or send a call to your headphones. Right from the menu bar.",
-    windowsDetails: "Turn the music up and the browser down, mute one app, or send a call to your headphones. Right from the system tray.",
+    macOnly: true,
     seconds: 12,
     accent: "#f589a3",
     icon: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
@@ -74,6 +74,7 @@ export const features: Feature[] = [
     title: "Focus Follows Mouse",
     tagline: "Point at a window. It's ready.",
     details: "The window under the pointer comes forward, no click needed. Sweep quickly across others and they stay where they are.",
+    macOnly: true,
     seconds: 9,
     accent: "#6fd39a",
     icon: '<path d="M6 3.5v14.3l3.9-3.7 2.6 5.8 2.4-1.1-2.6-5.6h5.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
@@ -83,7 +84,7 @@ export const features: Feature[] = [
     title: "Keep Awake",
     tagline: "Your Mac stays awake for as long as you need.",
     details: "Keep the screen on for a set time or indefinitely, with separate choices on power and on battery.",
-    windowsTagline: "Your PC stays awake for as long as you need.",
+    macOnly: true,
     seconds: 6,
     accent: "#f5c451",
     icon: '<path d="M4.5 9h11v4.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 3.5c-.8 1 .8 1.6 0 2.8M12 3.5c-.8 1 .8 1.6 0 2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
@@ -132,6 +133,7 @@ export const features: Feature[] = [
     title: "Auto Quit",
     tagline: "Close the last window, and the app goes too.",
     details: "Apps you're done with stop running in the background. Keep the ones you want open running with a simple list.",
+    macOnly: true,
     seconds: 10,
     accent: "#ff7b72",
     icon: '<rect x="4" y="4" width="16" height="16" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',

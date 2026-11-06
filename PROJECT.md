@@ -14,16 +14,16 @@ The Mac app is the reference for how a utility behaves. The Windows one matches 
 | --- | --- | --- |
 | Clipboard | yes | yes |
 | Color Picker | yes | yes |
-| Volume Mixer | yes | yes, per-app volume up to 100% (more needs an audio driver) |
-| Keep Awake | yes | yes |
 | Rounded Corners | yes | yes |
 | Window Snapping | yes | yes |
-| Focus Follows Mouse | yes | yes |
-| Auto Quit | yes | yes |
 | Remap | yes | yes |
 | Dock Preview | yes | no: the taskbar already shows previews |
 | Middle Click | yes | no: three-finger tap is a Windows setting |
 | Delete to Trash | yes | no: Delete already works this way |
+| Volume Mixer | yes | no: Windows's own volume mixer sets each app's volume and output |
+| Keep Awake | yes | no: Windows's power settings already cover it |
+| Focus Follows Mouse | yes | no: Windows has it as an accessibility setting |
+| Auto Quit | yes | no: closing the last window already quits most Windows apps |
 
 Only what makes sense on a platform goes in: what the system already does well, or what can't really be done there, stays out, and this table says so.
 

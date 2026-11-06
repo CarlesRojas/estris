@@ -1,0 +1,14 @@
+"Software Update" = "Aggiornamento software";
+"Checking for updates…" = "Ricerca di aggiornamenti…";
+"You're up to date!" = "Sei aggiornato!";
+"Estris %@ is the newest version available." = "Estris %@ è la versione più recente.";
+"Couldn't check for updates" = "Impossibile cercare aggiornamenti";
+"Check your internet connection and try again." = "Controlla la connessione a internet e riprova.";
+"A new version of Estris is available!" = "È disponibile una nuova versione di Estris!";
+"Estris %@ is now available. You have %@. Would you like to install it now?" = "Estris %@ è ora disponibile. Hai la %@. Vuoi installarla adesso?";
+"Remind Me Later" = "Ricordamelo più tardi";
+"Install Update" = "Installa aggiornamento";
+"Downloading update…" = "Download dell'aggiornamento…";
+"Estris opens again by itself when it's done." = "Estris si riaprirà da solo al termine.";
+"Couldn't install the update" = "Impossibile installare l'aggiornamento";
+"Release Notes:" = "Note di rilascio:";

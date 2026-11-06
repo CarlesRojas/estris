@@ -80,7 +80,7 @@ public sealed class TrayMenu : FrostWindow
         if (Updates.Shared.AvailableVersion is { } version)
         {
             var install = new Button { Content = T("Update"), HorizontalAlignment = HorizontalAlignment.Right };
-            install.Click += async (_, _) => await Updates.Shared.Install();
+            install.Click += (_, _) => { CloseMenu(); UpdateWindow.Open(checkFirst: false); };
             var row = new Grid();
             row.Children.Add(new TextBlock { Text = T("Update Available: %@", version), VerticalAlignment = VerticalAlignment.Center });
             row.Children.Add(install);

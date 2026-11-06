@@ -13,8 +13,10 @@ public sealed partial class TrayIcon : IDisposable
     private const uint WM_APP_TRAY = 0x8010, NIM_ADD = 0, NIM_MODIFY = 1, NIM_DELETE = 2, NIM_SETVERSION = 4;
     private const uint NIF_MESSAGE = 1, NIF_ICON = 2, NIF_TIP = 4;
     private const uint NOTIFYICON_VERSION_4 = 4;
-    private const uint NIN_SELECT = 0x400, NIN_KEYSELECT = 0x401, WM_CONTEXTMENU = 0x7B, WM_SETTINGCHANGE = 0x1A;
-    private static readonly nint HWND_MESSAGE = -3;
+    private const uint NIN_SELECT = 0x400, NIN_KEYSELECT = 0x401, WM_CONTEXTMENU = 0x7B, WM_SETTINGCHANGE = 0x1A, WM_DISPLAYCHANGE = 0x7E;
+    private const uint WS_POPUP = 0x80000000;
+    private const int BaseIconSize = 16;
+    private const uint StandardDpi = 96;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct NOTIFYICONDATA
@@ -52,6 +54,7 @@ public sealed partial class TrayIcon : IDisposable
     [DllImport("user32", CharSet = CharSet.Unicode)] private static extern nint DefWindowProc(nint hwnd, uint message, nint wParam, nint lParam);
     [DllImport("user32", CharSet = CharSet.Unicode)] private static extern uint RegisterWindowMessage(string name);
     [DllImport("user32")] private static extern bool DestroyWindow(nint hwnd);
+    [DllImport("user32", CharSet = CharSet.Unicode)] private static extern nint FindWindow(string cls, string? title);
     [DllImport("user32")] private static extern bool DestroyIcon(nint icon);
 
     private readonly TraySettings settings;
@@ -70,7 +73,7 @@ public sealed partial class TrayIcon : IDisposable
         var instance = Native.GetModuleHandle(null);
         var cls = new WNDCLASS { lpfnWndProc = proc, hInstance = instance, lpszClassName = "EstrisTray" };
         RegisterClass(ref cls);
-        window = CreateWindowEx(0, cls.lpszClassName, "", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, instance, 0);
+        window = CreateWindowEx(0, cls.lpszClassName, "", WS_POPUP, 0, 0, 0, 0, 0, 0, instance, 0);
 
         settings.Icon.Changed += Refresh;
         settings.UsesCustomColor.Changed += Refresh;
@@ -97,6 +100,7 @@ public sealed partial class TrayIcon : IDisposable
         Shell_NotifyIcon(NIM_ADD, ref data);
         data.uVersion = NOTIFYICON_VERSION_4;
         Shell_NotifyIcon(NIM_SETVERSION, ref data);
+        TrayPromotion.PromoteWhenListed();
     }
 
     private void RenderIcon()
@@ -105,8 +109,17 @@ public sealed partial class TrayIcon : IDisposable
         var color = settings.UsesCustomColor.Value
             ? ColorTranslator.FromHtml(settings.CustomColor.Value)
             : TrayIcons.TaskbarIsLight() ? Color.Black : Color.White;
-        var size = (int)Math.Round(16 * Native.GetDpiForSystem() / 96.0);
-        icon = TrayIcons.Render(settings.Icon.Value, color, size);
+        icon = TrayIcons.Render(settings.Icon.Value, color, IconSize());
+    }
+
+    /// The size the taskbar shows it at, in pixels, so the shell has nothing to scale. The system
+    /// DPI won't do: it stays what it was at sign-in, while the taskbar's follows its screen.
+    private static int IconSize()
+    {
+        var taskbar = FindWindow("Shell_TrayWnd", null);
+        var dpi = taskbar != 0 ? Native.GetDpiForWindow(taskbar) : 0;
+        if (dpi == 0) dpi = Native.GetDpiForSystem();
+        return (int)Math.Round((double)BaseIconSize * dpi / StandardDpi);
     }
 
     private void Refresh()
@@ -126,7 +139,7 @@ public sealed partial class TrayIcon : IDisposable
             return 0;
         }
         if (message == taskbarCreated) Show();
-        else if (message == WM_SETTINGCHANGE && !settings.UsesCustomColor.Value) Refresh();
+        else if (message is WM_SETTINGCHANGE or WM_DISPLAYCHANGE) Refresh();
         return DefWindowProc(hwnd, message, wParam, lParam);
     }
 

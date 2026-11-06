@@ -91,12 +91,7 @@ public static class GeneralPane
         if (Updates.Shared.IsInstalled)
         {
             var check = new Button { Content = T("Check for Updates…") };
-            check.Click += async (_, _) =>
-            {
-                check.IsEnabled = false;
-                if (await Updates.Shared.Check()) await Updates.Shared.Install();
-                check.IsEnabled = true;
-            };
+            check.Click += (_, _) => UpdateWindow.Open(checkFirst: true);
             links.Children.Add(check);
         }
         links.Children.Add(new HyperlinkButton { Content = T("Website"), NavigateUri = new Uri(WebsiteUrl) });
@@ -106,7 +101,7 @@ public static class GeneralPane
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        var icon = new Image { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(Path.Combine(AppContext.BaseDirectory, "Assets", "Estris.ico"))), Width = 40, Height = 40 };
+        var icon = AppLogo.Tile(40);
         row.Children.Add(icon);
         Grid.SetColumn(details, 1);
         row.Children.Add(details);

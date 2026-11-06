@@ -10,6 +10,8 @@ namespace Estris.Ui.Panes;
 /// Picks the tray icon and what the tray menu shows of each utility.
 public static class TrayPane
 {
+    private const double IconPreviewSize = 20;
+
     public static UIElement Build(TraySettings settings)
     {
         var pane = new Pane();
@@ -17,14 +19,6 @@ public static class TrayPane
         pane.Add(IconGrid(settings));
         pane.Toggle(T("Custom color"), settings.UsesCustomColor, T("Draws the icon in a color of your choice instead of the taskbar's own."));
         pane.ColorChoice(T("Color"), settings.CustomColor);
-
-        pane.Section(T("Volume Mixer"));
-        pane.Toggle(T("Show System Volume"), settings.ShowsSystem);
-        pane.Toggle(T("Show Output"), settings.ShowsOutput);
-        pane.Toggle(T("Show Microphone"), settings.ShowsMicrophone);
-        pane.Toggle(T("Show Apps Volume"), settings.ShowsApps);
-        pane.Toggle(T("Show device pickers"), settings.ShowsDevicePickers);
-        pane.Toggle(T("Show volume percentages"), settings.ShowsPercentages);
 
         pane.Section(T("Clipboard"));
         pane.Toggle(T("Show recent entries"), settings.ShowsClipboardHistory);
@@ -54,7 +48,7 @@ public static class TrayPane
                 Width = 44,
                 Height = 44,
                 Padding = new Thickness(0),
-                Content = id == TrayIcons.DefaultId ? new FontIcon { Glyph = "" } : new FontIcon { Glyph = id },
+                Content = id == TrayIcons.DefaultId ? AppLogo.Mark(IconPreviewSize, (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"]) : new FontIcon { Glyph = id },
             };
             button.Click += (_, _) => settings.Icon.Value = id;
             buttons.Add((id, button));

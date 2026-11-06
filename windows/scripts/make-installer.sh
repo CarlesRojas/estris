@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Publishes the app for x64 and ARM64 and packs each with Velopack into build/releases: the
 # installers (Estris-win-Setup.exe, Estris-win-arm64-Setup.exe) and what installed copies read
-# to update themselves. VERSION is required; SIGN_PARAMS, if set, goes to signtool.
+# to update themselves. VERSION is required; SIGN_PARAMS, if set, goes to signtool; RELEASE_NOTES,
+# if set, is a Markdown file the update window shows.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -24,7 +25,8 @@ pack() {
         --delta none \
         --noPortable \
         --outputDir build/releases \
-        ${SIGN_PARAMS:+--signParams "$SIGN_PARAMS"}
+        ${SIGN_PARAMS:+--signParams "$SIGN_PARAMS"} \
+        ${RELEASE_NOTES:+--releaseNotes "$RELEASE_NOTES"}
 }
 
 pack x64 win-x64 win

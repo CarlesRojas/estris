@@ -7,6 +7,10 @@ import AppKit
 /// the pointer's place on the screen picks a snap area (previewed, applied on release).
 /// Once its size changes it is being resized, and windows that shared the edge being dragged
 /// follow it.
+///
+/// Every mouse event is handled, and nothing on the way waits for another app: the dragged
+/// window's frame comes from the window server, and the windows that follow are moved on a
+/// thread of their own, so the preview and the windows keep up with the pointer.
 @MainActor
 final class DragSnapper {
     /// How far along an edge from a corner the corner reaches, at least.
@@ -19,8 +23,6 @@ final class DragSnapper {
     private static let minimumNeighbourSize: CGFloat = 120
     /// How tall the title bar and toolbar of Estris's windows are, where they are dragged.
     private static let ownTitleBarHeight: CGFloat = 52
-    /// Gap between window reads while dragging.
-    private static let readInterval: TimeInterval = 1.0 / 30
 
     private enum Mode { case undecided, moving, resizing }
 
@@ -47,13 +49,15 @@ final class DragSnapper {
     /// the space next to other windows.
     private let snapper: (AXWindow, SnapAction, NSScreen, NSRect, Bool) -> Void
     private let preview = SnapPreview()
+    private let follower = NeighbourFollower()
     private var tap: CFMachPort?
 
     private var window: AXWindow?
+    /// The dragged window's number in the window server, to read its frame from there.
+    private var number: CGWindowID?
     private var startFrame: NSRect = .zero
     private var startPoint: NSPoint = .zero
     private var mode = Mode.undecided
-    private var lastRead = Date.distantPast
     private var target: (action: SnapAction, screen: NSScreen)?
     private var neighbours: [Neighbour]?
     /// The tiled windows on each screen the drag has passed over, for filling space.
@@ -117,15 +121,22 @@ final class DragSnapper {
         // Windows kept in front of everything are left alone, and don't drag others along.
         guard let window = AXWindow.at(NSEvent.mouseLocation), let frame = window.frame, window.isNormalLevel else { return }
         self.window = window
-        startFrame = frame
+        number = window.number
+        // From the same place as the frames read while dragging, so they compare exactly.
+        startFrame = currentFrame ?? frame
         startPoint = NSEvent.mouseLocation
     }
 
+    /// Where the dragged window is now, from the window server rather than the app.
+    private var currentFrame: NSRect? {
+        if let own = window?.own { return own.frame }
+        return number.flatMap(AXWindow.serverFrame(of:)) ?? window?.frame
+    }
+
     private func mouseDragged() {
-        guard let window, Date().timeIntervalSince(lastRead) >= Self.readInterval else { return }
-        lastRead = Date()
+        guard window != nil else { return }
         if mode == .undecided {
-            guard let frame = window.frame else { return }
+            guard let frame = currentFrame else { return }
             if frame != startFrame {
                 mode = frame.size == startFrame.size ? .moving : .resizing
             } else if isDraggingOwnTitleBar {
@@ -139,7 +150,7 @@ final class DragSnapper {
             guard settings.snapsByDragging else { return }
             updateTarget()
         case .resizing:
-            guard settings.resizesTogether, let frame = window.frame else { return }
+            guard settings.resizesTogether, let frame = currentFrame else { return }
             resizeNeighbours(to: frame)
         case .undecided:
             break
@@ -153,8 +164,8 @@ final class DragSnapper {
         case .moving:
             if let target { snapper(window, target.action, target.screen, startFrame, fills) }
         case .resizing:
-            // The last drag events may have been skipped; line the neighbours up once more.
-            if settings.resizesTogether, let frame = window.frame { resizeNeighbours(to: frame) }
+            // The app may have settled on a slightly different size; line the neighbours up with it.
+            if settings.resizesTogether, let frame = currentFrame { resizeNeighbours(to: frame) }
         case .undecided:
             break
         }
@@ -170,7 +181,9 @@ final class DragSnapper {
     }
 
     private func reset() {
+        if neighbours != nil { follower.end() }
         window = nil
+        number = nil
         mode = .undecided
         target = nil
         neighbours = nil
@@ -184,8 +197,8 @@ final class DragSnapper {
         let point = NSEvent.mouseLocation
         guard let screen = NSScreen.screens.first(where: { NSMouseInRect(point, $0.frame, false) }),
               let found = snapArea(at: point, on: screen.frame),
-              let window, let current = window.frame,
-              let usual = found.action.frame(in: screen, current: current)
+              let window,
+              let usual = found.action.frame(in: screen, current: startFrame)
         else {
             target = nil
             preview.hide()
@@ -197,7 +210,7 @@ final class DragSnapper {
             area = SpaceFiller.fit(usual, for: found.action, on: screen, among: tiled[screen] ?? [], pid: window.pid)
         }
         target = (found.action, screen)
-        preview.show(area, from: found.edge, below: window.number, isFrosted: settings.frostedPreview)
+        preview.show(area, from: found.edge, below: number, isFrosted: settings.frostedPreview)
     }
 
     /// The snap area under the pointer: corners for quarters, the top for the whole screen,
@@ -248,9 +261,19 @@ final class DragSnapper {
     // MARK: - Resizing together
 
     /// Moves every window edge that lay on a line the resize moved, so windows tiled along
-    /// that line, on either side and anywhere along it, keep meeting there.
+    /// that line, on either side and anywhere along it, keep meeting there. Estris's own
+    /// windows move here; other apps' through the follower.
     private func resizeNeighbours(to frame: NSRect) {
-        if neighbours == nil { neighbours = findNeighbours(movedTo: frame) }
+        if neighbours == nil {
+            let found = findNeighbours(movedTo: frame)
+            neighbours = found
+            let others = found.filter { $0.window.own == nil }
+            follower.begin(
+                others.compactMap { neighbour in neighbour.window.element.map { ($0, AXWindow.axRect(neighbour.frame)) } },
+                pids: Set(others.map(\.window.pid))
+            )
+        }
+        var followed: [CGRect?] = []
         for neighbour in neighbours ?? [] {
             var rect = neighbour.frame
             for (edge, line) in neighbour.edges {
@@ -262,9 +285,14 @@ final class DragSnapper {
                 case .top: rect.size.height = position - rect.minY
                 }
             }
-            guard rect.width >= Self.minimumNeighbourSize, rect.height >= Self.minimumNeighbourSize else { continue }
-            neighbour.window.setFrame(rect)
+            let fits = rect.width >= Self.minimumNeighbourSize && rect.height >= Self.minimumNeighbourSize
+            if let own = neighbour.window.own {
+                if fits { own.setFrame(rect, display: true) }
+            } else if neighbour.window.element != nil {
+                followed.append(fits ? AXWindow.axRect(rect) : nil)
+            }
         }
+        if !followed.isEmpty { follower.move(to: followed) }
     }
 
     /// Where the dragged window's edge that was on a line is now.

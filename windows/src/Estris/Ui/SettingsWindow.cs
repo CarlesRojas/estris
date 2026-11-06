@@ -65,7 +65,7 @@ public sealed class SettingsWindow : Window
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var titleBar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12, Margin = new Thickness(16, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
-        titleBar.Children.Add(new Image { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(Path.Combine(AppContext.BaseDirectory, "Assets", "Estris.ico"))), Width = 16, Height = 16 });
+        titleBar.Children.Add(AppLogo.Tile(16));
         titleBar.Children.Add(new TextBlock { Text = "Estris", Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"], VerticalAlignment = VerticalAlignment.Center });
         root.Children.Add(titleBar);
         SetTitleBar(titleBar);
@@ -95,8 +95,13 @@ public sealed class SettingsWindow : Window
         if (state is null) item.Content = title;
         else
         {
-            var status = new TextBlock { Foreground = (Brush)Application.Current.Resources["TextFillColorTertiaryBrush"], Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"], VerticalAlignment = VerticalAlignment.Center };
-            void Sync() => status.Text = state.Value ? "On" : "Off";
+            // On in the accent colour, so the utilities at work stand out; Off stays quiet.
+            var status = new TextBlock { Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"], VerticalAlignment = VerticalAlignment.Center };
+            void Sync()
+            {
+                status.Text = state.Value ? T("On") : T("Off");
+                status.Foreground = (Brush)Application.Current.Resources[state.Value ? "AccentTextFillColorPrimaryBrush" : "TextFillColorTertiaryBrush"];
+            }
             Sync();
             state.Changed += Sync;
             Closed += (_, _) => state.Changed -= Sync;
