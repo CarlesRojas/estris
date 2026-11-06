@@ -6,6 +6,11 @@ export interface Feature {
   tagline: string;
   /** At most three short lines on how it works. */
   details: string;
+  /** Replace those for visitors on Windows, where the wording differs. */
+  windowsTagline?: string;
+  windowsDetails?: string;
+  /** Windows has this built in, so Estris for Windows doesn't. */
+  macOnly?: boolean;
   seconds: number;
   /** The colour of its glow on the page. */
   accent: string;
@@ -19,6 +24,7 @@ export const features: Feature[] = [
     title: "Window Snapping",
     tagline: "Every window, exactly where you want it.",
     details: "Drag a window to an edge or a corner, or use ⌃⌥ shortcuts for halves, thirds and corners. One shortcut lines up every window on the screen.",
+    windowsDetails: "Drag a window to an edge or a corner, or use Ctrl+Alt shortcuts for halves, thirds and corners. One shortcut lines up every window on the screen.",
     seconds: 10,
     accent: "#6ea8fe",
     icon: '<rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 5v14" stroke="currentColor" stroke-width="1.8"/>',
@@ -28,6 +34,7 @@ export const features: Feature[] = [
     title: "Clipboard",
     tagline: "Everything you copy, one shortcut away.",
     details: "Hold ⌘⇧ and tap V to step back through what you copied, then let go to paste it. Text, images and files, with passwords left out.",
+    windowsDetails: "Hold Ctrl+Shift and tap V to step back through what you copied, then let go to paste it. Text, images and files, with passwords left out.",
     seconds: 12,
     accent: "#ffb867",
     icon: '<rect x="5.5" y="4.5" width="13" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="2.8" width="6" height="3.4" rx="1.2" fill="currentColor"/>',
@@ -37,6 +44,7 @@ export const features: Feature[] = [
     title: "Volume Mixer",
     tagline: "A volume knob for every app.",
     details: "Turn the music up and the browser down, mute one app, or send a call to your headphones. Right from the menu bar.",
+    windowsDetails: "Turn the music up and the browser down, mute one app, or send a call to your headphones. Right from the system tray.",
     seconds: 12,
     accent: "#f589a3",
     icon: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
@@ -46,6 +54,7 @@ export const features: Feature[] = [
     title: "Dock Preview",
     tagline: "See an app's windows before you click.",
     details: "Rest the pointer on an app in the Dock to see every window it has open, even on other desktops. Click one to go straight to it.",
+    macOnly: true,
     seconds: 10,
     accent: "#b794f6",
     icon: '<rect x="3" y="3.5" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="18" width="12" height="3" rx="1.5" fill="currentColor"/>',
@@ -55,6 +64,7 @@ export const features: Feature[] = [
     title: "Color Picker",
     tagline: "Any color on your screen, copied in a click.",
     details: "Press ⌘⇧C, point and click. The color is copied as Hex, RGB, HSL or SwiftUI, and your recent colors stay a click away.",
+    windowsDetails: "Press Ctrl+Shift+C, point and click. The color is copied as Hex, RGB, HSL or C#, and your recent colors stay a click away.",
     seconds: 8,
     accent: "#ff8a5c",
     icon: '<path d="M12 3.5c3 4 5.5 6.8 5.5 10a5.5 5.5 0 0 1-11 0c0-3.2 2.5-6 5.5-10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
@@ -73,6 +83,7 @@ export const features: Feature[] = [
     title: "Keep Awake",
     tagline: "Your Mac stays awake for as long as you need.",
     details: "Keep the screen on for a set time or indefinitely, with separate choices on power and on battery.",
+    windowsTagline: "Your PC stays awake for as long as you need.",
     seconds: 6,
     accent: "#f5c451",
     icon: '<path d="M4.5 9h11v4.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 3.5c-.8 1 .8 1.6 0 2.8M12 3.5c-.8 1 .8 1.6 0 2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
@@ -91,6 +102,7 @@ export const features: Feature[] = [
     title: "Remap",
     tagline: "Make every key and button do what you want.",
     details: "Turn Caps Lock into Escape, or a mouse button into Mission Control. Each keyboard and mouse keeps its own mappings.",
+    windowsDetails: "Turn Caps Lock into Escape, or a mouse button into Task View. Each keyboard and mouse keeps its own mappings.",
     seconds: 6,
     accent: "#7cc8f0",
     icon: '<rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 10h1M10.5 10h1M14.5 10h1M8 14h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
@@ -100,6 +112,7 @@ export const features: Feature[] = [
     title: "Middle Click",
     tagline: "The middle click, now on your trackpad.",
     details: "Tap with three fingers to open a link in a new tab or close one, just like clicking a mouse wheel.",
+    macOnly: true,
     seconds: 8,
     accent: "#9d9bf0",
     icon: '<circle cx="6.5" cy="13" r="2" fill="currentColor"/><circle cx="12" cy="10" r="2" fill="currentColor"/><circle cx="17.5" cy="13" r="2" fill="currentColor"/>',
@@ -109,6 +122,7 @@ export const features: Feature[] = [
     title: "Delete to Trash",
     tagline: "The Delete key, as it works on Windows.",
     details: "Select files and press Delete to move them to the Trash, no ⌘ needed. It works in Photos, Notes and other apps too, and Shift-Delete skips the Trash.",
+    macOnly: true,
     seconds: 8,
     accent: "#a3a8b8",
     icon: '<path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2a1.8 1.8 0 0 0 1.8 1.6h5.6a1.8 1.8 0 0 0 1.8-1.6L17.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.2 10.5v6.5M13.8 10.5v6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
@@ -123,11 +137,3 @@ export const features: Feature[] = [
     icon: '<rect x="4" y="4" width="16" height="16" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   },
 ];
-
-/** How many tools, as a word ("eleven"), for copy that names the count. */
-export const toolCount =
-  ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen"][features.length] ??
-  String(features.length);
-
-/** The same, capitalized to start a sentence. */
-export const ToolCount = toolCount[0].toUpperCase() + toolCount.slice(1);

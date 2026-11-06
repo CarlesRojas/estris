@@ -1,6 +1,6 @@
 ---
 import "../styles/spot.css";
-import { features, ToolCount } from "../data/features";
+import { features } from "../data/features";
 import { spots } from "../components/spots";
 
 /** The picture shown when the site is shared (1200 × 630), recorded into public/og.png by
@@ -38,8 +38,8 @@ const Spot = spots[feature.id];
   <body>
     <div class="words">
       <div class="brand"><img src="/icon.svg" alt="" />Estris</div>
-      <h1>The little tools your Mac is missing.</h1>
-      <p>{ToolCount} utilities in one menu bar app. Free.</p>
+      <h1>The little tools your computer is missing.</h1>
+      <p>Small utilities in one app. Free, for Mac and Windows.</p>
     </div>
     <Spot d={feature.seconds} />
     <script is:inline>document.querySelector(".spot").classList.add("playing");</script>
