@@ -65,7 +65,7 @@ public sealed class SettingsWindow : Window
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var titleBar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12, Margin = new Thickness(16, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
-        titleBar.Children.Add(new Image { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(Path.Combine(AppContext.BaseDirectory, "Assets", "Estris.png"))), Width = 16, Height = 16 });
+        titleBar.Children.Add(AppLogo.Tile(16));
         titleBar.Children.Add(new TextBlock { Text = "Estris", Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"], VerticalAlignment = VerticalAlignment.Center });
         root.Children.Add(titleBar);
         SetTitleBar(titleBar);

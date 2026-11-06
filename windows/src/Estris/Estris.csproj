@@ -34,6 +34,5 @@
     <!-- One file per area and language: Localization/<language>/<area>.strings -->
     <EmbeddedResource Include="Localization\**\*.strings" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     <Content Include="Assets\Estris.ico" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Assets\Estris.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

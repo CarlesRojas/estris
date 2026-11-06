@@ -52,7 +52,8 @@ public sealed class UpdateWindow : Window
         }
         Place();
 
-        var icon = new Image { Source = new BitmapImage(new Uri(Path.Combine(AppContext.BaseDirectory, "Assets", "Estris.png"))), Width = IconSize, Height = IconSize, VerticalAlignment = VerticalAlignment.Top };
+        var icon = AppLogo.Tile(IconSize);
+        icon.VerticalAlignment = VerticalAlignment.Top;
         var text = new StackPanel { Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
         text.Children.Add(title);
         text.Children.Add(message);

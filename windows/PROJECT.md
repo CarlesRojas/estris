@@ -8,7 +8,7 @@ It is written in C# on .NET 10 with WinUI 3 (Windows App SDK), unpackaged and se
 
 ## Look
 
-It should look like a Windows 11 app, not a Mac port: the Settings window is laid out as Windows's own Settings (Mica drawn into the title bar, a navigation list with search, cards), with Segoe UI, Segoe Fluent Icons and the system accent colour, in the system's light or dark theme. The tray menu and floating pills are real Acrylic (`Ui/FrostWindow.cs`); `FrostBackdrop` keeps the frost on when the window has no focus, which the stock backdrop doesn't. The icon is the Mac's bento on its dark grey gradient, as a Windows tile (`scripts/make-icon.py`).
+It should look like a Windows 11 app, not a Mac port: the Settings window is laid out as Windows's own Settings (Mica drawn into the title bar, a navigation list with search, cards), with Segoe UI, Segoe Fluent Icons and the system accent colour, in the system's light or dark theme. The tray menu and floating pills are real Acrylic (`Ui/FrostWindow.cs`); `FrostBackdrop` keeps the frost on when the window has no focus, which the stock backdrop doesn't. The icon is the Mac's bento on its dark grey gradient, as a Windows tile (`scripts/make-icon.py` for the icon file). The app's own pages draw it (`Ui/AppLogo.cs`) rather than load a picture, as WinUI scales pictures down roughly, and the tray draws its own at the exact size the taskbar shows it, with every edge on a whole pixel, so the shell scales nothing.
 
 ## System tray
 

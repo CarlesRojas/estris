@@ -10,6 +10,7 @@ namespace Estris.Tray;
 public static class TrayIcons
 {
     public const string DefaultId = "bento";
+    private const float GridSize = 16;
 
     public static readonly string[] Glyphs =
     [
@@ -38,6 +39,8 @@ public static class TrayIcons
         using (var g = Graphics.FromImage(bitmap))
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
+            // Whole numbers are pixel edges, not pixel centres.
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
             g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
             if (id == DefaultId) DrawBento(g, color, size);
             else DrawGlyph(g, id, color, size);
@@ -45,24 +48,27 @@ public static class TrayIcons
         return bitmap.GetHicon();
     }
 
-    /// One tall compartment and two small ones, as on the app's icon.
+    /// One tall compartment and two small ones, square as on the Mac. Every edge lands on a whole
+    /// pixel, mirrored around the middle, so nothing blurs and the two columns stay equal.
     private static void DrawBento(Graphics g, Color color, int size)
     {
         using var brush = new SolidBrush(color);
-        float unit = size / 16f;
-        Fill(g, brush, 1.5f * unit, 2 * unit, 6 * unit, 12 * unit, 1.6f * unit);
-        Fill(g, brush, 8.5f * unit, 2 * unit, 6 * unit, 5.5f * unit, 1.6f * unit);
-        Fill(g, brush, 8.5f * unit, 8.5f * unit, 6 * unit, 5.5f * unit, 1.6f * unit);
+        var radius = 1.25f * size / GridSize;
+        int Edge(float position) => (int)MathF.Floor(position * size / GridSize + 0.49f);
+        int Mirrored(float position) => size - Edge(GridSize - position);
+        Fill(g, brush, Edge(2), Edge(2), Edge(7), Mirrored(14), radius);
+        Fill(g, brush, Mirrored(9), Edge(2), Mirrored(14), Edge(7), radius);
+        Fill(g, brush, Mirrored(9), Mirrored(9), Mirrored(14), Mirrored(14), radius);
     }
 
-    private static void Fill(Graphics g, Brush brush, float x, float y, float width, float height, float radius)
+    private static void Fill(Graphics g, Brush brush, int left, int top, int right, int bottom, float radius)
     {
         using var path = new GraphicsPath();
         var d = radius * 2;
-        path.AddArc(x, y, d, d, 180, 90);
-        path.AddArc(x + width - d, y, d, d, 270, 90);
-        path.AddArc(x + width - d, y + height - d, d, d, 0, 90);
-        path.AddArc(x, y + height - d, d, d, 90, 90);
+        path.AddArc(left, top, d, d, 180, 90);
+        path.AddArc(right - d, top, d, d, 270, 90);
+        path.AddArc(right - d, bottom - d, d, d, 0, 90);
+        path.AddArc(left, bottom - d, d, d, 90, 90);
         path.CloseFigure();
         g.FillPath(brush, path);
     }

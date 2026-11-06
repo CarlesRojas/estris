@@ -10,6 +10,8 @@ namespace Estris.Ui.Panes;
 /// Picks the tray icon and what the tray menu shows of each utility.
 public static class TrayPane
 {
+    private const double IconPreviewSize = 20;
+
     public static UIElement Build(TraySettings settings)
     {
         var pane = new Pane();
@@ -46,7 +48,7 @@ public static class TrayPane
                 Width = 44,
                 Height = 44,
                 Padding = new Thickness(0),
-                Content = id == TrayIcons.DefaultId ? new FontIcon { Glyph = "" } : new FontIcon { Glyph = id },
+                Content = id == TrayIcons.DefaultId ? AppLogo.Mark(IconPreviewSize, (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"]) : new FontIcon { Glyph = id },
             };
             button.Click += (_, _) => settings.Icon.Value = id;
             buttons.Add((id, button));
