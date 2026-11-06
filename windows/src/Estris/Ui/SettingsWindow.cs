@@ -95,8 +95,13 @@ public sealed class SettingsWindow : Window
         if (state is null) item.Content = title;
         else
         {
-            var status = new TextBlock { Foreground = (Brush)Application.Current.Resources["TextFillColorTertiaryBrush"], Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"], VerticalAlignment = VerticalAlignment.Center };
-            void Sync() => status.Text = state.Value ? "On" : "Off";
+            // On in the accent colour, so the utilities at work stand out; Off stays quiet.
+            var status = new TextBlock { Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"], VerticalAlignment = VerticalAlignment.Center };
+            void Sync()
+            {
+                status.Text = state.Value ? T("On") : T("Off");
+                status.Foreground = (Brush)Application.Current.Resources[state.Value ? "AccentTextFillColorPrimaryBrush" : "TextFillColorTertiaryBrush"];
+            }
             Sync();
             state.Changed += Sync;
             Closed += (_, _) => state.Changed -= Sync;
