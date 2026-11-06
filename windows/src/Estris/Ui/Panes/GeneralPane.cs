@@ -107,7 +107,31 @@ public static class GeneralPane
         row.Children.Add(details);
         Grid.SetColumn(links, 2);
         row.Children.Add(links);
-        return row;
+
+        var about = new StackPanel { Spacing = 8 };
+        about.Children.Add(row);
+        about.Children.Add(UpdateBanner());
+        return about;
+    }
+
+    /// The same as the top of the tray menu: there once a new version is known.
+    private static InfoBar UpdateBanner()
+    {
+        var install = new Button { Content = T("Update") };
+        install.Click += (_, _) => UpdateWindow.Open(checkFirst: false);
+        var bar = new InfoBar { IsClosable = false, Severity = InfoBarSeverity.Informational, ActionButton = install };
+        void Sync()
+        {
+            bar.Message = T("Update Available: %@", Updates.Shared.AvailableVersion ?? "");
+            bar.IsOpen = Updates.Shared.AvailableVersion is not null;
+        }
+        bar.Loaded += (_, _) =>
+        {
+            Updates.Shared.Changed += Sync;
+            Sync();
+        };
+        bar.Unloaded += (_, _) => Updates.Shared.Changed -= Sync;
+        return bar;
     }
 
     private static async Task Export(Window window)

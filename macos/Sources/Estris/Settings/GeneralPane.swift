@@ -9,6 +9,7 @@ struct GeneralPane: View {
     private static let accessibilitySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
 
     @ObservedObject var general: GeneralSettings
+    @ObservedObject private var updates = Updates.shared
     @State private var openAtLogin = LoginItem.isEnabled
     @State private var versionTaps: [Date] = []
     @State private var accessibilityGranted = Paster.isTrusted(prompt: false)
@@ -20,6 +21,24 @@ struct GeneralPane: View {
     private struct TransferFailure {
         let title: String
         let message: String
+    }
+
+    /// The same as the top of the menu bar menu: there once a new version is known.
+    private func updateRow(_ version: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.down.circle.fill")
+                .font(.title2)
+                .foregroundStyle(Color.accentColor)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Update Available")
+                Text("Version \(version)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Update") { Updates.shared.checkForUpdates() }
+                .buttonStyle(.borderedProminent)
+        }
     }
 
     var body: some View {
@@ -98,6 +117,9 @@ struct GeneralPane: View {
                     if Updates.shared.canCheck {
                         Button("Check for Updates…") { Updates.shared.checkForUpdates() }
                     }
+                }
+                if let version = updates.availableVersion {
+                    updateRow(version)
                 }
             }
 

@@ -94,7 +94,7 @@ public enum UpdateCheck { UpToDate, Available, Failed }
 
 /// Updates through Velopack, from the rolling windows-latest release: the same idea as the
 /// Mac's Sparkle. Looks at launch and every 6 hours; a new version shows at the top of the
-/// tray menu with an Update button, which opens the update window.
+/// tray menu and in General > About with an Update button, which opens the update window.
 public sealed class Updates
 {
     public static Updates Shared { get; } = new();
