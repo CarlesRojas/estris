@@ -29,8 +29,8 @@ def used_keys():
         if "obj" in path.parts or "bin" in path.parts:
             continue
         # Doc comments show examples, not text.
-        text = "
-".join(l for l in path.read_text(encoding="utf-8").splitlines() if not l.lstrip().startswith("//"))
+        lines = path.read_text(encoding="utf-8").splitlines()
+        text = chr(10).join(l for l in lines if not l.lstrip().startswith("//"))
         keys.update(USED.findall(text))
         keys.update(TITLE.findall(text))
     return keys
