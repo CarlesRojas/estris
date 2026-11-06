@@ -1,7 +1,6 @@
 "12-hour" = "12 horas";
 "24-hour" = "24 horas";
 "About" = "Acerca de";
-"Auto Quit" = "Cierre automático";
 "Cancel" = "Cancelar";
 "Change what keys and mouse buttons do, per device." = "Cambia lo que hacen las teclas y los botones del ratón, por dispositivo.";
 "Check for Updates…" = "Buscar actualizaciones…";
@@ -18,13 +17,11 @@
 "Entries" = "Entradas";
 "Export & Import" = "Exportar e importar";
 "Export Settings…" = "Exportar ajustes…";
-"Focus Follows Mouse" = "Foco bajo el puntero";
 "General" = "General";
 "Hide Developer Settings" = "Ocultar ajustes de desarrollador";
 "Home" = "Inicio";
 "Icon" = "Icono";
 "Import Settings…" = "Importar ajustes…";
-"Keep Awake" = "Mantener despierto";
 "Keyboard & Mouse" = "Teclado y ratón";
 "Language" = "Idioma";
 "Language & Region" = "Idioma y región";
@@ -43,16 +40,10 @@
 "Search apps" = "Buscar apps";
 "Search logs" = "Buscar en los registros";
 "Settings" = "Ajustes";
-"Show Apps Volume" = "Mostrar Volumen de las apps";
 "Show Clear History button" = "Mostrar el botón Borrar historial";
-"Show Microphone" = "Mostrar Micrófono";
-"Show Output" = "Mostrar Salida";
 "Show Pick a Color button" = "Mostrar el botón Elegir un color";
-"Show System Volume" = "Mostrar Volumen del sistema";
-"Show device pickers" = "Mostrar selectores de dispositivo";
 "Show recent colors" = "Mostrar colores recientes";
 "Show recent entries" = "Mostrar entradas recientes";
-"Show volume percentages" = "Mostrar porcentajes de volumen";
 "Space" = "Espacio";
 "Startup" = "Inicio";
 "System" = "Sistema";
@@ -60,7 +51,6 @@
 "Tools" = "Herramientas";
 "Update" = "Actualizar";
 "Version %@" = "Versión %@";
-"Volume Mixer" = "Mezclador de volumen";
 "Website" = "Sitio web";
 "Window Snapping" = "Ajuste de ventanas";
 "Windows & Apps" = "Ventanas y apps";
