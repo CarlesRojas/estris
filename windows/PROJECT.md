@@ -91,7 +91,7 @@ windows/
 
 To add a utility: a folder in `Utilities/` with a class implementing `IUtility`, added to `UtilityList`, with its pane in `BuildPane` and, if it shows in the tray menu, `BuildTrayGroup`.
 
-Input hook handlers (`Core/InputHooks.cs`) run on one shared thread and must be quick: Windows silently drops a hook that takes too long. A utility that notices its hook went quiet (Remap does, through Raw Input) calls `InputHooks.RequestReinstall`, which installs the hooks again, first in line.
+Input hook handlers (`Core/InputHooks.cs`) run on one shared thread and must be quick: Windows silently drops a hook that takes too long. A utility that notices its hook went quiet (Remap does, through Raw Input) calls `InputHooks.RequestReinstall`, which installs the hooks again, first in line. Every 3 seconds the hooks check against Windows's last input time and reinstall themselves if input went past them, so no utility stays deaf; the garbage collector runs in its low latency mode, as a pause there delays a hook call before it reaches any code.
 
 ## Releases
 

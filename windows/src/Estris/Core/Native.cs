@@ -24,6 +24,7 @@ public static partial class Native
     [StructLayout(LayoutKind.Sequential)] public struct MSG { public nint hwnd; public uint message; public nint wParam, lParam; public uint time; public POINT pt; }
     [StructLayout(LayoutKind.Sequential)] public struct KBDLLHOOKSTRUCT { public uint vkCode, scanCode, flags, time; public nuint dwExtraInfo; }
     [StructLayout(LayoutKind.Sequential)] public struct MSLLHOOKSTRUCT { public POINT pt; public uint mouseData, flags, time; public nuint dwExtraInfo; }
+    [StructLayout(LayoutKind.Sequential)] public struct LASTINPUTINFO { public uint cbSize, dwTime; }
     [StructLayout(LayoutKind.Sequential)] public struct MONITORINFO { public int cbSize; public RECT rcMonitor, rcWork; public uint dwFlags; }
 
     [LibraryImport("user32", EntryPoint = "SetWindowsHookExW")] public static partial nint SetWindowsHookEx(int id, HookProc proc, nint module, uint thread);
@@ -45,6 +46,8 @@ public static partial class Native
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetCursorPos(out POINT point);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetWindowRect(nint hwnd, out RECT rect);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetClientRect(nint hwnd, out RECT rect);
+    [LibraryImport("user32", EntryPoint = "SetTimer")] public static partial nuint SetThreadTimer(nint hwnd, nuint id, uint milliseconds, nint callback);
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetLastInputInfo(ref LASTINPUTINFO info);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool ClientToScreen(nint hwnd, ref POINT point);
     [LibraryImport("user32", EntryPoint = "GetWindowLongPtrW")] public static partial long GetWindowLongPtr(nint hwnd, int index);
     [LibraryImport("user32", EntryPoint = "SetWindowLongPtrW")] public static partial long SetWindowLongPtr(nint hwnd, int index, long value);

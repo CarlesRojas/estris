@@ -1,3 +1,4 @@
+using System.Runtime;
 using System.Runtime.InteropServices;
 using static Estris.Core.Native;
 
@@ -33,8 +34,10 @@ public sealed class MouseEvent
 
 /// The low-level keyboard and mouse hooks, one thread shared by every utility. Each hook is
 /// only installed while something listens. Handlers run on the hook thread, in the order they
-/// subscribed, and must be quick: Windows drops a hook that takes too long (about 300 ms).
-/// Marshal anything slow to another thread, and never touch UI from them.
+/// subscribed, and must be quick: Windows drops a hook that takes too long (about 300 ms), without
+/// saying so. Marshal anything slow to another thread, and never touch UI from them. A pause in
+/// .NET counts too, as a call waits for it before reaching any code here, so the collector is
+/// asked to avoid long ones, and a hook that went quiet anyway is put back within seconds.
 public static class InputHooks
 {
     private static readonly object Gate = new();
@@ -45,7 +48,11 @@ public static class InputHooks
     private static Thread? thread;
     private static uint threadId;
     private static nint keyHook, mouseHook;
-    private const uint WM_APP_UPDATE = 0x8001, WM_APP_REINSTALL = 0x8004;
+    private const uint WM_APP_UPDATE = 0x8001, WM_APP_REINSTALL = 0x8004, WM_TIMER = 0x113;
+    private const uint HookCheckMilliseconds = 3000;
+    /// Input newer than the last hook call by this much didn't pass through the hooks.
+    private const int MissedInputMilliseconds = 500;
+    private static int lastHookCall = Environment.TickCount;
 
     public static void Subscribe(Action<KeyEvent> handler)
     {
@@ -77,6 +84,7 @@ public static class InputHooks
         {
             if (thread is null)
             {
+                GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
                 using var ready = new ManualResetEventSlim();
                 thread = new Thread(() =>
                 {
@@ -97,10 +105,12 @@ public static class InputHooks
 
     private static void Run()
     {
+        SetThreadTimer(0, 0, HookCheckMilliseconds, 0);
         while (GetMessage(out var message, 0, 0, 0) > 0)
         {
             if (message.message == WM_APP_UPDATE) Apply();
             if (message.message == WM_APP_REINSTALL) Reinstall();
+            if (message.message == WM_TIMER) ReinstallIfMissingInput();
             TranslateMessage(ref message);
             DispatchMessage(ref message);
         }
@@ -130,11 +140,26 @@ public static class InputHooks
         if (thread is not null) PostThreadMessage(threadId, WM_APP_REINSTALL, 0, 0);
     }
 
+    /// New hooks first, so no input slips through between the old going and the new arriving.
     private static void Reinstall()
     {
-        if (keyHook != 0) { UnhookWindowsHookEx(keyHook); keyHook = 0; }
-        if (mouseHook != 0) { UnhookWindowsHookEx(mouseHook); mouseHook = 0; }
+        var (oldKey, oldMouse) = (keyHook, mouseHook);
+        (keyHook, mouseHook) = (0, 0);
         Apply();
+        if (oldKey != 0) UnhookWindowsHookEx(oldKey);
+        if (oldMouse != 0) UnhookWindowsHookEx(oldMouse);
+        lastHookCall = Environment.TickCount;
+    }
+
+    /// Windows knows of input the hooks never saw: they were dropped. With the keyboard hook alone,
+    /// moving the mouse also looks like this, which is why it only costs a harmless reinstall.
+    private static void ReinstallIfMissingInput()
+    {
+        if (keyHook == 0 && mouseHook == 0) return;
+        var input = new LASTINPUTINFO { cbSize = (uint)Marshal.SizeOf<LASTINPUTINFO>() };
+        if (!GetLastInputInfo(ref input) || unchecked((int)input.dwTime - lastHookCall) < MissedInputMilliseconds) return;
+        if (keyHook != 0 && mouseHook != 0) App.Shared.Log.Add("Input", "Hooks missed input: installing them again");
+        Reinstall();
     }
 
     public static void Shutdown()
@@ -144,6 +169,7 @@ public static class InputHooks
 
     private static nint OnKey(int code, nint message, nint data)
     {
+        lastHookCall = Environment.TickCount;
         if (code < 0) return CallNextHookEx(0, code, message, data);
         var raw = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(data);
         var e = new KeyEvent
@@ -168,6 +194,7 @@ public static class InputHooks
 
     private static nint OnMouse(int code, nint message, nint data)
     {
+        lastHookCall = Environment.TickCount;
         if (code < 0) return CallNextHookEx(0, code, message, data);
         var raw = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(data);
         var high = (short)(raw.mouseData >> 16);
