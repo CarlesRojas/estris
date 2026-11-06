@@ -64,6 +64,7 @@ internal sealed class MappingsView
         {
             settings.Devices.Changed += Rebuild;
             settings.CustomNames.Changed += Rebuild;
+            settings.CustomKinds.Changed += Rebuild;
             remap.Devices.Changed += Rebuild;
             remap.IsOnMappings = true;
             this.Rebuild();
@@ -73,6 +74,7 @@ internal sealed class MappingsView
         {
             settings.Devices.Changed -= Rebuild;
             settings.CustomNames.Changed -= Rebuild;
+            settings.CustomKinds.Changed -= Rebuild;
             remap.Devices.Changed -= Rebuild;
             remap.IsOnMappings = false;
             settings.RemoveEmptyMappings();
@@ -90,7 +92,7 @@ internal sealed class MappingsView
             .Where(d => d.Value.Mappings.Count > 0 && connected.All(c => c.Id != d.Key))
             .Select(d => new InputDevice(d.Key, d.Value.Name, d.Value.Kind, false));
         return connected.Concat(saved)
-            .Select(d => d with { Name = settings.Name(d) })
+            .Select(d => d with { Name = settings.Name(d), Kind = settings.Kind(d) })
             .OrderBy(d => d.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
     }
@@ -115,11 +117,11 @@ internal sealed class MappingsView
         }
     }
 
-    /// "&lt;name&gt; Mappings", with a pencil to rename the device.
+    /// "&lt;name&gt; Mappings", after the device's icon, which changes its kind, with a pencil to rename it.
     private FrameworkElement Header(InputDevice device)
     {
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(1, 20, 0, 6) };
-        row.Children.Add(new FontIcon { Glyph = device.Glyph, FontSize = 16 });
+        row.Children.Add(KindButton(device));
         row.Children.Add(new TextBlock
         {
             Text = device.IsConnected ? T("%@ Mappings", device.Name) : T("%@ Mappings (not connected)", device.Name),
@@ -131,6 +133,23 @@ internal sealed class MappingsView
         rename.Click += async (_, _) => await Rename(device, rename.XamlRoot);
         row.Children.Add(rename);
         return row;
+    }
+
+    /// Windows doesn't say what a device is, and receivers look like both, so it can be told here.
+    /// It picks the icon and what the pickers list first, and whether it counts as a keyboard.
+    private Button KindButton(InputDevice device)
+    {
+        var button = IconButton(device.Glyph, T("Change device type"));
+        var detected = remap.Devices.Connected.FirstOrDefault(d => d.Id == device.Id)?.Kind;
+        var menu = new MenuFlyout();
+        foreach (var (kind, title) in new[] { (DeviceKind.Keyboard, T("Keyboard")), (DeviceKind.Mouse, T("Mouse")) })
+        {
+            var item = new RadioMenuFlyoutItem { Text = title, IsChecked = device.Kind == kind };
+            item.Click += (_, _) => settings.SetKind(device.Id, kind, detected);
+            menu.Items.Add(item);
+        }
+        button.Flyout = menu;
+        return button;
     }
 
     private async Task Rename(InputDevice device, XamlRoot root)

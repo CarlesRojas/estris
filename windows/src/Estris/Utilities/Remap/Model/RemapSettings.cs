@@ -37,11 +37,25 @@ public sealed class RemapSettings
     public Setting<bool> Enabled { get; } = SettingsStore.Shared.Get("remapEnabled", false);
     public Setting<Dictionary<string, DeviceMappings>> Devices { get; } = SettingsStore.Shared.Get("remapDevices", new Dictionary<string, DeviceMappings>());
     public Setting<Dictionary<string, string>> CustomNames { get; } = SettingsStore.Shared.Get("remapDeviceNames", new Dictionary<string, string>());
+    /// Devices the user said are of another kind than Windows's reports suggest.
+    public Setting<Dictionary<string, DeviceKind>> CustomKinds { get; } = SettingsStore.Shared.Get("remapDeviceKinds", new Dictionary<string, DeviceKind>());
 
     public RemapSettings() => RemoveEmptyMappings();
 
     /// The device's name, as renamed by the user if it was.
     public string Name(InputDevice device) => CustomNames.Value.GetValueOrDefault(device.Id) ?? device.Name;
+
+    /// The device's kind, as set by the user if it was.
+    public DeviceKind Kind(InputDevice device) => CustomKinds.Value.GetValueOrDefault(device.Id, device.Kind);
+
+    /// Sets a device's kind; the one it was detected as just forgets the choice.
+    public void SetKind(string deviceId, DeviceKind kind, DeviceKind? detected)
+    {
+        var kinds = new Dictionary<string, DeviceKind>(CustomKinds.Value);
+        if (kind == detected) kinds.Remove(deviceId);
+        else kinds[deviceId] = kind;
+        CustomKinds.Value = kinds;
+    }
 
     /// Renames a device; an empty name goes back to the one it reports.
     public void Rename(string deviceId, string name)
@@ -146,6 +160,6 @@ public sealed class RemapSettings
             if (isConnected.Contains(id)) devices[id] = mappings;
         }
         foreach (var device in connected) devices.TryAdd(device.Id, []);
-        return new MappingTable(devices, deviceLess, connected.Where(d => d.Kind == DeviceKind.Keyboard).Select(d => d.Id).ToList());
+        return new MappingTable(devices, deviceLess, connected.Where(d => Kind(d) == DeviceKind.Keyboard).Select(d => d.Id).ToList());
     }
 }

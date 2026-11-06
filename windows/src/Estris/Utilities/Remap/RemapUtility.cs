@@ -52,6 +52,7 @@ public sealed class RemapUtility : IUtility
     {
         Enabled.Changed += Apply;
         Settings.Devices.Changed += Apply;
+        Settings.CustomKinds.Changed += Apply;
         Devices.Changed += OnDevicesChanged;
         AppDomain.CurrentDomain.ProcessExit += OnExit;
         wasEnabled = Enabled.Value;
@@ -63,6 +64,7 @@ public sealed class RemapUtility : IUtility
     {
         Enabled.Changed -= Apply;
         Settings.Devices.Changed -= Apply;
+        Settings.CustomKinds.Changed -= Apply;
         Devices.Changed -= OnDevicesChanged;
         AppDomain.CurrentDomain.ProcessExit -= OnExit;
         engine.SetTable(MappingTable.Empty);

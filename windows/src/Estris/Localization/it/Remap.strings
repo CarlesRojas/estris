@@ -108,3 +108,6 @@
 "Volume Up" = "Alza volume";
 "With more than one keyboard, keys go by the one you're typing on, as Windows only says which keyboard sent a key after apps get it. Right after switching keyboards, a key that differs between them may act as on the other one, or only when you let go of it. Mouse buttons always know their mouse." = "Con più di una tastiera, i tasti seguono quella su cui stai scrivendo, perché Windows dice quale tastiera ha inviato un tasto solo dopo che le app lo ricevono. Subito dopo aver cambiato tastiera, un tasto diverso tra le due può agire come sull'altra, o solo quando lo rilasci. I pulsanti del mouse sanno sempre da quale mouse arrivano.";
 "§ (Section)" = "§ (Paragrafo)";
+"Change device type" = "Cambia tipo di dispositivo";
+"Keyboard" = "Tastiera";
+"Mouse" = "Mouse";
