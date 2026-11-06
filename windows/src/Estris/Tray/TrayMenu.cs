@@ -19,7 +19,7 @@ public sealed class TrayMenu : FrostWindow
 
     private readonly TraySettings settings;
     private readonly IReadOnlyList<IUtility> utilities;
-    private readonly StackPanel root = new() { Spacing = 8, Padding = new Thickness(12), Width = MenuWidth };
+    private readonly StackPanel root = new() { Spacing = 8, Padding = new Thickness(12), Width = MenuWidth, VerticalAlignment = VerticalAlignment.Top };
     private DateTime hiddenAt;
     private bool isOpen;
 
@@ -38,6 +38,8 @@ public sealed class TrayMenu : FrostWindow
             if (e.Key == Windows.System.VirtualKey.Escape) CloseMenu();
         };
         Updates.Shared.Changed += () => { if (isOpen) Rebuild(); };
+        // What it shows can change while open, as apps start and stop playing.
+        root.SizeChanged += (_, _) => Place();
     }
 
     public void Toggle()
