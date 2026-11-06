@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.3.3 - 2026-11-06
+
 - When a new version is known, General > About shows it under the version with an Update button, as the menu bar menu does.
+- Performance improvements and bug fixes.
 
 ## 0.3.2 - 2026-11-06
 
