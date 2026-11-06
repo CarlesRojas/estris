@@ -71,6 +71,15 @@ public static class LoginItem
         }
     }
 
+    /// When uninstalling: nothing left pointing at a program that's gone, and a later install
+    /// starts with Windows again, as a first install does.
+    public static void Forget()
+    {
+        IsEnabled = false;
+        WasSetUp.Value = false;
+        SettingsStore.Shared.Flush();
+    }
+
     public static void ApplyOnFirstLaunch()
     {
         // Only for an installed copy, so a development build doesn't add itself.

@@ -1,17 +1,17 @@
+using Estris.Core;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Estris.Utilities.ClipboardManager;
 
 /// Saves entry contents, thumbnails and copies of files next to the history in
-/// %LOCALAPPDATA%\Estris\history, and removes them with their entry.
+/// %APPDATA%\Estris\history, and removes them with their entry.
 public static class ClipPayloadStore
 {
     /// Larger copies (a huge image, say) are not kept.
     public const long MaxPayloadBytes = 25 * 1024 * 1024;
 
-    public static string Directory { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Estris", "history");
+    public static string Directory { get; } = Path.Combine(SettingsStore.Folder, "history");
 
     private static string PayloadPath(Guid id) => Path.Combine(Directory, $"{id}.payload");
     public static string ThumbnailPath(Guid id) => Path.Combine(Directory, $"{id}-thumbnail.png");
