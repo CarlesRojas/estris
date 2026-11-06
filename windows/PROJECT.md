@@ -47,6 +47,10 @@ As on the Mac, with Ctrl+Alt for the shortcuts. Windows's own Snap should be off
 
 The preview is one style, not two: frosted like Windows's own Snap preview, with no border. The Mac's dark outline and its **Frosted preview** switch aren't here. Holding Ctrl while dragging previews and snaps the exact area, as ⌘ does on the Mac.
 
+The preview matches Windows 11's own, measured from it: the system's blurred backdrop under a grey tint (light or dark with the system theme, solid with transparency effects off), 8 px rounded corners, a soft shadow, 8 px in from the screen's edges. It is drawn by the system compositor in a click-through window per screen, just behind the dragged window, so it grows out of the window, glides between areas and shrinks back into it in step with the display; Animation effects off makes it instant. The window landing in its area isn't animated: another app's window can only be moved by asking that app to lay itself out again for every frame, which takes it 6 to 13 ms a step and shows its content lagging behind its frame.
+
+The drag is followed from the dragged window's own move events (as PowerToys' FancyZones does), with a timer for the pointer moving while the window can't; a drag that starts with a resize arrow is a resize. Windows of apps run as administrator are left alone, as Windows doesn't let Estris move them. A window moved to a screen with another scale is sized a second time, after it has resized itself for the new scale.
+
 ## Remap
 
 As on the Mac, with a very different engine, since Windows has no per-device key mapping: a low-level hook can swallow input but doesn't say which device sent it, and Raw Input says the device but can't swallow anything. So the two are matched up (`Utilities/Remap/`): a key or button with a mapping on any device is held back in the hook until its Raw Input event tells which device it came from, then that device's mapping applies, or it is sent on unchanged if that device has none. Input with no mapping anywhere isn't touched or delayed.
