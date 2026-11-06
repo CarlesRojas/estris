@@ -9,7 +9,7 @@ namespace Estris.Core;
 /// One copy at a time: a second one tells the first to open Settings, as the Mac's reopen does.
 public static class SingleInstance
 {
-    private const string Name = "Estris.SingleInstance";
+    private const string Name = "EstrisWS.SingleInstance";
     private static Mutex? mutex;
 
     public static bool TryBecomeFirst()
