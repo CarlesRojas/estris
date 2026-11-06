@@ -89,7 +89,8 @@ internal sealed partial class LayeredWindow : IDisposable
         ShowWindow(Hwnd, SW_SHOWNOACTIVATE);
     }
 
-    public void ExcludeFromCapture() { if (Environment.GetEnvironmentVariable("ESTRIS_SHOW") is null) SetWindowDisplayAffinity(Hwnd, WDA_EXCLUDEFROMCAPTURE); } // TESTONLY
+    /// Left out of screenshots, recordings and what BitBlt reads of the screen.
+    public void ExcludeFromCapture() => SetWindowDisplayAffinity(Hwnd, WDA_EXCLUDEFROMCAPTURE);
 
     /// Back above other topmost windows, which the taskbar becomes as soon as it's used.
     public void BringToTop() => SetWindowPos(Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_TOPMOST_ONLY);

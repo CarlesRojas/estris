@@ -103,6 +103,7 @@ public sealed partial class RoundedCornersUtility(AppLog log) : IUtility
         if (displayWatcher is null) return;
         var screens = LayeredWindow.Screens();
         var count = screens.Count * 4;
+        if (count != windows.Count) log.Add(Title, $"painting the corners of {screens.Count} screen(s)");
         while (windows.Count > count)
         {
             windows[^1].Dispose();
@@ -126,7 +127,6 @@ public sealed partial class RoundedCornersUtility(AppLog log) : IUtility
                 windows[index++].Present(x, y, side, side, (pixels, _, _) => PaintCorner(pixels, side, radius, isRight, isBottom));
             }
         }
-        log.Add(Title, $"painting {screens.Count} screen(s) at radius {settings.Radius.Value:0}");
     }
 
     /// Black outside a circular arc, with its edge antialiased from the distance to the arc.
@@ -151,7 +151,7 @@ public sealed partial class RoundedCornersUtility(AppLog log) : IUtility
     public UIElement BuildPane()
     {
         var pane = new Pane();
-        pane.UtilityHeader(this, T("Paint the corners of every screen black, as if the screens were rounded."));
+        pane.UtilityHeader(this, T("Rounds the corners of your screens by painting them black."));
         pane.Section(T("Corners"));
         pane.Slider(T("Radius"), settings.Radius, RoundedCornersSettings.MinimumRadius, RoundedCornersSettings.MaximumRadius, 1, value => T("%lld px", (long)Math.Round(value)));
         pane.Note(T("By default, as round as the corners of Windows 11 windows, so a maximized window fits them."));

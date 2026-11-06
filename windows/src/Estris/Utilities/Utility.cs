@@ -33,8 +33,6 @@ public static class UtilityList
     [
         new ClipboardManager.ClipboardManagerUtility(log),
         new ColorPicker.ColorPickerUtility(log),
-        new VolumeMixer.VolumeMixerUtility(log),
-        new KeepAwake.KeepAwakeUtility(log),
         new RoundedCorners.RoundedCornersUtility(log),
         new WindowSnapping.WindowSnappingUtility(log),
         new FocusFollowsMouse.FocusFollowsMouseUtility(log),

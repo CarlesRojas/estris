@@ -132,7 +132,7 @@ public sealed class ColorPickerUtility(AppLog log) : IUtility
     public UIElement BuildPane()
     {
         var pane = new Pane();
-        pane.UtilityHeader(this, T("Pick a color anywhere on screen and copy it."));
+        pane.UtilityHeader(this, T("Pick a color anywhere on screen with a shortcut and copy it."));
 
         pane.Section(T("Shortcut"));
         pane.ShortcutRow(T("Pick a color"), settings.Shortcut);
