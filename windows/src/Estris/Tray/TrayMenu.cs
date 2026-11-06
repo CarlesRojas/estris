@@ -63,7 +63,7 @@ public sealed class TrayMenu : FrostWindow
         var margin = (int)(ScreenMargin * Scale);
         var width = (int)Math.Ceiling(MenuWidth * Scale);
         var height = Math.Min((int)Math.Ceiling(Math.Max(root.DesiredSize.Height, 48) * Scale), work.Height - 2 * margin);
-        ShowAt(work.Right - width - margin, work.Bottom - height - margin, width, height);
+        ShowContentAt(work.Right - width - margin, work.Bottom - height - margin, width, height);
     }
 
     private void CloseMenu()

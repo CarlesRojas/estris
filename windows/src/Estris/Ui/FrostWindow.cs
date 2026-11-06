@@ -93,6 +93,24 @@ public class FrostWindow : Window
         if (takesFocus) SetForegroundWindow(Hwnd);
     }
 
+    /// Shows it with its content at exactly this place and size, in physical pixels. The frame that
+    /// keeps the rounded corners has invisible borders, which ShowAt counts in the size it is given.
+    /// They are measured, as AppWindow.ResizeClient adds a title bar this window doesn't have.
+    public void ShowContentAt(int x, int y, int width, int height)
+    {
+        GetWindowRect(Hwnd, out var frame);
+        GetClientRect(Hwnd, out var client);
+        var origin = new POINT();
+        ClientToScreen(Hwnd, ref origin);
+        AppWindow.MoveAndResize(new RectInt32(
+            x - (origin.X - frame.Left),
+            y - (origin.Y - frame.Top),
+            width + frame.Width - client.Width,
+            height + frame.Height - client.Height));
+        AppWindow.Show(takesFocus);
+        if (takesFocus) SetForegroundWindow(Hwnd);
+    }
+
     public void Hide() => AppWindow.Hide();
 
     /// The screen the pointer is on, as (whole screen, the part outside the taskbar).

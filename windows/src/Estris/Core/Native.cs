@@ -44,6 +44,8 @@ public static partial class Native
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool IsIconic(nint hwnd);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetCursorPos(out POINT point);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetWindowRect(nint hwnd, out RECT rect);
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetClientRect(nint hwnd, out RECT rect);
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool ClientToScreen(nint hwnd, ref POINT point);
     [LibraryImport("user32", EntryPoint = "GetWindowLongPtrW")] public static partial long GetWindowLongPtr(nint hwnd, int index);
     [LibraryImport("user32", EntryPoint = "SetWindowLongPtrW")] public static partial long SetWindowLongPtr(nint hwnd, int index, long value);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool SetWindowPos(nint hwnd, nint after, int x, int y, int width, int height, uint flags);
