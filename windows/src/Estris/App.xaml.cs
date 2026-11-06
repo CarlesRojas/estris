@@ -25,6 +25,8 @@ public partial class App : Application
     {
         this.openedAtLogin = openedAtLogin;
         InitializeComponent();
+        // Estris lives in the tray: closing its last window leaves it running, and only Quit ends it.
+        DispatcherShutdownMode = DispatcherShutdownMode.OnExplicitShutdown;
         UnhandledException += (_, e) =>
         {
             Log.Add("App", $"Unhandled: {e.Exception}");
