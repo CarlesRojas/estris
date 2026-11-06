@@ -28,8 +28,10 @@ const year = new Date().getFullYear();
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script is:inline>
-      // Before anything paints, so a Windows visitor never sees the Mac's wording first.
+      // Before anything paints, so visitors only ever see what their system has. An iPad says
+      // it is a Mac, but has a touch screen; anyone else gets both.
       if (/Windows/.test(navigator.userAgent)) document.documentElement.dataset.os = "windows";
+      else if (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints < 2) document.documentElement.dataset.os = "mac";
     </script>
   </head>
   <body>
@@ -48,14 +50,15 @@ const year = new Date().getFullYear();
         <img src="/icon.svg" alt="" width="72" height="72" />
         <h1>The little tools your computer is missing.</h1>
         <div class="downloads">
-          <a class="button button-large for-mac-first" href={DOWNLOAD_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
-          <a class="button button-large for-windows-first" href={DOWNLOAD_WINDOWS_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Windows</a>
+          <a class="button button-large download-mac" href={DOWNLOAD_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
+          <a class="button button-large download-windows" href={DOWNLOAD_WINDOWS_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Windows</a>
         </div>
       </div>
       <nav class="feature-list" role="tablist" aria-label="Features">
         {features.map((feature, index) => (
           <button
             class="feature-tab"
+            data-mac-only={feature.macOnly ? "" : undefined}
             role="tab"
             id={`tab-${feature.id}`}
             aria-controls={`panel-${feature.id}`}
@@ -78,6 +81,7 @@ const year = new Date().getFullYear();
           return (
             <article
               class="feature-panel"
+              data-mac-only={feature.macOnly ? "" : undefined}
               role="tabpanel"
               id={`panel-${feature.id}`}
               aria-labelledby={`tab-${feature.id}`}
@@ -105,10 +109,10 @@ const year = new Date().getFullYear();
         <img src="/icon.svg" alt="" width="40" height="40" />
         <p class="foot-title">Every tool, free.</p>
         <div class="downloads">
-          <a class="button for-mac-first" href={DOWNLOAD_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
-          <a class="button for-windows-first" href={DOWNLOAD_WINDOWS_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Windows</a>
+          <a class="button download-mac" href={DOWNLOAD_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
+          <a class="button download-windows" href={DOWNLOAD_WINDOWS_URL}><svg class="button-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Windows</a>
         </div>
-        <p class="note">{MIN_MACOS} · {MIN_WINDOWS}</p>
+        <p class="note"><span class="note-mac">{MIN_MACOS}</span><span class="note-windows">{MIN_WINDOWS}</span></p>
       </div>
       <p class="copyright">© {year} Carles Rojas</p>
     </footer>
@@ -116,8 +120,9 @@ const year = new Date().getFullYear();
     <script>
       // The features play one after another, each for its animation's length. Picking one
       // stops that: it keeps replaying until another is picked.
-      const tabs = [...document.querySelectorAll<HTMLButtonElement>(".feature-tab")];
-      const panels = [...document.querySelectorAll<HTMLElement>(".feature-panel")];
+      const available = document.documentElement.dataset.os === "windows" ? ":not([data-mac-only])" : "";
+      const tabs = [...document.querySelectorAll<HTMLButtonElement>(`.feature-tab${available}`)];
+      const panels = [...document.querySelectorAll<HTMLElement>(`.feature-panel${available}`)];
       let current = 0;
       let picked = false;
       let timer: number | undefined;
