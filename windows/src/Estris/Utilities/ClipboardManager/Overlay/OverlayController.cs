@@ -281,7 +281,7 @@ internal sealed class OverlayController
     }
 
     /// Releasing always pastes the selected entry, not the one under the pointer; a click pastes
-    /// the card, deletes through its trash, and closes anywhere else on that screen.
+    /// the card, deletes through its trash, and closes anywhere else, other screens included.
     private void Click(int x, int y)
     {
         if (!isVisible || window is null) return;
@@ -293,7 +293,7 @@ internal sealed class OverlayController
             case OverlayHit.Card:
                 Commit();
                 break;
-            case OverlayHit.Nothing:
+            case OverlayHit.Nothing or null:
                 Dismiss();
                 break;
         }

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Estris.Core;
 using Estris.Ui;
@@ -17,10 +16,9 @@ internal enum OverlayHit { Nothing, Card, Trash }
 
 /// One borderless window over the whole screen with the pointer, never activated: a picture of
 /// the screen taken just before it opens, the dim on top, and the frosted card over both, whose
-/// blur reads that picture. The dim and the card fade in and out together.
+/// blur reads that picture. The dim and the card fade in and out together, on the compositor.
 internal sealed partial class OverlayWindow : FrostWindow
 {
-    private const double FadeSeconds = 0.15;
     private const double PillGap = 12;
     /// A window shows what it last drew until it draws again: stay cloaked for this many frames.
     private const int FramesToDraw = 2;
@@ -31,16 +29,17 @@ internal sealed partial class OverlayWindow : FrostWindow
     private readonly AppearanceSettings appearance;
     private readonly ScreenCapture capture = new();
     private readonly Image backdrop = new() { Stretch = Stretch.Fill, IsHitTestVisible = false };
-    private readonly Microsoft.UI.Xaml.Shapes.Rectangle dim = new() { Fill = new SolidColorBrush(Colors.Black), Opacity = 0, IsHitTestVisible = false };
-    private readonly Canvas stage = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Opacity = 0 };
+    private readonly Microsoft.UI.Xaml.Shapes.Rectangle dim = new() { Fill = new SolidColorBrush(Colors.Black), IsHitTestVisible = false };
+    private readonly Canvas stage = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+    /// The dim and the stage, which fade as one.
+    private readonly Grid layer = new() { Opacity = 0 };
     private readonly Grid pillRow = new();
     private readonly Grid root = new();
     private readonly SurfaceLook look;
     private readonly ClipCard card;
     private readonly PositionPill pill;
-    private readonly Stopwatch fadeClock = new();
+    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer hideTimer;
     private RECT bounds;
-    private double fadeFrom, fadeTo, fade;
     private int framesLeft;
     private bool isRendering, isWarming, isOnScreen;
 
@@ -60,10 +59,22 @@ internal sealed partial class OverlayWindow : FrostWindow
         pillRow.Children.Add(pill);
         stage.Children.Add(pillRow);
         stage.Children.Add(card);
+        dim.Opacity = appearance.BackdropDim.Value;
+        appearance.BackdropDim.Changed += () => dim.Opacity = appearance.BackdropDim.Value;
+        layer.Children.Add(dim);
+        layer.Children.Add(stage);
         root.Children.Add(backdrop);
-        root.Children.Add(dim);
-        root.Children.Add(stage);
+        root.Children.Add(layer);
         Content = root;
+
+        // Once faded out, it leaves the screen; a show in the meantime stops it.
+        hideTimer = App.Ui.CreateTimer();
+        hideTimer.IsRepeating = false;
+        hideTimer.Tick += (_, _) =>
+        {
+            isOnScreen = false;
+            Hide();
+        };
     }
 
     /// Draws once while cloaked, so the first real open doesn't pay for setting everything up.
@@ -95,9 +106,9 @@ internal sealed partial class OverlayWindow : FrostWindow
     public void Present()
     {
         isWarming = false;
-        if (isOnScreen)
+        if (isOnScreen && !isRendering)
         {
-            StartFade(1);
+            FadeTo(1);
             return;
         }
         var (screen, _) = ScreenUnderPointer();
@@ -119,7 +130,7 @@ internal sealed partial class OverlayWindow : FrostWindow
 
     public void Dismiss()
     {
-        if (isOnScreen) StartFade(0);
+        if (isOnScreen) FadeTo(0);
     }
 
     /// Lets go of the screen's picture while nothing shows.
@@ -151,12 +162,14 @@ internal sealed partial class OverlayWindow : FrostWindow
         card.IsTrashHovered = hit == OverlayHit.Trash;
     }
 
-    private void StartFade(double target)
+    private void FadeTo(double target)
     {
-        fadeFrom = fade;
-        fadeTo = target;
-        fadeClock.Restart();
-        Render(true);
+        hideTimer.Stop();
+        layer.OpacityTransition = Motion.OpacityTransition(Motion.Fade);
+        layer.Opacity = target;
+        if (target > 0) return;
+        hideTimer.Interval = layer.OpacityTransition?.Duration ?? TimeSpan.Zero;
+        hideTimer.Start();
     }
 
     private void Render(bool isOn)
@@ -167,32 +180,19 @@ internal sealed partial class OverlayWindow : FrostWindow
         else CompositionTarget.Rendering -= OnRendering;
     }
 
+    /// Waits for the window to have drawn, then uncloaks it and fades in; a warm-up just leaves.
     private void OnRendering(object? sender, object e)
     {
-        if (framesLeft > 0)
+        if (--framesLeft > 0) return;
+        Render(false);
+        if (isWarming)
         {
-            if (--framesLeft > 0) return;
-            if (isWarming)
-            {
-                Render(false);
-                isOnScreen = false;
-                Hide();
-                return;
-            }
-            SetCloaked(false);
-            StartFade(1);
+            isOnScreen = false;
+            Hide();
             return;
         }
-
-        var progress = Math.Min(1, fadeClock.Elapsed.TotalSeconds / FadeSeconds);
-        fade = fadeFrom + (fadeTo - fadeFrom) * progress;
-        dim.Opacity = fade * appearance.BackdropDim.Value;
-        stage.Opacity = fade;
-        if (progress < 1) return;
-        Render(false);
-        if (fadeTo > 0) return;
-        isOnScreen = false;
-        Hide();
+        SetCloaked(false);
+        FadeTo(1);
     }
 
     private void SetCloaked(bool isCloaked)

@@ -81,6 +81,7 @@ internal sealed class SurfaceLook
 /// outside it. A shadow under the whole card would show through the frost and darken it.
 internal class Surface : Grid
 {
+    private readonly BrushTransition hoverTransition = new() { Duration = Motion.Hover };
     private readonly SurfaceLook look;
     private readonly double radius;
     private readonly Image shadow = new() { Stretch = Stretch.Fill, IsHitTestVisible = false, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
@@ -109,6 +110,7 @@ internal class Surface : Grid
         {
             if (state == value) return;
             state = value;
+            tint.BackgroundTransition = Motion.IsReduced ? null : hoverTransition;
             tint.Background = look.Tint(state);
             shadow.Opacity = SurfaceLook.ShadowOpacityFor(state);
         }

@@ -1,5 +1,4 @@
 using Estris.Core;
-using Estris.Ui;
 using Estris.Utilities.ClipboardManager.Overlay;
 using Estris.Utilities.ClipboardManager.Settings;
 using Microsoft.UI.Dispatching;
@@ -49,7 +48,6 @@ public sealed class ClipboardManagerUtility : IUtility
         foreach (var slot in settings.AlternativeShortcuts) slot.Changed += OnShortcutsChanged;
         Enabled.Changed += ApplyEnabled;
         ApplyEnabled();
-        if (Environment.GetEnvironmentVariable("ESTRIS_DBG") != null) Hotkeys.Register(this, new Shortcut(true, false, true, false, 0x78), () => { var w = new FrostWindow(true); var ok = new StackPanel { Padding = new Thickness(12), Width = 360 }; w.Content = ok; ok.Children.Add(BuildTrayGroup(() => w.Hide())!); w.ShowAt(1000, 300, 540, 500); });
     }
 
     public void Stop()
