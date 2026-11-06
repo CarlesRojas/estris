@@ -46,6 +46,7 @@ public static partial class Native
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetCursorPos(out POINT point);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetWindowRect(nint hwnd, out RECT rect);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetClientRect(nint hwnd, out RECT rect);
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool SetLayeredWindowAttributes(nint hwnd, uint key, byte alpha, uint flags);
     [LibraryImport("user32", EntryPoint = "SetTimer")] public static partial nuint SetThreadTimer(nint hwnd, nuint id, uint milliseconds, nint callback);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool GetLastInputInfo(ref LASTINPUTINFO info);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] public static partial bool ClientToScreen(nint hwnd, ref POINT point);

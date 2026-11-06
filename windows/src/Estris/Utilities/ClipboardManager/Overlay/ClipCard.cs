@@ -203,15 +203,15 @@ internal sealed class ClipCard : Surface
     }
 }
 
-/// "2 of 12", on a capsule of the same material.
+/// "2 of 12", on the same material.
 internal sealed class PositionPill : Surface
 {
-    public const double PillHeight = SurfaceLook.PillRadius * 2;
+    public const double PillHeight = 30;
     private const double FontSize = 13, SidePadding = 14;
 
     private readonly TextBlock text;
 
-    public PositionPill(SurfaceLook look) : base(look, SurfaceLook.PillRadius)
+    public PositionPill(SurfaceLook look) : base(look, SurfaceLook.CardRadius)
     {
         text = new TextBlock { FontSize = FontSize, Foreground = look.Secondary, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(SidePadding, 0, SidePadding, 0) };
         Height = PillHeight;

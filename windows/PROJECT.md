@@ -30,7 +30,7 @@ As on the Mac, with these differences:
 
 - The overlay has one style, **Default**: the Mac's Grid, Carousel, Stack and Ring menu aren't here.
 - The shortcut is Ctrl+Shift+V. Windows keeps Ctrl+Shift+Esc for the Task Manager, so Esc while holding the keys closes the overlay without pasting.
-- The overlay is one full-screen window over a picture of the screen taken as it opens: that picture, dimmed and blurred behind each card, gives real frost wherever the card is.
+- The overlay is live, with no picture of the screen: **Dim screen** is a plain click-through window of black at a set transparency, and the card and the "2 of 12" are windows of real Acrylic over it, so a video behind keeps playing, dimmed and blurred. As Acrylic fills its window, these have Windows's own shadow and corners, which is why there's no **Shadow** setting nor a round pill. With one style there's nothing to select either, so no **Selected highlight**.
 - **Ignore passwords** skips copies carrying the formats password managers set to stay out of clipboard history (`ExcludeClipboardContentFromMonitorProcessing`, `CanIncludeInClipboardHistory`, `Clipboard Viewer Ignore`).
 
 ## Color Picker

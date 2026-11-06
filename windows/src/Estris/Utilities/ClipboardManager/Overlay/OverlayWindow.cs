@@ -1,12 +1,10 @@
 using System.Runtime.InteropServices;
 using Estris.Core;
 using Estris.Ui;
-using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using static Estris.Core.Loc;
 using static Estris.Core.Native;
 
 namespace Estris.Utilities.ClipboardManager.Overlay;
@@ -14,76 +12,136 @@ namespace Estris.Utilities.ClipboardManager.Overlay;
 /// What's under a point of the overlay.
 internal enum OverlayHit { Nothing, Card, Trash }
 
-/// One borderless window over the whole screen with the pointer, never activated: a picture of
-/// the screen taken just before it opens, the dim on top, and the frosted card over both, whose
-/// blur reads that picture. The dim and the card fade in and out together, on the compositor.
-internal sealed partial class OverlayWindow : FrostWindow
+/// The dim over a whole screen: a plain black window at a set transparency that clicks go through.
+/// The system composes it over what's on screen in every frame, so a video keeps playing under it.
+internal sealed partial class DimWindow
+{
+    private const uint WS_POPUP = 0x80000000, LWA_ALPHA = 2;
+    private const int BLACK_BRUSH = 4, SW_HIDE = 0;
+    private const string ClassName = "EstrisDim";
+
+    private delegate nint WndProc(nint hwnd, uint message, nint wParam, nint lParam);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct WNDCLASS
+    {
+        public uint style;
+        public WndProc lpfnWndProc;
+        public int cbClsExtra, cbWndExtra;
+        public nint hInstance, hIcon, hCursor, hbrBackground;
+        public string? lpszMenuName;
+        public string lpszClassName;
+    }
+
+    private readonly WndProc proc = DefWindowProc;
+    private readonly nint window;
+
+    public DimWindow()
+    {
+        var instance = GetModuleHandle(null);
+        var cls = new WNDCLASS { lpfnWndProc = proc, hInstance = instance, hbrBackground = GetStockObject(BLACK_BRUSH), lpszClassName = ClassName };
+        RegisterClass(ref cls);
+        window = CreateWindowEx((uint)(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE), ClassName, "", WS_POPUP, 0, 0, 0, 0, 0, 0, instance, 0);
+    }
+
+    public void Show(RECT screen)
+    {
+        SetAlpha(0);
+        SetWindowPos(window, HWND_TOPMOST, screen.Left, screen.Top, screen.Width, screen.Height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    }
+
+    public void SetAlpha(byte alpha) => SetLayeredWindowAttributes(window, 0, alpha, LWA_ALPHA);
+
+    public void Hide() => ShowWindow(window, SW_HIDE);
+
+    [DllImport("user32", CharSet = CharSet.Unicode)] private static extern ushort RegisterClass(ref WNDCLASS wc);
+    [DllImport("user32", CharSet = CharSet.Unicode)] private static extern nint CreateWindowEx(uint ex, string cls, string title, uint style, int x, int y, int w, int h, nint parent, nint menu, nint instance, nint param);
+    [DllImport("user32", CharSet = CharSet.Unicode)] private static extern nint DefWindowProc(nint hwnd, uint message, nint wParam, nint lParam);
+    [DllImport("gdi32")] private static extern nint GetStockObject(int item);
+    [DllImport("user32")] private static extern bool ShowWindow(nint hwnd, int command);
+}
+
+/// A window of real Acrylic holding one surface, blurring what's behind it live. It fades through
+/// the window's own transparency, as the blur belongs to the window and not to what's in it.
+internal sealed class OverlayPanel : FrostWindow
+{
+    private const uint LWA_ALPHA = 2;
+    /// Windows's own minimum would otherwise widen a small panel.
+    private const int SmallestSize = 1;
+
+    public FrostBackdrop Backdrop { get; }
+    private (int X, int Y, int Width, int Height) placed;
+
+    public OverlayPanel(UIElement content) : this(content, new FrostBackdrop()) { }
+
+    private OverlayPanel(UIElement content, FrostBackdrop backdrop) : base(takesFocus: false, backdrop)
+    {
+        Backdrop = backdrop;
+        Content = content;
+        var presenter = (OverlappedPresenter)AppWindow.Presenter;
+        presenter.PreferredMinimumWidth = SmallestSize;
+        presenter.PreferredMinimumHeight = SmallestSize;
+        SetWindowLongPtr(Hwnd, GWL_EXSTYLE, GetWindowLongPtr(Hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+        SetAlpha(0);
+    }
+
+    public void SetAlpha(byte alpha) => SetLayeredWindowAttributes(Hwnd, 0, alpha, LWA_ALPHA);
+
+    /// Only when something changed, as stepping through entries calls this for each one.
+    public void Place(int x, int y, int width, int height)
+    {
+        if (placed == (x, y, width, height)) return;
+        placed = (x, y, width, height);
+        PlaceContentAt(x, y, width, height);
+    }
+
+    public void Forget() => placed = default;
+}
+
+/// The overlay, on the screen with the pointer and never activated: the dim, then the card and the
+/// "2 of 12" over it as windows of their own. All of it is live, nothing is a picture of the screen.
+internal sealed class OverlayWindow
 {
     private const double PillGap = 12;
-    /// A window shows what it last drew until it draws again: stay cloaked for this many frames.
+    /// A window shows what it last drew until it draws again: wait this many frames.
     private const int FramesToDraw = 2;
-    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWA_BORDER_COLOR = 34, DWMWA_CLOAK = 13;
-    private const int DWMWCP_DONOTROUND = 1;
-    private const uint DWMWA_COLOR_NONE = 0xFFFFFFFE;
+    private const float FrostOpacity = 0.45f;
+    private const byte Opaque = 255;
+    private static readonly TimeSpan FadeStep = TimeSpan.FromMilliseconds(16);
 
     private readonly AppearanceSettings appearance;
-    private readonly ScreenCapture capture = new();
-    private readonly Image backdrop = new() { Stretch = Stretch.Fill, IsHitTestVisible = false };
-    private readonly Microsoft.UI.Xaml.Shapes.Rectangle dim = new() { Fill = new SolidColorBrush(Colors.Black), IsHitTestVisible = false };
-    private readonly Canvas stage = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-    /// The dim and the stage, which fade as one.
-    private readonly Grid layer = new() { Opacity = 0 };
-    private readonly Grid pillRow = new();
-    private readonly Grid root = new();
     private readonly SurfaceLook look;
     private readonly ClipCard card;
     private readonly PositionPill pill;
-    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer hideTimer;
+    private readonly OverlayPanel cardPanel, pillPanel;
+    private readonly DimWindow dim = new();
+    private readonly DispatcherQueueTimer fadeTimer;
     private RECT bounds;
+    private double usualHeight, opacity, target;
     private int framesLeft;
-    private bool isRendering, isWarming, isOnScreen;
+    private bool isRendering, isWarming, isOnScreen, showsPill;
 
-    public OverlayWindow(AppearanceSettings appearance) : base(takesFocus: false)
+    public OverlayWindow(AppearanceSettings appearance)
     {
         this.appearance = appearance;
-        SystemBackdrop = null;
-        ((OverlappedPresenter)AppWindow.Presenter).SetBorderAndTitleBar(false, false);
-        var noRounding = DWMWCP_DONOTROUND;
-        DwmSetWindowAttribute(Hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref noRounding, sizeof(int));
-        var noBorder = unchecked((int)DWMWA_COLOR_NONE);
-        DwmSetWindowAttribute(Hwnd, DWMWA_BORDER_COLOR, ref noBorder, sizeof(int));
-
-        look = new SurfaceLook(appearance);
+        look = new SurfaceLook(appearance, isOverAcrylic: true);
         card = new ClipCard(look, CardMetrics.Entry, fitsImageInside: false);
         pill = new PositionPill(look);
-        pillRow.Children.Add(pill);
-        stage.Children.Add(pillRow);
-        stage.Children.Add(card);
-        dim.Opacity = appearance.BackdropDim.Value;
-        appearance.BackdropDim.Changed += () => dim.Opacity = appearance.BackdropDim.Value;
-        layer.Children.Add(dim);
-        layer.Children.Add(stage);
-        root.Children.Add(backdrop);
-        root.Children.Add(layer);
-        Content = root;
+        cardPanel = new OverlayPanel(card);
+        pillPanel = new OverlayPanel(pill);
 
-        // Once faded out, it leaves the screen; a show in the meantime stops it.
-        hideTimer = App.Ui.CreateTimer();
-        hideTimer.IsRepeating = false;
-        hideTimer.Tick += (_, _) =>
-        {
-            isOnScreen = false;
-            Hide();
-        };
+        fadeTimer = App.Ui.CreateTimer();
+        fadeTimer.Interval = FadeStep;
+        fadeTimer.Tick += (_, _) => StepFade();
+        appearance.BackdropDim.Changed += () => { if (isOnScreen) ApplyOpacity(); };
     }
 
-    /// Draws once while cloaked, so the first real open doesn't pay for setting everything up.
+    /// Draws once, unseen, so the first real open doesn't pay for setting everything up.
     public void Warm()
     {
         if (isOnScreen) return;
         isWarming = true;
-        var (screen, _) = ScreenUnderPointer();
-        Reveal(screen);
+        Reveal();
     }
 
     /// Shows the entry under the pill's "2 of 12". position is null when there's nothing to show.
@@ -91,18 +149,13 @@ internal sealed partial class OverlayWindow : FrostWindow
     {
         card.ShowCorner(showsDate, showsDelete);
         card.Show(item, width, height);
-        pill.Visibility = position is null ? Visibility.Collapsed : Visibility.Visible;
+        usualHeight = height;
+        showsPill = position is not null;
         if (position is not null) pill.Text = position;
-        stage.Width = width;
-        stage.Height = PositionPill.PillHeight + PillGap + height;
-        pillRow.Width = width;
-        // Laid out at the usual height with the top pinned: a card that grows for an image grows
-        // downward only.
-        Canvas.SetTop(card, PositionPill.PillHeight + PillGap);
+        if (isOnScreen) Place();
     }
 
-    /// Takes the picture of the screen and opens over it. While it is still fading out, the
-    /// screen is already showing this window, so it just fades back in.
+    /// Opens on the pointer's screen. While it is still fading out, it just fades back in.
     public void Present()
     {
         isWarming = false;
@@ -111,21 +164,44 @@ internal sealed partial class OverlayWindow : FrostWindow
             FadeTo(1);
             return;
         }
-        var (screen, _) = ScreenUnderPointer();
-        look.ApplyTheme();
-        capture.Take(screen);
-        backdrop.Source = capture.Bitmap;
-        Reveal(screen);
+        Reveal();
     }
 
-    private void Reveal(RECT screen)
+    private void Reveal()
     {
-        bounds = screen;
-        SetCloaked(true);
+        (bounds, _) = FrostWindow.ScreenUnderPointer();
+        look.ApplyTheme();
+        cardPanel.Backdrop.Update(look.BaseColor, FrostOpacity);
+        pillPanel.Backdrop.Update(look.BaseColor, FrostOpacity);
+        opacity = 0;
         isOnScreen = true;
-        ShowAt(screen.Left, screen.Top, screen.Width, screen.Height);
+        if (!isWarming) dim.Show(bounds);
+        ApplyOpacity();
+        Place();
+        cardPanel.AppWindow.Show(false);
+        if (showsPill) pillPanel.AppWindow.Show(false);
         framesLeft = FramesToDraw;
         Render(true);
+    }
+
+    /// The card centred with the pill above it. Measured at the usual height: a card that grows
+    /// for an image grows downward only.
+    private void Place()
+    {
+        var scale = cardPanel.Scale;
+        var width = (int)Math.Ceiling(card.Width * scale);
+        var height = (int)Math.Ceiling(card.Height * scale);
+        var pillHeight = (int)Math.Ceiling(PositionPill.PillHeight * scale);
+        var gap = (int)Math.Ceiling(PillGap * scale);
+        var left = bounds.Left + (bounds.Width - width) / 2;
+        var top = bounds.Top + (bounds.Height - pillHeight - gap - (int)Math.Ceiling(usualHeight * scale)) / 2;
+        cardPanel.Place(left, top + pillHeight + gap, width, height);
+
+        pill.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+        var pillWidth = (int)Math.Ceiling(Math.Max(pill.DesiredSize.Width, PositionPill.PillHeight) * scale);
+        pillPanel.Place(left + (width - pillWidth) / 2, top, pillWidth, pillHeight);
+        if (showsPill) pillPanel.AppWindow.Show(false);
+        else pillPanel.Hide();
     }
 
     public void Dismiss()
@@ -133,26 +209,16 @@ internal sealed partial class OverlayWindow : FrostWindow
         if (isOnScreen) FadeTo(0);
     }
 
-    /// Lets go of the screen's picture while nothing shows.
-    public void ReleaseCapture()
-    {
-        if (isOnScreen) return;
-        backdrop.Source = null;
-        capture.Dispose();
-    }
-
     /// What's at a point in screen pixels. Null when it isn't on the overlay's screen.
     public OverlayHit? HitTest(int x, int y)
     {
         if (x < bounds.Left || x >= bounds.Right || y < bounds.Top || y >= bounds.Bottom) return null;
-        var point = new Windows.Foundation.Point((x - bounds.Left) / Scale, (y - bounds.Top) / Scale);
-        var result = OverlayHit.Nothing;
-        foreach (var element in Microsoft.UI.Xaml.Media.VisualTreeHelper.FindElementsInHostCoordinates(point, root))
-        {
-            if (element == card.Trash) return OverlayHit.Trash;
-            if (element == card) result = OverlayHit.Card;
-        }
-        return result;
+        var origin = new POINT();
+        ClientToScreen(cardPanel.Hwnd, ref origin);
+        var scale = cardPanel.Scale;
+        var point = new Windows.Foundation.Point((x - origin.X) / scale, (y - origin.Y) / scale);
+        if (point.X < 0 || point.Y < 0 || point.X >= card.ActualWidth || point.Y >= card.ActualHeight) return OverlayHit.Nothing;
+        return VisualTreeHelper.FindElementsInHostCoordinates(point, card).Contains(card.Trash) ? OverlayHit.Trash : OverlayHit.Card;
     }
 
     /// Highlights what the pointer is over.
@@ -162,14 +228,38 @@ internal sealed partial class OverlayWindow : FrostWindow
         card.IsTrashHovered = hit == OverlayHit.Trash;
     }
 
-    private void FadeTo(double target)
+    private void FadeTo(double value)
     {
-        hideTimer.Stop();
-        layer.OpacityTransition = Motion.OpacityTransition(Motion.Fade);
-        layer.Opacity = target;
-        if (target > 0) return;
-        hideTimer.Interval = layer.OpacityTransition?.Duration ?? TimeSpan.Zero;
-        hideTimer.Start();
+        target = value;
+        if (Motion.IsReduced) opacity = value;
+        fadeTimer.Start();
+        StepFade();
+    }
+
+    private void StepFade()
+    {
+        var step = FadeStep / Motion.Fade;
+        opacity = opacity < target ? Math.Min(opacity + step, target) : Math.Max(opacity - step, target);
+        ApplyOpacity();
+        if (opacity != target) return;
+        fadeTimer.Stop();
+        if (target == 0) LeaveScreen();
+    }
+
+    private void ApplyOpacity()
+    {
+        var alpha = (byte)Math.Round(Opaque * opacity);
+        cardPanel.SetAlpha(alpha);
+        pillPanel.SetAlpha(alpha);
+        dim.SetAlpha((byte)Math.Round(Opaque * opacity * appearance.BackdropDim.Value));
+    }
+
+    private void LeaveScreen()
+    {
+        isOnScreen = false;
+        cardPanel.Hide();
+        pillPanel.Hide();
+        dim.Hide();
     }
 
     private void Render(bool isOn)
@@ -180,27 +270,14 @@ internal sealed partial class OverlayWindow : FrostWindow
         else CompositionTarget.Rendering -= OnRendering;
     }
 
-    /// Waits for the window to have drawn, then uncloaks it and fades in; a warm-up just leaves.
+    /// Waits for the panels to have drawn, then fades in; a warm-up just leaves. They are placed
+    /// again here, as a panel can only measure itself once it has shown.
     private void OnRendering(object? sender, object e)
     {
         if (--framesLeft > 0) return;
         Render(false);
-        if (isWarming)
-        {
-            isOnScreen = false;
-            Hide();
-            return;
-        }
-        SetCloaked(false);
-        FadeTo(1);
+        Place();
+        if (isWarming) LeaveScreen();
+        else FadeTo(1);
     }
-
-    private void SetCloaked(bool isCloaked)
-    {
-        var value = isCloaked ? 1 : 0;
-        DwmSetWindowAttribute(Hwnd, DWMWA_CLOAK, ref value, sizeof(int));
-    }
-
-    [LibraryImport("dwmapi")]
-    private static partial int DwmSetWindowAttribute(nint hwnd, int attribute, ref int value, int size);
 }

@@ -77,7 +77,6 @@ internal sealed class OverlayController
         history.Changed -= QueueWarm;
         warmTimer.Stop();
         Dismiss();
-        window?.ReleaseCapture();
     }
 
     private void QueueWarm()

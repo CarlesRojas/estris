@@ -1,4 +1,3 @@
-using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -56,68 +55,4 @@ internal static partial class Gdi
         }
         finally { ReleaseDC(0, dc); }
     }
-}
-
-/// A picture of one screen, taken just before the overlay covers it. The overlay shows it as its
-/// background, so its frosted cards have something to blur. Buffers are kept between opens: a
-/// new one for every open would take longer than the copy.
-internal sealed class ScreenCapture : IDisposable
-{
-    private nint memoryDc, section, sectionBits, previous;
-    private int width, height;
-
-    public WriteableBitmap? Bitmap { get; private set; }
-
-    public void Take(RECT bounds)
-    {
-        if (bounds.Width != width || bounds.Height != height) Allocate(bounds.Width, bounds.Height);
-        var screen = Gdi.GetDC(0);
-        Gdi.BitBlt(memoryDc, 0, 0, width, height, screen, bounds.Left, bounds.Top, Gdi.SRCCOPY);
-        Gdi.ReleaseDC(0, screen);
-        MakeOpaque();
-        unsafe
-        {
-            using var stream = Bitmap!.PixelBuffer.AsStream();
-            stream.Write(new ReadOnlySpan<byte>((void*)sectionBits, width * height * 4));
-        }
-        Bitmap.Invalidate();
-    }
-
-    private void Allocate(int newWidth, int newHeight)
-    {
-        Release();
-        width = newWidth;
-        height = newHeight;
-        var info = Gdi.TopDownHeader(width, height);
-        var screen = Gdi.GetDC(0);
-        memoryDc = Gdi.CreateCompatibleDC(screen);
-        section = Gdi.CreateDIBSection(memoryDc, ref info, 0, out sectionBits, 0, 0);
-        Gdi.ReleaseDC(0, screen);
-        previous = Gdi.SelectObject(memoryDc, section);
-        Bitmap = new WriteableBitmap(width, height);
-    }
-
-    /// BitBlt leaves alpha at 0, which would show as nothing.
-    private unsafe void MakeOpaque()
-    {
-        var pixels = new Span<uint>((void*)sectionBits, width * height);
-        var opaque = new Vector<uint>(0xFF000000);
-        var index = 0;
-        for (; index <= pixels.Length - Vector<uint>.Count; index += Vector<uint>.Count)
-            (new Vector<uint>(pixels[index..]) | opaque).CopyTo(pixels[index..]);
-        for (; index < pixels.Length; index++) pixels[index] |= 0xFF000000;
-    }
-
-    private void Release()
-    {
-        if (memoryDc == 0) return;
-        Gdi.SelectObject(memoryDc, previous);
-        Gdi.DeleteObject(section);
-        Gdi.DeleteDC(memoryDc);
-        memoryDc = 0;
-        Bitmap = null;
-        width = height = 0;
-    }
-
-    public void Dispose() => Release();
 }

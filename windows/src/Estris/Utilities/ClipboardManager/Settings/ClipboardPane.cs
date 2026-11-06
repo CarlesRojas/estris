@@ -42,8 +42,6 @@ internal static class ClipboardPane
         pane.Toggle(T("Show delete button"), settings.ShowDeleteButton);
         pane.ColorChoice(T("Tint"), appearance.Tint);
         pane.Slider(T("Tint strength"), appearance.TintOpacity, 0, AppearanceSettings.MaxTintOpacity, 0.01, Percent);
-        pane.Slider(T("Selected highlight"), appearance.SelectedTintOpacity, 0, AppearanceSettings.MaxSelectedTintOpacity, 0.01, Percent);
-        pane.Slider(T("Shadow"), appearance.ShadowRadius, 0, AppearanceSettings.MaxShadowRadius, 1, Whole);
         pane.Slider(T("Dim screen"), appearance.BackdropDim, 0, AppearanceSettings.MaxBackdropDim, 0.01, Percent);
         pane.ResetButton(() =>
         {

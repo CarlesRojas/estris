@@ -10,15 +10,16 @@ using Windows.UI.ViewManagement;
 
 namespace Estris.Utilities.ClipboardManager.Overlay;
 
-public enum SurfaceState { Normal, Hovered, Selected }
+public enum SurfaceState { Normal, Hovered }
 
 /// The frosted material and colors shared by one window's surfaces, following the Appearance
 /// settings and the Windows theme. Brushes are changed in place, so surfaces pick it up live.
 internal sealed class SurfaceLook
 {
-    /// Windows 11's own radius for cards and flyouts, and half the pill's height.
-    public const double CardRadius = 8, PillRadius = 15;
-    private const double SelectedShadowOpacity = 0.35, ShadowOpacity = 0.22;
+    /// Windows 11's own radius for cards and flyouts, which windows have too.
+    public const double CardRadius = 8;
+    private const double PreviewShadowRadius = 16;
+    public const double ShadowOpacity = 0.22;
 
     private static readonly Color DarkBase = Color.FromArgb(255, 32, 32, 32), LightBase = Color.FromArgb(255, 243, 243, 243);
 
@@ -27,39 +28,41 @@ internal sealed class SurfaceLook
     {
         [SurfaceState.Normal] = new SolidColorBrush(),
         [SurfaceState.Hovered] = new SolidColorBrush(),
-        [SurfaceState.Selected] = new SolidColorBrush(),
     };
 
-    public AcrylicBrush Frost { get; } = new() { TintOpacity = 0.45, TintLuminosityOpacity = 0.7 };
+    private readonly AcrylicBrush frost = new() { TintOpacity = 0.45, TintLuminosityOpacity = 0.7 };
+    private readonly bool isOverAcrylic;
+
+    /// The material under the tint. Over a window's real Acrylic there's none to draw.
+    public Brush? Frost => isOverAcrylic ? null : frost;
+    public Color BaseColor { get; private set; }
     public SolidColorBrush Stroke { get; } = new();
     public SolidColorBrush Primary { get; } = new();
     public SolidColorBrush Secondary { get; } = new();
 
-    /// Runs when the shadow changes.
-    public event Action? ShadowChanged;
-
-    public SurfaceLook(AppearanceSettings appearance)
+    /// isOverAcrylic is for surfaces filling a window of real Acrylic, whose shadow is the window's;
+    /// the others, in the settings preview, draw both themselves.
+    public SurfaceLook(AppearanceSettings appearance, bool isOverAcrylic = false)
     {
         this.appearance = appearance;
-        foreach (var setting in new[] { appearance.TintOpacity, appearance.SelectedTintOpacity }) setting.Changed += ApplyTint;
+        this.isOverAcrylic = isOverAcrylic;
+        appearance.TintOpacity.Changed += ApplyTint;
         appearance.Tint.Changed += ApplyTint;
-        appearance.ShadowRadius.Changed += () => ShadowChanged?.Invoke();
         ApplyTheme();
     }
 
-    public double ShadowRadius => appearance.ShadowRadius.Value;
+    public double ShadowRadius => isOverAcrylic ? 0 : PreviewShadowRadius;
 
     public Brush Tint(SurfaceState state) => tints[state];
-
-    public static double ShadowOpacityFor(SurfaceState state) => state == SurfaceState.Selected ? SelectedShadowOpacity : ShadowOpacity;
 
     /// Picks up a change of Windows' light or dark mode.
     public void ApplyTheme()
     {
         var background = new UISettings().GetColorValue(UIColorType.Background);
         var isDark = background.R < 128;
-        Frost.TintColor = isDark ? DarkBase : LightBase;
-        Frost.FallbackColor = Frost.TintColor;
+        BaseColor = isDark ? DarkBase : LightBase;
+        frost.TintColor = BaseColor;
+        frost.FallbackColor = BaseColor;
         Primary.Color = isDark ? Colors.White : Color.FromArgb(0xE4, 0, 0, 0);
         Secondary.Color = isDark ? Color.FromArgb(0xC8, 255, 255, 255) : Color.FromArgb(0x9E, 0, 0, 0);
         Stroke.Color = isDark ? Color.FromArgb(0x18, 255, 255, 255) : Color.FromArgb(0x14, 0, 0, 0);
@@ -97,10 +100,9 @@ internal class Surface : Grid
         Children.Add(shadow);
         Children.Add(new Border { CornerRadius = corners, Background = look.Frost });
         Children.Add(tint);
-        look.ShadowChanged += ApplyShadow;
         SizeChanged += (_, _) => ApplyShadow();
         ApplyShadow();
-        shadow.Opacity = SurfaceLook.ShadowOpacityFor(state);
+        shadow.Opacity = SurfaceLook.ShadowOpacity;
     }
 
     public SurfaceState State
@@ -112,7 +114,6 @@ internal class Surface : Grid
             state = value;
             tint.BackgroundTransition = Motion.IsReduced ? null : hoverTransition;
             tint.Background = look.Tint(state);
-            shadow.Opacity = SurfaceLook.ShadowOpacityFor(state);
         }
     }
 

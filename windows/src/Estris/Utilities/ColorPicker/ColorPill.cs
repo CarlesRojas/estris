@@ -164,6 +164,5 @@ internal sealed partial class ColorPill : FrostWindow
         SetLayeredWindowAttributes(Hwnd, 0, (byte)alpha, LWA_ALPHA);
     }
 
-    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool SetLayeredWindowAttributes(nint hwnd, uint key, byte alpha, uint flags);
     [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool GetClientRect(nint hwnd, out RECT rect);
 }

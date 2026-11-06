@@ -106,27 +106,20 @@ public sealed class AppearanceSettings
 {
     private static readonly SettingsStore Store = SettingsStore.Shared;
 
-    public const double MaxTintOpacity = 0.6, MaxSelectedTintOpacity = 0.6, MaxShadowRadius = 30, MaxBackdropDim = 0.7;
+    public const double MaxTintOpacity = 0.6, MaxBackdropDim = 0.7;
+    private const double HoverTint = 0.1;
 
     public Setting<string> Tint { get; } = Store.Get("clipboardTint", "#808080");
     public Setting<double> TintOpacity { get; } = Store.Get("clipboardTintOpacity", 0.2);
-    public Setting<double> SelectedTintOpacity { get; } = Store.Get("clipboardSelectedTintOpacity", 0.3);
-    public Setting<double> ShadowRadius { get; } = Store.Get("clipboardShadowRadius", 16.0);
     public Setting<double> BackdropDim { get; } = Store.Get("clipboardBackdropDim", 0.5);
 
-    public IEnumerable<ISetting> All => [Tint, TintOpacity, SelectedTintOpacity, ShadowRadius, BackdropDim];
+    public IEnumerable<ISetting> All => [Tint, TintOpacity, BackdropDim];
 
     public void Reset()
     {
         foreach (var setting in All) setting.Reset();
     }
 
-    /// How much of the tint a surface shows. Hover adds a third of the selection highlight, so
-    /// it never reads as selected.
-    public double SurfaceTintOpacity(SurfaceState state) => Math.Min(1, TintOpacity.Value + state switch
-    {
-        SurfaceState.Selected => SelectedTintOpacity.Value,
-        SurfaceState.Hovered => SelectedTintOpacity.Value / 3,
-        _ => 0,
-    });
+    /// How much of the tint a surface shows.
+    public double SurfaceTintOpacity(SurfaceState state) => Math.Min(1, TintOpacity.Value + (state == SurfaceState.Hovered ? HoverTint : 0));
 }

@@ -98,6 +98,14 @@ public class FrostWindow : Window
     /// They are measured, as AppWindow.ResizeClient adds a title bar this window doesn't have.
     public void ShowContentAt(int x, int y, int width, int height)
     {
+        PlaceContentAt(x, y, width, height);
+        AppWindow.Show(takesFocus);
+        if (takesFocus) SetForegroundWindow(Hwnd);
+    }
+
+    /// The same without showing it.
+    public void PlaceContentAt(int x, int y, int width, int height)
+    {
         GetWindowRect(Hwnd, out var frame);
         GetClientRect(Hwnd, out var client);
         var origin = new POINT();
@@ -107,8 +115,6 @@ public class FrostWindow : Window
             y - (origin.Y - frame.Top),
             width + frame.Width - client.Width,
             height + frame.Height - client.Height));
-        AppWindow.Show(takesFocus);
-        if (takesFocus) SetForegroundWindow(Hwnd);
     }
 
     public void Hide() => AppWindow.Hide();
