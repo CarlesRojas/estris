@@ -16,6 +16,7 @@ public static partial class WindowSnappingPane
 {
     private const uint SPI_GETWINARRANGING = 0x82;
     private const double IconWidth = 18, IconHeight = 14, IconRadius = 2, IconStroke = 1.25;
+    private static readonly TimeSpan SnapCheckInterval = TimeSpan.FromSeconds(2);
 
     [LibraryImport("user32", EntryPoint = "SystemParametersInfoW")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -39,16 +40,25 @@ public static partial class WindowSnappingPane
         return pane.Root;
     }
 
-    /// Shown while Windows's own Snap is on, read again each time the pane comes back.
+    /// Shown while Windows's own Snap is on, read again every few seconds while the pane shows,
+    /// so it goes away once it is turned off in Windows Settings.
     private static void AddWindowsSnapWarning(Pane pane)
     {
         var open = new Button { Content = T("Open Multitasking Settings") };
         open.Click += async (_, _) => await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:multitasking"));
-        var bar = pane.Warning(T("Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so that both don't act."));
+        var bar = pane.Warning(T("Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act."));
         bar.Margin = new Thickness(0, 8, 0, 0);
         bar.ActionButton = open;
         bar.IsOpen = IsWindowsSnapOn;
-        pane.Root.Loaded += (_, _) => bar.IsOpen = IsWindowsSnapOn;
+        var timer = App.Ui.CreateTimer();
+        timer.Interval = SnapCheckInterval;
+        timer.Tick += (_, _) => bar.IsOpen = IsWindowsSnapOn;
+        pane.Root.Loaded += (_, _) =>
+        {
+            bar.IsOpen = IsWindowsSnapOn;
+            timer.Start();
+        };
+        pane.Root.Unloaded += (_, _) => timer.Stop();
     }
 
     private static void AddDragging(Pane pane, WindowSnappingSettings settings)

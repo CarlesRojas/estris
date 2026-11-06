@@ -22,7 +22,7 @@ public sealed class AppLog
             entries.Add(new Entry(DateTime.Now, source, message));
             if (entries.Count > Limit) entries.RemoveAt(0);
         }
-        File.AppendAllText(Path.Combine(Environment.GetEnvironmentVariable("TEMP")!, "estris-wsfa", "log.txt"), $"{DateTime.Now:HH:mm:ss.fff} [{source}] {message}{Environment.NewLine}");
+        System.Diagnostics.Debug.WriteLine($"[{source}] {message}");
         Changed?.Invoke();
     }
 

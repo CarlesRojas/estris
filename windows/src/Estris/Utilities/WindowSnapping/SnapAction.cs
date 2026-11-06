@@ -63,8 +63,8 @@ public static class SnapActions
         _ => T("Restore"),
     };
 
-    /// The key each starts out with, used with Ctrl and Alt. On the Mac the two thirds are E, R
-    /// and T, but Ctrl+Alt+E types € on most European keyboards, so here they are R, T and Y.
+    /// The key each starts out with, used with Ctrl and Alt, as on the Mac. Where Ctrl+Alt plus
+    /// one types a character (E is € on many keyboards), AltGr keeps typing it and the pane says so.
     public static int DefaultKey(this SnapAction action) => action switch
     {
         SnapAction.LeftHalf => 0x25,
@@ -79,9 +79,9 @@ public static class SnapActions
         SnapAction.FirstThird => 'D',
         SnapAction.CenterThird => 'F',
         SnapAction.LastThird => 'G',
-        SnapAction.FirstTwoThirds => 'R',
-        SnapAction.CenterTwoThirds => 'T',
-        SnapAction.LastTwoThirds => 'Y',
+        SnapAction.FirstTwoThirds => 'E',
+        SnapAction.CenterTwoThirds => 'R',
+        SnapAction.LastTwoThirds => 'T',
         _ => 0x08,
     };
 

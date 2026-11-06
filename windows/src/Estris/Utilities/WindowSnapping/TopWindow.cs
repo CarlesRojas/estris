@@ -75,8 +75,7 @@ public readonly record struct TopWindow(nint Hwnd)
     private const int SetFrameAttempts = 3;
     private const uint MoveFlags = SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER;
 
-    /// The surfaces of the shell: never windows to act on, and what shows while they are in
-    /// front is dismissed by focusing anything else.
+    /// The surfaces of the shell: never windows to act on.
     private static readonly HashSet<string> ShellClasses =
     [
         "Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Windows.UI.Core.CoreWindow",
@@ -98,9 +97,6 @@ public readonly record struct TopWindow(nint Hwnd)
         return windows;
     }
 
-    /// The top-level window at a point, which is what a click there would reach.
-    public static TopWindow At(POINT point) => new(GetAncestor(WindowFromPoint(point), GA_ROOT));
-
     public bool Exists => Hwnd != 0 && IsWindow(Hwnd);
     public long Style => GetWindowLongPtr(Hwnd, GWL_STYLE);
     public long ExStyle => GetWindowLongPtr(Hwnd, GWL_EXSTYLE);
@@ -111,7 +107,6 @@ public readonly record struct TopWindow(nint Hwnd)
     public bool IsResizable => (Style & WS_THICKFRAME) != 0;
     public bool IsOwned => GetWindow(Hwnd, GW_OWNER) != 0;
     public string ClassName => WindowNative.ClassName(Hwnd);
-    public string Title => WindowNative.Title(Hwnd);
 
     public uint ProcessId
     {
@@ -124,7 +119,8 @@ public readonly record struct TopWindow(nint Hwnd)
 
     public uint ThreadId => GetWindowThreadProcessId(Hwnd, out _);
 
-    /// Why the DWM doesn't draw it: 0 when it does, DWM_CLOAKED_SHELL on another virtual desktop.
+    /// Why the DWM doesn't draw it: 0 when it does; not 0 on another virtual desktop, or for a
+    /// suspended app's frame.
     public int Cloak => DwmGetWindowAttribute(Hwnd, DWMWA_CLOAKED, out int value, sizeof(int)) == 0 ? value : 0;
 
     public bool IsShell => ShellClasses.Contains(ClassName);
