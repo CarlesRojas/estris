@@ -10,6 +10,9 @@ import ApplicationServices
 struct AXWindow {
     /// Longest any single request may block, so a busy app can't freeze dragging.
     private static let messagingTimeout: Float = 0.25
+    /// Set on an app by assistive tools; while on, the app animates every frame change, so a
+    /// window moved through Accessibility lags behind.
+    private static let enhancedUserInterface = "AXEnhancedUserInterface" as CFString
 
     let element: AXUIElement?
     /// One of Estris's own windows.
@@ -186,11 +189,53 @@ struct AXWindow {
         var position = rect.origin
         var size = rect.size
         guard let positionValue = AXValueCreate(.cgPoint, &position), let sizeValue = AXValueCreate(.cgSize, &size) else { return }
+        let enhancedApp = Self.turnOffEnhancedUserInterface(pid: pid)
         // Size, position, then size again: a window can't grow past a screen edge, so the
         // first size may be cut short until it has moved.
         AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, sizeValue)
         AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, positionValue)
         AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, sizeValue)
+        if let enhancedApp { Self.turnOnEnhancedUserInterface(enhancedApp) }
+    }
+
+    /// Moves and sizes a window to a frame in Accessibility coordinates, setting only what
+    /// changed from `old`, for the many small steps of a live resize.
+    static func place(_ element: AXUIElement, at frame: CGRect, from old: CGRect?) {
+        var position = frame.origin
+        var size = frame.size
+        if old?.origin != frame.origin, let value = AXValueCreate(.cgPoint, &position) {
+            AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, value)
+        }
+        if old?.size != frame.size, let value = AXValueCreate(.cgSize, &size) {
+            AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, value)
+        }
+    }
+
+    /// Turns off an app's enhanced user interface if it was on, returning the app to turn it
+    /// back on afterwards.
+    static func turnOffEnhancedUserInterface(pid: pid_t) -> AXUIElement? {
+        let app = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(app, messagingTimeout)
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(app, enhancedUserInterface, &value) == .success,
+              (value as? Bool) == true
+        else { return nil }
+        AXUIElementSetAttributeValue(app, enhancedUserInterface, kCFBooleanFalse)
+        return app
+    }
+
+    static func turnOnEnhancedUserInterface(_ app: AXUIElement) {
+        AXUIElementSetAttributeValue(app, enhancedUserInterface, kCFBooleanTrue)
+    }
+
+    /// The frame as the window server has it: read without asking the app, so it's quick even
+    /// while the app is busy with a drag.
+    static func serverFrame(of number: CGWindowID) -> NSRect? {
+        let list = CGWindowListCopyWindowInfo([.optionIncludingWindow], number) as? [[String: Any]] ?? []
+        guard let bounds = list.first?[kCGWindowBounds as String] as? [String: Any],
+              let rect = CGRect(dictionaryRepresentation: bounds as CFDictionary)
+        else { return nil }
+        return appKitRect(rect)
     }
 
     func isSame(as other: AXWindow) -> Bool {

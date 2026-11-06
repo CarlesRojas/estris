@@ -91,12 +91,7 @@ public static class GeneralPane
         if (Updates.Shared.IsInstalled)
         {
             var check = new Button { Content = T("Check for Updates…") };
-            check.Click += async (_, _) =>
-            {
-                check.IsEnabled = false;
-                if (await Updates.Shared.Check()) await Updates.Shared.Install();
-                check.IsEnabled = true;
-            };
+            check.Click += (_, _) => UpdateWindow.Open(checkFirst: true);
             links.Children.Add(check);
         }
         links.Children.Add(new HyperlinkButton { Content = T("Website"), NavigateUri = new Uri(WebsiteUrl) });

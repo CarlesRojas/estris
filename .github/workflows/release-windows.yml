@@ -70,6 +70,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
           SIGN_PARAMS: ${{ steps.signing.outputs.params }}
+          RELEASE_NOTES: build/release-notes.md
         run: ./scripts/make-installer.sh
 
       - name: Commit, tag and publish
