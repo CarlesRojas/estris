@@ -14,7 +14,8 @@ namespace Estris.Ui;
 /// it and opens Estris again. Opens on the screen with the pointer.
 public sealed class UpdateWindow : Window
 {
-    private const int WidthDips = 540, HeightDips = 460, IconSize = 64;
+    /// Tall with release notes, short for every other step.
+    private const int WidthDips = 540, TallHeightDips = 460, ShortHeightDips = 250, IconSize = 64;
 
     private static UpdateWindow? shown;
 
@@ -78,9 +79,23 @@ public sealed class UpdateWindow : Window
     private void Place()
     {
         var (_, work) = FrostWindow.ScreenUnderPointer();
-        var scale = Native.GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)) / 96.0;
-        int width = (int)(WidthDips * scale), height = (int)(HeightDips * scale);
+        var (width, height) = Size(ShortHeightDips);
         AppWindow.MoveAndResize(new RectInt32(work.Left + (work.Width - width) / 2, work.Top + (work.Height - height) / 2, width, height));
+    }
+
+    /// Grows or shrinks around the window's current centre.
+    private void Resize(int heightDips)
+    {
+        var (width, height) = Size(heightDips);
+        if (AppWindow.Size.Height == height) return;
+        var centreY = AppWindow.Position.Y + AppWindow.Size.Height / 2;
+        AppWindow.MoveAndResize(new RectInt32(AppWindow.Position.X, centreY - height / 2, width, height));
+    }
+
+    private (int Width, int Height) Size(int heightDips)
+    {
+        var scale = Native.GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)) / 96.0;
+        return ((int)(WidthDips * scale), (int)(heightDips * scale));
     }
 
     private async void Check()
@@ -124,6 +139,7 @@ public sealed class UpdateWindow : Window
 
     private void Show(string heading, string text, UIElement? content)
     {
+        Resize(content is Border ? TallHeightDips : ShortHeightDips);
         title.Text = heading;
         message.Text = text;
         message.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
