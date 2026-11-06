@@ -53,8 +53,7 @@ public sealed class Setting<T> : ISetting, INotifyPropertyChanged
 public sealed class SettingsStore
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
-    public static string Folder { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Estris");
+    public static string Folder { get; } = @"C:\Users\carle\AppData\Local\Temp\estris-t\appdata";
 
     public static SettingsStore Shared { get; } = new();
 
