@@ -135,24 +135,3 @@ public static class SnapActions
         _ => null,
     };
 }
-
-/// The screen edge or corner a drag is snapping to, which the preview grows out of.
-public enum SnapEdge { Left, Right, Top, Bottom, TopLeft, TopRight, BottomLeft, BottomRight }
-
-public static class SnapEdges
-{
-    private const int Sliver = 2;
-
-    /// A sliver of the target along the edge, or a dot at the corner.
-    public static RECT StartRect(this SnapEdge edge, RECT target) => edge switch
-    {
-        SnapEdge.Left => target with { Right = target.Left + Sliver },
-        SnapEdge.Right => target with { Left = target.Right - Sliver },
-        SnapEdge.Top => target with { Bottom = target.Top + Sliver },
-        SnapEdge.Bottom => target with { Top = target.Bottom - Sliver },
-        SnapEdge.TopLeft => target with { Right = target.Left + Sliver, Bottom = target.Top + Sliver },
-        SnapEdge.TopRight => target with { Left = target.Right - Sliver, Bottom = target.Top + Sliver },
-        SnapEdge.BottomLeft => target with { Right = target.Left + Sliver, Top = target.Bottom - Sliver },
-        _ => target with { Left = target.Right - Sliver, Top = target.Bottom - Sliver },
-    };
-}

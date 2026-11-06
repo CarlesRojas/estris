@@ -46,8 +46,6 @@ public sealed class WindowSnappingSettings
     public Setting<bool> ResizesTogether { get; } = Store.Get("windowSnappingResizesTogether", true);
     /// Fit snaps to the space left by windows already tiled on the screen.
     public Setting<bool> FillsSpace { get; } = Store.Get("windowSnappingFillsSpace", true);
-    /// The drag preview is frosted, like the overlays, instead of dark.
-    public Setting<bool> FrostedPreview { get; } = Store.Get("windowSnappingFrostedPreview", false);
     /// How far into the screen, in logical pixels, the edges reach for dragging.
     public Setting<double> EdgeArea { get; } = Store.Get("windowSnappingEdgeArea", 64.0);
     /// A shortcut shares the screen evenly among all its windows.
@@ -77,11 +75,11 @@ public sealed class WindowSnappingSettings
         Gestures.Value = gestures;
     }
 
-    /// Back to how dragging, the preview, resizing, gestures, Arrange All and the shortcut keys
-    /// start out; the on/off switch stays.
+    /// Back to how dragging, resizing, gestures, Arrange All and the shortcut keys start out;
+    /// the on/off switch stays.
     public void Reset()
     {
-        foreach (var setting in new ISetting[] { ArrangesAll, KeyCodes, SnapsByDragging, ResizesTogether, FillsSpace, FrostedPreview, EdgeArea, Gestures })
+        foreach (var setting in new ISetting[] { ArrangesAll, KeyCodes, SnapsByDragging, ResizesTogether, FillsSpace, EdgeArea, Gestures })
             setting.Reset();
     }
 }

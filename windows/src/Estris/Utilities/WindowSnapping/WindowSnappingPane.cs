@@ -66,8 +66,7 @@ public static partial class WindowSnappingPane
         pane.Section(T("Dragging"));
         pane.Toggle(T("Snap by dragging a window to a screen edge"), settings.SnapsByDragging);
         var edge = pane.Slider(T("Edge area"), settings.EdgeArea, WindowSnappingSettings.MinimumEdgeArea, WindowSnappingSettings.MaximumEdgeArea, 1, v => T("%lld px", (long)v));
-        var frosted = pane.Toggle(T("Frosted preview"), settings.FrostedPreview);
-        EnableWith(settings.SnapsByDragging, edge, frosted);
+        EnableWith(settings.SnapsByDragging, edge);
         pane.Toggle(T("Resize side-by-side windows together"), settings.ResizesTogether);
         pane.Toggle(T("Fill the space next to other windows"), settings.FillsSpace, T("Press a shortcut again for the exact size, or hold Ctrl while dragging."));
     }

@@ -125,6 +125,9 @@ public readonly record struct TopWindow(nint Hwnd)
 
     public bool IsShell => ShellClasses.Contains(ClassName);
 
+    /// Its app runs as administrator and Estris doesn't, so Windows won't let Estris move it.
+    public bool IsOutOfReach => !Environment.IsPrivilegedProcess && IsElevated(ProcessId);
+
     /// An app's own window: not a floating tool or a part of the shell. Has a frame, so
     /// splash screens, overlays and borderless things don't count.
     public bool IsAppWindow
@@ -177,6 +180,8 @@ public readonly record struct TopWindow(nint Hwnd)
 
     /// Moves it so its visible frame is this one, restoring it first if maximized. Returns
     /// false when it couldn't: elevated windows refuse a normal process, hung ones don't answer.
+    /// A window going to a screen with another scale resizes itself for it once there, so it
+    /// is always sized a second time then.
     public bool SetFrame(RECT frame, Core.AppLog? log = null, string source = "")
     {
         if (IsHungAppWindow(Hwnd))
@@ -186,6 +191,7 @@ public readonly record struct TopWindow(nint Hwnd)
         }
         if (IsMinimized || IsMaximized) Restore(frame);
         var flags = MoveFlags | (IsResizable ? 0 : SWP_NOSIZE);
+        var changesScale = GetDpiForWindow(Hwnd) != DpiAt(frame);
         var last = Frame;
         for (var attempt = 0; attempt < SetFrameAttempts; attempt++)
         {
@@ -201,6 +207,7 @@ public readonly record struct TopWindow(nint Hwnd)
                 return false;
             }
             var now = Frame;
+            if (changesScale && attempt == 0) continue;
             if (now is { } got && (Rects.Near(got, frame) || (last is { } before && Rects.Near(got, before, 1)))) break;
             last = now;
         }
@@ -212,15 +219,33 @@ public readonly record struct TopWindow(nint Hwnd)
         SetWindowPos(Hwnd, 0, frame.Left - borders.Left, frame.Top - borders.Top,
             frame.Width + borders.Left + borders.Right, frame.Height + borders.Top + borders.Bottom, MoveFlags | SWP_ASYNCWINDOWPOS);
 
-    /// Back to a normal window without activating it, ending up about where it's going next.
+    /// Back to a normal window without activating it, ending up about where it's going next,
+    /// and no longer going back to maximized when restored from the taskbar.
     private void Restore(RECT frame)
     {
         var placement = new WINDOWPLACEMENT { length = Marshal.SizeOf<WINDOWPLACEMENT>() };
         if (!GetWindowPlacement(Hwnd, ref placement)) return;
+        var borders = Borders();
+        var outer = new RECT { Left = frame.Left - borders.Left, Top = frame.Top - borders.Top, Right = frame.Right + borders.Right, Bottom = frame.Bottom + borders.Bottom };
         placement.showCmd = SW_SHOWNOACTIVATE;
-        placement.rcNormalPosition = frame;
+        placement.flags &= ~WPF_RESTORETOMAXIMIZED;
+        placement.rcNormalPosition = ToWorkspace(outer);
         SetWindowPlacement(Hwnd, ref placement);
     }
+
+    /// A placement's normal frame is in workspace coordinates: from the corner of its screen's
+    /// work area, not of the screen, which differ when the taskbar is at the top or left.
+    private static RECT ToWorkspace(RECT rect)
+    {
+        var info = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
+        GetMonitorInfo(MonitorFromRect(rect, MONITOR_DEFAULTTONEAREST), ref info);
+        var x = info.rcWork.Left - info.rcMonitor.Left;
+        var y = info.rcWork.Top - info.rcMonitor.Top;
+        return new RECT { Left = rect.Left - x, Top = rect.Top - y, Right = rect.Right - x, Bottom = rect.Bottom - y };
+    }
+
+    private static uint DpiAt(RECT frame) =>
+        GetDpiForMonitor(MonitorFromRect(frame, MONITOR_DEFAULTTONEAREST), 0, out var dpi, out _) == 0 ? dpi : 96;
 
     public void Maximize() => ShowWindow(Hwnd, SW_MAXIMIZE);
 }

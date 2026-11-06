@@ -8,10 +8,11 @@ namespace Estris.Utilities.WindowSnapping;
 /// Watches windows being dragged, to snap one taken to a screen edge or corner and to resize
 /// the windows next to one being resized.
 ///
-/// Windows says when a drag starts and ends; once the window moves without changing size it is
-/// being moved, and the pointer's place on the screen picks a snap area (previewed, applied on
-/// release). Once its size changes it is being resized, and windows that shared the edge
-/// being dragged follow it. A timer does the watching, only during a drag.
+/// Windows says when a drag starts and ends, and each time the window moves. A drag that starts
+/// with a resize arrow, or changes the window's size, is a resize, and windows that shared the
+/// edge being dragged follow it; otherwise the window is being moved, and the pointer's place on
+/// the screen picks a snap area (previewed, applied on release). Each move of the window is
+/// acted on as it comes, and a timer catches the pointer moving while the window can't.
 public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Snapper snap)
 {
     /// Snaps a window: the action, its screen, where the window started, whether to fill the
@@ -46,6 +47,10 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
     private readonly SnapPreview preview = new();
     private WinEventHook? hook;
     private DispatcherQueueTimer? timer;
+    /// The dragged window, for the event thread to pick out its moves.
+    private nint watched;
+    /// 1 while a look at the window is waiting to run, so moves don't pile up.
+    private int isTickQueued;
 
     private TopWindow window;
     private bool isDragging;
@@ -60,18 +65,30 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
     /// The tiled windows on each screen the drag has passed over, for filling space.
     private readonly Dictionary<RECT, List<RECT>> tiled = [];
 
-    public void Start() => hook ??= new WinEventHook(EVENT_SYSTEM_MOVESIZESTART, EVENT_SYSTEM_MOVESIZEEND, OnEvent, "Window Snapping");
+    public void Start() => hook ??= new WinEventHook(OnEvent, "Window Snapping",
+        (EVENT_SYSTEM_MOVESIZESTART, EVENT_SYSTEM_MOVESIZEEND), (EVENT_OBJECT_LOCATIONCHANGE, EVENT_OBJECT_LOCATIONCHANGE));
 
     public void Stop()
     {
         hook?.Dispose();
         hook = null;
         Reset();
+        preview.Dispose();
     }
 
     private void OnEvent(uint type, nint hwnd, int idObject, int idChild)
     {
         if (idObject != OBJID_WINDOW || idChild != 0) return;
+        if (type == EVENT_OBJECT_LOCATIONCHANGE)
+        {
+            if (hwnd == Volatile.Read(ref watched) && Interlocked.Exchange(ref isTickQueued, 1) == 0)
+                App.Ui.TryEnqueue(DispatcherQueuePriority.High, () =>
+                {
+                    Volatile.Write(ref isTickQueued, 0);
+                    Tick();
+                });
+            return;
+        }
         var moved = new TopWindow(hwnd);
         if (type == EVENT_SYSTEM_MOVESIZESTART)
         {
@@ -79,23 +96,27 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
             // has no pointer to follow.
             if (!IsLeftButtonHeld || moved.Frame is not { } frame) return;
             var maximized = moved.IsMaximized;
-            App.Ui.TryEnqueue(() => Begin(moved, frame, maximized));
+            var resizes = IsSizingCursor();
+            App.Ui.TryEnqueue(DispatcherQueuePriority.High, () => Begin(moved, frame, maximized, resizes));
         }
         else
         {
-            App.Ui.TryEnqueue(() => { if (moved == window) End(); });
+            App.Ui.TryEnqueue(DispatcherQueuePriority.High, () => { if (moved == window) End(); });
         }
     }
 
-    private void Begin(TopWindow dragged, RECT frame, bool maximized)
+    private void Begin(TopWindow dragged, RECT frame, bool maximized, bool resizes)
     {
         Reset();
         // Windows kept in front of everything are left alone, and don't drag others along.
-        if (dragged.IsTopmost || !dragged.IsAppWindow || dragged.IsOwned) return;
+        // Windows run as administrator can't be moved by Estris, so they get no preview.
+        if (dragged.IsTopmost || !dragged.IsAppWindow || dragged.IsOwned || dragged.IsOutOfReach) return;
         window = dragged;
         isDragging = true;
         startFrame = frame;
         wasMaximized = maximized;
+        if (resizes) mode = Mode.Resizing;
+        Volatile.Write(ref watched, dragged.Hwnd);
         if (timer is null)
         {
             timer = App.Ui.CreateTimer();
@@ -144,7 +165,10 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
     private void End()
     {
         var (dragged, finalMode) = (window, mode);
-        if (finalMode == Mode.Moving && !isCancelled && target is { } found)
+        // A window gone or hidden by the end (a browser tab dropped back into its window), or
+        // maximized by Windows itself, isn't snapped.
+        var isSnappable = dragged.Exists && dragged.IsVisible && !dragged.IsMaximized;
+        if (finalMode == Mode.Moving && !isCancelled && isSnappable && target is { } found)
             snap(dragged, found.Action, found.Screen, startFrame, Fills, wasMaximized);
         // The last moves may have been missed; line the neighbours up once more.
         else if (finalMode == Mode.Resizing && !isCancelled && settings.ResizesTogether.Value && dragged.Frame is { } frame)
@@ -155,6 +179,7 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
     private void Reset()
     {
         timer?.Stop();
+        Volatile.Write(ref watched, 0);
         isDragging = false;
         window = default;
         mode = Mode.Undecided;
@@ -164,7 +189,7 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
         neighbours = [];
         movedEdges = [];
         tiled.Clear();
-        preview.Hide();
+        preview.Close();
     }
 
     // Snap areas
@@ -174,10 +199,10 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
         GetCursorPos(out var point);
         var screen = Screen.At(point);
         if (isCancelled || !Rects.Contains(screen.Bounds, point.X, point.Y)
-            || SnapArea(point, screen) is not { } found || found.Action.Frame(screen) is not { } usual)
+            || SnapArea(point, screen) is not { } action || action.Frame(screen) is not { } usual)
         {
+            if (target is not null) preview.Hide(window);
             target = null;
-            preview.Hide();
             return;
         }
         var area = usual;
@@ -185,10 +210,10 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
         {
             if (!tiled.TryGetValue(screen.Bounds, out var windows))
                 windows = tiled[screen.Bounds] = SpaceFiller.TiledWindows(screen, window);
-            area = SpaceFiller.Fit(usual, found.Action, screen, windows, window.ProcessId);
+            area = SpaceFiller.Fit(usual, action, screen, windows, window.ProcessId);
         }
-        target = (found.Action, screen);
-        preview.Show(area, found.Edge, window, settings.FrostedPreview.Value, screen.Scale);
+        target = (action, screen);
+        preview.Show(area, screen, window);
     }
 
     /// The snap area under the pointer: corners for quarters, the top for the whole screen,
@@ -197,7 +222,7 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
     /// Gestures switched off in Settings leave their place to the next area that applies.
     /// The edges reach as far into the screen as Settings says, wider than the screen's very
     /// edge, so a drag can stop on an edge shared with another display.
-    private (SnapAction Action, SnapEdge Edge)? SnapArea(POINT point, Screen screen)
+    private SnapAction? SnapArea(POINT point, Screen screen)
     {
         var frame = screen.Bounds;
         var band = (int)(settings.EdgeArea.Value * screen.Scale);
@@ -212,30 +237,29 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
         var nearTop = point.Y <= frame.Top + corner;
         var nearBottom = point.Y >= frame.Bottom - corner;
 
-        if (settings.Has(SnapGesture.TopLeft) && ((left && nearTop) || (top && nearLeft))) return (SnapAction.TopLeft, SnapEdge.TopLeft);
-        if (settings.Has(SnapGesture.TopRight) && ((right && nearTop) || (top && nearRight))) return (SnapAction.TopRight, SnapEdge.TopRight);
-        if (settings.Has(SnapGesture.BottomLeft) && ((left && nearBottom) || (bottom && nearLeft))) return (SnapAction.BottomLeft, SnapEdge.BottomLeft);
-        if (settings.Has(SnapGesture.BottomRight) && ((right && nearBottom) || (bottom && nearRight))) return (SnapAction.BottomRight, SnapEdge.BottomRight);
-        if (top && settings.Has(SnapGesture.Maximize)) return (SnapAction.Maximize, SnapEdge.Top);
+        if (settings.Has(SnapGesture.TopLeft) && ((left && nearTop) || (top && nearLeft))) return SnapAction.TopLeft;
+        if (settings.Has(SnapGesture.TopRight) && ((right && nearTop) || (top && nearRight))) return SnapAction.TopRight;
+        if (settings.Has(SnapGesture.BottomLeft) && ((left && nearBottom) || (bottom && nearLeft))) return SnapAction.BottomLeft;
+        if (settings.Has(SnapGesture.BottomRight) && ((right && nearBottom) || (bottom && nearRight))) return SnapAction.BottomRight;
+        if (top && settings.Has(SnapGesture.Maximize)) return SnapAction.Maximize;
         if (left || right)
         {
-            var edge = left ? SnapEdge.Left : SnapEdge.Right;
-            if (settings.Has(SnapGesture.TopHalf) && point.Y <= frame.Top + shortEdge) return (SnapAction.TopHalf, edge);
-            if (settings.Has(SnapGesture.BottomHalf) && point.Y >= frame.Bottom - shortEdge) return (SnapAction.BottomHalf, edge);
-            if (left && settings.Has(SnapGesture.LeftHalf)) return (SnapAction.LeftHalf, edge);
-            if (right && settings.Has(SnapGesture.RightHalf)) return (SnapAction.RightHalf, edge);
+            if (settings.Has(SnapGesture.TopHalf) && point.Y <= frame.Top + shortEdge) return SnapAction.TopHalf;
+            if (settings.Has(SnapGesture.BottomHalf) && point.Y >= frame.Bottom - shortEdge) return SnapAction.BottomHalf;
+            if (left && settings.Has(SnapGesture.LeftHalf)) return SnapAction.LeftHalf;
+            if (right && settings.Has(SnapGesture.RightHalf)) return SnapAction.RightHalf;
         }
         if (bottom && settings.Has(SnapGesture.Thirds))
         {
             var third = frame.Width / 3;
-            if (point.X < frame.Left + third) return (SnapAction.FirstThird, SnapEdge.Bottom);
-            if (point.X > frame.Right - third) return (SnapAction.LastThird, SnapEdge.Bottom);
-            if (!settings.Has(SnapGesture.TwoThirds)) return (SnapAction.CenterThird, SnapEdge.Bottom);
+            if (point.X < frame.Left + third) return SnapAction.FirstThird;
+            if (point.X > frame.Right - third) return SnapAction.LastThird;
+            if (!settings.Has(SnapGesture.TwoThirds)) return SnapAction.CenterThird;
             return target?.Action switch
             {
-                SnapAction.FirstThird or SnapAction.FirstTwoThirds => (SnapAction.FirstTwoThirds, SnapEdge.Bottom),
-                SnapAction.LastThird or SnapAction.LastTwoThirds => (SnapAction.LastTwoThirds, SnapEdge.Bottom),
-                _ => (SnapAction.CenterThird, SnapEdge.Bottom),
+                SnapAction.FirstThird or SnapAction.FirstTwoThirds => SnapAction.FirstTwoThirds,
+                SnapAction.LastThird or SnapAction.LastTwoThirds => SnapAction.LastTwoThirds,
+                _ => SnapAction.CenterThird,
             };
         }
         return null;
