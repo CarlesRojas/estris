@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Hot Corners: Start, Search and Notification Center open on the screen whose corner you pushed, not always on the main one.
 - Hot Corners now starts with every corner set to Nothing, so none acts until you choose what it does.
 - Hot Corners: Show Desktop no longer stops responding after Task View was opened over the desktop, and using another corner while the desktop shows makes the next push show it again.
 - Hot Corners: while Task View is open, only its own corner works.
