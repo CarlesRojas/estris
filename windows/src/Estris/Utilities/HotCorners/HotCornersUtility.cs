@@ -19,7 +19,11 @@ namespace Estris.Utilities.HotCorners;
 /// is in front only its own corner works, and any other corner forgets the shown desktop.
 public sealed partial class HotCornersUtility(AppLog log) : IUtility
 {
-    private const int Win = 0x5B, Shift = 0xA0, VkA = 0x41, VkM = 0x4D, VkN = 0x4E, VkW = 0x57;
+    private const int Win = 0x5B, Shift = 0xA0, VkA = 0x41, VkM = 0x4D, VkN = 0x4E, VkS = 0x53, VkW = 0x57;
+    /// How long Search waits for Start to open on the corner's screen before switching it to search.
+    private const int StartOpenMilliseconds = 1000, StartPollMilliseconds = 20;
+    /// Start and Search, which share a window.
+    private static readonly HashSet<string> StartApps = ["searchhost.exe", "startmenuexperiencehost.exe"];
     private const int VK_LBUTTON = 1, VK_RBUTTON = 2, VK_MBUTTON = 4;
     private const int QUNS_BUSY = 2, QUNS_RUNNING_D3D_FULL_SCREEN = 3, QUNS_PRESENTATION_MODE = 4;
     /// How near a corner, in pixels, counts as in it.
@@ -61,6 +65,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
 
     // UI thread only.
     private HotCornerAction pendingAction;
+    private POINT pendingPoint;
     /// A corner showed the desktop, and nothing has been opened since.
     private bool isDesktopShown;
 
@@ -68,7 +73,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
     {
         delayTimer = App.Ui.CreateTimer();
         delayTimer.IsRepeating = false;
-        delayTimer.Tick += (_, _) => Fire(pendingGeneration, pendingAction);
+        delayTimer.Tick += (_, _) => Fire(pendingGeneration, pendingAction, pendingPoint);
         Enabled.Changed += Apply;
         foreach (var corner in Enum.GetValues<Corner>()) settings.For(corner).Changed += Apply;
         Apply();
@@ -126,16 +131,19 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         latched = corner;
         latchedBounds = screen.Bounds;
         var action = settings.For(corner).Value;
+        var (pointX, pointY) = CornerPoint(screen.Bounds, corner);
+        var point = new POINT { X = pointX, Y = pointY };
         if (action == HotCornerAction.Nothing) return;
         var push = Interlocked.Increment(ref generation);
         var delay = settings.Delay.Value;
         if (delay > 0) Volatile.Write(ref pendingGeneration, push);
         App.Ui.TryEnqueue(() =>
         {
-            if (delay <= 0) Fire(push, action);
+            if (delay <= 0) Fire(push, action, point);
             else if (delayTimer is not null)
             {
                 pendingAction = action;
+                pendingPoint = point;
                 delayTimer.Stop();
                 delayTimer.Interval = TimeSpan.FromMilliseconds(delay);
                 delayTimer.Start();
@@ -194,7 +202,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         screens.Any(s => x >= s.Bounds.Left && x < s.Bounds.Right && y >= s.Bounds.Top && y < s.Bounds.Bottom);
 
     /// On the UI thread, if this push is still the latest.
-    private void Fire(int push, HotCornerAction action)
+    private void Fire(int push, HotCornerAction action, POINT corner)
     {
         if (push == 0 || Volatile.Read(ref generation) != push) return;
         Volatile.Write(ref pendingGeneration, 0);
@@ -216,7 +224,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         else
         {
             isDesktopShown = false;
-            Perform(action);
+            Perform(action, corner);
         }
     }
 
@@ -231,14 +239,16 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         return app is null || !ShellApps.Contains(app);
     }
 
-    private void Perform(HotCornerAction action)
+    /// Start, Search and Notification Center open from the corner's own taskbar, on its screen;
+    /// the shortcuts would open them on the main screen.
+    private void Perform(HotCornerAction action, POINT corner)
     {
         switch (action)
         {
             case HotCornerAction.TaskView: SystemActions.Perform(SystemAction.TaskView, log); break;
-            case HotCornerAction.StartMenu: SystemActions.Perform(SystemAction.StartMenu, log); break;
-            case HotCornerAction.Search: SystemActions.Perform(SystemAction.Search, log); break;
-            case HotCornerAction.NotificationCenter: InputSender.Chord(Win, VkN); break;
+            case HotCornerAction.StartMenu: _ = Task.Run(() => PressOrChord(corner, TaskbarButtons.Start, Win)); break;
+            case HotCornerAction.Search: _ = Task.Run(() => OpenSearch(corner)); break;
+            case HotCornerAction.NotificationCenter: _ = Task.Run(() => PressOrChord(corner, TaskbarButtons.Clock, Win, VkN)); break;
             case HotCornerAction.QuickSettings: InputSender.Chord(Win, VkA); break;
             case HotCornerAction.Widgets: InputSender.Chord(Win, VkW); break;
             case HotCornerAction.SleepDisplay: SystemActions.Perform(SystemAction.SleepDisplay, log); break;
@@ -262,6 +272,32 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
             isDesktopShown = true;
         }
     }
+
+    private void PressOrChord(POINT corner, string button, params int[] chord)
+    {
+        if (TaskbarButtons.Press(corner, button)) return;
+        log.Add(Title, $"no {button} on that screen's taskbar: using the shortcut");
+        InputSender.Chord(chord);
+    }
+
+    /// Search has no button of its own on every taskbar, so Start opens on the corner's screen and
+    /// Win+S turns it into Search there. With Start or Search already open, Win+S switches or closes.
+    private void OpenSearch(POINT corner)
+    {
+        if (!IsStartInFront() && TaskbarButtons.Press(corner, TaskbarButtons.Start))
+        {
+            var deadline = Environment.TickCount64 + StartOpenMilliseconds;
+            while (!IsStartInFront() && Environment.TickCount64 < deadline) Thread.Sleep(StartPollMilliseconds);
+            if (!IsStartInFront())
+            {
+                log.Add(Title, "Start didn't open on that screen: not searching");
+                return;
+            }
+        }
+        InputSender.Chord(Win, VkS);
+    }
+
+    private static bool IsStartInFront() => ForegroundApp() is { } app && StartApps.Contains(app);
 
     private static string ActionTitle(HotCornerAction action) => action switch
     {
