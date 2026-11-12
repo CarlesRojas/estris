@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Hot Corners now starts with every corner set to Nothing, so none acts until you choose what it does.
+- Hot Corners: Show Desktop no longer stops responding after Task View was opened over the desktop, and using another corner while the desktop shows makes the next push show it again.
+- Hot Corners: while Task View is open, only its own corner works.
+
 ## 1.1.0 - 2026-11-12
 
 - New utility, Hot Corners: push the pointer into a corner of the screen to show the desktop, open Task View, the Start menu, notifications and more, and push it again to go back. Each corner gets its own action.
