@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Resizing a window no longer also resizes a window behind it whose edge happens to line up with the one you drag.
 - Delete to Trash: Delete now also deletes folders and zip files selected on the desktop.
 
 ## 0.3.3 - 2026-11-06

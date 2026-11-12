@@ -261,7 +261,8 @@ final class DragSnapper {
     // MARK: - Resizing together
 
     /// Moves every window edge that lay on a line the resize moved, so windows tiled along
-    /// that line, on either side and anywhere along it, keep meeting there. Estris's own
+    /// that line, on either side and anywhere along it, keep meeting there. Windows overlapping
+    /// the dragged one (behind or in front of it) never follow. Estris's own
     /// windows move here; other apps' through the follower.
     private func resizeNeighbours(to frame: NSRect) {
         if neighbours == nil {
@@ -329,6 +330,9 @@ final class DragSnapper {
             // Mostly on the same screen.
             let shared = other.intersection(screen)
             guard !shared.isNull, shared.width * shared.height > other.width * other.height / 2 else { continue }
+            // A window behind or in front of the dragged one (overlapping it) isn't tiled with it.
+            let overlap = other.intersection(startFrame)
+            guard overlap.isNull || overlap.width <= tolerance || overlap.height <= tolerance else { continue }
             var edges: [(edge: Edge, line: Line)] = []
             for line in lines {
                 let near = { (value: CGFloat) in abs(value - line.position) <= tolerance }
