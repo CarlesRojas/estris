@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 1.1.0 - 2026-11-12
+
 - New utility, Hot Corners: push the pointer into a corner of the screen to show the desktop, open Task View, the Start menu, notifications and more, and push it again to go back. Each corner gets its own action.
 - Resizing a window no longer also resizes a window behind it whose edge happens to line up with the one you drag.
+- Performance improvements and bug fixes.
 
 ## 1.0.1 - 2026-11-06
 
