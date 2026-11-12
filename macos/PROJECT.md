@@ -118,7 +118,7 @@ Delete deletes what is selected, as on Windows, where macOS wants ⌘⌫. Off by
 - **Delete (⌫)** (the Mac keyboard's delete key, Backspace on others) and **Forward Delete (⌦)** (Delete on keyboards made for Windows, fn-Delete on a Mac keyboard) each have a switch, both on by default.
 - **Shift-Delete deletes immediately** (on by default): Shift with either key is sent on as ⌥⌘⌫ where the app has that (Delete Immediately in Finder, which asks first). Off, Shift-Delete is left as it is.
 - Finder always counts as having both (its Delete Immediately is a hidden alternate menu item). In Finder's Trash, where ⌘⌫ is Put Back, Delete is sent on as ⌥⌘⌫ instead, found by the front window's title being the Trash's name.
-- Left as it is while the focus is on something that takes text (a text field, a text area, a search field, renaming a file), or when that can't be told; with ⌘, ⌃ or ⌥ held; in Estris itself; in apps without such a command; and in excluded apps.
+- Left as it is while the focus is on something that takes text (a text field, a text area, a search field, renaming a file), or when that can't be told (what has the focus is asked of the system with 0.2 s to answer, then once more of the app itself with 0.5 s; an app answering that nothing has the focus, as Finder may with a folder or archive selected on the desktop, counts as not typing); with ⌘, ⌃ or ⌥ held; in Estris itself; in apps without such a command; and in excluded apps.
 - **Excluded Apps**: every installed app with a switch, all off. Switch an app on to leave the keys alone in it.
 - Holding the key down deletes once: repeats are dropped.
 - Uses an event tap on key presses and reads what has the focus and the apps' menus, so it needs the Accessibility permission.
