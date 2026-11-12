@@ -1,6 +1,6 @@
 # Estris for Windows: project context
 
-A native Windows app with a set of utilities: Clipboard, Color Picker, Rounded Corners, Window Snapping and Remap. `PROJECT.md` at the root of the repo says why the Mac's other utilities stay out. For building and running, see `README.md` there.
+A native Windows app with a set of utilities: Clipboard, Color Picker, Rounded Corners, Window Snapping, Hot Corners and Remap. `PROJECT.md` at the root of the repo says why the Mac's other utilities stay out, and why Hot Corners is only here. For building and running, see `README.md` there.
 
 The Mac app is the reference: `macos/PROJECT.md` describes how each utility behaves, and this file only says what is different here, plus how this app is built. ⌘ on the Mac is Ctrl here. Window Snapping's ⌃⌥ is Win+Alt.
 
@@ -50,6 +50,17 @@ The preview is one style, not two: frosted like Windows's own Snap preview, with
 The preview matches Windows 11's own, measured from it: the system's blurred backdrop under a grey tint (light or dark with the system theme, solid with transparency effects off), 8 px rounded corners, a soft shadow, 8 px in from the screen's edges. It is drawn by the system compositor in a click-through window per screen, just behind the dragged window, so it grows out of the window, glides between areas and shrinks back into it in step with the display; Animation effects off makes it instant. The window landing in its area isn't animated: another app's window can only be moved by asking that app to lay itself out again for every frame, which takes it 6 to 13 ms a step and shows its content lagging behind its frame.
 
 The drag is followed from the dragged window's own move events (as PowerToys' FancyZones does), with a timer for the pointer moving while the window can't; a drag that starts with a resize arrow is a resize. Windows of apps run as administrator are left alone, as Windows doesn't let Estris move them. A window moved to a screen with another scale is sized a second time, after it has resized itself for the new scale.
+
+## Hot Corners
+
+Only on Windows: the Mac has it in System Settings. Behaves as the Mac's: pushing the pointer into a corner of a screen runs the action chosen for that corner, at once, and pushing it again undoes it, as every action toggles (Show Desktop is Win+D, Task View Win+Tab). Any action goes in any corner: Nothing, Show Desktop, Task View, Start Menu, Search, Notification Center (Win+N), Quick Settings (Win+A), Widgets (Win+W), Sleep Display and Lock Screen, the ones shared with Remap run through its `SystemActions`. By default the top-right corner opens Task View and the bottom-right one shows the desktop.
+
+- The pointer is followed from the shared mouse hook (only while on with something in a corner); the hook can report it past the edge it is pushed against, so the point is moved onto the nearest screen first. A corner counts within 1 px, and only where the pointer stops: a corner with another screen past either of its edges doesn't. Screens are listed again every 2 seconds, from the pointer's moves.
+- After firing, a corner fires again only once the pointer has gone 24 logical px away, so a nudge doesn't undo it.
+- Nothing happens while a mouse button is held, so dragging a window into a corner (Window Snapping) doesn't trigger it.
+- **Delay** (none by default, up to 1 s): the pointer must rest in the corner that long; leaving earlier cancels. It's there for the top-right corner, where a maximized window's close button is.
+- **Off in full-screen apps** (on by default): `SHQueryUserNotificationState` says a full-screen app or presentation is in front. The shell's own full-screen windows (the desktop, Task View, Start, Search) don't count, so a second push still undoes them.
+- The actions are keys sent with `SendInput`, which Windows blocks while a window running as administrator is in front.
 
 ## Remap
 

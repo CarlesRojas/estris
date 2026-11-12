@@ -1,0 +1,13 @@
+"%lld ms" = "%lld ms";
+"Behavior" = "Verhalten";
+"Delay" = "Verzögerung";
+"Games, videos and presentations shown full screen ignore the corners." = "Spiele, Videos und Präsentationen im Vollbild ignorieren die Ecken.";
+"Hot Corners" = "Aktive Ecken";
+"How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Wie lange der Zeiger in einer Ecke verweilt, bevor die Aktion ausgeführt wird. Eine kurze Verzögerung verhindert, dass eine schnelle Bewegung zur Schließen-Schaltfläche eines maximierten Fensters die Aufgabenansicht öffnet.";
+"None" = "Keine";
+"Notification Center" = "Benachrichtigungscenter";
+"Off in full-screen apps" = "In Vollbild-Apps aus";
+"Only corners where the pointer stops count: one shared with another screen doesn't. Dragging into a corner does nothing, so Window Snapping's corners keep working." = "Nur Ecken, an denen der Zeiger stoppt, zählen: eine Ecke, die an einen anderen Bildschirm grenzt, nicht. Ziehen in eine Ecke bewirkt nichts, damit die Ecken von „Fenster einrasten“ weiter funktionieren.";
+"Push the pointer into a corner of the screen to show the desktop, open Task View and more. Push it again to go back." = "Schiebe den Zeiger in eine Ecke des Bildschirms, um den Desktop anzuzeigen, die Aufgabenansicht zu öffnen und mehr. Schiebe ihn erneut hinein, um zurückzukehren.";
+"Quick Settings" = "Schnelleinstellungen";
+"Widgets" = "Widgets";

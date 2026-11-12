@@ -1,0 +1,209 @@
+---
+import Cursor from "../Cursor.astro";
+import { pointer, pop, EASE } from "../../lib/motion";
+/** A Windows desktop. The pointer pushes into the bottom-right corner: a glow there, and the
+    windows minimize to show the desktop; a second push brings them back. Then the top-right
+    corner opens Task View, the windows side by side over the desktops strip, and a second push
+    closes it, so it loops. */
+const { d } = Astro.props;
+// The pointer lives on the stage, outside the screen (6%–94% across, 5%–71% down), so it stays
+// in view while its tip sits right in a corner.
+const BR: [number, number] = [94, 71];
+const TR: [number, number] = [94, 5];
+const hits = { br: [13, 30], tr: [50, 68] };
+
+/** A glow and a ring spreading from a corner at each hit. */
+function pulses(name: string, at: number[], from: string, peak: string, to: string): string {
+  const frames = [`0% { opacity: 0; transform: ${from}; }`];
+  for (const p of at) {
+    frames.push(
+      `${p}% { opacity: 0; transform: ${from}; animation-timing-function: ${EASE.snap}; }`,
+      `${p + 1.5}% { opacity: 1; transform: ${peak}; animation-timing-function: ${EASE.sine}; }`,
+      `${p + 8}% { opacity: 0; transform: ${to}; }`,
+    );
+  }
+  frames.push(`100% { opacity: 0; transform: ${from}; }`);
+  return `@keyframes ${name} { ${frames.join(" ")} }`;
+}
+
+const css = [
+  pointer("hc-cursor", [
+    [0, 52, 40], [5, 52, 40], [13, ...BR], [22, ...BR], [25.5, 87, 63], [26.5, 87, 63], [30, ...BR], [33, ...BR],
+    [37.5, 82, 56], [38.5, 82, 56], [50, ...TR], [60, ...TR], [63.5, 87, 13], [64.5, 87, 13], [68, ...TR], [77, ...TR],
+    [90, 52, 40], [100, 52, 40],
+  ]),
+  pulses("hc-glow-br", hits.br, "translate(50%, 50%) scale(.3)", "translate(50%, 50%) scale(1)", "translate(50%, 50%) scale(1.1)"),
+  pulses("hc-glow-tr", hits.tr, "translate(50%, -50%) scale(.3)", "translate(50%, -50%) scale(1)", "translate(50%, -50%) scale(1.1)"),
+  pulses("hc-ring-br", hits.br, "translate(50%, 50%) scale(.1)", "translate(50%, 50%) scale(.45)", "translate(50%, 50%) scale(1.25)"),
+  pulses("hc-ring-tr", hits.tr, "translate(50%, -50%) scale(.1)", "translate(50%, -50%) scale(.45)", "translate(50%, -50%) scale(1.25)"),
+  pop("hc-pill-1", 14, 27),
+  pop("hc-pill-2", 51, 63),
+  // Each window: minimized into the taskbar and back, then into Task View's row and back.
+  ...[
+    { id: "a", n: [7, 7, 52, 60], t: [7.5, 20, 26, 38], lag: 0 },
+    { id: "b", n: [38, 26, 48, 56], t: [37, 20, 26, 38], lag: 0.6 },
+    { id: "c", n: [56, 5, 38, 44], t: [66.5, 20, 26, 38], lag: 1.2 },
+  ].map(({ id, n, t, lag }) => {
+    const box = ([l, tp, w, h]: number[]) => `left: ${l}%; top: ${tp}%; width: ${w}%; height: ${h}%;`;
+    const down = `opacity: 0; transform: translateY(45%) scale(.55);`;
+    const up = `opacity: 1; transform: none;`;
+    return `@keyframes hc-${id} {
+      0%, ${13.5 + lag}% { ${box(n)} ${up} animation-timing-function: ${EASE.snap}; }
+      ${19.5 + lag}%, ${30.5 + lag * 0.5}% { ${box(n)} ${down} animation-timing-function: ${EASE.back}; }
+      ${36.5 + lag * 0.5}%, ${50.5 + lag * 0.5}% { ${box(n)} ${up} animation-timing-function: ${EASE.back}; }
+      ${57 + lag * 0.5}%, ${68.5 + lag * 0.5}% { ${box(t)} ${up} animation-timing-function: ${EASE.snap}; }
+      ${75 + lag * 0.5}%, 100% { ${box(n)} ${up} }
+    }`;
+  }),
+  `@keyframes hc-overlay {
+    0%, 50.5% { opacity: 0; animation-timing-function: ${EASE.snap}; }
+    55%, 68.5% { opacity: 1; animation-timing-function: ${EASE.snap}; }
+    73%, 100% { opacity: 0; }
+  }`,
+  `@keyframes hc-strip {
+    0%, 52% { opacity: 0; transform: translate(-50%, 2cqw); animation-timing-function: ${EASE.back}; }
+    57%, 68.5% { opacity: 1; transform: translate(-50%, 0); animation-timing-function: ${EASE.exit}; }
+    71.5%, 100% { opacity: 0; transform: translate(-50%, 1cqw); }
+  }`,
+].join("\n");
+
+const windows = [
+  { id: "a", color: "var(--blue)" },
+  { id: "b", color: "var(--pink)" },
+  { id: "c", color: "var(--green)" },
+];
+---
+<div class="spot s-hc" style={`--d:${d}s`}>
+  <div class="screen hc-screen">
+    <div class="hc-icons"><span><i></i><b></b></span><span><i></i><b></b></span></div>
+    <div class="hc-overlay"></div>
+    {windows.map(({ id, color }) => (
+      <div class={`hc-win hc-${id}`} style={`--c:${color}`}>
+        <div class="hc-title">
+          <span class="hc-app"></span><b></b>
+          <svg class="hc-ctl" viewBox="0 0 30 10" aria-hidden="true"><path d="M2 5h5M13 2.5h5v5h-5zM24 2.5l5 5M29 2.5l-5 5" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+        </div>
+        <div class="hc-body"><b></b><b></b><b></b><b></b></div>
+      </div>
+    ))}
+    <div class="hc-strip">
+      <span class="hc-desk on"><i><u></u></i><b>Desktop 1</b></span>
+      <span class="hc-desk"><i></i><b>Desktop 2</b></span>
+      <span class="hc-desk hc-new"><i>+</i><b>New desktop</b></span>
+    </div>
+    <div class="hc-taskbar">
+      <span class="hc-apps">
+        <span class="hc-start"><i></i><i></i><i></i><i></i></span>
+        <span class="hc-search"></span>
+        <span class="hc-tile running" style="background:var(--blue)"></span>
+        <span class="hc-tile running" style="background:var(--pink)"></span>
+        <span class="hc-tile running" style="background:var(--green)"></span>
+        <span class="hc-tile" style="background:var(--orange)"></span>
+      </span>
+      <span class="hc-tray"><b></b><b></b><span class="hc-clock">10:42</span></span>
+    </div>
+    <div class="hc-glow hc-glow-br"></div>
+    <div class="hc-glow hc-glow-tr"></div>
+    <div class="hc-ring hc-ring-br"></div>
+    <div class="hc-ring hc-ring-tr"></div>
+  </div>
+  <Cursor class="hc-cursor" />
+  <div class="hc-pill hc-pill-1"><span class="pill">↘ Show desktop</span></div>
+  <div class="hc-pill hc-pill-2"><span class="pill">↗ Task View</span></div>
+</div>
+<Fragment set:html={`<style>${css}</style>`} />
+
+<style is:global>
+  /* Windows 11 in dark mode: the bloom wallpaper, Mica windows with their caption buttons on
+     the right, and a centred taskbar. */
+  .s-hc { --hc: #bfe06a; --bar: 9%; font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; }
+  .s-hc .hc-screen {
+    border-radius: 1.4cqw;
+    background:
+      radial-gradient(60% 70% at 62% 58%, rgba(96, 150, 255, .55), transparent 70%),
+      radial-gradient(40% 50% at 40% 70%, rgba(140, 110, 255, .35), transparent 70%),
+      linear-gradient(160deg, #18213f, #0d1226);
+  }
+  .s-hc .hc-icons { position: absolute; left: 2.5%; top: 4%; display: flex; flex-direction: column; gap: 2cqw; }
+  .s-hc .hc-icons span { display: flex; flex-direction: column; align-items: center; gap: 0.7cqw; }
+  .s-hc .hc-icons i { width: 4.4cqw; height: 4.4cqw; border-radius: 0.9cqw; background: linear-gradient(160deg, #7cc8f0, #4a8fe0); }
+  .s-hc .hc-icons span:last-child i { background: linear-gradient(160deg, #ffd479, #f0a840); }
+  .s-hc .hc-icons b { width: 5cqw; height: 0.8cqw; border-radius: 1cqw; background: rgba(255, 255, 255, .55); }
+
+  .s-hc .hc-win {
+    position: absolute; border-radius: 1cqw; overflow: hidden; background: #202020; transform-origin: 50% 100%;
+    box-shadow: 0 0 0 0.18cqw rgba(255, 255, 255, .12), 0 1.6cqw 3.2cqw rgba(0, 0, 0, .5);
+  }
+  .s-hc .hc-a { left: 7%; top: 7%; width: 52%; height: 60%; z-index: 8; }
+  .s-hc .hc-b { left: 38%; top: 26%; width: 48%; height: 56%; z-index: 7; }
+  .s-hc .hc-c { left: 56%; top: 5%; width: 38%; height: 44%; z-index: 6; }
+  .s-hc .hc-title { display: flex; align-items: center; gap: 1cqw; height: 3.6cqw; padding: 0 1.2cqw; background: #2b2b2b; color: rgba(255, 255, 255, .8); }
+  .s-hc .hc-app { flex: none; width: 1.6cqw; height: 1.6cqw; border-radius: 0.4cqw; background: var(--c); }
+  .s-hc .hc-title b { flex: none; width: 7cqw; height: 0.9cqw; border-radius: 1cqw; background: rgba(255, 255, 255, .3); }
+  .s-hc .hc-ctl { flex: none; width: 6.6cqw; margin-left: auto; }
+  .s-hc .hc-body { padding: 1.8cqw; display: flex; flex-direction: column; gap: 1.2cqw; }
+  .s-hc .hc-body b { display: block; height: 1.1cqw; border-radius: 1cqw; background: rgba(255, 255, 255, .13); }
+  .s-hc .hc-body b:nth-child(1) { width: 60%; background: var(--c); }
+  .s-hc .hc-body b:nth-child(2) { width: 88%; }
+  .s-hc .hc-body b:nth-child(3) { width: 52%; }
+  .s-hc .hc-body b:nth-child(4) { width: 76%; }
+
+  /* Task View: the desktop dims and blurs behind the windows, with the desktops below. */
+  .s-hc .hc-overlay { position: absolute; inset: 0; z-index: 5; opacity: 0; background: rgba(12, 14, 22, .55); backdrop-filter: blur(1.2cqw); }
+  .s-hc .hc-strip {
+    position: absolute; left: 50%; bottom: calc(var(--bar) + 3%); z-index: 9; display: flex; gap: 2cqw;
+    padding: 1.2cqw 1.8cqw; border-radius: 1.4cqw; background: rgba(44, 44, 48, .82);
+    box-shadow: 0 0 0 0.18cqw rgba(255, 255, 255, .1); opacity: 0; transform: translate(-50%, 2cqw);
+  }
+  .s-hc .hc-desk { display: flex; flex-direction: column; align-items: center; gap: 0.7cqw; }
+  .s-hc .hc-desk i {
+    position: relative; display: grid; place-items: center; width: 11cqw; height: 6.6cqw; border-radius: 0.7cqw;
+    background: radial-gradient(70% 80% at 62% 58%, rgba(96, 150, 255, .6), transparent 70%), #141b34;
+    box-shadow: 0 0 0 0.18cqw rgba(255, 255, 255, .14); font-style: normal; font-size: 3.2cqw; color: rgba(255, 255, 255, .8);
+  }
+  .s-hc .hc-desk.on i { box-shadow: 0 0 0 0.35cqw var(--hc); }
+  .s-hc .hc-desk u { position: absolute; left: 18%; top: 20%; width: 50%; height: 50%; border-radius: 0.3cqw; background: #2b2b2b; box-shadow: 1.6cqw 0.6cqw 0 -0.3cqw #3a3a3e; }
+  .s-hc .hc-new i { background: rgba(255, 255, 255, .06); }
+  .s-hc .hc-desk b { font-size: 1.6cqw; font-weight: 500; color: rgba(255, 255, 255, .85); white-space: nowrap; }
+
+  .s-hc .hc-taskbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: var(--bar); z-index: 10; display: flex; align-items: center; justify-content: center;
+    background: rgba(28, 28, 32, .86); box-shadow: inset 0 0.15cqw rgba(255, 255, 255, .08);
+  }
+  .s-hc .hc-apps { display: flex; align-items: center; gap: 1.6cqw; }
+  .s-hc .hc-start { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25cqw; width: 3.2cqw; height: 3.2cqw; padding: 0.2cqw; }
+  .s-hc .hc-start i { border-radius: 0.2cqw; background: linear-gradient(135deg, #5ab4ff, #2f7fe6); }
+  .s-hc .hc-search { width: 2.6cqw; height: 2.6cqw; border-radius: 50%; box-shadow: inset 0 0 0 0.35cqw rgba(255, 255, 255, .7); }
+  .s-hc .hc-tile { position: relative; width: 3.4cqw; height: 3.4cqw; border-radius: 0.8cqw; }
+  .s-hc .hc-tile.running::after {
+    content: ""; position: absolute; left: 50%; bottom: -1cqw; width: 1.2cqw; height: 0.35cqw; margin-left: -0.6cqw;
+    border-radius: 1cqw; background: rgba(255, 255, 255, .6);
+  }
+  .s-hc .hc-tray { position: absolute; right: 2.5%; display: flex; align-items: center; gap: 1cqw; }
+  .s-hc .hc-tray b { width: 1.6cqw; height: 1.6cqw; border-radius: 0.4cqw; background: rgba(255, 255, 255, .45); }
+  .s-hc .hc-clock { margin-left: 0.6cqw; font-size: 1.7cqw; font-weight: 500; color: rgba(255, 255, 255, .9); }
+
+  /* The hit: a glow and a ring spreading from the corner. */
+  .s-hc .hc-glow, .s-hc .hc-ring { position: absolute; right: 0; z-index: 20; pointer-events: none; opacity: 0; border-radius: 50%; }
+  .s-hc .hc-glow { width: 50cqw; height: 50cqw; background: radial-gradient(closest-side, color-mix(in srgb, var(--hc) 95%, transparent), color-mix(in srgb, var(--hc) 40%, transparent) 40%, transparent); }
+  .s-hc .hc-ring { width: 36cqw; height: 36cqw; box-shadow: inset 0 0 0 0.7cqw var(--hc), 0 0 2cqw color-mix(in srgb, var(--hc) 50%, transparent); }
+  .s-hc .hc-glow-br, .s-hc .hc-ring-br { bottom: 0; transform: translate(50%, 50%) scale(.3); }
+  .s-hc .hc-glow-tr, .s-hc .hc-ring-tr { top: 0; transform: translate(50%, -50%) scale(.3); }
+
+  .s-hc .hc-cursor { left: 52%; top: 40%; }
+  .s-hc .hc-pill { position: absolute; left: 0; right: 0; top: 79%; display: flex; justify-content: center; opacity: 0; }
+  .s-hc .hc-pill .pill { font-size: 3.4cqw; padding: 1.6cqw 3cqw; }
+
+  .s-hc.playing .hc-cursor { animation: hc-cursor-x var(--d) both, hc-cursor-y var(--d) both; }
+  .s-hc.playing .hc-a { animation: hc-a var(--d) both; }
+  .s-hc.playing .hc-b { animation: hc-b var(--d) both; }
+  .s-hc.playing .hc-c { animation: hc-c var(--d) both; }
+  .s-hc.playing .hc-overlay { animation: hc-overlay var(--d) both; }
+  .s-hc.playing .hc-strip { animation: hc-strip var(--d) both; }
+  .s-hc.playing .hc-glow-br { animation: hc-glow-br var(--d) both; }
+  .s-hc.playing .hc-glow-tr { animation: hc-glow-tr var(--d) both; }
+  .s-hc.playing .hc-ring-br { animation: hc-ring-br var(--d) both; }
+  .s-hc.playing .hc-ring-tr { animation: hc-ring-tr var(--d) both; }
+  .s-hc.playing .hc-pill-1 { animation: hc-pill-1 var(--d) both; }
+  .s-hc.playing .hc-pill-2 { animation: hc-pill-2 var(--d) both; }
+</style>

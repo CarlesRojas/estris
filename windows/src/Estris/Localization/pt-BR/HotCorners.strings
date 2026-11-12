@@ -1,0 +1,13 @@
+"%lld ms" = "%lld ms";
+"Behavior" = "Comportamento";
+"Delay" = "Atraso";
+"Games, videos and presentations shown full screen ignore the corners." = "Jogos, vídeos e apresentações em tela cheia ignoram os cantos.";
+"Hot Corners" = "Cantos Ativos";
+"How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Quanto tempo o ponteiro fica num canto antes de a ação ser executada. Um atraso curto evita que um movimento rápido até o botão de fechar de uma janela maximizada abra a Visão de Tarefas.";
+"None" = "Nenhum";
+"Notification Center" = "Central de Notificações";
+"Off in full-screen apps" = "Desativados em apps em tela cheia";
+"Only corners where the pointer stops count: one shared with another screen doesn't. Dragging into a corner does nothing, so Window Snapping's corners keep working." = "Só contam os cantos onde o ponteiro para: um compartilhado com outra tela não conta. Arrastar até um canto não faz nada, para que os cantos do Encaixe de janelas continuem funcionando.";
+"Push the pointer into a corner of the screen to show the desktop, open Task View and more. Push it again to go back." = "Leve o ponteiro a um canto da tela para mostrar a área de trabalho, abrir a Visão de Tarefas e mais. Leve-o de novo para voltar.";
+"Quick Settings" = "Configurações Rápidas";
+"Widgets" = "Widgets";

@@ -1,4 +1,5 @@
 import WindowSnapping from "./WindowSnapping.astro";
+import HotCorners from "./HotCorners.astro";
 import Clipboard from "./Clipboard.astro";
 import VolumeMixer from "./VolumeMixer.astro";
 import DockPreview from "./DockPreview.astro";
@@ -14,6 +15,7 @@ import DeleteToTrash from "./DeleteToTrash.astro";
 /** Each feature's spot, by feature id. */
 export const spots: Record<string, any> = {
   "window-snapping": WindowSnapping,
+  "hot-corners": HotCorners,
   clipboard: Clipboard,
   "volume-mixer": VolumeMixer,
   "dock-preview": DockPreview,

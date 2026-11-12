@@ -11,6 +11,8 @@ export interface Feature {
   windowsDetails?: string;
   /** Not in Estris for Windows: PROJECT.md's table says why. */
   macOnly?: boolean;
+  /** Not in Estris for Mac: PROJECT.md's table says why. */
+  windowsOnly?: boolean;
   seconds: number;
   /** The colour of its glow on the page. */
   accent: string;
@@ -28,6 +30,16 @@ export const features: Feature[] = [
     seconds: 10,
     accent: "#6ea8fe",
     icon: '<rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 5v14" stroke="currentColor" stroke-width="1.8"/>',
+  },
+  {
+    id: "hot-corners",
+    title: "Hot Corners",
+    tagline: "Every corner of your screen, a shortcut.",
+    details: "Push the pointer into a corner to show the desktop, open Task View or Start, lock the screen and more, whatever you pick for that corner. Push again to put things back.",
+    windowsOnly: true,
+    seconds: 10,
+    accent: "#bfe06a",
+    icon: '<rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15 5.9a5.1 5.1 0 0 0 5.1 5.1V7.5a1.6 1.6 0 0 0-1.6-1.6z" fill="currentColor"/><path d="M8 15.5l5.5-5.5M9.5 10h4v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
   },
   {
     id: "clipboard",

@@ -1,0 +1,13 @@
+"%lld ms" = "%lld ms";
+"Behavior" = "Comportament";
+"Delay" = "Retard";
+"Games, videos and presentations shown full screen ignore the corners." = "Els jocs, vídeos i presentacions a pantalla completa ignoren els angles.";
+"Hot Corners" = "Angles actius";
+"How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Quanta estona reposa el punter en un angle abans que s'executi l'acció. Un retard curt evita que un moviment ràpid cap al botó de tancar d'una finestra maximitzada obri la Vista de tasques.";
+"None" = "Cap";
+"Notification Center" = "Centre de notificacions";
+"Off in full-screen apps" = "Desactivats en apps a pantalla completa";
+"Only corners where the pointer stops count: one shared with another screen doesn't. Dragging into a corner does nothing, so Window Snapping's corners keep working." = "Només compten els angles on el punter s'atura: un de compartit amb una altra pantalla no. Arrossegar fins a un angle no fa res, així els angles de l'Ajust de finestres continuen funcionant.";
+"Push the pointer into a corner of the screen to show the desktop, open Task View and more. Push it again to go back." = "Porta el punter a un angle de la pantalla per mostrar l'escriptori, obrir la Vista de tasques i més. Torna-l'hi a portar per tornar enrere.";
+"Quick Settings" = "Configuració ràpida";
+"Widgets" = "Ginys";

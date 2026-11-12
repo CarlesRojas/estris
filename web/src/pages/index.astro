@@ -59,6 +59,7 @@ const year = new Date().getFullYear();
           <button
             class="feature-tab"
             data-mac-only={feature.macOnly ? "" : undefined}
+            data-windows-only={feature.windowsOnly ? "" : undefined}
             role="tab"
             id={`tab-${feature.id}`}
             aria-controls={`panel-${feature.id}`}
@@ -82,6 +83,7 @@ const year = new Date().getFullYear();
             <article
               class="feature-panel"
               data-mac-only={feature.macOnly ? "" : undefined}
+              data-windows-only={feature.windowsOnly ? "" : undefined}
               role="tabpanel"
               id={`panel-${feature.id}`}
               aria-labelledby={`tab-${feature.id}`}
@@ -93,6 +95,7 @@ const year = new Date().getFullYear();
               <div class="copy">
                 <h2>{feature.title}</h2>
                 {feature.macOnly && <p class="only">Mac only</p>}
+                {feature.windowsOnly && <p class="only">Windows only</p>}
                 <p class:list={["tagline", { "for-mac": feature.windowsTagline }]}>{feature.tagline}</p>
                 {feature.windowsTagline && <p class="tagline for-windows">{feature.windowsTagline}</p>}
                 <p class:list={["details", { "for-mac": feature.windowsDetails }]}>{feature.details}</p>
@@ -120,7 +123,8 @@ const year = new Date().getFullYear();
     <script>
       // The features play one after another, each for its animation's length. Picking one
       // stops that: it keeps replaying until another is picked.
-      const available = document.documentElement.dataset.os === "windows" ? ":not([data-mac-only])" : "";
+      const os = document.documentElement.dataset.os;
+      const available = os === "windows" ? ":not([data-mac-only])" : os === "mac" ? ":not([data-windows-only])" : "";
       const tabs = [...document.querySelectorAll<HTMLButtonElement>(`.feature-tab${available}`)];
       const panels = [...document.querySelectorAll<HTMLElement>(`.feature-panel${available}`)];
       let current = 0;
