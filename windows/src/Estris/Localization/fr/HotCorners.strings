@@ -1,0 +1,13 @@
+"%lld ms" = "%lld ms";
+"Behavior" = "Comportement";
+"Delay" = "Délai";
+"Games, videos and presentations shown full screen ignore the corners." = "Les jeux, vidéos et présentations en plein écran ignorent les coins.";
+"Hot Corners" = "Coins actifs";
+"How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Combien de temps le pointeur reste dans un coin avant que l'action s'exécute. Un court délai évite qu'un geste rapide vers le bouton de fermeture d'une fenêtre agrandie ouvre l'Affichage des tâches.";
+"None" = "Aucun";
+"Notification Center" = "Centre de notifications";
+"Off in full-screen apps" = "Désactivés dans les apps en plein écran";
+"Only corners where the pointer stops count: one shared with another screen doesn't. Dragging into a corner does nothing, so Window Snapping's corners keep working." = "Seuls comptent les coins où le pointeur s'arrête : un coin partagé avec un autre écran ne compte pas. Faire glisser jusqu'à un coin ne fait rien, pour que les coins de l'Ancrage des fenêtres continuent de fonctionner.";
+"Push the pointer into a corner of the screen to show the desktop, open Task View and more. Push it again to go back." = "Poussez le pointeur dans un coin de l'écran pour afficher le bureau, ouvrir l'Affichage des tâches et plus encore. Poussez-le à nouveau pour revenir.";
+"Quick Settings" = "Paramètres rapides";
+"Widgets" = "Widgets";

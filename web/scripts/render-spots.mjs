@@ -10,12 +10,13 @@ import { readFile, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { extname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const SIZE = 1080;
 const FPS = 30;
-const dist = new URL("../dist/", import.meta.url).pathname;
-const out = new URL("../public/spots/", import.meta.url).pathname;
-const frames = new URL("../.frames/", import.meta.url).pathname;
+const dist = fileURLToPath(new URL("../dist/", import.meta.url));
+const out = fileURLToPath(new URL("../public/spots/", import.meta.url));
+const frames = fileURLToPath(new URL("../.frames/", import.meta.url));
 const args = process.argv.slice(2);
 const sheet = args.includes("--sheet");
 const mov = args.includes("--mov");

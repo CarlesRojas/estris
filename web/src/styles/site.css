@@ -72,7 +72,7 @@ h1, h2, p { margin: 0; }
 .note-mac + .note-windows::before { content: " · "; }
 [data-os="windows"] .note-mac, [data-os="mac"] .note-windows { display: none; }
 [data-os="windows"] .note-windows::before { content: none; }
-[data-os="windows"] [data-mac-only] { display: none; }
+[data-os="windows"] [data-mac-only], [data-os="mac"] [data-windows-only] { display: none; }
 [data-os] .only { display: none; }
 .for-windows { display: none; }
 [data-os="windows"] .for-windows { display: block; }
