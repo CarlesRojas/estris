@@ -15,6 +15,8 @@ final class DeleteToTrash {
     private static let finder = "com.apple.finder"
     /// Accessibility calls into a busy app give up after this long instead of stalling keys.
     private static let messagingTimeout: Float = 0.2
+    /// Longer, for asking once more what has the focus when the first ask got no answer.
+    private static let retryTimeout: Float = 0.5
     /// How long an app's menu commands are trusted before they are read again.
     private static let commandsLifetime: TimeInterval = 5
     /// Roles of elements that take text: there, the key deletes text.
@@ -98,7 +100,7 @@ final class DeleteToTrash {
         else { return true }
         let withShift = event.flags.contains(.maskShift)
         if withShift, !settings.shiftDeletesImmediately { return true }
-        guard !isTyping() else { return true }
+        guard !isTyping(in: app.processIdentifier) else { return true }
 
         // Finder keeps Delete Immediately as a hidden alternate of Move to Trash, which menus
         // may not show to Accessibility; it always has both.
@@ -120,14 +122,50 @@ final class DeleteToTrash {
     // MARK: Accessibility
 
     /// Whether the focus is on something that takes text, or it can't be told: then the key
-    /// is left as it is.
-    private func isTyping() -> Bool {
+    /// is left as it is. When the app answers that nothing has the focus (Finder may, with
+    /// a folder or an archive selected on the desktop), there is nothing to type into.
+    private func isTyping(in pid: pid_t) -> Bool {
         let system = AXUIElementCreateSystemWide()
         AXUIElementSetMessagingTimeout(system, Self.messagingTimeout)
-        guard let focused = Self.element(system, kAXFocusedUIElementAttribute) else { return true }
-        AXUIElementSetMessagingTimeout(focused, Self.messagingTimeout)
-        return [kAXRoleAttribute, kAXSubroleAttribute].contains { attribute in
-            Self.value(focused, attribute).map { Self.textRoles.contains($0 as? String ?? "") } ?? false
+        var focused = Self.focusedElement(of: system)
+        if case .failure(.cannotTell) = focused {
+            // A busy app (Finder working out a folder's or an archive's details) may not answer
+            // in time: asked once more, directly and with longer to answer.
+            let app = AXUIElementCreateApplication(pid)
+            AXUIElementSetMessagingTimeout(app, Self.retryTimeout)
+            focused = Self.focusedElement(of: app)
+        }
+        switch focused {
+        case .failure(.nothing):
+            return false
+        case .failure(.cannotTell):
+            log("Delete left alone: can't tell what has the focus")
+            return true
+        case let .success(element):
+            AXUIElementSetMessagingTimeout(element, Self.messagingTimeout)
+            return [kAXRoleAttribute, kAXSubroleAttribute].contains { attribute in
+                Self.value(element, attribute).map { Self.textRoles.contains($0 as? String ?? "") } ?? false
+            }
+        }
+    }
+
+    private enum FocusError: Error {
+        /// The app answered that nothing has the focus.
+        case nothing
+        /// No answer in time, or an answer that isn't an element.
+        case cannotTell
+    }
+
+    private static func focusedElement(of element: AXUIElement) -> Result<AXUIElement, FocusError> {
+        var value: CFTypeRef?
+        switch AXUIElementCopyAttributeValue(element, kAXFocusedUIElementAttribute as CFString, &value) {
+        case .success:
+            guard let value, CFGetTypeID(value) == AXUIElementGetTypeID() else { return .failure(.nothing) }
+            return .success(value as! AXUIElement)
+        case .noValue, .attributeUnsupported:
+            return .failure(.nothing)
+        default:
+            return .failure(.cannotTell)
         }
     }
 

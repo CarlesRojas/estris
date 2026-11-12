@@ -268,7 +268,8 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
     // Resizing together
 
     /// Moves every window edge that lay on a line the resize moved, so windows tiled along
-    /// that line, on either side and anywhere along it, keep meeting there.
+    /// that line, on either side and anywhere along it, keep meeting there. Windows overlapping
+    /// the dragged one (behind or in front of it) never follow.
     private void ResizeNeighbours(RECT frame)
     {
         var screen = Screen.Of(startFrame);
@@ -330,20 +331,17 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
         var found = new List<Neighbour>();
         foreach (var other in others)
         {
+            // A window behind or in front of the dragged one (overlapping it) isn't tiled with it.
+            var overlaps = Math.Min(other.Frame.Right, startFrame.Right) - Math.Max(other.Frame.Left, startFrame.Left) > tolerance
+                && Math.Min(other.Frame.Bottom, startFrame.Bottom) - Math.Max(other.Frame.Top, startFrame.Top) > tolerance;
+            if (overlaps) continue;
             var edges = new List<(Edge, Edge)>();
             foreach (var dragged in movedEdges)
             {
                 var line = Position(dragged, startFrame);
-                if (dragged is Edge.Left or Edge.Right)
-                {
-                    if (Near(other.Frame.Left, line)) edges.Add((Edge.Left, dragged));
-                    if (Near(other.Frame.Right, line)) edges.Add((Edge.Right, dragged));
-                }
-                else
-                {
-                    if (Near(other.Frame.Top, line)) edges.Add((Edge.Top, dragged));
-                    if (Near(other.Frame.Bottom, line)) edges.Add((Edge.Bottom, dragged));
-                }
+                Edge[] candidates = dragged is Edge.Left or Edge.Right ? [Edge.Left, Edge.Right] : [Edge.Top, Edge.Bottom];
+                foreach (var edge in candidates)
+                    if (Near(Position(edge, other.Frame), line)) edges.Add((edge, dragged));
             }
             if (edges.Count > 0) found.Add(new Neighbour(other.Window, other.Frame, other.Borders, edges));
         }
