@@ -21,9 +21,9 @@ public sealed class HotCornersSettings
     public const bool DefaultIgnoresFullScreen = true;
 
     public Setting<HotCornerAction> TopLeft { get; } = Store.Get("hotCornersTopLeft", HotCornerAction.Nothing);
-    public Setting<HotCornerAction> TopRight { get; } = Store.Get("hotCornersTopRight", HotCornerAction.TaskView);
+    public Setting<HotCornerAction> TopRight { get; } = Store.Get("hotCornersTopRight", HotCornerAction.Nothing);
     public Setting<HotCornerAction> BottomLeft { get; } = Store.Get("hotCornersBottomLeft", HotCornerAction.Nothing);
-    public Setting<HotCornerAction> BottomRight { get; } = Store.Get("hotCornersBottomRight", HotCornerAction.ShowDesktop);
+    public Setting<HotCornerAction> BottomRight { get; } = Store.Get("hotCornersBottomRight", HotCornerAction.Nothing);
     /// How long the pointer rests in a corner before the action runs, in milliseconds.
     public Setting<double> Delay { get; } = Store.Get("hotCornersDelay", DefaultDelay);
     public Setting<bool> IgnoresFullScreen { get; } = Store.Get("hotCornersIgnoreFullScreen", DefaultIgnoresFullScreen);

@@ -3,6 +3,7 @@ using Estris.Core;
 using Estris.Ui;
 using Estris.Utilities.Remap;
 using Estris.Utilities.RoundedCorners;
+using Estris.Utilities.WindowSnapping;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -13,11 +14,12 @@ using static Estris.Core.Native;
 namespace Estris.Utilities.HotCorners;
 
 /// Pushing the pointer into a corner of a screen runs that corner's action, as macOS's Hot
-/// Corners. The actions toggle (Win+D, Win+Tab…), so a second push undoes the first. A corner
-/// counts only where the pointer stops: one shared with the screen next to it doesn't.
+/// Corners. The actions toggle (Win+Tab…), so a second push undoes the first. A corner counts
+/// only where the pointer stops: one shared with the screen next to it doesn't. While Task View
+/// is in front only its own corner works, and any other corner forgets the shown desktop.
 public sealed partial class HotCornersUtility(AppLog log) : IUtility
 {
-    private const int Win = 0x5B, VkA = 0x41, VkN = 0x4E, VkW = 0x57;
+    private const int Win = 0x5B, Shift = 0xA0, VkA = 0x41, VkM = 0x4D, VkN = 0x4E, VkW = 0x57;
     private const int VK_LBUTTON = 1, VK_RBUTTON = 2, VK_MBUTTON = 4;
     private const int QUNS_BUSY = 2, QUNS_RUNNING_D3D_FULL_SCREEN = 3, QUNS_PRESENTATION_MODE = 4;
     /// How near a corner, in pixels, counts as in it.
@@ -31,6 +33,10 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
     /// push must still undo them.
     private static readonly HashSet<string> ShellApps =
         ["explorer.exe", "startmenuexperiencehost.exe", "searchhost.exe", "searchapp.exe", "shellexperiencehost.exe", "widgets.exe"];
+    /// Task View's window, on Windows 11 and on Windows 10.
+    private static readonly HashSet<string> TaskViewClasses = ["XamlExplorerHostIslandWindow", "MultitaskingViewFrame"];
+    /// What is in front once the desktop shows: the desktop itself or a taskbar.
+    private static readonly HashSet<string> DesktopClasses = ["Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd"];
 
     public string Id => "hotCorners";
     public string Title => "Hot Corners";
@@ -55,6 +61,8 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
 
     // UI thread only.
     private HotCornerAction pendingAction;
+    /// A corner showed the desktop, and nothing has been opened since.
+    private bool isDesktopShown;
 
     public void Start()
     {
@@ -197,8 +205,19 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
             log.Add(Title, "a full-screen app is in front: not acting");
             return;
         }
+        var front = WindowNative.ClassName(GetForegroundWindow());
+        if (action != HotCornerAction.TaskView && TaskViewClasses.Contains(front))
+        {
+            log.Add(Title, "Task View is in front: only its corner works");
+            return;
+        }
         log.Add(Title, $"{action}");
-        Perform(action);
+        if (action == HotCornerAction.ShowDesktop) ToggleDesktop(front);
+        else
+        {
+            isDesktopShown = false;
+            Perform(action);
+        }
     }
 
     private static bool IsButtonHeld() =>
@@ -216,7 +235,6 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
     {
         switch (action)
         {
-            case HotCornerAction.ShowDesktop: SystemActions.Perform(SystemAction.ShowDesktop, log); break;
             case HotCornerAction.TaskView: SystemActions.Perform(SystemAction.TaskView, log); break;
             case HotCornerAction.StartMenu: SystemActions.Perform(SystemAction.StartMenu, log); break;
             case HotCornerAction.Search: SystemActions.Perform(SystemAction.Search, log); break;
@@ -225,6 +243,23 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
             case HotCornerAction.Widgets: InputSender.Chord(Win, VkW); break;
             case HotCornerAction.SleepDisplay: SystemActions.Perform(SystemAction.SleepDisplay, log); break;
             case HotCornerAction.LockScreen: SystemActions.Perform(SystemAction.LockScreen, log); break;
+        }
+    }
+
+    /// Minimizes every window, then brings them back. Not Win+D: it toggles, and opening Task View
+    /// over the desktop it showed leaves it thinking the desktop is still shown, so a push did
+    /// nothing. A window opened since the desktop showed means the next push hides it again.
+    private void ToggleDesktop(string front)
+    {
+        if (isDesktopShown && (front.Length == 0 || DesktopClasses.Contains(front)))
+        {
+            InputSender.Chord(Win, Shift, VkM);
+            isDesktopShown = false;
+        }
+        else
+        {
+            InputSender.Chord(Win, VkM);
+            isDesktopShown = true;
         }
     }
 
