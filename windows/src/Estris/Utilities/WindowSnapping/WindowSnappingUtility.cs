@@ -56,6 +56,7 @@ public sealed class WindowSnappingUtility : IUtility
     {
         hotkeys.Set([]);
         dragSnapper.Stop();
+        SystemSnap.SetEdgeSnappingSuppressed(false);
     }
 
     public UIElement BuildPane() => WindowSnappingPane.Build(this, settings);
@@ -77,6 +78,7 @@ public sealed class WindowSnappingUtility : IUtility
         hotkeys.Set(keys);
         if (settings.Enabled.Value && (settings.SnapsByDragging.Value || settings.ResizesTogether.Value)) dragSnapper.Start();
         else dragSnapper.Stop();
+        SystemSnap.SetEdgeSnappingSuppressed(settings.Enabled.Value && settings.SnapsByDragging.Value);
     }
 
     /// Shares the screen the pointer is on evenly among all its windows, each going to the space

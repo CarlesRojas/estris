@@ -42,5 +42,6 @@
 "Top edge: maximize" = "Oberer Rand: maximieren";
 "Top left corner" = "Ecke oben links";
 "Top right corner" = "Ecke oben rechts";
-"Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "Das Andocken von Windows reagiert auf dieselben Ziehbewegungen. Schalte „Fenster andocken“ unter Einstellungen > System > Multitasking aus, damit nicht beide reagieren.";
 "Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Windows oder eine andere App verwendet dieses Tastenkürzel. Estris übernimmt es, solange Window Snapping aktiv ist, oder wähle eine andere Taste.";
+"Windows shows its snap layouts when you drag a window to the top of the screen. Turn that off under “Snap windows” in Settings > System > Multitasking so they don't both act." = "Windows zeigt seine Andocklayouts, wenn du ein Fenster an den oberen Bildschirmrand ziehst. Schalte das unter „Fenster andocken“ in Einstellungen > System > Multitasking aus, damit nicht beide reagieren.";
+"With “Snap windows” off, Windows doesn't let you drag a maximized window. Turn it on in Settings > System > Multitasking: Estris keeps Windows from snapping the windows you drag." = "Ist „Fenster andocken“ aus, lässt Windows dich ein maximiertes Fenster nicht ziehen. Schalte es unter Einstellungen > System > Multitasking ein: Estris verhindert, dass Windows die Fenster andockt, die du ziehst.";
