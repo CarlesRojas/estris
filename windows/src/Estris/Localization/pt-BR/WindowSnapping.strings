@@ -42,5 +42,6 @@
 "Top edge: maximize" = "Borda superior: maximizar";
 "Top left corner" = "Canto superior esquerdo";
 "Top right corner" = "Canto superior direito";
-"Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "O Ajuste do próprio Windows reage aos mesmos arrastos. Desative “Ajustar janelas” em Configurações > Sistema > Multitarefas para que os dois não atuem.";
 "Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "O Windows ou outro app usa este atalho. O Estris assume enquanto o Window Snapping estiver ativado, ou escolha outra tecla.";
+"Windows shows its snap layouts when you drag a window to the top of the screen. Turn that off under “Snap windows” in Settings > System > Multitasking so they don't both act." = "O Windows mostra seus layouts de ajuste quando você arrasta uma janela até o topo da tela. Desative isso em “Ajustar janelas” em Configurações > Sistema > Multitarefas para que os dois não atuem.";
+"With “Snap windows” off, Windows doesn't let you drag a maximized window. Turn it on in Settings > System > Multitasking: Estris keeps Windows from snapping the windows you drag." = "Com “Ajustar janelas” desativado, o Windows não deixa você arrastar uma janela maximizada. Ative em Configurações > Sistema > Multitarefas: o Estris impede que o Windows ajuste as janelas que você arrasta.";

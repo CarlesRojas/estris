@@ -42,5 +42,6 @@
 "Top edge: maximize" = "Bord supérieur : agrandir";
 "Top left corner" = "Coin supérieur gauche";
 "Top right corner" = "Coin supérieur droit";
-"Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "L’ancrage de Windows réagit aux mêmes glissements. Désactivez « Ancrer les fenêtres » dans Paramètres > Système > Multitâche pour qu’ils n’agissent pas tous les deux.";
 "Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Windows ou une autre app utilise ce raccourci. Estris le prend tant que Window Snapping est activé, ou choisissez une autre touche.";
+"Windows shows its snap layouts when you drag a window to the top of the screen. Turn that off under “Snap windows” in Settings > System > Multitasking so they don't both act." = "Windows affiche ses dispositions d’ancrage quand vous faites glisser une fenêtre vers le haut de l’écran. Désactivez-les sous « Ancrer les fenêtres » dans Paramètres > Système > Multitâche pour qu’ils n’agissent pas tous les deux.";
+"With “Snap windows” off, Windows doesn't let you drag a maximized window. Turn it on in Settings > System > Multitasking: Estris keeps Windows from snapping the windows you drag." = "Quand « Ancrer les fenêtres » est désactivé, Windows ne vous laisse pas faire glisser une fenêtre agrandie. Activez-le dans Paramètres > Système > Multitâche : Estris empêche Windows d’ancrer les fenêtres que vous faites glisser.";

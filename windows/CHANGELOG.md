@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Window Snapping no longer needs Windows's own “Snap windows” turned off, so maximized windows can be dragged again: Estris now turns off only Windows's snapping of windows dragged to an edge while it snaps them itself.
 - Hot Corners: Start, Search and Notification Center open on the screen whose corner you pushed, not always on the main one.
 - Hot Corners now starts with every corner set to Nothing, so none acts until you choose what it does.
 - Hot Corners: Show Desktop no longer stops responding after Task View was opened over the desktop, and using another corner while the desktop shows makes the next push show it again.

@@ -94,6 +94,7 @@ public sealed class DragSnapper(WindowSnappingSettings settings, DragSnapper.Sna
         {
             // Read here, as close to the start as can be. A drag from the keyboard (Alt+Space)
             // has no pointer to follow.
+            SystemSnap.KeepSuppressed();
             if (!IsLeftButtonHeld || moved.Frame is not { } frame) return;
             var maximized = moved.IsMaximized;
             var resizes = IsSizingCursor();

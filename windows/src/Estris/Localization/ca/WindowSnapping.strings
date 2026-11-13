@@ -42,5 +42,6 @@
 "Top edge: maximize" = "Vora superior: maximitza";
 "Top left corner" = "Cantonada superior esquerra";
 "Top right corner" = "Cantonada superior dreta";
-"Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act." = "L’ajust propi del Windows reacciona als mateixos arrossegaments. Desactiva «Ajusta les finestres» a Configuració > Sistema > Multitasca perquè no actuïn tots dos.";
 "Windows or another app uses this shortcut. Estris takes it while Window Snapping is on, or pick another key." = "Windows o una altra app fa servir aquesta drecera. L’Estris la pren mentre Window Snapping està activat, o tria una altra tecla.";
+"Windows shows its snap layouts when you drag a window to the top of the screen. Turn that off under “Snap windows” in Settings > System > Multitasking so they don't both act." = "El Windows mostra els seus dissenys d’ajust quan arrossegues una finestra a la part superior de la pantalla. Desactiva-ho a «Ajusta les finestres» a Configuració > Sistema > Multitasca perquè no actuïn tots dos.";
+"With “Snap windows” off, Windows doesn't let you drag a maximized window. Turn it on in Settings > System > Multitasking: Estris keeps Windows from snapping the windows you drag." = "Amb «Ajusta les finestres» desactivat, el Windows no et deixa arrossegar una finestra maximitzada. Activa-ho a Configuració > Sistema > Multitasca: l’Estris evita que el Windows ajusti les finestres que arrossegues.";

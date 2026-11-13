@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
-using System.Runtime.InteropServices;
 using static Estris.Core.Loc;
 
 namespace Estris.Utilities.WindowSnapping;
@@ -14,22 +13,14 @@ namespace Estris.Utilities.WindowSnapping;
 /// shortcuts on one page.
 public static partial class WindowSnappingPane
 {
-    private const uint SPI_GETWINARRANGING = 0x82;
     private const double IconWidth = 18, IconHeight = 14, IconRadius = 2, IconStroke = 1.25;
     private static readonly TimeSpan SnapCheckInterval = TimeSpan.FromSeconds(2);
-
-    [LibraryImport("user32", EntryPoint = "SystemParametersInfoW")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SystemParametersInfo(uint action, uint param, out int value, uint update);
-
-    /// Whether Windows's own Snap is on, which reacts to the same drags.
-    private static bool IsWindowsSnapOn => SystemParametersInfo(SPI_GETWINARRANGING, 0, out var on, 0) && on != 0;
 
     public static UIElement Build(IUtility utility, WindowSnappingSettings settings)
     {
         var pane = new Pane();
         pane.UtilityHeader(utility, T("Snap windows to halves, corners and thirds with shortcuts or by dragging them to a screen edge."));
-        AddWindowsSnapWarning(pane);
+        AddWindowsSnapWarning(pane, settings);
         AddDragging(pane, settings);
         AddArrangeAll(pane, settings);
         AddGestures(pane, settings);
@@ -40,22 +31,44 @@ public static partial class WindowSnappingPane
         return pane.Root;
     }
 
-    /// Shown while Windows's own Snap is on, read again every few seconds while the pane shows,
-    /// so it goes away once it is turned off in Windows Settings.
-    private static void AddWindowsSnapWarning(Pane pane)
+    /// About Windows's own Snap, read again every few seconds while the pane shows, so it
+    /// follows changes made in Windows Settings. With "Snap windows" off, maximized windows can't
+    /// be dragged off the top, and Estris already keeps Windows from snapping dragged windows
+    /// (`SystemSnap`), so it asks for it on. With it on, only the snap layouts shown at the top
+    /// of the screen still react to Estris's drags.
+    private static void AddWindowsSnapWarning(Pane pane, WindowSnappingSettings settings)
     {
         var open = new Button { Content = T("Open Multitasking Settings") };
         open.Click += async (_, _) => await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:multitasking"));
-        var bar = pane.Warning(T("Windows's own Snap reacts to the same drags. Turn off “Snap windows” in Settings > System > Multitasking so they don't both act."));
+        var bar = pane.Warning("");
         bar.Margin = new Thickness(0, 8, 0, 0);
         bar.ActionButton = open;
-        bar.IsOpen = IsWindowsSnapOn;
+        void Update()
+        {
+            if (!SystemSnap.IsOn)
+            {
+                bar.Severity = InfoBarSeverity.Informational;
+                bar.Message = T("With “Snap windows” off, Windows doesn't let you drag a maximized window. Turn it on in Settings > System > Multitasking: Estris keeps Windows from snapping the windows you drag.");
+                bar.IsOpen = true;
+            }
+            else if (settings.SnapsByDragging.Value && SystemSnap.ShowsLayoutsOnDrag)
+            {
+                bar.Severity = InfoBarSeverity.Warning;
+                bar.Message = T("Windows shows its snap layouts when you drag a window to the top of the screen. Turn that off under “Snap windows” in Settings > System > Multitasking so they don't both act.");
+                bar.IsOpen = true;
+            }
+            else
+            {
+                bar.IsOpen = false;
+            }
+        }
+        Update();
         var timer = App.Ui.CreateTimer();
         timer.Interval = SnapCheckInterval;
-        timer.Tick += (_, _) => bar.IsOpen = IsWindowsSnapOn;
+        timer.Tick += (_, _) => Update();
         pane.Root.Loaded += (_, _) =>
         {
-            bar.IsOpen = IsWindowsSnapOn;
+            Update();
             timer.Start();
         };
         pane.Root.Unloaded += (_, _) => timer.Stop();
