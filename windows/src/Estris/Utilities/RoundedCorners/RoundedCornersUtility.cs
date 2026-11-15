@@ -23,7 +23,7 @@ public sealed partial class RoundedCornersUtility(AppLog log) : IUtility
     public string Glyph => "\uE7F4";
     public UtilityGroup Group => UtilityGroup.Tools;
     public string[] Keywords => ["corners", "round", "radius", "screen", "display", "black"];
-    public Setting<bool> Enabled { get; } = SettingsStore.Shared.Get("roundedCornersEnabled", false);
+    public Setting<bool> Enabled { get; } = SettingsStore.Shared.Get(RoundedCornersSettings.EnabledKey, false);
 
     private readonly RoundedCornersSettings settings = new();
     private readonly List<LayeredWindow> windows = [];

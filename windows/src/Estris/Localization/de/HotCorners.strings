@@ -14,5 +14,5 @@
 "Push the pointer into a corner of the screen to show the desktop, open Task View and more. Push it again to go back." = "Schiebe den Zeiger in eine Ecke des Bildschirms, um den Desktop anzuzeigen, die Aufgabenansicht zu öffnen und mehr. Schiebe ihn erneut hinein, um zurückzukehren.";
 "Quick Settings" = "Schnelleinstellungen";
 "Separate for each display" = "Für jeden Bildschirm getrennt";
-"The corners below are this display's." = "Die Ecken unten gehören zu diesem Bildschirm.";
+"The corners below are this display's. Picking one outlines it for a moment." = "Die Ecken unten gehören zu diesem Bildschirm. Beim Auswählen wird er kurz umrandet.";
 "Widgets" = "Widgets";

@@ -327,7 +327,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         var displays = new List<Display>();
         string? selected = null;
         var displayBox = new ComboBox { MinWidth = 180 };
-        var displayCard = pane.Card(T("Display"), displayBox, T("The corners below are this display's."));
+        var displayCard = pane.Card(T("Display"), displayBox, T("The corners below are this display's. Picking one outlines it for a moment."));
         var rows = new List<Action>();
         void SyncRows() { foreach (var sync in rows) sync(); }
         var isLoading = false;
@@ -350,6 +350,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
             if (isLoading || displayBox.SelectedIndex < 0) return;
             selected = displays[displayBox.SelectedIndex].Id;
             SyncRows();
+            DisplayHighlight.Show(displays[displayBox.SelectedIndex]);
         };
         void ShowDisplays()
         {
@@ -357,7 +358,13 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
             if (settings.SeparatesDisplays.Value) LoadDisplays();
             else SyncRows();
         }
-        settings.SeparatesDisplays.Changed += ShowDisplays;
+        settings.SeparatesDisplays.Changed += () =>
+        {
+            ShowDisplays();
+            // Turned on: show which display the rows are for.
+            if (settings.SeparatesDisplays.Value && displays.Find(d => d.Id == selected) is { Id: not null } shown)
+                DisplayHighlight.Show(shown);
+        };
         settings.PerDisplay.Changed += SyncRows;
         // Screens may have changed since the pane was last shown.
         pane.Root.Loaded += (_, _) => ShowDisplays();

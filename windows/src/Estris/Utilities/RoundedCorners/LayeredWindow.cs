@@ -26,6 +26,7 @@ internal sealed partial class LayeredWindow : IDisposable
     private readonly MessageHandler? handler;
     private nint memoryDc, bitmap, previousBitmap, pixels;
     private int surfaceWidth, surfaceHeight;
+    private POINT shownPosition;
     private bool isShown;
 
     public nint Hwnd { get; }
@@ -61,17 +62,28 @@ internal sealed partial class LayeredWindow : IDisposable
         return DefWindowProc(hwnd, message, wParam, lParam);
     }
 
-    /// Paints the window and puts it at a place in physical pixels, in one step.
-    public void Present(int x, int y, int width, int height, Painter paint)
+    /// Paints the window and puts it at a place in physical pixels, in one step, at an opacity.
+    public void Present(int x, int y, int width, int height, Painter paint, byte opacity = 255)
     {
         if (width != surfaceWidth || height != surfaceHeight) Allocate(width, height);
         paint(pixels, width, height);
-        var position = new POINT { X = x, Y = y };
+        var position = shownPosition = new POINT { X = x, Y = y };
         var size = new SIZE { cx = width, cy = height };
         var source = new POINT();
-        var blend = new BLENDFUNCTION { SourceConstantAlpha = 255, AlphaFormat = 1 };
+        var blend = new BLENDFUNCTION { SourceConstantAlpha = opacity, AlphaFormat = 1 };
         UpdateLayeredWindow(Hwnd, 0, ref position, ref size, memoryDc, ref source, 0, ref blend, ULW_ALPHA);
         Show();
+    }
+
+    /// Fades what was last presented, without painting it again: 255 is fully shown.
+    public void SetOpacity(byte opacity)
+    {
+        if (memoryDc == 0) return;
+        var position = shownPosition;
+        var size = new SIZE { cx = surfaceWidth, cy = surfaceHeight };
+        var source = new POINT();
+        var blend = new BLENDFUNCTION { SourceConstantAlpha = opacity, AlphaFormat = 1 };
+        UpdateLayeredWindow(Hwnd, 0, ref position, ref size, memoryDc, ref source, 0, ref blend, ULW_ALPHA);
     }
 
     /// For a window that only has to exist, not show anything: nearly clear over an area.
