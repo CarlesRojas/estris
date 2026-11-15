@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using Estris.Core;
 using Estris.Ui;
 using Estris.Utilities.Remap;
-using Estris.Utilities.RoundedCorners;
 using Estris.Utilities.WindowSnapping;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -14,9 +13,10 @@ using static Estris.Core.Native;
 namespace Estris.Utilities.HotCorners;
 
 /// Pushing the pointer into a corner of a screen runs that corner's action, as macOS's Hot
-/// Corners. The actions toggle (Win+Tab…), so a second push undoes the first. A corner counts
-/// only where the pointer stops: one shared with the screen next to it doesn't. While Task View
-/// is in front only its own corner works, and any other corner forgets the shown desktop.
+/// Corners, and each display can have its own. The actions toggle (Win+Tab…), so a second push
+/// undoes the first. A corner counts only where the pointer stops: one shared with the screen
+/// next to it doesn't. While Task View is in front only its own corner works, and any other
+/// corner forgets the shown desktop.
 public sealed partial class HotCornersUtility(AppLog log) : IUtility
 {
     private const int Win = 0x5B, Shift = 0xA0, VkA = 0x41, VkM = 0x4D, VkN = 0x4E, VkS = 0x53, VkW = 0x57;
@@ -54,7 +54,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
     private bool isListening;
 
     // Hook thread only.
-    private List<(RECT Bounds, uint Dpi)> screens = [];
+    private List<Display> screens = [];
     private long screensAt;
     private Corner? latched;
     private RECT latchedBounds;
@@ -76,14 +76,15 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         delayTimer.Tick += (_, _) => Fire(pendingGeneration, pendingAction, pendingPoint);
         Enabled.Changed += Apply;
         foreach (var corner in Enum.GetValues<Corner>()) settings.For(corner).Changed += Apply;
+        settings.SeparatesDisplays.Changed += Apply;
+        settings.PerDisplay.Changed += Apply;
         Apply();
     }
 
     public void Stop() => Listen(false);
 
     /// Listens to the pointer only while on with something in a corner.
-    private void Apply() =>
-        Listen(Enabled.Value && Enum.GetValues<Corner>().Any(c => settings.For(c).Value != HotCornerAction.Nothing));
+    private void Apply() => Listen(Enabled.Value && settings.HasAny);
 
     private void Listen(bool listens)
     {
@@ -105,7 +106,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         if (e.Action != MouseAction.Move || e.IsOwn) return;
         if (screens.Count == 0 || Environment.TickCount64 - screensAt > ScreensRefreshMilliseconds)
         {
-            screens = LayeredWindow.Screens();
+            screens = Displays.All();
             screensAt = Environment.TickCount64;
         }
         if (screens.Count == 0) return;
@@ -130,7 +131,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         if (hit is not { } corner) return;
         latched = corner;
         latchedBounds = screen.Bounds;
-        var action = settings.For(corner).Value;
+        var action = settings.CornersOf(screen.Id)[corner];
         var (pointX, pointY) = CornerPoint(screen.Bounds, corner);
         var point = new POINT { X = pointX, Y = pointY };
         if (action == HotCornerAction.Nothing) return;
@@ -152,7 +153,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
     }
 
     /// The screen the point is on, or the nearest one, with the point moved onto it.
-    private ((RECT Bounds, uint Dpi) Screen, int X, int Y) Nearest(int x, int y)
+    private (Display Screen, int X, int Y) Nearest(int x, int y)
     {
         var best = screens[0];
         var (bestX, bestY, bestDistance) = (0, 0, long.MaxValue);
@@ -319,7 +320,50 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         pane.UtilityHeader(this, T("Push the pointer into a corner of the screen to show the desktop, open Task View and more. Push it again to go back."));
 
         pane.Section(T("Corners"));
-        var options = Enum.GetValues<HotCornerAction>().Select(a => (a, ActionTitle(a))).ToArray();
+        pane.Toggle(T("Separate for each display"), settings.SeparatesDisplays,
+            T("Give each display its own corners: choose a display, then set what its corners do.")).HeaderIcon = new FontIcon { Glyph = "" };
+
+        // The display whose corners the rows below show, while each display has its own.
+        var displays = new List<Display>();
+        string? selected = null;
+        var displayBox = new ComboBox { MinWidth = 180 };
+        var displayCard = pane.Card(T("Display"), displayBox, T("The corners below are this display's."));
+        var rows = new List<Action>();
+        void SyncRows() { foreach (var sync in rows) sync(); }
+        var isLoading = false;
+        void LoadDisplays()
+        {
+            isLoading = true;
+            displays = Displays.All(refresh: true);
+            displayBox.Items.Clear();
+            foreach (var display in displays)
+                displayBox.Items.Add(display.IsMain ? T("%@ · Main display", display.Name) : display.Name);
+            var index = displays.FindIndex(d => d.Id == selected);
+            if (index < 0) index = Math.Max(0, displays.FindIndex(d => d.IsMain));
+            displayBox.SelectedIndex = displays.Count > 0 ? index : -1;
+            selected = displays.Count > 0 ? displays[index].Id : null;
+            isLoading = false;
+            SyncRows();
+        }
+        displayBox.SelectionChanged += (_, _) =>
+        {
+            if (isLoading || displayBox.SelectedIndex < 0) return;
+            selected = displays[displayBox.SelectedIndex].Id;
+            SyncRows();
+        };
+        void ShowDisplays()
+        {
+            displayCard.Visibility = settings.SeparatesDisplays.Value ? Visibility.Visible : Visibility.Collapsed;
+            if (settings.SeparatesDisplays.Value) LoadDisplays();
+            else SyncRows();
+        }
+        settings.SeparatesDisplays.Changed += ShowDisplays;
+        settings.PerDisplay.Changed += SyncRows;
+        // Screens may have changed since the pane was last shown.
+        pane.Root.Loaded += (_, _) => ShowDisplays();
+        ShowDisplays();
+
+        var options = Enum.GetValues<HotCornerAction>().ToArray();
         foreach (var (corner, title) in new[]
         {
             (Corner.TopLeft, T("Top Left")),
@@ -327,7 +371,23 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
             (Corner.BottomLeft, T("Bottom Left")),
             (Corner.BottomRight, T("Bottom Right")),
         })
-            pane.Choice(title, settings.For(corner), options).HeaderIcon = CornerIcon(corner);
+        {
+            var row = new CornerSetting(settings, corner, () => settings.SeparatesDisplays.Value ? selected : null);
+            var box = new ComboBox { MinWidth = 180 };
+            foreach (var option in options) box.Items.Add(ActionTitle(option));
+            var isSyncing = false;
+            void Sync()
+            {
+                isSyncing = true;
+                box.SelectedIndex = Array.IndexOf(options, row.Value);
+                isSyncing = false;
+            }
+            box.SelectionChanged += (_, _) => { if (!isSyncing && box.SelectedIndex >= 0) row.Value = options[box.SelectedIndex]; };
+            settings.For(corner).Changed += Sync;
+            rows.Add(Sync);
+            Sync();
+            pane.Card(title, box, null, row).HeaderIcon = CornerIcon(corner);
+        }
         pane.Note(T("Only corners where the pointer stops count: one shared with another screen doesn't. Dragging into a corner does nothing, so Window Snapping's corners keep working."));
 
         pane.Section(T("Behavior"));
@@ -338,6 +398,24 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
 
         pane.ResetButton(settings.Reset);
         return pane.Root;
+    }
+
+    /// One corner of the display picked in the pane, or of every display while they share them.
+    private sealed class CornerSetting(HotCornersSettings settings, Corner corner, Func<string?> display) : ISetting
+    {
+        public HotCornerAction Value
+        {
+            get => settings.CornersOf(display())[corner];
+            set
+            {
+                if (display() is { } id) settings.Set(id, corner, value);
+                else settings.For(corner).Value = value;
+            }
+        }
+
+        public bool IsDefault => Value == HotCornerAction.Nothing;
+        public void Reset() => Value = HotCornerAction.Nothing;
+        public event Action? Changed { add { } remove { } }
     }
 
     /// A screen with its corner marked, as a vector icon in the text colour.

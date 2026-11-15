@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Hot Corners: turn on Separate for each display to give each display its own corners.
+
 ## 1.1.1 - 2026-11-13
 
 - Window Snapping no longer needs Windows's own “Snap windows” turned off, so maximized windows can be dragged again: Estris now turns off only Windows's snapping of windows dragged to an edge while it snaps them itself.
