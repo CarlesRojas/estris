@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 1.2.1 - 2026-11-15
+
 - Hot Corners: picking a display in Separate for each display outlines it for a moment, so you can tell which screen it is.
+- Performance improvements and bug fixes.
 
 ## 1.2.0 - 2026-11-15
 
