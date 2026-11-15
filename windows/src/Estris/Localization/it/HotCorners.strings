@@ -1,7 +1,10 @@
+"%@ · Main display" = "%@ · Schermo principale";
 "%lld ms" = "%lld ms";
 "Behavior" = "Comportamento";
+"Built-in Display" = "Schermo integrato";
 "Delay" = "Ritardo";
 "Games, videos and presentations shown full screen ignore the corners." = "Giochi, video e presentazioni a schermo intero ignorano gli angoli.";
+"Give each display its own corners: choose a display, then set what its corners do." = "Dai a ogni schermo i suoi angoli: scegli uno schermo, poi cosa fanno i suoi angoli.";
 "Hot Corners" = "Angoli attivi";
 "How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Quanto a lungo il puntatore resta in un angolo prima che l'azione venga eseguita. Un breve ritardo evita che un movimento rapido verso il pulsante di chiusura di una finestra ingrandita apra Visualizzazione attività.";
 "None" = "Nessuno";
@@ -10,4 +13,6 @@
 "Only corners where the pointer stops count: one shared with another screen doesn't. Dragging into a corner does nothing, so Window Snapping's corners keep working." = "Contano solo gli angoli dove il puntatore si ferma: uno condiviso con un altro schermo no. Trascinare in un angolo non fa nulla, così gli angoli dell'Aggancio finestre continuano a funzionare.";
 "Push the pointer into a corner of the screen to show the desktop, open Task View and more. Push it again to go back." = "Porta il puntatore in un angolo dello schermo per mostrare il desktop, aprire Visualizzazione attività e altro. Portalo di nuovo per tornare indietro.";
 "Quick Settings" = "Impostazioni rapide";
+"Separate for each display" = "Separati per schermo";
+"The corners below are this display's." = "Gli angoli qui sotto sono quelli di questo schermo.";
 "Widgets" = "Widget";
