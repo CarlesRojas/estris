@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 1.2.0 - 2026-11-15
+
 - Hot Corners: turn on Separate for each display to give each display its own corners.
+- Performance improvements and bug fixes.
 
 ## 1.1.1 - 2026-11-13
 
