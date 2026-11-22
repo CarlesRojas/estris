@@ -3,7 +3,7 @@
 "Behavior" = "Comportament";
 "Built-in Display" = "Pantalla integrada";
 "Delay" = "Retard";
-"Games, videos and presentations shown full screen ignore the corners." = "Els jocs, vídeos i presentacions a pantalla completa ignoren els angles.";
+"Games, videos and presentations shown full screen, and games that hide or hold the pointer, ignore the corners." = "Els jocs, vídeos i presentacions a pantalla completa, i els jocs que amaguen o retenen el punter, ignoren els angles.";
 "Give each display its own corners: choose a display, then set what its corners do." = "Dona a cada pantalla les seves pròpies cantonades: tria una pantalla i després què fan les seves cantonades.";
 "Hot Corners" = "Angles actius";
 "How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Quanta estona reposa el punter en un angle abans que s'executi l'acció. Un retard curt evita que un moviment ràpid cap al botó de tancar d'una finestra maximitzada obri la Vista de tasques.";

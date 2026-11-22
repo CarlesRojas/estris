@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- New utility, Accent Menu: hold down a letter key while typing to choose an accented version of it, such as é, ñ or ç, as on a Mac.
+- Hot Corners: with Off in full-screen apps on, corners also stay off in borderless full-screen games and videos, and in games that hide or hold the pointer.
+
 ## 1.2.1 - 2026-11-15
 
 - Hot Corners: picking a display in Separate for each display outlines it for a moment, so you can tell which screen it is.

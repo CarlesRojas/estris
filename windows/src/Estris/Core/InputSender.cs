@@ -8,7 +8,7 @@ public static partial class InputSender
     public static readonly nuint Tag = 0x45535452; // "ESTR"
 
     private const uint INPUT_MOUSE = 0, INPUT_KEYBOARD = 1;
-    private const uint KEYEVENTF_EXTENDEDKEY = 1, KEYEVENTF_KEYUP = 2, KEYEVENTF_SCANCODE = 8;
+    private const uint KEYEVENTF_EXTENDEDKEY = 1, KEYEVENTF_KEYUP = 2, KEYEVENTF_UNICODE = 4, KEYEVENTF_SCANCODE = 8;
 
     [StructLayout(LayoutKind.Sequential)]
     private struct KEYBDINPUT { public ushort wVk, wScan; public uint dwFlags, time; public nuint dwExtraInfo; }
@@ -56,6 +56,20 @@ public static partial class InputSender
         SendInput((uint)inputs.Count, inputs.ToArray(), Marshal.SizeOf<INPUT>());
     }
 
+    /// Types text as it is, whatever the keyboard layout: each character as a Unicode key press.
+    public static void Text(string text)
+    {
+        var inputs = new List<INPUT>(text.Length * 2);
+        foreach (var c in text)
+            foreach (var up in new[] { false, true })
+                inputs.Add(new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    data = new InputUnion { Key = new KEYBDINPUT { wScan = c, dwFlags = KEYEVENTF_UNICODE | (up ? KEYEVENTF_KEYUP : 0), dwExtraInfo = Tag } },
+                });
+        SendInput((uint)inputs.Count, inputs.ToArray(), Marshal.SizeOf<INPUT>());
+    }
+
     public static void Mouse(uint flags, uint data = 0) =>
         SendInput(1, [new INPUT { type = INPUT_MOUSE, data = new InputUnion { Mouse = new MOUSEINPUT { dwFlags = flags, mouseData = data, dwExtraInfo = Tag } } }], Marshal.SizeOf<INPUT>());
 
@@ -68,6 +82,10 @@ public static partial class InputSender
 
     [LibraryImport("user32")]
     public static partial short GetAsyncKeyState(int vk);
+
+    /// Toggle keys' state (Caps Lock) in the low bit.
+    [LibraryImport("user32")]
+    public static partial short GetKeyState(int vk);
 
     private static bool IsExtendedKey(int vk) => vk is
         0x21 or 0x22 or 0x23 or 0x24 or 0x25 or 0x26 or 0x27 or 0x28 or 0x2D or 0x2E // navigation

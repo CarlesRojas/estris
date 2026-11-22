@@ -11,6 +11,7 @@ import Remap from "./Remap.astro";
 import MiddleClick from "./MiddleClick.astro";
 import AutoQuit from "./AutoQuit.astro";
 import DeleteToTrash from "./DeleteToTrash.astro";
+import AccentMenu from "./AccentMenu.astro";
 
 /** Each feature's spot, by feature id. */
 export const spots: Record<string, any> = {
@@ -27,4 +28,5 @@ export const spots: Record<string, any> = {
   "middle-click": MiddleClick,
   "auto-quit": AutoQuit,
   "delete-to-trash": DeleteToTrash,
+  "accent-menu": AccentMenu,
 };

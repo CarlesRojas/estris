@@ -3,7 +3,7 @@
 "Behavior" = "Verhalten";
 "Built-in Display" = "Integrierter Bildschirm";
 "Delay" = "Verzögerung";
-"Games, videos and presentations shown full screen ignore the corners." = "Spiele, Videos und Präsentationen im Vollbild ignorieren die Ecken.";
+"Games, videos and presentations shown full screen, and games that hide or hold the pointer, ignore the corners." = "Spiele, Videos und Präsentationen im Vollbild sowie Spiele, die den Zeiger ausblenden oder festhalten, ignorieren die Ecken.";
 "Give each display its own corners: choose a display, then set what its corners do." = "Gib jedem Bildschirm eigene Ecken: Wähle einen Bildschirm und dann, was seine Ecken tun.";
 "Hot Corners" = "Aktive Ecken";
 "How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Wie lange der Zeiger in einer Ecke verweilt, bevor die Aktion ausgeführt wird. Eine kurze Verzögerung verhindert, dass eine schnelle Bewegung zur Schließen-Schaltfläche eines maximierten Fensters die Aufgabenansicht öffnet.";

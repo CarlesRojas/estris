@@ -121,6 +121,16 @@ export const features: Feature[] = [
     icon: '<rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 10h1M10.5 10h1M14.5 10h1M8 14h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   },
   {
+    id: "accent-menu",
+    title: "Accent Menu",
+    tagline: "Every accent, one held key away.",
+    details: "Hold down a letter while typing to see its accents over the text, as on a Mac. Pick é, ñ or ç with its number, the arrow keys or a click.",
+    windowsOnly: true,
+    seconds: 8,
+    accent: "#e58df2",
+    icon: '<rect x="3" y="6" width="18" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13.6 2.5l-2.2 2.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.2 13.6h5.8a2.9 2.9 0 1 0-.9 2.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+  },
+  {
     id: "middle-click",
     title: "Middle Click",
     tagline: "The middle click, now on your trackpad.",

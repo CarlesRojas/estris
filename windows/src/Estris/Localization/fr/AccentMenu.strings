@@ -1,0 +1,4 @@
+"Accent Menu" = "Menu des accents";
+"Hold down a letter key while typing to choose an accented version of it, such as é, ñ or ç." = "Maintenez une lettre enfoncée pendant la saisie pour choisir une version accentuée, comme é, ñ ou ç.";
+"How long a key is held before its accents show." = "Durée pendant laquelle une touche doit être maintenue avant que ses accents s’affichent.";
+"Pick an accent with its number, with the arrow keys and Enter, or with a click. Esc keeps the letter you typed. As on a Mac, letters don't repeat while held in a text field." = "Choisissez un accent avec son numéro, avec les flèches et Entrée, ou d’un clic. Échap conserve la lettre tapée. Comme sur un Mac, les lettres ne se répètent pas lorsqu’elles sont maintenues dans un champ de texte.";

@@ -1,6 +1,6 @@
 # Estris for Windows: project context
 
-A native Windows app with a set of utilities: Clipboard, Color Picker, Rounded Corners, Window Snapping, Hot Corners and Remap. `PROJECT.md` at the root of the repo says why the Mac's other utilities stay out, and why Hot Corners is only here. For building and running, see `README.md` there.
+A native Windows app with a set of utilities: Clipboard, Color Picker, Rounded Corners, Window Snapping, Hot Corners, Remap and Accent Menu. `PROJECT.md` at the root of the repo says why the Mac's other utilities stay out, and why Hot Corners and Accent Menu are only here. For building and running, see `README.md` there.
 
 The Mac app is the reference: `macos/PROJECT.md` describes how each utility behaves, and this file only says what is different here, plus how this app is built. ⌘ on the Mac is Ctrl here. Window Snapping's ⌃⌥ is Win+Alt.
 
@@ -60,7 +60,7 @@ Only on Windows: the Mac has it in System Settings. Behaves as the Mac's: pushin
 - Nothing happens while a mouse button is held, so dragging a window into a corner (Window Snapping) doesn't trigger it.
 - **Separate for each display** (off by default): each display gets its own corners. A **Display** picker (its monitor's name, numbered left to right when two are the same model, the main one marked) chooses which display the four corner rows show and set. Picking a display, or turning this on, outlines that display in the accent colour for a moment (`DisplayHighlight`: a click-through layered window over the display, fading in and out, its corners following Rounded Corners' radius while that is on), so you can tell which one it is. Displays are told apart by their monitor's device path (`Displays`, from the display configuration), which names the model and the port, so each keeps its corners across restarts and reconnects. A display not set yet uses the shared corners, and its first change copies them, so turning this on changes nothing until a corner is set. Both settings are `local.`, as they belong to this PC's monitors. The display configuration is asked again only when the screens change.
 - **Delay** (none by default, up to 1 s): the pointer must rest in the corner that long; leaving earlier cancels. It's there for the top-right corner, where a maximized window's close button is.
-- **Off in full-screen apps** (on by default): `SHQueryUserNotificationState` says a full-screen app or presentation is in front. The shell's own full-screen windows (the desktop, Task View, Start, Search) don't count, so a second push still undoes them.
+- **Off in full-screen apps** (on by default): a full-screen app, game or presentation is in front when `SHQueryUserNotificationState` says so, when the window in front covers the whole screen of the corner without being maximized (borderless full-screen games and videos, which Windows doesn't always report), or when the pointer is hidden or clipped to part of the screens, as games hold it. The shell's own full-screen windows (the desktop, Task View, Start, Search) and Estris's don't count, so a second push still undoes them.
 - The actions are keys sent with `SendInput`, which Windows blocks while a window running as administrator is in front.
 
 ## Remap
@@ -79,6 +79,16 @@ As on the Mac (a group of mappings per device with rename, Add Mapping, source a
 - Devices come from `GetRawInputDeviceList` with the HID vendor, product, maker and product name (Device Manager's name for those that give none); every interface of a device counts as it. Identified by vendor, product and name, so mappings survive reconnects and identical devices share them. Listed again when one connects or disconnects, 5 and 20 seconds after Remap starts listening, and when a press comes from an interface not listed yet (at most every 2 seconds).
 - Event Viewer: Down and Up rows with the name, the scan code and virtual key (or button number) and the device; a remapped one shows an arrow and the result in the accent colour. Hovering a row shows Create Mapping. It follows new events unless scrolled up, and logs only while open.
 - Keys and buttons can't be remapped while a window running as administrator is in front (Windows keeps its input from other programs); the pane says so.
+
+## Accent Menu
+
+Only on Windows: the Mac does it itself. Behaves as the Mac's press-and-hold: holding down a letter key while typing shows its accented versions over the caret, numbered, in the Mac's order and lists (a, c, e, i, l, n, o, s, u, y and z; capitals with Shift or Caps Lock). A number (top row or keypad) picks one; Left and Right select (the first press selects the first or last), and then Enter, or Space followed by a space, picks it; the pointer over one selects it and a click picks it. The pick takes the place of the letter typed (Backspace, then the character as a Unicode key press, so any layout types it). Esc closes it keeping the letter; any other key, a click elsewhere or another window in front closes it and goes on as usual. The menu stays when the key is let go, as on the Mac.
+
+- Only while typing into text: UI Automation's focused element is an editable Edit or Document (a web page or a reader is a Document with no value to set), or the app shows a system caret (classic Win32). Password fields are left out. Elsewhere (games, a page being read) held keys repeat as usual. The caret's place comes from UI Automation's text pattern (the character just typed) or the system caret, scaled for apps that aren't DPI aware; an editable field that says neither puts the menu at a single line's start, or by the pointer.
+- The check runs off the hook thread, 100 ms after the press (or half the delay), so the app has typed the letter by then. As on the Mac, no letter held in text repeats, with accents or not (other keys do); until the check is back, its repeats are held back too.
+- Not with Ctrl, Alt or Win held (a shortcut), and only when the key types its own letter in the layout of the app in front, so not on Cyrillic or Greek layouts.
+- **Delay** (500 ms, Windows's default key repeat delay, from 200 ms to 1.5 s): how long a key is held before the menu shows.
+- The menu is a `GlassPanel` that lets the pointer through; the mouse hook, only while it shows, follows the pointer over it and takes its clicks, so it never takes the focus.
 
 ## Updates
 
