@@ -3,7 +3,7 @@
 "Behavior" = "Comportement";
 "Built-in Display" = "Écran intégré";
 "Delay" = "Délai";
-"Games, videos and presentations shown full screen ignore the corners." = "Les jeux, vidéos et présentations en plein écran ignorent les coins.";
+"Games, videos and presentations shown full screen, and games that hide or hold the pointer, ignore the corners." = "Les jeux, vidéos et présentations en plein écran, ainsi que les jeux qui masquent ou retiennent le pointeur, ignorent les coins.";
 "Give each display its own corners: choose a display, then set what its corners do." = "Donnez à chaque écran ses propres coins : choisissez un écran, puis ce que font ses coins.";
 "Hot Corners" = "Coins actifs";
 "How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Combien de temps le pointeur reste dans un coin avant que l'action s'exécute. Un court délai évite qu'un geste rapide vers le bouton de fermeture d'une fenêtre agrandie ouvre l'Affichage des tâches.";

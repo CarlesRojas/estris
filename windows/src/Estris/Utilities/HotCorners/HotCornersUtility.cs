@@ -209,7 +209,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         Volatile.Write(ref pendingGeneration, 0);
         // Dragging into a corner, as Window Snapping does, isn't a push.
         if (IsButtonHeld()) return;
-        if (settings.IgnoresFullScreen.Value && IsFullScreenAppInFront())
+        if (settings.IgnoresFullScreen.Value && IsFullScreenAppInFront(corner))
         {
             log.Add(Title, "a full-screen app is in front: not acting");
             return;
@@ -232,13 +232,44 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
     private static bool IsButtonHeld() =>
         new[] { VK_LBUTTON, VK_RBUTTON, VK_MBUTTON }.Any(vk => (InputSender.GetAsyncKeyState(vk) & 0x8000) != 0);
 
-    private static bool IsFullScreenAppInFront()
+    /// A game, video or presentation has the screen: Windows says so, the window in front covers the
+    /// corner's whole screen without being maximized, or the pointer is hidden or held in a part of
+    /// the screens, as games do. The shell's own full-screen windows don't count.
+    private static bool IsFullScreenAppInFront(POINT corner)
     {
-        if (SHQueryUserNotificationState(out var state) != 0) return false;
-        if (state is not (QUNS_BUSY or QUNS_RUNNING_D3D_FULL_SCREEN or QUNS_PRESENTATION_MODE)) return false;
         var app = ForegroundApp();
-        return app is null || !ShellApps.Contains(app);
+        if (app is not null && ShellApps.Contains(app)) return false;
+        if (SHQueryUserNotificationState(out var state) == 0 && state is QUNS_BUSY or QUNS_RUNNING_D3D_FULL_SCREEN or QUNS_PRESENTATION_MODE)
+            return true;
+        if (IsPointerCaptured()) return true;
+        var front = GetForegroundWindow();
+        if (front == 0 || IsZoomed(front) || InputHooks.IsOwnWindowInFront || !GetWindowRect(front, out var window)) return false;
+        var info = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
+        if (!GetMonitorInfo(MonitorFromPoint(corner, MONITOR_DEFAULTTONEAREST), ref info)) return false;
+        var screen = info.rcMonitor;
+        return window.Left <= screen.Left && window.Top <= screen.Top && window.Right >= screen.Right && window.Bottom >= screen.Bottom;
     }
+
+    /// The pointer is hidden, or kept inside part of the screens.
+    private static bool IsPointerCaptured()
+    {
+        var cursor = new CURSORINFO { cbSize = Marshal.SizeOf<CURSORINFO>() };
+        if (GetCursorInfo(ref cursor) && cursor.flags == 0) return true;
+        if (!GetClipCursor(out var clip)) return false;
+        var (left, top) = (GetSystemMetrics(SM_XVIRTUALSCREEN), GetSystemMetrics(SM_YVIRTUALSCREEN));
+        var (width, height) = (GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN));
+        return clip.Left > left || clip.Top > top || clip.Right < left + width || clip.Bottom < top + height;
+    }
+
+    private const int SM_XVIRTUALSCREEN = 76, SM_YVIRTUALSCREEN = 77, SM_CXVIRTUALSCREEN = 78, SM_CYVIRTUALSCREEN = 79;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct CURSORINFO { public int cbSize; public uint flags; public nint hCursor; public POINT ptScreenPos; }
+
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool GetCursorInfo(ref CURSORINFO info);
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool GetClipCursor(out RECT rect);
+    [LibraryImport("user32")] private static partial int GetSystemMetrics(int index);
+    [LibraryImport("user32")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool IsZoomed(nint hwnd);
 
     /// Start, Search and Notification Center open from the corner's own taskbar, on its screen;
     /// the shortcuts would open them on the main screen.
@@ -401,7 +432,7 @@ public sealed partial class HotCornersUtility(AppLog log) : IUtility
         pane.Slider(T("Delay"), settings.Delay, 0, HotCornersSettings.MaximumDelay, HotCornersSettings.DelayStep,
             value => value <= 0 ? T("None") : T("%lld ms", (long)Math.Round(value)),
             T("How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View."));
-        pane.Toggle(T("Off in full-screen apps"), settings.IgnoresFullScreen, T("Games, videos and presentations shown full screen ignore the corners."));
+        pane.Toggle(T("Off in full-screen apps"), settings.IgnoresFullScreen, T("Games, videos and presentations shown full screen, and games that hide or hold the pointer, ignore the corners."));
 
         pane.ResetButton(settings.Reset);
         return pane.Root;

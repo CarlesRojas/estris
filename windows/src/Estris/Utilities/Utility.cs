@@ -37,5 +37,6 @@ public static class UtilityList
         new WindowSnapping.WindowSnappingUtility(log),
         new HotCorners.HotCornersUtility(log),
         new Remap.RemapUtility(log),
+        new AccentMenu.AccentMenuUtility(log),
     ];
 }

@@ -3,7 +3,7 @@
 "Behavior" = "Comportamento";
 "Built-in Display" = "Schermo integrato";
 "Delay" = "Ritardo";
-"Games, videos and presentations shown full screen ignore the corners." = "Giochi, video e presentazioni a schermo intero ignorano gli angoli.";
+"Games, videos and presentations shown full screen, and games that hide or hold the pointer, ignore the corners." = "Giochi, video e presentazioni a schermo intero, e i giochi che nascondono o trattengono il puntatore, ignorano gli angoli.";
 "Give each display its own corners: choose a display, then set what its corners do." = "Dai a ogni schermo i suoi angoli: scegli uno schermo, poi cosa fanno i suoi angoli.";
 "Hot Corners" = "Angoli attivi";
 "How long the pointer rests in a corner before the action runs. A short delay keeps a quick move to a maximized window's close button from opening Task View." = "Quanto a lungo il puntatore resta in un angolo prima che l'azione venga eseguita. Un breve ritardo evita che un movimento rapido verso il pulsante di chiusura di una finestra ingrandita apra Visualizzazione attività.";
