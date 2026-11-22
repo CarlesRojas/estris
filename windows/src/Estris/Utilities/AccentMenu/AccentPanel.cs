@@ -13,14 +13,21 @@ namespace Estris.Utilities.AccentMenu;
 /// pointer itself, from the mouse hook, so the window never takes a click or the focus.
 internal sealed class AccentPanel
 {
-    private const double ItemWidth = 34, ItemHeight = 44, Padding = 4, Spacing = 2, Radius = 8, ItemRadius = 5, ShadowBlur = 16;
-    private const double LetterSize = 20, NumberSize = 11;
+    /// The items' corners sit inside the panel's, as the Clipboard's card: its radius is theirs plus the padding.
+    private const double ItemWidth = 32, ItemHeight = 42, Padding = 5, Spacing = 2, ItemRadius = 8, Radius = ItemRadius + Padding, ShadowBlur = 24;
+    private const double LetterSize = 18, LetterLine = 22, NumberSize = 10, NumberLine = 12;
+    /// The text over the glass, as the Clipboard's: white or black, the numbers fainter.
+    private static readonly Windows.UI.Color DarkLetter = Windows.UI.Color.FromArgb(0xFF, 255, 255, 255), LightLetter = Windows.UI.Color.FromArgb(0xE4, 0, 0, 0);
+    private static readonly Windows.UI.Color DarkNumber = Windows.UI.Color.FromArgb(0x8C, 255, 255, 255), LightNumber = Windows.UI.Color.FromArgb(0x80, 0, 0, 0);
+    /// The number on the chosen accent: the accent's own text colour, fainter.
+    private const double OnAccentNumberOpacity = 0.7;
     /// The gap between the caret and the panel, in logical pixels.
     private const double CaretGap = 6;
 
     private readonly StackPanel row = new() { Orientation = Orientation.Horizontal, Spacing = Spacing, Padding = new Thickness(Padding) };
     private readonly GlassPanel panel;
     private readonly List<(Border Item, TextBlock Letter, TextBlock Number)> items = [];
+    private readonly SolidColorBrush letterBrush = new(), numberBrush = new();
     private (int X, int Y) origin;
     private double scale = 1;
 
@@ -38,8 +45,16 @@ internal sealed class AccentPanel
         items.Clear();
         for (var i = 0; i < accents.Length; i++)
         {
-            var letter = new TextBlock { Text = accents[i].ToString(), FontSize = LetterSize, HorizontalAlignment = HorizontalAlignment.Center };
-            var number = new TextBlock { Text = (i + 1).ToString(), FontSize = NumberSize, HorizontalAlignment = HorizontalAlignment.Center };
+            var letter = new TextBlock
+            {
+                Text = accents[i].ToString(), FontSize = LetterSize, LineHeight = LetterLine,
+                LineStackingStrategy = LineStackingStrategy.BlockLineHeight, HorizontalAlignment = HorizontalAlignment.Center,
+            };
+            var number = new TextBlock
+            {
+                Text = (i + 1).ToString(), FontSize = NumberSize, LineHeight = NumberLine,
+                LineStackingStrategy = LineStackingStrategy.BlockLineHeight, HorizontalAlignment = HorizontalAlignment.Center,
+            };
             var stack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
             stack.Children.Add(letter);
             stack.Children.Add(number);
@@ -47,6 +62,10 @@ internal sealed class AccentPanel
             items.Add((item, letter, number));
             row.Children.Add(item);
         }
+        // Light or dark text as the glass is, which follows Windows's own theme rather than the app's.
+        var isLightGlass = GlassLook.Current().Tint.R > 128;
+        letterBrush.Color = isLightGlass ? LightLetter : DarkLetter;
+        numberBrush.Color = isLightGlass ? LightNumber : DarkNumber;
         Select(-1);
 
         var monitor = MonitorFromPoint(new POINT { X = caret.Left, Y = caret.Top }, MONITOR_DEFAULTTONEAREST);
@@ -85,8 +104,10 @@ internal sealed class AccentPanel
             var (item, letter, number) = items[i];
             var isSelected = i == index;
             item.Background = isSelected ? (Brush)resources["AccentFillColorDefaultBrush"] : null;
-            letter.Foreground = (Brush)resources[isSelected ? "TextOnAccentFillColorPrimaryBrush" : "TextFillColorPrimaryBrush"];
-            number.Foreground = (Brush)resources[isSelected ? "TextOnAccentFillColorSecondaryBrush" : "TextFillColorSecondaryBrush"];
+            var onAccent = (Brush)resources["TextOnAccentFillColorPrimaryBrush"];
+            letter.Foreground = isSelected ? onAccent : letterBrush;
+            number.Foreground = isSelected ? onAccent : numberBrush;
+            number.Opacity = isSelected ? OnAccentNumberOpacity : 1;
         }
     }
 

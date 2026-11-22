@@ -88,7 +88,7 @@ Only on Windows: the Mac does it itself. Behaves as the Mac's press-and-hold: ho
 - The check runs off the hook thread, 100 ms after the press (or half the delay), so the app has typed the letter by then. As on the Mac, no letter held in text repeats, with accents or not (other keys do); until the check is back, its repeats are held back too.
 - Not with Ctrl, Alt or Win held (a shortcut), and only when the key types its own letter in the layout of the app in front, so not on Cyrillic or Greek layouts.
 - **Delay** (500 ms, Windows's default key repeat delay, from 200 ms to 1.5 s): how long a key is held before the menu shows.
-- The menu is a `GlassPanel` that lets the pointer through; the mouse hook, only while it shows, follows the pointer over it and takes its clicks, so it never takes the focus.
+- The menu is the Clipboard card's glass (a `GlassPanel`), its corners rounded around the items' (their radius plus the padding), with the letters at 18 px and their numbers at 10 px and fainter, in white or black as the glass is (it follows Windows's theme, not the app's); the chosen one is filled with the accent colour. It lets the pointer through; the mouse hook, only while it shows, follows the pointer over it and takes its clicks, so it never takes the focus.
 
 ## Updates
 
